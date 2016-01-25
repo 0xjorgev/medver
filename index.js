@@ -18,9 +18,9 @@ app.get('/', function(request, response) {
 		if(err) response.send("Could not connect to DB: " + err);
 		client.query('SELECT * FROM Discipline', function(err, result) {
 			done();
-			console.log("My Rows ", result.rows);
+
 			if(err) return response.status(status).send("My own Error: ", err);
-			
+			//console.log("My Rows ", result.rows);
 			response.send(result.rows);
 			//response.render('pages/index');
 		});

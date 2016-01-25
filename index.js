@@ -18,10 +18,10 @@ app.get('/', function(request, response) {
 		if(err) response.send("Could not connect to DB: " + err);
 		client.query('SELECT * FROM Discipline', function(err, result) {
 			done();
-			if(err) return response.send(err);
+			if(err) return response.send("My own Error: ", err);
 			console.log("My Rows ", result.rows);
 			response.send(result.rows);
-			response.render('pages/index');
+			//response.render('pages/index');
 		});
 	});
 });

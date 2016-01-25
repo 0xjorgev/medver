@@ -1,4 +1,5 @@
 var connString = 'postgres://rpjjyrwrvbfmyo:c4JJX-UqiY4eqwDPMvQk_pjiIU@ec2-54-225-165-132.compute-1.amazonaws.com:5432/d662a1395kh861';
+//postgres://*USERNAME*:*PASSWORD*@*HOST*:*PORT:/*DATABASE*"
 var pg = require('pg');
 var express = require('express');
 var app = express();

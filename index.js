@@ -15,18 +15,20 @@ app.set('view engine', 'ejs');
 app.get('/', function(request, response) {
 
 console.log("The test!");
-response.render('pages/index');
-	// pg.connect(connString, function(err, client, done) {
-	// 	if(err) response.send("Could not connect to DB: " + err);
-	// 	client.query('SELECT * FROM Discipline', function(err, result) {
-	// 		done();
 
-	// 		if(err) return response.status(status).send("My own Error: ", err);
-	// 		//console.log("My Rows ", result.rows);
-	// 		response.send(result.rows);
-	// 		//response.render('pages/index');
-	// 	});
-	// });
+	pg.connect(connString, function(err, client, done) {
+		if(err) console.log("Error ", err); //response.send("Could not connect to DB: " + err);
+		client.query('SELECT * FROM Discipline', function(err, result) {
+			done();
+
+			if(err) return response.status(status).send("My own Error: ", err);
+			console.log("My Rows ", result.rows);
+			// response.send(result.rows);
+			//response.render('pages/index');
+		});
+	});
+response.render('pages/index');
+
 });
 
 app.listen(app.get('port'), function() {

@@ -13,7 +13,7 @@
   }
 
 app.get('/', function(request, response){
-	response.write({Welcome:'Welcome!'});
+	response.write(JSON.stringify({"Welcome":'Welcome!'}));
 	response.end();
 });
 

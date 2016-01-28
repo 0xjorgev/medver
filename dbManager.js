@@ -2,11 +2,11 @@
  var http = require('http');
 
  var conString = {
-	    user: "rpjjyrwrvbfmyo",
-	    password: "c4JJX-UqiY4eqwDPMvQk_pjiIU",
-	    database: "d662a1395kh861",
+	    user: "",
+	    password: "",
+	    database: "",
 	    port: 5432,
-	    host: "ec2-54-225-165-132.compute-1.amazonaws.com",
+	    host: "",
 	    ssl: true
 	}
 

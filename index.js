@@ -12,6 +12,10 @@
 	    ssl: true
   }
 
+app.get('/', function(request, response){
+	response.write({Welcome:'Welcome!'});
+	response.end();
+});
 
   app.get('/discipline', function(request,response){
 response.setHeader("Access-Control-Allow-Origin", "*");

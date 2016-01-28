@@ -43,7 +43,7 @@ response.setHeader("Access-Control-Allow-Origin", "*");
 				response.end();
 			}
 			done();
-			var res = JSON.stringify({"Error" : false, "Message": "Success!", "Rows": result.rows});
+			var res = JSON.stringify({"Message": "Success!", "Rows": result.rows});
 			console.log(res);
 			response.write(res);
 			response.end();
@@ -68,7 +68,7 @@ response.setHeader("Access-Control-Allow-Origin", "*");
 				response.end();
 			}
 			done();
-			var res = JSON.stringify({"Error" : false, "Message": "Success!", "Rows": result.rows});
+			var res = JSON.stringify({"Message": "Success!", "Rows": result.rows});
 			console.log(res);
 			response.write(res);
 			response.end();
@@ -93,7 +93,7 @@ response.setHeader("Access-Control-Allow-Origin", "*");
 				return
 			}
 			done();
-			var res = JSON.stringify({"Error" : false, "Message": "Success!", "Rows": result.rows});
+			var res = JSON.stringify({"Message": "Success!", "Rows": result.rows});
 			console.log(res);
 			response.write(res);
 			response.end();

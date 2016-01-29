@@ -24,14 +24,15 @@
   }
 
 	var setResponseHeader = function(res){
+		onsole.log('-------------------------------->');
 		console.log("Response: ", res);
 		res.setHeader("Access-Control-Allow-Origin", "*");
 		res.end();
 	}
 
 	app.get('/', function(request, response){
-		response.write(JSON.stringify({"Welcome":'Welcome!'}));
 		setResponseHeader(response);
+		response.write(JSON.stringify({"Welcome":'Welcome!'}));
 	});
 
   	app.get('/discipline', function(request,response){

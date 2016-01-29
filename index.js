@@ -11,8 +11,9 @@
   var express = require('express');
   var app = express();
   var pg = require('pg');
-  // var pg = require('./dbManager');
+  var pg = require('./dbManager');
   var logger = require('./logger');
+
   var conString = {
 	    user: "rpjjyrwrvbfmyo",
 	    password: "c4JJX-UqiY4eqwDPMvQk_pjiIU",
@@ -22,13 +23,19 @@
 	    ssl: true
   }
 
-app.get('/', function(request, response){
-	response.write(JSON.stringify({"Welcome":'Welcome!'}));
-	response.end();
-});
+	var setResponseHeader = function(res){
+		console.log("Response: ", res);
+		res.setHeader("Access-Control-Allow-Origin", "*");
+		res.end();
+	}
 
-  app.get('/discipline', function(request,response){
-response.setHeader("Access-Control-Allow-Origin", "*");
+	app.get('/', function(request, response){
+		response.write(JSON.stringify({"Welcome":'Welcome!'}));
+		setResponseHeader(response);
+	});
+
+  	app.get('/discipline', function(request,response){
+	response.setHeader("Access-Control-Allow-Origin", "*");
   	pg.connect(conString, function(err, client, done) {
 	  // if(err) {
 	  //   return console.error('error fetching client from pool', err);
@@ -52,7 +59,7 @@ response.setHeader("Access-Control-Allow-Origin", "*");
   });
 
     app.get('/discipline/:idDis', function(request,response){
-response.setHeader("Access-Control-Allow-Origin", "*");
+	response.setHeader("Access-Control-Allow-Origin", "*");
 	var value = request.params.idDis;
 	console.log('The value is: ', value);
   	pg.connect(conString, function(err, client, done) {
@@ -77,7 +84,7 @@ response.setHeader("Access-Control-Allow-Origin", "*");
   });
 
     app.get('/subdiscipline/', function(request,response){
-response.setHeader("Access-Control-Allow-Origin", "*");
+	response.setHeader("Access-Control-Allow-Origin", "*");
   	pg.connect(conString, function(err, client, done) {
 	  // if(err) {
 	  //   return console.error('error fetching client from pool', err);

@@ -24,7 +24,7 @@
   }
 
 	var setResponseHeader = function(res){
-		onsole.log('-------------------------------->');
+		console.log('-------------------------------->');
 		console.log("Response: ", res);
 		res.setHeader("Access-Control-Allow-Origin", "*");
 		res.end();

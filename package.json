@@ -4,6 +4,6 @@
   "dependencies": {
   	"pg": "4.4.3",
     "express": "4.x",
-    "body-parser ": "1.14.2"
+    "body-parser ": "1.x"
   }
 }

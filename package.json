@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "dependencies": {
   	"pg": "4.4.3",
-    "express": "4.x"
+    "express": "4.x",
+    "body-parser ": "1.14.2"
   }
 }

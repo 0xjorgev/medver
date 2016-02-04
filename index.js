@@ -11,27 +11,39 @@
   var express = require('express');
   var app = express();
   var bodyParser = require('body-parser');
-  var pg = require('pg');
-  //var pg = require('./dbManager');
-  var logger = require('./logger');
+  var disciplineWS = require('./Route/Discipline');
+  //Middleware
+  var allowCrossDomain = function(req, res, next) {
+  	res.header('Access-Control-Allow-Origin', '*');
+  	next();	
+  };
 
-  app.use(bodyParser.json()); // support json encoded bodies
-  app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+	app.use(allowCrossDomain);
+	// parse application/x-www-form-urlencoded
+	app.use(bodyParser.urlencoded());
 
-  var conString = {
-	    user: "rpjjyrwrvbfmyo",
-	    password: "c4JJX-UqiY4eqwDPMvQk_pjiIU",
-	    database: "d662a1395kh861",
-	    port: 5432,
-	    host: "ec2-54-225-165-132.compute-1.amazonaws.com",
-	    ssl: true
-  }
+	// parse application/json
+	app.use(bodyParser.json());
 
-	var setResponseHeader = function(res, body){
-		res.setHeader("Access-Control-Allow-Origin", "*");
-		res.write(JSON.stringify(body));
-		res.end();
-	}
+	// parse application/vnd.api+json as json
+	app.use(bodyParser.json({type: 'application/vnd.api+json'}));
+
+	//app.use(bodyParser.json()); // support json encoded bodies
+  	app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+  	app.use('/discipline', disciplineWS);
+
+	// elsewhere, to use the bookshelf client:
+	//var bookshelf = app.get('bookshelf');
+
+	//app.use(bookshelf);
+
+// {our model definition code goes here}
+
+	// var Discipline = bookshelf.Model.extend({
+ //  		tableName: 'Discipline'
+
+	// });
 
 	var getQueryNoParams = function(res, conex, query){
 		pg.connect(conex, function(err, client, done) {
@@ -87,36 +99,57 @@
 	//POST -> NonEntity -> Complex Query -> Return Objects
 
 	//Root
-	app.get('/', function(request, response){
-		setResponseHeader(response, {"Welcome":'Welcome!'});
-	});
+	// app.get('/', function(request, response){
+	// 	//setResponseHeader(response, {"Welcome":'Welcome!'});
+	// 	new Discipline().fetchAll()
+ //    		.then(function(disciplines) {
+ //      			response.send(disciplines.toJSON());
+ //    		}).catch(function(error) {
+ //      			console.log(error);
+ //      			response.send('An error occured');
+ //    	});
+	// });
+
+
 	//V 2.0
 	//Discipline List
-	app.get('/discipline', function(request,response){
-		getQueryNoParams(response, conString, 'SELECT * from "Discipline"');
-	});
-	//Discipline By Id
-	app.get('/discipline/:id', function(request, response){
-		var param = request.params.id;
-		getQueryWithParams(response, conString, 'SELECT * from "Discipline" WHERE id ='+param);
-	});
-	//SubDiscipline List
-	app.get('/subdiscipline/', function(request,response){
-		getQueryNoParams(response, conString, 'SELECT * from "Subdiscipline"');
-	});
+	// app.get('/discipline', function(request,response){
+	// 	getQueryNoParams(response, conString, 'SELECT * from "Discipline"');
+	// });
+	//***********************
+	/* Test Time! */
+	//Bookshelf ORM TESTS
 
-	//SubDiscipline by Id
-	app.get('/subdiscipline/:id', function(request,response){
-		var param = request.params.id;
-		getQueryWithParams(response, conString, 'SELECT * from "Subdiscipline" WHERE id ='+param);
-	});	
-	//New SubDiscipline
-	app.post('/subdiscipline/', function(request, response){
-		// console.log('Request Object: ', request);
-		//ODIO ESTA LINEA DE CODIGO VB 1998!!!!
-		var query = 'INSERT INTO "Subdiscipline" ("name", "description", "disciplineId") values(\''+request.body.name +'\',\''+ request.body.description+'\','+ request.body.disciplineId + ')';
-		postInsert(response, conString, query);
-	});
+	// app.get('/discipline', function(request,response){
+	// 	getQueryNoParams(response, conString, 'SELECT * from "Discipline"');
+	// });
+
+
+	//***********************
+
+
+	//Discipline By Id
+	// app.get('/discipline/:id', function(request, response){
+	// 	var param = request.params.id;
+	// 	getQueryWithParams(response, conString, 'SELECT * from "Discipline" WHERE id ='+param);
+	// });
+	//SubDiscipline List
+	// app.get('/subdiscipline/', function(request,response){
+	// 	getQueryNoParams(response, conString, 'SELECT * from "Subdiscipline"');
+	// });
+
+	// //SubDiscipline by Id
+	// app.get('/subdiscipline/:id', function(request,response){
+	// 	var param = request.params.id;
+	// 	getQueryWithParams(response, conString, 'SELECT * from "Subdiscipline" WHERE id ='+param);
+	// });	
+	// //New SubDiscipline
+	// app.post('/subdiscipline/', function(request, response){
+	// 	// console.log('Request Object: ', request);
+	// 	//ODIO ESTA LINEA DE CODIGO VB 1998!!!!
+	// 	var query = 'INSERT INTO "Subdiscipline" ("name", "description", "disciplineId") values(\''+request.body.name +'\',\''+ request.body.description+'\','+ request.body.disciplineId + ')';
+	// 	postInsert(response, conString, query);
+	// });
 
 
   // 	app.get('/discipline', function(request,response){
@@ -194,7 +227,7 @@
  //  });
 
 //For production enviroment
-app.listen(process.env.PORT || 80);
+ app.listen(process.env.PORT || 80);
 //For esting enviroment
 // app.listen(3000, function(){
 //    	console.log('Running on port 3000!');

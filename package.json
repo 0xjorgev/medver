@@ -2,8 +2,12 @@
   "name": "Heroku-Postgres-DB-api",
   "version": "0.0.2",
   "dependencies": {
-  	"pg": "4.4.3",
+    "body-parser": "1.14.2",
+    "bookshelf": "^0.9.1",
     "express": "4.x",
-    "body-parser": "1.x"
+    "knex": "^0.9.0",
+    "pg": "4.4.3",
+    "checkit": "0.6.0",
+    "bluebird": "3.2.1"
   }
 }

@@ -13,7 +13,7 @@ var bookshelf = require("../Config/bookshelf");
 //   	tableName: 'Discipline'
 // });
 
-var Discipline = require('../Model/discipline');
+var Discipline = require('../Model/Discipline');
 
 var Subdiscipline = bookshelf.Model.extend({
 	//Model / Table  Name

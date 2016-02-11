@@ -8,6 +8,6 @@ var connectionString = {
 	        charset: 'utf8', // Or your preferred charset
 	        ssl: true
 	    }
-	}
+	};
 
 module.exports = connectionString;

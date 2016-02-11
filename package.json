@@ -1,6 +1,6 @@
 {
   "name": "Heroku-Postgres-DB-api",
-  "version": "0.0.2",
+  "version": "0.1.5",
   "dependencies": {
     "body-parser": "1.14.2",
     "bookshelf": "^0.9.1",
@@ -10,5 +10,12 @@
     "checkit": "0.6.0",
     "bluebird": "3.2.1",
     "bcrypt": "0.8.5"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-develop-server": "^0.5.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-livereload": "^3.8.1",
+    "jshint-stylish": "^2.1.0"
   }
 }

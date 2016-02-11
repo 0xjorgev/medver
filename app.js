@@ -2,7 +2,7 @@
   var app = express();
   var bodyParser = require('body-parser');
   var log = require('./logger');
-  var disciplineWS = require('./Route/discipline');
+  var disciplineWS = require('./Route/Discipline');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {
@@ -20,7 +20,7 @@
 	//app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-  console.log('Using logger');
+  gulconsole.log('Using logger');
   log.logger();
 
 

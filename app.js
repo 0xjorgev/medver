@@ -1,7 +1,7 @@
   var express = require('express');
   var app = express();
   var bodyParser = require('body-parser');
-  var disciplineWS = require('./Route/discipline');
+  var disciplineWS = require('/Route/discipline');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {

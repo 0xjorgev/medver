@@ -1,4 +1,4 @@
-var connectionString = {  
+var connectionString = {
 	    client: 'pg',
 	    connection: {
 	        host: 'ec2-54-225-165-132.compute-1.amazonaws.com', // IP or domain name

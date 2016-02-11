@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var parseUrlencoded = bodyParser.urlencoded({ extended: false });
 
 //Dependency
-var bookshelf = require("../Config/bookshelf");
+var bookshelf = require("../config/bookshelf");
 
 //Model / Table
 var Discipline = bookshelf.Model.extend({

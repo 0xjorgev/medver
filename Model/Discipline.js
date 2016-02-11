@@ -1,4 +1,4 @@
-var bookshelf = require("../Config/bookshelf");
+var bookshelf = require("../config/bookshelf");
 var subdiscipline = require('.subdiscipline');
 var Discipline = bookshelf.Model.extend({
 	//Model / Table  Name

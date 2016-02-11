@@ -1,7 +1,8 @@
   var express = require('express');
   var app = express();
   var bodyParser = require('body-parser');
-  var disciplineWS = require('/Route/discipline');
+  var log = require('./logger');
+  var disciplineWS = require('./Route/discipline');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {
@@ -18,6 +19,10 @@
 
 	//app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+  console.log('Using logger');
+  log.logger();
+
 
   app.get('/', function(request, response){
     response.send('This are not the droids you are looking for');

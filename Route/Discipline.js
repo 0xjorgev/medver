@@ -28,7 +28,7 @@ router.get('/', function(request, response){
   new Discipline().fetch({withRelated:['Subdiscipline']})
       .then(function(subdisciplines) {
         console.log('Nested Result', subdisciplines);
-          response.send(subdisciplines.toJSON());
+          response.send(JSON.stringify(subdisciplines));
       })
       .catch(function(error) {
           console.log('Error on: ', error);

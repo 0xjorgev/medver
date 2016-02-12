@@ -25,7 +25,7 @@
 
 
   app.get('/', function(request, response){
-    response.send('This are not the droids you are looking for');
+    response.send('These are not the droids you are looking for');
   });
 
   app.use('/discipline', disciplineWS);

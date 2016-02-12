@@ -30,7 +30,7 @@ gulp.task('jshint', function () {
 // src is the file(s) to add (or ./*)
 gulp.task('add', function(){
   return gulp.src('./*')
-    .pipe(git.add());
+    .pipe(git.add( {args: '--all', quiet: false}));
 });
 
 // Run git commit, passing multiple messages as if calling

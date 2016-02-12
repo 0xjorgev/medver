@@ -11,6 +11,10 @@
     "bluebird": "3.2.1",
     "bcrypt": "0.8.5"
   },
+  "engines": {
+      "node": "5.10.1",
+      "npm": "3.3.12"
+  },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-develop-server": "^0.5.0",

@@ -30,6 +30,8 @@
 
   app.use('/discipline', disciplineWS);
 
-  app.listen(3000 || 80, function(){
-    console.log('Running on port 3000!');
+  var port = (process.env.PORT === undefined) ? 3000 : process.env.PORT;
+
+  app.listen(port, function(){
+    console.log('Running on port ' + port);
   });

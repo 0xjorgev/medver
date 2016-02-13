@@ -25,11 +25,13 @@
 
 
   app.get('/', function(request, response){
-    response.send('This are not the droids you are looking for');
+    response.send('These are not the droids you are looking for');
   });
 
   app.use('/discipline', disciplineWS);
 
-  app.listen(3000 || 80, function(){
-    console.log('Running on port 3000!');
+  var port = (process.env.PORT === undefined) ? 3000 : process.env.PORT;
+
+  app.listen(port, function(){
+    console.log('Running on port ' + port);
   });

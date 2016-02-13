@@ -30,14 +30,22 @@ gulp.task('jshint', function () {
 // src is the file(s) to add (or ./*)
 gulp.task('add', function(){
   return gulp.src('./*')
-    .pipe(git.add( {args: '--all', quiet: false}));
+    .pipe(git.add({args: '-u'}));
 });
 
 // Run git commit, passing multiple messages as if calling
 // git commit -m "initial commit" -m "additional message"
 gulp.task('commit', function(){
-  return gulp.src('./git-test/*')
-    .pipe(git.commit(['Gulp automated message by Jorge']));
+    var message;
+    gulp.src('./*', {buffer:false})
+    .pipe(prompt.prompt({
+        type: 'input',
+        name: 'commit',
+        message: 'Please enter commit message...'
+    }, function(res){
+        message = res.commit;
+    }))
+    .pipe(git.commit(message));
 });
 
 // Run git push
@@ -53,7 +61,7 @@ gulp.task( 'server:start', function() {
     server.listen( options, livereload.listen );
 });
 
-gulp.task('gitool', ['add', 'commit', 'push',]);
+gulp.task('gitool', ['add', 'commit']);
 
 
 // If server scripts change, restart the server and then livereload.

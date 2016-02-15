@@ -75,8 +75,8 @@ gulp.task( 'server:start', function() {
     server.listen( options, livereload.listen );
 });
 
-gulp.task('gitool', ['add', 'commit']);
-
+gulp.task('gitcommit', ['add', 'commit']);
+gulp.task('gitdeploy', ['add', 'commit', 'push']);
 
 // If server scripts change, restart the server and then livereload.
 gulp.task( 'default', [ 'server:start' ], function() {

@@ -40,7 +40,7 @@ router.get('/:disciplineId', function(request, response){
   //New Model / Table name
   var discplineId = request.params.disciplineId;
 
-  new Discipline({'id': discplineId}).fetchAll({withRelated:['Subdiscipline']})
+  new Discipline({'id': discplineId}).fetch({withRelated:['Subdiscipline']})
       .then(function(subdisciplines) {
         //console.log('Nested Result', subdisciplines);
           response.send(subdisciplines.toJSON());

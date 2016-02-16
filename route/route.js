@@ -25,7 +25,7 @@ var Subdiscipline = bookshelf.Model.extend({
 });
 
 router.get('/', function(request, response){
-  new Discipline().fetch({withRelated:['Subdiscipline']})
+  new Discipline().fetchAll({withRelated:['Subdiscipline']})
       .then(function(subdisciplines) {
         console.log('Nested Result', subdisciplines);
           response.send(JSON.stringify(subdisciplines));
@@ -40,7 +40,7 @@ router.get('/:disciplineId', function(request, response){
   //New Model / Table name
   var discplineId = request.params.disciplineId;
 
-  new Discipline({'id': discplineId}).fetch({withRelated:['Subdiscipline']})
+  new Discipline({'id': discplineId}).fetchAll({withRelated:['Subdiscipline']})
       .then(function(subdisciplines) {
         //console.log('Nested Result', subdisciplines);
           response.send(subdisciplines.toJSON());

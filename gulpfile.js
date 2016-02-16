@@ -4,10 +4,13 @@ livereload = require( 'gulp-livereload' );
 var jshint = require('gulp-jshint');
 var git = require('gulp-git');
 var prompt = require('gulp-prompt');
+var env = require('gulp-env');
+var nodemon = require('nodemon');
 
-gulp.task('default', function() {
-  // place code for your default task here
-});
+
+// gulp.task('default' ,function() {
+//   // place code for your default task here
+// });
 
 var options = {
     path: 'app.js'
@@ -15,9 +18,10 @@ var options = {
 
 var serverFiles = [
     './app.js',
-    './Route/*.js',
-    './Model/*.js',
-    './Config/*.js'
+    './gulpfile.js',
+    './route/*.js',
+    './model/*.js',
+    './config/*.js'
 ];
 
 gulp.task('jshint', function () {
@@ -37,17 +41,6 @@ gulp.task('add', function(){
 // Run git commit, passing multiple messages as if calling
 // git commit -m "initial commit" -m "additional message"
 gulp.task('commit', function(){
-    // var message;
-    // gulp.src('./*', {buffer:false})
-    // .pipe(prompt.prompt({
-    //     type: 'input',
-    //     name: 'commit',
-    //     message: 'Please enter commit message...'
-    // }, function(res){
-    //     message = res.commit;
-    // }))
-    // .pipe(git.commit(message));
-
      // just source anything here - we just wan't to call the prompt for now
     gulp.src('./*')
     .pipe(prompt.prompt({
@@ -78,23 +71,20 @@ gulp.task( 'server:start', function() {
 gulp.task('gitcommit', ['add', 'commit']);
 gulp.task('gitdeploy', ['add', 'commit', 'push']);
 
+
+//Been called but does not set the ENV.VAR :(
+gulp.task('devPort', function(){
+  var PORT = process.env.PORT || 3000;
+  return PORT;
+});
+
 // If server scripts change, restart the server and then livereload.
-gulp.task( 'default', [ 'server:start' ], function() {
+gulp.task( 'default', [ 'jshint', 'devPort','server:start' ], function() {
 
     function restart( file ) {
         server.changed( function( error ) {
             if( ! error ) livereload.changed( file.path );
         });
     }
-    gulp.watch( serverFiles ).on( 'change', restart );
+    gulp.watch(serverFiles).on( 'change', restart );
 });
-
-
-// gulp.task( 'server:start', function() {
-//     server.listen( { path: './app.js' } );
-// });
-
-// // restart server if app.js changed
-// gulp.task( 'server:restart', function() {
-//     gulp.watch( [ './app.js' ], server.restart );
-// });

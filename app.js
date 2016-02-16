@@ -2,7 +2,7 @@
   var app = express();
   var bodyParser = require('body-parser');
   var log = require('./logger.js');
-  var disciplineWS = require('./route/route');
+  var discipline_ws = require('./route/disciplines_route');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {
@@ -23,12 +23,11 @@
   console.log('Using logger');
   log.logger();
 
-
   app.get('/', function(request, response){
     response.send('These are not the droids you are looking for');
   });
 
-  app.use('/discipline', disciplineWS);
+  app.use('/discipline', discipline_ws);
 
   var port = (process.env.PORT === undefined) ? 3000 : process.env.PORT;
 

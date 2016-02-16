@@ -1,10 +1,10 @@
 var bookshelf = require("../config/bookshelf");
-var subdiscipline = require('.subdiscipline');
+var subdiscipline = require('./subdiscipline');
 var discipline = bookshelf.Model.extend({
 	//Model / Table  Name
   	tableName: 'Discipline',
-    subdiscipline: function() {
-       return this.belongsTo(Discipline, 'disciplineId');
+    Subdiscipline: function() {
+       return this.hasMany(Subdiscipline, 'disciplineId');
     }
 });
 module.export = discipline;

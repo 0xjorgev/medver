@@ -5,24 +5,28 @@ var bodyParser = require('body-parser');
 var parseUrlencoded = bodyParser.urlencoded({ extended: false });
 
 //Dependency
-var bookshelf = require("../config/bookshelf");
+var bookshelf = require('../config/bookshelf');
 
 //Model / Table
+// var Discipline = require('../model/discipline');
+var Subdiscipline = require('../model/subdiscipline');
 var Discipline = bookshelf.Model.extend({
-	//Model / Table  Name
-  	tableName: 'Discipline',
+  //Model / Table  Name
+    tableName: 'Discipline',
     Subdiscipline: function() {
        return this.hasMany(Subdiscipline, 'disciplineId');
     }
 });
 
-var Subdiscipline = bookshelf.Model.extend({
-	//Model / Table  Name
-  	tableName: 'Subdiscipline',
-    Discipline: function(){
-      return this.belongsTo(Discipline, 'disciplineId');
-    }
-});
+
+
+// var Subdiscipline = bookshelf.Model.extend({
+// 	//Model / Table  Name
+//   	tableName: 'Subdiscipline',
+//     Discipline: function(){
+//       return this.belongsTo(Discipline, 'disciplineId');
+//     }
+// });
 
 router.get('/', function(request, response){
   new Discipline().fetchAll({withRelated:['Subdiscipline']})

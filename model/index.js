@@ -8,10 +8,10 @@ if (typeof define !== 'function') {
 define([
     './discipline',
     './subdiscipline'
-], function (discipline, subdiscipline) {
+], function (Discipline, Subdiscipline) {
 
     return {
-    	discipline: discipline,
-        subdiscipline: subdiscipline
+    	discipline: Discipline,
+        subdiscipline: Subdiscipline
     };
 });

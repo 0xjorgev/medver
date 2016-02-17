@@ -15,9 +15,9 @@ var options = {
 
 var serverFiles = [
     './app.js',
-    './Route/*.js',
-    './Model/*.js',
-    './Config/*.js'
+    './route/*.js',
+    './model/*.js',
+    './config/*.js'
 ];
 
 gulp.task('jshint', function () {

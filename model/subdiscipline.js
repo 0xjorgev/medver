@@ -4,8 +4,8 @@ var subdiscipline = bookshelf.Model.extend({
 	//Model / Table  Name
   	tableName: 'Subdiscipline',
     Discipline: function(){
-      return this.belongsTo(discipline, 'id');
+      return this.belongsTo(Discipline, 'disciplineId');
     }
 });
 
-module.export = subdiscipline;
+// module.export = subdiscipline;

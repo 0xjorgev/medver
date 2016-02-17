@@ -8,17 +8,17 @@ var parseUrlencoded = bodyParser.urlencoded({ extended: false });
 var bookshelf = require('../config/bookshelf');
 
 //Model / Table
-// var Discipline = require('../model/discipline');
-var Subdiscipline = require('../model/subdiscipline');
-var Discipline = bookshelf.Model.extend({
-  //Model / Table  Name
-    tableName: 'Discipline',
-    Subdiscipline: function() {
-       return this.hasMany(Subdiscipline, 'disciplineId');
-    }
-});
+var discipline = require('../model/discipline');
+var subdiscipline = require('../model/subdiscipline');
 
-
+var dis = new discipline();
+// var Discipline = bookshelf.Model.extend({
+//   //Model / Table  Name
+//     tableName: 'Discipline',
+//     Subdiscipline: function() {
+//        return this.hasMany(Subdiscipline, 'disciplineId');
+//     }
+// });
 
 // var Subdiscipline = bookshelf.Model.extend({
 // 	//Model / Table  Name
@@ -28,8 +28,10 @@ var Discipline = bookshelf.Model.extend({
 //     }
 // });
 
+
+
 router.get('/', function(request, response){
-  new Discipline().fetchAll({withRelated:['Subdiscipline']})
+  new discipline().fetchAll({withRelated:['Subdiscipline']})
       .then(function(subdisciplines) {
         console.log('Nested Result', subdisciplines);
           response.send(JSON.stringify(subdisciplines));

@@ -7,4 +7,4 @@ var discipline = bookshelf.Model.extend({
        return this.hasMany(Subdiscipline, 'disciplineId');
     }
 });
-module.export = discipline;
+// module.export = discipline;

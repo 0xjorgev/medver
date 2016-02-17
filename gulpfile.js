@@ -72,14 +72,35 @@ gulp.task('gitcommit', ['add', 'commit']);
 gulp.task('gitdeploy', ['add', 'commit', 'push']);
 
 
-//Been called but does not set the ENV.VAR :(
-gulp.task('devPort', function(){
-  var PORT = process.env.PORT || 3000;
-  return PORT;
+// //Been called but does not set the ENV.VAR :(
+// gulp.task('devPort', function(){
+//   process.env.PORT = 3000;
+//   var PORT = process.env.PORT;
+//   return PORT;
+// });
+
+
+gulp.task('nodemon', function() {
+  env({
+    file: 'env.json',
+    vars: {  }
+  });
 });
 
+gulp.task('set-prod-node-env', function() {
+    return process.env.NODE_ENV = 'production';
+});
+
+// gulp.task('set-dev-node-env', function() {
+//     return ''; //process.env.NODE_ENV = 'guasacaca';
+// });
+
+// gulp.task('set-dev-port', function() {
+//     return process.env.SOMETHING = '3000';
+// });
+
 // If server scripts change, restart the server and then livereload.
-gulp.task( 'default', [ 'jshint', 'devPort','server:start' ], function() {
+gulp.task( 'default', ['set-prod-node-env', 'jshint','server:start' ], function() {
 
     function restart( file ) {
         server.changed( function( error ) {

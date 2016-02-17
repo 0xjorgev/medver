@@ -31,8 +31,9 @@
   app.use('/discipline', disciplineWS);
 
   var port = process.env.PORT;
+  console.log('Port is: ', process.env.PORT);
    //(process.env.PORT === undefined) ? 3000 : process.env.PORT;
-
+  console.log('Environment is: ', process.env.NODE_ENV);
   app.listen(port, function(){
     console.log('Running on port ' + port);
   });

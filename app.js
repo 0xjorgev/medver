@@ -3,6 +3,7 @@
   var bodyParser = require('body-parser');
   var log = require('./logger.js');
   var disciplineWS = require('./route/route');
+  var env = require('gulp-env');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {
@@ -23,7 +24,6 @@
   console.log('Using logger');
   log.logger();
 
-
   app.get('/', function(request, response){
     response.send('These are not the droids you are looking for');
   });
@@ -31,9 +31,8 @@
   app.use('/discipline', disciplineWS);
 
   // process.env.NODE_ENV = 'production';
-  process.env.PORT = '3001';
-
-  console.log(process.env.NODE_ENV);
+  // process.env.PORT = '3001';
+  // console.log(process.env.NODE_ENV);
 
   var port = process.env.PORT;
   console.log('Port is: ', process.env.PORT);

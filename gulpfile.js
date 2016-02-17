@@ -100,7 +100,7 @@ gulp.task('set-prod-node-env', function() {
 // });
 
 // If server scripts change, restart the server and then livereload.
-gulp.task( 'default', ['set-prod-node-env', 'jshint','server:start' ], function() {
+gulp.task( 'default', ['nodemon','jshint', 'server:start', 'set-prod-node-env' ], function() {
 
     function restart( file ) {
         server.changed( function( error ) {
@@ -108,4 +108,6 @@ gulp.task( 'default', ['set-prod-node-env', 'jshint','server:start' ], function(
         });
     }
     gulp.watch(serverFiles).on( 'change', restart );
+
+process.env.NODE_ENV = 'production';
 });

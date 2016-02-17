@@ -30,6 +30,11 @@
 
   app.use('/discipline', disciplineWS);
 
+  // process.env.NODE_ENV = 'production';
+  process.env.PORT = '3001';
+
+  console.log(process.env.NODE_ENV);
+
   var port = process.env.PORT;
   console.log('Port is: ', process.env.PORT);
    //(process.env.PORT === undefined) ? 3000 : process.env.PORT;

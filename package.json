@@ -2,6 +2,7 @@
   "name": "Heroku-Postgres-DB-api",
   "version": "0.1.5",
   "dependencies": {
+    "amdefine": "^1.0.0",
     "bcrypt": "0.8.5",
     "bluebird": "3.2.1",
     "body-parser": "1.14.2",

@@ -11,7 +11,7 @@ define(['knex', 'bookshelf', '../knexfile'], function (Knex, Bookshelf, dbConfig
 	if (process.env.NODE_ENV === 'development'){
 		bookshelf = new Bookshelf(new Knex(dbConfig.development));
 	} else {
-		bookshelf = new Bookshelf(new Knex(dbConfig));
+		bookshelf = new Bookshelf(new Knex(dbConfig.production));
 	}
     // var bookshelf = new Bookshelf(new Knex(dbConfig.development));
     // enable Bookshelf plugins

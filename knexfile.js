@@ -1,13 +1,13 @@
 // Update with your config settings.
-
+var env = require('gulp-env');
 module.exports = {
   //development: {
     client: 'pg',
     connection: {
-        host     : '127.0.0.1',
-        user     : 'postgres',
-        password : 'postgres',
-        database : 'somosport_core'
+        host     : process.env.DB_HOST,
+        user     : process.env.DB_USER,
+        password : process.env.DB_PASSWORD,
+        database : process.env.DB_NAME
     }
   //},
   // production: {

@@ -2,11 +2,13 @@
   var app = express();
   var bodyParser = require('body-parser');
   var discipline_ws = require('./route/disciplines_route');
+  var user_ws = require('./route/users_route');
   //var log = require('./logger.js');
   //var discipline_ws = require('./route/disciplines_route');
   var apiVersion = 'v1.0';
   var prefix = 'api';
   var api_prefix = `/${prefix}/${apiVersion}/`; //'template literal syntax' is only available in ES6 (use 'esversion: 6').
+  var env = require('gulp-env');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {
@@ -28,9 +30,12 @@
     response.send('These are not the droids you are looking for');
   });
 
-  console.log('discipline url: ', api_prefix+'discipline');
-
   app.use(api_prefix+'discipline', discipline_ws);
+  app.use(api_prefix+'user', user_ws);
+
+  // process.env.NODE_ENV = 'production';
+  // process.env.PORT = '3001';
+  // console.log(process.env.NODE_ENV);
 
   var port = process.env.PORT;
   console.log('Port is: ', process.env.PORT);

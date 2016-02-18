@@ -9,16 +9,20 @@ define(['express', '../model/index'], function (express, Models) {
 
     var router = express.Router();
 
-    router.get('/login/', function (req, res, next) {
+    router.post('/login', function (req, res, next) {
 
         // tapping into Knex query builder to modify query being run
-        return Models.user.where({
+        var user_login = req.body;
+        var username = user_login['username'];
+        var password = user_login['password'];
+        console.log(`user_values: ${username} ${password}`);
+        res.send(`user_values: ${username} ${password}`);
+        // return Models.user.where({
 
-        }).fetchAll()
-        .then(function (result) {
-                res.json(result);
-            });
+        // }).fetchAll()
+        // .then(function (result) {
+        //         res.json(result);
+        //     });
     });
-
     return router;
 });

@@ -64,48 +64,52 @@ gulp.task('push', function(){
   });
 });
 
-gulp.task( 'server:start', function() {
-    server.listen( options, livereload.listen );
-});
-
 gulp.task('gitcommit', ['add', 'commit']);
 gulp.task('gitdeploy', ['add', 'commit', 'push']);
 
-
-// //Been called but does not set the ENV.VAR :(
-// gulp.task('devPort', function(){
-//   process.env.PORT = 3000;
-//   var PORT = process.env.PORT;
-//   return PORT;
-// });
-
-
 gulp.task('nodemon', function() {
+
+  var configFile = null;
+  var environmentType = process.env.NODE_ENV || 'development';
+
+  //let's set NODE_ENV, just in case its undefined
+  process.env.NODE_ENV = environmentType;
+  //defaults to development unless explicitly stated
+  switch(environmentType)
+  {
+    case 'development':
+      configFile = './config/environments/development.json'
+      break;
+    case 'test':
+      configFile = './config/environments/test.json'
+      break;
+    case 'production':
+      configFile = './config/environments/production.json'
+      break;
+  }
+
   env({
-    file: 'env.json',
-    vars: {  }
-  });
-});
-
-gulp.task('set-prod-node-env', function() {
-    return process.env.NODE_ENV = 'production';
-});
-
-// gulp.task('set-dev-node-env', function() {
-//     return ''; //process.env.NODE_ENV = 'guasacaca';
-// });
-
-// gulp.task('set-dev-port', function() {
-//     return process.env.SOMETHING = '3000';
-// });
-
-// If server scripts change, restart the server and then livereload.
-gulp.task( 'default', ['set-prod-node-env', 'jshint','server:start' ], function() {
-
-    function restart( file ) {
-        server.changed( function( error ) {
-            if( ! error ) livereload.changed( file.path );
-        });
+    file: configFile,
+    vars: {
+      //this overrides configFile file
+      //'PORT': 3003
     }
-    gulp.watch(serverFiles).on( 'change', restart );
+  });
+
+  nodemon({
+    script: 'app.js',
+    ext: 'js html'
+    // other config ...
+  }).on('restart', function () {
+    console.info('Restarting... ⎈ Yep, your code has been reloaded');
+  }).on('start', () => {
+    console.info('Loading ' + environmentType + ' environment on port ' + process.env.PORT);
+  }).on('quit', () => {
+    // nodemon.emit('bye!');
+  });
+
+});
+
+gulp.task( 'default', [/*'jshint',*/'nodemon'], function() {
+  //add stuff here
 });

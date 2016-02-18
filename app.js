@@ -8,7 +8,7 @@
   var apiVersion = 'v1.0';
   var prefix = 'api';
   var api_prefix = `/${prefix}/${apiVersion}/`; //'template literal syntax' is only available in ES6 (use 'esversion: 6').
-  var env = require('gulp-env');
+  // var env = require('gulp-env');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {

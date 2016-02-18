@@ -1,5 +1,4 @@
 // Update with your config settings.
-var env = require('gulp-env');
 module.exports = {
   //development: {
     client: 'pg',

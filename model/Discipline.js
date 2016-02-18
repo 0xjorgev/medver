@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // var bookshelf = require("../config/bookshelf");
 // var discipline = require('./discipline');
 // var subdiscipline = bookshelf.Model.extend({
@@ -32,3 +33,15 @@ define(['./base_model', './subdiscipline'], function (DB) {
     // uses Registry plugin
     return DB.model('Discipline', Discipline);
 });
+=======
+var bookshelf = require("../config/bookshelf");
+var subdiscipline = require('.subdiscipline');
+var discipline = bookshelf.Model.extend({
+	//Model / Table  Name
+  	tableName: 'Discipline',
+    subdiscipline: function() {
+       return this.belongsTo(Discipline, 'disciplineId');
+    }
+});
+module.export = discipline;
+>>>>>>> jorge-gulp-16022016

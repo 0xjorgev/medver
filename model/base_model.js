@@ -7,7 +7,12 @@ if (typeof define !== 'function') {
 
 define(['knex', 'bookshelf', '../knexfile'], function (Knex, Bookshelf, dbConfig) {
 
-	var bookshelf = new Bookshelf(new Knex(dbConfig));
+	var bookshelf;
+	if (process.env.NODE_ENV === 'development'){
+		bookshelf = new Bookshelf(new Knex(dbConfig.development));
+	} else {
+		bookshelf = new Bookshelf(new Knex(dbConfig));
+	}
     // var bookshelf = new Bookshelf(new Knex(dbConfig.development));
     // enable Bookshelf plugins
     bookshelf.plugin('registry');

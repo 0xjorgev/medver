@@ -9,7 +9,7 @@ define(['express', '../model/index'], function (express, Models) {
 
     var router = express.Router();
 
-    router.get('/', function (req, res, next) {
+    router.get('/', function (req, res) {
 
         // tapping into Knex query builder to modify query being run
         return Models.discipline.query(function(qb){
@@ -20,8 +20,21 @@ define(['express', '../model/index'], function (express, Models) {
             });
     });
 
+    router.get('/:discipline', function (req, res) {
 
-    router.get('/subdiscipline', function (req, res, next) {
+        var dis = req.params.discipline;
+        console.log(`The request value is ${dis}`);
+
+        // tapping into Knex query builder to modify query being run
+        return Models.discipline.where({'id':dis})
+        .fetch({withRelated: ['subdiscipline']})
+        .then(function (result) {
+            res.json(result);
+        });
+    });
+
+
+    router.get('/subdiscipline', function (req, res) {
 
         // tapping into Knex query builder to modify query being run
         return Models.subdiscipline.query(function(qb){

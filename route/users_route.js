@@ -13,16 +13,21 @@ define(['express', '../model/index'], function (express, Models) {
 
         // tapping into Knex query builder to modify query being run
         var user_login = req.body;
-        var username = user_login['username'];
-        var password = user_login['password'];
-        console.log(`user_values: ${username} ${password}`);
-        res.send(`user_values: ${username} ${password}`);
-        // return Models.user.where({
+        var username = user_login.username;
+        var password = user_login.password;
 
-        // }).fetchAll()
-        // .then(function (result) {
-        //         res.json(result);
-        //     });
+        // res.send(`user_values: ${username} ${password}`);
+        return Models.user.where({'username':username, 'password':password, 'active':true})
+        .fetch().then(function (result) {
+            if (result != null){
+                console.log('found a user');
+                res.json(result);
+            } else {
+                console.log('user not found');
+                res.status(404);
+                res.json({'error':'wrong user/password combination'});
+            }
+        });
     });
     return router;
 });

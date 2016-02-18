@@ -23,8 +23,6 @@ define(['express', '../model/index'], function (express, Models) {
     router.get('/:discipline', function (req, res) {
 
         var dis = req.params.discipline;
-        console.log(`The request value is ${dis}`);
-
         // tapping into Knex query builder to modify query being run
         return Models.discipline.where({'id':dis})
         .fetch({withRelated: ['subdiscipline']})

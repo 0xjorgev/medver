@@ -7,10 +7,12 @@ if (typeof define !== 'function') {
 
 define([
     './discipline',
-    './subdiscipline'
-], function (Discipline, Subdiscipline) {
+    './subdiscipline',
+    './user'
+], function (Discipline, Subdiscipline, User) {
 
     return {
+    	user: User,
     	discipline: Discipline,
         subdiscipline: Subdiscipline
     };

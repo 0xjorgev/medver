@@ -18,10 +18,7 @@ var options = {
 
 var serverFiles = [
     './app.js',
-<<<<<<< HEAD
-=======
     './gulpfile.js',
->>>>>>> jorge-gulp-16022016
     './route/*.js',
     './model/*.js',
     './config/*.js'

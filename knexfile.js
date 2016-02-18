@@ -1,6 +1,6 @@
 // Update with your config settings.
 module.exports = {
-  //development: {
+  development: {
     client: 'pg',
     connection: {
         host     : process.env.DB_HOST,
@@ -8,11 +8,14 @@ module.exports = {
         password : process.env.DB_PASSWORD,
         database : process.env.DB_NAME
     }
-  //},
-  // production: {
-  //   client: 'pg',
-  //   connection: process.env.DATABASE_URL
-  // }
+  },
+   production: {
+     client: 'pg',
+     connection: process.env.DATABASE_URL
+   },
+   migrations: {
+    tableName: 'schema_info'
+  }
 };
 
 /*

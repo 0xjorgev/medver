@@ -6,12 +6,14 @@ if (typeof define !== 'function') {
 }
 
 define([
+	'./util',
     './discipline',
     './subdiscipline',
     './user'
-], function (Discipline, Subdiscipline, User) {
+], function (Util, Discipline, Subdiscipline, User) {
 
     return {
+    	util : Util,
     	user: User,
     	discipline: Discipline,
         subdiscipline: Subdiscipline

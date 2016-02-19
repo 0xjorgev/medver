@@ -33,6 +33,7 @@ define(['express', '../model/index'], function (express, Models) {
         });
     });
 
+    //TODO: Add translation to errors!
     router.post('/register', function(req, res, next){
 
         var new_user = req.body;
@@ -40,7 +41,7 @@ define(['express', '../model/index'], function (express, Models) {
         var password = new_user.password;
         var email    = new_user.email;
 
-        Models.util('users').returning('id').insert({
+        Models.util('users').insert({
             username: username,
             email:email,
             password:password
@@ -51,6 +52,18 @@ define(['express', '../model/index'], function (express, Models) {
             console.log(error);
             res.send({error:error.detail});
         });
+
+        //         Models.util('users').returning('id').insert({
+        //     username: username,
+        //     email:email,
+        //     password:password
+        // }).then(function(result){
+        //     res.send({message:'user added', id:result});
+        //     console.log(`User id: ${result}`);
+        // }).catch(function(error) {
+        //     console.log(error);
+        //     res.send({error:error.detail});
+        // });
 
         //NOT TODAY!
         // Models.user.insert({

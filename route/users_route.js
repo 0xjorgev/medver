@@ -40,18 +40,18 @@ define(['express', '../model/index'], function (express, Models) {
         var username = new_user.username;
         var password = new_user.password;
         var email    = new_user.email;
-
-        Models.util('users').insert({
-            username: username,
-            email:email,
-            password:password
-        }).then(function(result){
-            res.send({message:'user added', id:result});
-            console.log(`User id: ${result}`);
-        }).catch(function(error) {
-            console.log(error);
-            res.send({error:error.detail});
-        });
+//working ... kind of..
+        // Models.util('users').insert({
+        //     username: username,
+        //     email:email,
+        //     password:password
+        // }).then(function(result){
+        //     res.send({message:'user added', id:result});
+        //     console.log(`User id: ${result}`);
+        // }).catch(function(error) {
+        //     console.log(error);
+        //     res.send({error:error.detail});
+        // });
 
         //         Models.util('users').returning('id').insert({
         //     username: username,
@@ -66,7 +66,8 @@ define(['express', '../model/index'], function (express, Models) {
         // });
 
         //NOT TODAY!
-        // Models.user.insert({
+
+        // return Models.user.insert({
         //     username: username,
         //     email:email,
         //     password:password
@@ -89,15 +90,17 @@ define(['express', '../model/index'], function (express, Models) {
         //     res.send('epsito');
         // });
 
+var User = Models.user;
 
-
-        // new User({
-        //     username: username,
-        //     email:email,
-        //     password:password
-        // }).save().then(function(newUser){
-        //     res.send('epsito');
-        // });
+        new User({
+            username: username,
+            email:email,
+            password:password
+        }).save().then(function(newUser){
+            res.send(newUser);
+        }).catch(function(error){
+            res.send(error);
+        });
 
         // return Models.user
         // .insert({

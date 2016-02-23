@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index'], function (express, Models) {
+define(['express', '../model/index', '../model/util', 'randomstring'], function (express, Models, Util, random) {
 
     var router = express.Router();
 
@@ -70,64 +70,33 @@ define(['express', '../model/index'], function (express, Models) {
     // };
 
     router.post('/forgot', function(req, res, next){
-        // var User = new Models.user;
-        //last
-        return new Models.user
-        // .where(function(){ this.where('username',username).orWhere('email',username) })
-        // .where('active',true)
-        // .where('id',1)
-        .update({password:'2468'}).then(function (result) {
-            if (result !== null){
-                console.log('Updated a user');
-                res.json(result);
-            } else {
-                console.log('Nothing ...');
-                // res.status(404);
-                res.json({'error':'No update on town!'});
-            }
-        });
 
-        // return User.where('id','=', 1)
-        // .update({password:'24680'})
-        // .then(function(res){
-        //     res.send({result:res});
-        //     console.log('sucess!')
-        // }).catch(function(err){
-        //     console.log({error:err});
-        //     res.send({error:err});
-        // });
+        var user_fgt = req.body;
+        var username = user_fgt.username || user_fgt.email;
+        var generated_password = random.generate({
+            length: 8,
+            charset:'abcdefghijklmopqrstuvwxyzABCDEFGHIJKLMNOPRSTUVWXYZ1234567890@#$%*&'
+        });
+        Util('users')
+        .where(function(){
+            this.where('username',username).orWhere('email',username)
+        })
+        .where('active','=',1)
+        .update({password:generated_password})
+        .then(function(result){
+            console.log(`new pwd: ${generated_password}`);
+            //TODO:
+            //Send the email!!
+            //Add Md5 to field
+            message(res, 'Success', 0, result);
+        })
+        .catch(function(err){
+          message(res, err.detail, err.code, null);
+        });
     });
-        // var fgot_user = req.body;
-        // var username = fgot_user.username || fgot_user.email;
 
-        // Models.user
-        // .where(function(){ this.where('username',username).orWhere('email',username) })
-        // .where('active',true)
-        // .fetch()
-        // .then(function (result) {
-        //     res.send({'result':result});
-        //     if (result !== null){
-
-                // .then()
-                // .catch(function(error){
-                //     console.log('Nothing to update here');
-                //     res.send({'Error':error});
-                // });
-        //     }
-        // })
-        // .catch(function(error){
-        //     console.log('Nothing to update here');
-        //     res.send({'Error':error});
-        // })
-
-        /*
-
-.catch(function(error){
-            console.log({'error':error.details});
-            res.send({'error':error.details});
-        });
-
-        */
+        //Add change PWD
+        //Add update Profile
 
     return router;
 });

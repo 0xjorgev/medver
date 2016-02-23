@@ -56,9 +56,9 @@ define(['express', '../model/index'], function (express, Models) {
             email:email,
             password:password
         }).save().then(function(newUser){
-            res.send({message:'Success!', code:0, object:newUser});
+            message(res, 'Success', 0, newUser);
         }).catch(function(error){
-            res.send({message:error.detail, code:error.code, object:null});
+            message(res, error.detail, error.code, null);
         });
     });
 

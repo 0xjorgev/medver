@@ -15,6 +15,7 @@ define(['express', '../model/index'], function (express, Models) {
         var user_login = req.body;
         var username = user_login.username;
         var password = user_login.password;
+        console.log('req.body: ', req.body);
         console.log(`Request values: ${username}, ${password}`);
         // res.send(`user_values: ${username} ${password}`);
         return Models.user

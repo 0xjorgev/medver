@@ -22,14 +22,17 @@ define(['express', '../model/index'], function (express, Models) {
         .where('password',password)
         .where('active',true)
         .fetch().then(function (result) {
-            if (result != null){
+            // if (result != null){
                 console.log('found a user');
                 res.json(result);
-            } else {
-                console.log('user not found');
-                res.status(404);
-                res.json({'error':'wrong user/password combination'});
-            }
+            // } else {
+                // console.log('user not found');
+                //res.status(404);
+                // res.json({'error':'wrong user/password combination'});
+            // }
+        }).catch(function(err){
+            console.log(`Error: ${err}`);
+            res.json({'error':err});
         });
     });
 
@@ -53,20 +56,70 @@ define(['express', '../model/index'], function (express, Models) {
         });
     });
 
+    // var update = function(user_id){
+    //     return new Models.user.where('id', user_id).update({'password':'24680'}).catch(function(error){
+    //         console.log('Nothing to update here');
+    //     });
+    // };
+
     router.post('/forgot', function(req, res, next){
-        var fgot_user = req.body;
-        var username = fgot_user.username;
+        var User = new Models.user;
 
-        return new Models.user
-            .where(function(){ this.where('username',username)
-            .orWhere('email',username) })
-            .fecth()
-            .then(function(result){
+        .where(function(){ this.where('username',username).orWhere('email',username) })
+        .where('password',password)
+        .where('active',true)
+        .fetch().then(function (result) {
+            if (result != null){
+                console.log('found a user');
+                res.json(result);
+            } else {
+                console.log('user not found');
+                res.status(404);
+                res.json({'error':'wrong user/password combination'});
+            }
+        });
 
-            }).catch(function(error){
-
-            });
+        // return User.where('id','=', 1)
+        // .update({password:'24680'})
+        // .then(function(res){
+        //     res.send({result:res});
+        //     console.log('sucess!')
+        // }).catch(function(err){
+        //     console.log({error:err});
+        //     res.send({error:err});
+        // });
     });
+        // var fgot_user = req.body;
+        // var username = fgot_user.username || fgot_user.email;
+
+        // Models.user
+        // .where(function(){ this.where('username',username).orWhere('email',username) })
+        // .where('active',true)
+        // .fetch()
+        // .then(function (result) {
+        //     res.send({'result':result});
+        //     if (result !== null){
+
+                // .then()
+                // .catch(function(error){
+                //     console.log('Nothing to update here');
+                //     res.send({'Error':error});
+                // });
+        //     }
+        // })
+        // .catch(function(error){
+        //     console.log('Nothing to update here');
+        //     res.send({'Error':error});
+        // })
+
+        /*
+
+.catch(function(error){
+            console.log({'error':error.details});
+            res.send({'error':error.details});
+        });
+
+        */
 
     return router;
 });

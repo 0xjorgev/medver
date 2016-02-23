@@ -27,14 +27,15 @@ define(['express', '../model/index'], function (express, Models) {
         .where('password',password)
         .where('active',true)
         .fetch().then(function (result) {
-             // if (result !== null){
+             if (result !== null){
                 message(res,'Success', 0, result);
                 // res.json(result);
-            //  } else {
+            } else {
+                message(res,'Wrong user/password combination', 404, result);
             //     console.log('user not found');
 
             //     // res.json({'error':'wrong user/password combination'});
-            // }
+             }
         }).catch(function(err){
             console.log(`Error: ${err}`);
             message(res,err.detail, err.code, null);

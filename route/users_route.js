@@ -64,20 +64,20 @@ define(['express', '../model/index'], function (express, Models) {
 
     router.post('/forgot', function(req, res, next){
         var User = new Models.user;
-
-        .where(function(){ this.where('username',username).orWhere('email',username) })
-        .where('password',password)
-        .where('active',true)
-        .fetch().then(function (result) {
-            if (result != null){
-                console.log('found a user');
-                res.json(result);
-            } else {
-                console.log('user not found');
-                res.status(404);
-                res.json({'error':'wrong user/password combination'});
-            }
-        });
+        //last
+        // .where(function(){ this.where('username',username).orWhere('email',username) })
+        // .where('password',password)
+        // .where('active',true)
+        // .fetch().then(function (result) {
+        //     if (result != null){
+        //         console.log('found a user');
+        //         res.json(result);
+        //     } else {
+        //         console.log('user not found');
+        //         res.status(404);
+        //         res.json({'error':'wrong user/password combination'});
+        //     }
+        // });
 
         // return User.where('id','=', 1)
         // .update({password:'24680'})

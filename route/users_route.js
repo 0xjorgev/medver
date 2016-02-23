@@ -9,6 +9,10 @@ define(['express', '../model/index'], function (express, Models) {
 
     var router = express.Router();
 
+    var message = function(res, mess, code, obj){
+        res.json({message:mess,code: code, object:obj});
+    }
+
     router.post('/login', function (req, res, next) {
 
         // tapping into Knex query builder to modify query being run
@@ -23,17 +27,18 @@ define(['express', '../model/index'], function (express, Models) {
         .where('password',password)
         .where('active',true)
         .fetch().then(function (result) {
-            // if (result != null){
-                console.log('found a user');
-                res.json(result);
-            // } else {
-                // console.log('user not found');
-                //res.status(404);
-                // res.json({'error':'wrong user/password combination'});
+             // if (result !== null){
+                message(res,'Success', 0, result);
+                // res.json(result);
+            //  } else {
+            //     console.log('user not found');
+
+            //     // res.json({'error':'wrong user/password combination'});
             // }
         }).catch(function(err){
             console.log(`Error: ${err}`);
-            res.json({'error':err});
+            message(res,err.detail, err.code, null);
+            // res.json({'error':err});
         });
     });
 
@@ -51,9 +56,9 @@ define(['express', '../model/index'], function (express, Models) {
             email:email,
             password:password
         }).save().then(function(newUser){
-            res.send(newUser);
+            res.send({message:'Success!', code:0, object:newUser});
         }).catch(function(error){
-            res.send(error);
+            res.send({message:error.detail, code:error.code, object:null});
         });
     });
 
@@ -64,21 +69,22 @@ define(['express', '../model/index'], function (express, Models) {
     // };
 
     router.post('/forgot', function(req, res, next){
-        var User = new Models.user;
+        // var User = new Models.user;
         //last
+        return new Models.user
         // .where(function(){ this.where('username',username).orWhere('email',username) })
-        // .where('password',password)
         // .where('active',true)
-        // .fetch().then(function (result) {
-        //     if (result != null){
-        //         console.log('found a user');
-        //         res.json(result);
-        //     } else {
-        //         console.log('user not found');
-        //         res.status(404);
-        //         res.json({'error':'wrong user/password combination'});
-        //     }
-        // });
+        // .where('id',1)
+        .update({password:'2468'}).then(function (result) {
+            if (result !== null){
+                console.log('Updated a user');
+                res.json(result);
+            } else {
+                console.log('Nothing ...');
+                // res.status(404);
+                res.json({'error':'No update on town!'});
+            }
+        });
 
         // return User.where('id','=', 1)
         // .update({password:'24680'})

@@ -20,6 +20,27 @@ define(['express', '../model/index'], function (express, Models) {
             });
     });
 
+    /*
+
+{ method: 'select',
+  options: {},
+  bindings: [ 25 ],
+  sql: 'select "disciplines".* from "disciplines" limit ?' }
+{ method: 'select',
+  options: {},
+  bindings: [ 1, 2, 3, 4, 5 ],
+  sql: 'select "subdisciplines".* from "subdisciplines" where "subdisciplines"."discipline_id" in (?, ?, ?, ?, ?)' }
+{ method: 'select',
+  options: {},
+  bindings: [ 25 ],
+  sql: 'select "disciplines".* from "disciplines" limit ?' }
+{ method: 'select',
+  options: {},
+  bindings: [ 1, 2, 3, 4, 5 ],
+  sql: 'select "subdisciplines".* from "subdisciplines" where "subdisciplines"."discipline_id" in (?, ?, ?, ?, ?)' }
+
+    */
+
     router.get('/:discipline', function (req, res) {
 
         var dis = req.params.discipline;

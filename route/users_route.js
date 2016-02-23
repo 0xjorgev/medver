@@ -15,7 +15,7 @@ define(['express', '../model/index'], function (express, Models) {
         var user_login = req.body;
         var username = user_login.username;
         var password = user_login.password;
-        console.log(`Request values: ${user_login}`);
+        console.log(`Request values: ${username}, ${password}`);
         // res.send(`user_values: ${username} ${password}`);
         return Models.user
         .where(function(){ this.where('username',username).orWhere('email',username) })

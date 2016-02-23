@@ -15,7 +15,7 @@ define(['express', '../model/index'], function (express, Models) {
         var user_login = req.body;
         var username = user_login.username;
         var password = user_login.password;
-
+        console.log(`Request values: ${user_login}`);
         // res.send(`user_values: ${username} ${password}`);
         return Models.user
         .where(function(){ this.where('username',username).orWhere('email',username) })
@@ -40,57 +40,7 @@ define(['express', '../model/index'], function (express, Models) {
         var username = new_user.username;
         var password = new_user.password;
         var email    = new_user.email;
-//working ... kind of..
-        // Models.util('users').insert({
-        //     username: username,
-        //     email:email,
-        //     password:password
-        // }).then(function(result){
-        //     res.send({message:'user added', id:result});
-        //     console.log(`User id: ${result}`);
-        // }).catch(function(error) {
-        //     console.log(error);
-        //     res.send({error:error.detail});
-        // });
-
-        //         Models.util('users').returning('id').insert({
-        //     username: username,
-        //     email:email,
-        //     password:password
-        // }).then(function(result){
-        //     res.send({message:'user added', id:result});
-        //     console.log(`User id: ${result}`);
-        // }).catch(function(error) {
-        //     console.log(error);
-        //     res.send({error:error.detail});
-        // });
-
-        //NOT TODAY!
-
-        // return Models.user.insert({
-        //     username: username,
-        //     email:email,
-        //     password:password
-        // }).then(function(result){
-        //     res.send({message:'user added', id:result});
-        //     console.log(`User id: ${result}`);
-        // }).catch(function(error) {
-        //     console.log(error);
-        //     res.send({error:error.detail});
-        // });
-
-
-
-
-        // var User = Models.user.create({
-        //     username: username,
-        //     email:email,
-        //     password:password
-        // }).then(function(newUser){
-        //     res.send('epsito');
-        // });
-
-var User = Models.user;
+        var User = Models.user;
 
         new User({
             username: username,
@@ -101,13 +51,21 @@ var User = Models.user;
         }).catch(function(error){
             res.send(error);
         });
+    });
 
-        // return Models.user
-        // .insert({
-        //     username: username,
-        //     email:email,
-        //     password:password
-        // });
+    router.post('/forgot', function(req, res, next){
+        var fgot_user = req.body;
+        var username = fgot_user.username;
+
+        return new Models.user
+            .where(function(){ this.where('username',username)
+            .orWhere('email',username) })
+            .fecth()
+            .then(function(result){
+
+            }).catch(function(error){
+
+            });
     });
 
     return router;

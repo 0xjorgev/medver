@@ -28,13 +28,18 @@
 	//app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-  app.get(api_prefix, function(request, response){
-    response.send('These are not the droids you are looking for');
-  });
-
   app.use(api_prefix+'discipline', discipline_ws);
   app.use(api_prefix+'user', user_ws);
 
+  app.get(api_prefix, function(request, response){
+    // app._router.stack.forEach(function(r){
+    //   if (r.route && r.route.path){
+    //     console.log(r.route.path)
+    //   }
+    // });
+
+    response.send({api:'api'});
+  });
   // process.env.NODE_ENV = 'production';
   // process.env.PORT = '3001';
   // console.log(process.env.NODE_ENV);

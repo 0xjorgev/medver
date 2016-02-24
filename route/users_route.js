@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../model/util', 'randomstring'], function (express, Models, Util, random) {
+define(['express', '../model/index', '../model/util', 'randomstring', '../util/sendgrid'], function (express, Models, Util, random, Email) {
 
     var router = express.Router();
 
@@ -57,6 +57,7 @@ define(['express', '../model/index', '../model/util', 'randomstring'], function 
             email:email,
             password:password
         }).save().then(function(newUser){
+            email_sender(newUser.email);
             message(res, 'Success', 0, newUser);
         }).catch(function(error){
             message(res, error.detail, error.code, null);
@@ -94,6 +95,18 @@ define(['express', '../model/index', '../model/util', 'randomstring'], function 
           message(res, err.detail, err.code, null);
         });
     });
+
+    var email_sender = function(email){
+        Email.send({
+            to:       `${email}`,
+            from:     'jorgem@codefuel.me',
+            subject:  'Hello World',
+            text:     'My first email through SendGrid.'
+            }, function(err, json) {
+                if (err) { return console.error(err); }
+                        console.log(json);
+            });
+    }
 
         //Add change PWD
         //Add update Profile

@@ -57,6 +57,7 @@ define(['express', '../model/index', '../model/util', 'randomstring', '../util/s
             email:email,
             password:password
         }).save().then(function(newUser){
+            console.log(`{user_email: ${newUser.email}}`);
             email_sender(newUser.email);
             message(res, 'Success', 0, newUser);
         }).catch(function(error){
@@ -104,7 +105,7 @@ define(['express', '../model/index', '../model/util', 'randomstring', '../util/s
             text:     'My first email through SendGrid.'
             }, function(err, json) {
                 if (err) { return console.error(err); }
-                        console.log(json);
+                    console.log(`Success! json:${json}`);
             });
     }
 

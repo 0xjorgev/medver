@@ -57,6 +57,7 @@ define(['express', '../model/index', '../model/util', 'randomstring', '../util/s
             email:email,
             password:password
         }).save().then(function(newUser){
+            console.log(`{new_user: ${newUser}}`);
             console.log(`{user_email: ${newUser.email}}`);
             email_sender(newUser.email);
             message(res, 'Success', 0, newUser);

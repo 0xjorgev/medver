@@ -5,13 +5,22 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../model/util', 'randomstring', '../util/sendgrid'], function (express, Models, Util, random, Email) {
+define(['express',
+    '../model/index',
+    '../util/password_gen_util',
+    '../util/sendgrid_util',
+    '../util/knex_util',
+    '../util/request_message_util',
+    '../util/email_sender_util',
+    '../util/md5_gen_util' ], function (express, Models, Pwd_gen, Sendgrid, Knex_util, Message, Email, Md5) {
 
     var router = express.Router();
 
-    var message = function(res, mess, code, obj){
-        res.json({message:mess,code: code, object:obj});
-    }
+    var send_email_from = Email(process.env.SENDER_EMAIL);
+
+    // var message = function(res, mess, code, obj){
+    //     res.json({message:mess,code: code, object:obj});
+    // }
 
     router.post('/login', function (req, res, next) {
 
@@ -28,17 +37,17 @@ define(['express', '../model/index', '../model/util', 'randomstring', '../util/s
         .where('active',true)
         .fetch().then(function (result) {
              if (result !== null){
-                message(res,'Success', 0, result);
+                Message(res,'Success', '0', result);
                 // res.json(result);
             } else {
-                message(res,'Wrong user/password combination', 404, result);
+                Message(res,'Wrong user/password combination', 404, result);
             //     console.log('user not found');
 
             //     // res.json({'error':'wrong user/password combination'});
              }
         }).catch(function(err){
             console.log(`Error: ${err}`);
-            message(res,err.detail, err.code, null);
+            Message(res,err.detail, err.code, null);
             // res.json({'error':err});
         });
     });
@@ -59,10 +68,11 @@ define(['express', '../model/index', '../model/util', 'randomstring', '../util/s
         }).save().then(function(newUser){
             console.log(`{new_user: ${email}}`);
             console.log(`{user_email: ${email}}`);
-            email_sender(email);
-            message(res, 'Success', 0, newUser);
+            send_email_from(email,'Welcome to Somosport', 'Welcome to Somosport!')
+            // email_sender();
+            Message(res, 'Success', '0', newUser);
         }).catch(function(error){
-            message(res, error.detail, error.code, null);
+            Message(res, error.detail, error.code, null);
         });
     });
 
@@ -70,45 +80,53 @@ define(['express', '../model/index', '../model/util', 'randomstring', '../util/s
     //     return new Models.user.where('id', user_id).update({'password':'24680'}).catch(function(error){
     //         console.log('Nothing to update here');
     //     });
-    // };
+    // };//app46243864@heroku.com
+    //h8167juz0757
 
     router.post('/forgot', function(req, res, next){
 
+        var user = new Models.user;
         var user_fgt = req.body;
         var username = user_fgt.username || user_fgt.email;
-        var generated_password = random.generate({
-            length: 8,
-            charset:'abcdefghijklmopqrstuvwxyzABCDEFGHIJKLMNOPRSTUVWXYZ1234567890@#$%*&'
-        });
-        Util('users')
+
+        console.log('User Model Table: '+ user.tableName);
+        var generated_password = Pwd_gen;
+        var md5_pwd = Md5(generated_password);
+        // var generated_password = random.generate({
+        //     length: 8,
+        //     charset:'abcdefghijklmopqrstuvwxyzABCDEFGHIJKLMNOPRSTUVWXYZ1234567890@#$%*&'
+        // });
+        Knex_util('users')
         .where(function(){
             this.where('username',username).orWhere('email',username)
         })
         .where('active','=',1)
-        .update({password:generated_password})
+        .update({password:md5_pwd}, ['id','email'])
         .then(function(result){
-            console.log(`new pwd: ${generated_password}`);
-            //TODO:
-            //Send the email!!
-            //Add Md5 to field
-            message(res, 'Success', 0, result);
+            var email = result[0].email;
+            //Non Ethical!
+            // console.log('Result: '+ email);
+            // console.log(`new pwd: ${generated_password}, ${md5_pwd}`);
+            // console.log(`Your new somosport Password is: ${generated_password}`);
+            send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
+            Message(res, 'Success', '0', result);
         })
         .catch(function(err){
-          message(res, err.detail, err.code, null);
+          Message(res, err.detail, err.code, null);
         });
     });
 
-    var email_sender = function(email){
-        Email.send({
-            to:       `${email}`,
-            from:     'jorgem@codefuel.me',
-            subject:  'Hello World',
-            text:     'My first email through SendGrid.'
-            }, function(err, json) {
-                if (err) { return console.error(err); }
-                    console.log(`Success! json:${json}`);
-            });
-    }
+    // var email_sender = function(email, subject, content){
+    //     Email.send({
+    //         to:       `${email}`,
+    //         from:     'jorgem@codefuel.me',
+    //         subject:  `${subject}`,
+    //         text:     `${content}`
+    //         }, function(err, json) {
+    //             if (err) { return console.error(err); }
+    //                 console.log(`Success! json:${json}`);
+    //         });
+    // }
 
         //Add change PWD
         //Add update Profile

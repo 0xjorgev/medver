@@ -122,7 +122,7 @@ define(['express',
                 send_email_from(email, 'Your new Somosport Password!', 'Your somosport Password had been changed!' );
                 Message(res, 'Success', '0', result);
             } else {
-                Message(res, 'Username or email not found', '404', result);
+                Message(res, 'invalid input data', '404', result);
             }
         })
         .catch(function(err){
@@ -130,8 +130,7 @@ define(['express',
         });
 
     });
-//0d4f505ff8ecdb25178fec66b46262df
-        //Add change PWD
+        //TODO:
         //Add update Profile
 
     return router;

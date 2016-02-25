@@ -5,19 +5,22 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index'], function (express, Models) {
+define(['express', '../model/index', '../util/request_message_util'], function (express, Models, Message) {
 
     var router = express.Router();
 
     router.get('/', function (req, res) {
 
         // tapping into Knex query builder to modify query being run
-        return Models.discipline.query(function(qb){
+        return Models.discipline
+        .query(function(qb){
             qb.limit(25);
-        }).fetchAll({withRelated: ['subdiscipline'], debug: true})
+        }).fetchAll({withRelated: ['subdiscipline']})
         .then(function (result) {
-                res.json(result);
-            });
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
     });
 
     router.get('/:discipline', function (req, res) {
@@ -27,8 +30,10 @@ define(['express', '../model/index'], function (express, Models) {
         return Models.discipline.where({'id':dis})
         .fetch({withRelated: ['subdiscipline']})
         .then(function (result) {
-            res.json(result);
-        });
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });;
     });
 
     router.get('/subdiscipline', function (req, res) {
@@ -38,8 +43,10 @@ define(['express', '../model/index'], function (express, Models) {
             qb.limit(25);
         }).fetchAll({withRelated: ['discipline'], debug: true})
         .then(function (result) {
-                res.json(result);
-            });
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
     });
 
     return router;

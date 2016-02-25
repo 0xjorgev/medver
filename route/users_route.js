@@ -86,13 +86,20 @@ define(['express',
         .where('active','=',1)
         .update({password:md5_pwd}, ['id','email'])
         .then(function(result){
-            var email = result[0].email;
+            console.log('In Here ... ', result.length);
+            if (result.length != 0){
+                console.log('result is not null');
+                var email = result[0].email;
             //Non Ethical!
             // console.log('Result: '+ email);
             // console.log(`new pwd: ${generated_password}, ${md5_pwd}`);
             // console.log(`Your new somosport Password is: ${generated_password}`);
             send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
             Message(res, 'Success', '0', result);
+            } else {
+                console.log('result is null');
+                Message(res, 'Username or email not found', '404', result);
+            }
         })
         .catch(function(err){
           Message(res, err.detail, err.code, null);

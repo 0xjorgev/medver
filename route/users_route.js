@@ -8,19 +8,13 @@ if (typeof define !== 'function') {
 define(['express',
     '../model/index',
     '../util/password_gen_util',
-    '../util/sendgrid_util',
     '../util/knex_util',
     '../util/request_message_util',
     '../util/email_sender_util',
-    '../util/md5_gen_util' ], function (express, Models, Pwd_gen, Sendgrid, Knex_util, Message, Email, Md5) {
+    '../util/md5_gen_util' ], function (express, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
 
     var router = express.Router();
-
     var send_email_from = Email(process.env.SENDER_EMAIL);
-
-    // var message = function(res, mess, code, obj){
-    //     res.json({message:mess,code: code, object:obj});
-    // }
 
     router.post('/login', function (req, res, next) {
 
@@ -76,27 +70,16 @@ define(['express',
         });
     });
 
-    // var update = function(user_id){
-    //     return new Models.user.where('id', user_id).update({'password':'24680'}).catch(function(error){
-    //         console.log('Nothing to update here');
-    //     });
-    // };//app46243864@heroku.com
-    //h8167juz0757
-
     router.post('/forgot', function(req, res, next){
 
         var user = new Models.user;
         var user_fgt = req.body;
         var username = user_fgt.username || user_fgt.email;
 
-        console.log('User Model Table: '+ user.tableName);
         var generated_password = Pwd_gen;
         var md5_pwd = Md5(generated_password);
-        // var generated_password = random.generate({
-        //     length: 8,
-        //     charset:'abcdefghijklmopqrstuvwxyzABCDEFGHIJKLMNOPRSTUVWXYZ1234567890@#$%*&'
-        // });
-        Knex_util('users')
+
+        Knex_util(user.tableName)
         .where(function(){
             this.where('username',username).orWhere('email',username)
         })
@@ -116,17 +99,11 @@ define(['express',
         });
     });
 
-    // var email_sender = function(email, subject, content){
-    //     Email.send({
-    //         to:       `${email}`,
-    //         from:     'jorgem@codefuel.me',
-    //         subject:  `${subject}`,
-    //         text:     `${content}`
-    //         }, function(err, json) {
-    //             if (err) { return console.error(err); }
-    //                 console.log(`Success! json:${json}`);
-    //         });
-    // }
+    router.post('/change_password', function(req, res, next){
+        var user = new Models.user;
+        var user_pwd_change = req.body;
+        //
+    });
 
         //Add change PWD
         //Add update Profile

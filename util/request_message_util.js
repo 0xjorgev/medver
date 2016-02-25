@@ -7,7 +7,7 @@ if (typeof define !== 'function') {
 
 define(['express'], function (express) {
 	var message =  function(res, mess, code, obj){
-        res.json({message:mess,code: code, object:obj});
+        res.json({message:mess,code: code, data:obj});
     }
     return message;
 });

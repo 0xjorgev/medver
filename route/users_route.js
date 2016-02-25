@@ -86,7 +86,6 @@ define(['express',
         .where('active','=',1)
         .update({password:md5_pwd}, ['id','email'])
         .then(function(result){
-            console.log('In Here ... ', result.length);
             if (result.length != 0){
                 console.log('result is not null');
                 var email = result[0].email;
@@ -97,7 +96,6 @@ define(['express',
             send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
             Message(res, 'Success', '0', result);
             } else {
-                console.log('result is null');
                 Message(res, 'Username or email not found', '404', result);
             }
         })
@@ -109,9 +107,30 @@ define(['express',
     router.post('/change_password', function(req, res, next){
         var user = new Models.user;
         var user_pwd_change = req.body;
-        //
-    });
+        var user_id = user_pwd_change.id;
+        var user_new_password = user_pwd_change.new_password;
+        var user_old_password = user_pwd_change.old_password;
 
+        Knex_util(user.tableName)
+        .where('id','=',user_id)
+        .where('active','=',1)
+        .where('password','=',user_old_password)
+        .update({password:user_new_password}, ['id','email'])
+        .then(function(result){
+            if (result.length != 0){
+                var email = result[0].email;
+                send_email_from(email, 'Your new Somosport Password!', 'Your somosport Password had been changed!' );
+                Message(res, 'Success', '0', result);
+            } else {
+                Message(res, 'Username or email not found', '404', result);
+            }
+        })
+        .catch(function(err){
+          Message(res, err.detail, err.code, null);
+        });
+
+    });
+//0d4f505ff8ecdb25178fec66b46262df
         //Add change PWD
         //Add update Profile
 

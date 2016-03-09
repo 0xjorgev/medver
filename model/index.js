@@ -9,13 +9,15 @@ define([
 	'./util',
     './discipline',
     './subdiscipline',
-    './user'
-], function (Util, Discipline, Subdiscipline, User) {
+    './user',
+    './competition'
+], function (Util, Discipline, Subdiscipline, User, Competition) {
 
     return {
     	util : Util,
     	user: User,
     	discipline: Discipline,
-        subdiscipline: Subdiscipline
+        subdiscipline: Subdiscipline,
+        competition: Competition
     };
 });

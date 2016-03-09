@@ -93,6 +93,9 @@ gulp.task('nodemon', function() {
     vars: {
       //this overrides configFile file
       //'PORT': 3003
+      ///var/log/nginx/vhost-deluxe.codefuel.me-error_log
+      ///var/log/nginx/nginx-deluxe.codefuel.me
+      //12x3.12x3.
     }
   });
 

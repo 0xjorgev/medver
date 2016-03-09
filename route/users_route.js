@@ -34,7 +34,7 @@ define(['express',
                 Message(res,'Success', '0', result);
                 // res.json(result);
             } else {
-                Message(res,'Wrong user/password combination', 404, result);
+                Message(res,'Wrong user/password combination', '404', result);
             //     console.log('user not found');
 
             //     // res.json({'error':'wrong user/password combination'});

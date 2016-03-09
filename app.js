@@ -3,6 +3,7 @@
   var bodyParser = require('body-parser');
   var discipline_ws = require('./route/disciplines_route');
   var user_ws = require('./route/users_route');
+  var competition_ws = require('./route/competitions_route');
   //var log = require('./logger.js');
   //var discipline_ws = require('./route/disciplines_route');
   var apiVersion = 'v1.0';
@@ -30,6 +31,7 @@
 
   app.use(api_prefix+'discipline', discipline_ws);
   app.use(api_prefix+'user', user_ws);
+  app.use(api_prefix+'competition', competition_ws);
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){

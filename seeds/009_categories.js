@@ -12,7 +12,7 @@ exports.seed = function(knex, Promise) {
             table.string('image_url');
     */
     knex('categories')
-    .insert(
+    .insert([
         {name:'Professional',description:'Professional Futbol', gender_id:1, season_id:1},
         {name:'Sub 23',description:'Players under 23 years old', gender_id:1, season_id:1},
         {name:'Sub 22',description:'Players under 22 years old', gender_id:1, season_id:1},
@@ -25,7 +25,7 @@ exports.seed = function(knex, Promise) {
         {name:'Sub 15',description:'Players under 15 years old', gender_id:1, season_id:1},
         {name:'Sub 14',description:'Players under 14 years old', gender_id:1, season_id:1},
         {name:'Infant',description:'Kids under 13 years old', gender_id:1, season_id:1}
-
+        ]
         )
     ).then(function(){
 		//Add query

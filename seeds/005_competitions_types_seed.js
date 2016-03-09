@@ -5,11 +5,11 @@ exports.seed = function(knex, Promise) {
 
     // Inserts seed entries
     knex('competitions_types')
-    .insert(
+    .insert([
             {name:'League',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-league.svg'},
             {name:'Cup',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-cup.svg'},
             {name:'Championship',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-championship.svg'}
-        )
+        ])
     ).then(function(){
 		//Add query
         return knex.raw('');

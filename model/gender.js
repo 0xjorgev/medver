@@ -9,7 +9,7 @@ define(['./base_model'], function (DB) {
 
     var Gender = DB.Model.extend({
         tableName: 'genders',
-        hasTimestamps: true,
+        hasTimestamps: true
 
         //relations
         // user n:m

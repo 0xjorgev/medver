@@ -4,8 +4,8 @@ module.exports = {
     client: 'pg',
     connection: {
         host     : '127.0.0.1',
-        user     : 'ramses',
-        password : '',
+        user     : 'postgres',
+        password : 'postgres',
         database : 'somosport_core'
     },
     migrations: { tableName: 'schema_info'},

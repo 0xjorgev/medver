@@ -9,12 +9,12 @@ define(['express', '../model/index', '../util/request_message_util'], function (
 
     var router = express.Router();
 
+    //List of competitions
     router.get('/', function (req, res) {
 
-        // tapping into Knex query builder to modify query being run
         return Models.competition
         .query(function(qb){})
-        .fetchAll({withRelated: ['subdiscipline','discipline', 'type']})
+        .fetchAll({withRelated: ['discipline','subdiscipline', 'type', 'season']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -22,31 +22,20 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
-    // router.get('/:discipline', function (req, res) {
+    //Competition by Id
+    router.get('/:competition_id', function (req, res) {
 
-    //     var dis = req.params.discipline;
-    //     // tapping into Knex query builder to modify query being run
-    //     return Models.discipline.where({'id':dis})
-    //     .fetch({withRelated: ['subdiscipline']})
-    //     .then(function (result) {
-    //         Message(res,'Success', '0', result);
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
+        var comp_id = req.params.competition_id;
+        return Models.competition
+        .where({'id':comp_id})
+        .fetch( {withRelated: ['discipline','subdiscipline', 'type', 'season']} )
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
 
-    // router.get('/subdiscipline', function (req, res) {
-
-    //     // tapping into Knex query builder to modify query being run
-    //     return Models.subdiscipline.query(function(qb){
-    //         qb.limit(25);
-    //     }).fetchAll({withRelated: ['discipline'], debug: true})
-    //     .then(function (result) {
-    //         Message(res,'Success', '0', result);
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
 
     return router;
 });

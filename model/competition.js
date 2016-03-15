@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './discipline', './subdiscipline', './competition_type'], function (DB) {
+define(['./base_model', './discipline', './subdiscipline', './competition_type', './season'], function (DB) {
 
     var Competition = DB.Model.extend({
         tableName: 'competitions',
@@ -20,16 +20,20 @@ define(['./base_model', './discipline', './subdiscipline', './competition_type']
             table.integer('competition_type').references('competitions_types.id').index();
 
         */
-        disciplines: function(){
-            return this.hasOne('disciplines');
+        discipline: function(){
+            return this.belongsTo('Discipline', 'discipline_id');
         },
 
-        subdisciplines: function(){
-            return this.hasOne('subdisciplines');
+        subdiscipline: function(){
+            return this.belongsTo('Subdiscipline');
+        },
+
+        season: function(){
+            return this.hasMany('Season');
         },
 
         type: function(){
-            return this.hasOne('competitions_types');
+            return this.belongsTo('Competition_type','competition_type');
         }
     });
 

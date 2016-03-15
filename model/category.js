@@ -12,15 +12,12 @@ define(['./base_model','./gender','./season'], function (DB) {
         hasTimestamps: true,
 
         //relations
-        // user n:m
-        // organization n:m
-
         gender: function(){
-            return this.belongsTo('gender');
+            return this.belongsTo('Gender', 'gender_id');
         },
 
         season: function(){
-            return this.belongsTo('season');
+            return this.belongsTo('Season', 'season_id');
         }
     });
 

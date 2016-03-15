@@ -11,11 +11,10 @@ define([
     './subdiscipline',
     './user',
     './competition',
-    './season'
-    // './category',
-    // './gender'
-], function (Util, Discipline, Subdiscipline, User, Competition, Season) {
-    //, Category, Gender
+    './season',
+    './category',
+    './gender'
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender) {
 
     return {
     	util : Util,
@@ -23,8 +22,8 @@ define([
     	discipline: Discipline,
         subdiscipline: Subdiscipline,
         competition: Competition,
-        season: Season
-        // category: Category,
-        // gender: Gender
+        season: Season,
+        category: Category,
+        gender: Gender
     };
 });

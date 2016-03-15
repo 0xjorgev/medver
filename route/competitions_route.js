@@ -36,7 +36,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
-        //Seasons by Competition_Id -> Returns array of result
+    //Seasons by Competition_Id -> Returns array of result
     router.get('/:competition_id/season/', function (req, res) {
         var competition_id = req.params.competition_id;
         return Models.season

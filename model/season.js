@@ -17,7 +17,7 @@ define(['./base_model','./competition'], function (DB) {
         }
 
     });
-
+    //solving unable to resolve host ip-10-0-0-187
     // uses Registry plugin
     return DB.model('Season', Season);
 });

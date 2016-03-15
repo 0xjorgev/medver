@@ -36,6 +36,19 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
+        //Seasons by Competition_Id -> Returns array of result
+    router.get('/:competition_id/season/', function (req, res) {
+        var competition_id = req.params.competition_id;
+        return Models.season
+        .where({competition_id:competition_id})
+        .fetchAll({withRelated: ['competition']})
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
 
     return router;
 });

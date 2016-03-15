@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util'], function (express, Models, Message) {
+define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
 
     var router = express.Router();
 
@@ -46,6 +46,63 @@ define(['express', '../model/index', '../util/request_message_util'], function (
             Message(res,'Success', '0', result);
         }).catch(function(error){
             Message(res,error.details, error.code, []);
+        });
+    });
+
+    //Create Competition
+    router.post('/create', function (req, res) {
+
+        //Model Instance
+
+        var Competition = Models.competition;
+        var competition_post = req.body;
+
+        var name = competition_post.name;
+        var discipline_id = competition_post.discipline_id;
+        var subdiscipline_id = competition_post.subdiscipline_id;
+        var competition_type = competition_post.competition_type;
+
+        new Competition({
+            name: name,
+            discipline_id:discipline_id,
+            subdiscipline_id:subdiscipline_id,
+            competition_type:competition_type
+        }).save().then(function(new_competition){
+            console.log(`{new_competition: ${new_competition}}`);
+            Message(res, 'Success', '0', new_competition);
+        }).catch(function(error){
+            console.log(`{error: ${error}}`);
+            Message(res, error.detail, error.code, null);
+        });
+    });
+
+
+    //Competition Update
+    router.post('/:competition_id/update', function(req, res){
+        //Model Instance
+        var competition = Models.competition;
+
+        var competition_id = req.params.competition_id;
+        var competition_upd = req.body;
+
+        // Knex(competition.tableName)
+        Knex('competitions')
+        .where('id','=',competition_id)
+        .where('active','=',1)
+        .update(competition_upd, ['id'])
+        .then(function(result){
+            if (result.length != 0){
+                console.log('result is not null');
+                console.log(`result: ${result[0]}`);
+                Message(res, 'Success', '0', result);
+            } else {
+                console.log(`{error: ${error}}`);
+                Message(res, 'Username or email not found', '404', result);
+            }
+        })
+        .catch(function(err){
+            console.log(`error: ${err}`);
+          Message(res, err.detail, err.code, null);
         });
     });
 

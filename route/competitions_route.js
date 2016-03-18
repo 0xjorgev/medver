@@ -12,10 +12,12 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //List of competitions
     router.get('/', function (req, res) {
 
+        console.log('Competition List');
         return Models.competition
         .query(function(qb){})
-        .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'season']})
+        .fetchAll({withRelated: ['discipline','subdiscipline', 'season']})
         .then(function (result) {
+            console.log('result :', result);
             Message(res,'Success', '0', result);
         }).catch(function(error){
             Message(res,error.details, error.code, []);
@@ -28,7 +30,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var comp_id = req.params.competition_id;
         return Models.competition
         .where({'id':comp_id})
-        .fetch( {withRelated: ['discipline','subdiscipline', 'type', 'season']} )
+        .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'season']} )
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -41,7 +43,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var competition_id = req.params.competition_id;
         return Models.season
         .where({competition_id:competition_id})
-        .fetchAll({withRelated: ['competition']})
+        .fetchAll()
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

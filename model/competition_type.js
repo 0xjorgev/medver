@@ -9,7 +9,7 @@ define(['./base_model'], function (DB) {
 
     var Competition_type = DB.Model.extend({
         tableName: 'competitions_types',
-        hasTimestamps: true,
+        hasTimestamps: true
 
         //relations
         // user n:m

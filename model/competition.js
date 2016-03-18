@@ -28,12 +28,12 @@ define(['./base_model', './discipline', './subdiscipline', './competition_type',
             return this.belongsTo('Subdiscipline', 'subdiscipline_id');
         },
 
-        season_id: function(){
+        season: function(){
             return this.hasMany('Season');
         },
 
         competition_type: function(){
-            return this.belongsTo('Competition_type','competition_type');
+            return this.belongsTo('Competition_type','competition_type_id');
         }
     });
 

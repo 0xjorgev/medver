@@ -13,8 +13,10 @@ define([
     './competition',
     './season',
     './category',
-    './gender'
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender) {
+    './gender',
+    './competition_type'
+
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type) {
 
     return {
     	util : Util,
@@ -24,6 +26,7 @@ define([
         competition: Competition,
         season: Season,
         category: Category,
-        gender: Gender
+        gender: Gender,
+        competition_type: Competition_type
     };
 });

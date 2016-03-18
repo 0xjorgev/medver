@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
 			table.boolean('active').notNullable().defaultTo(true);
 			table.integer('discipline_id').references('disciplines.id').index();
 			table.integer('subdiscipline_id').references('subdisciplines.id').index();
-			table.integer('competition_type').references('competitions_types.id').index();
+			table.integer('competition_type_id').references('competitions_types.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
 		})

@@ -14,10 +14,6 @@ exports.up = function(knex, Promise) {
 			table.integer('season_id').references('seasons.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
-
-
-
-
 		})
 	]);
 };

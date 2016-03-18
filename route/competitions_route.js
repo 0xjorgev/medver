@@ -14,7 +14,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         return Models.competition
         .query(function(qb){})
-        .fetchAll({withRelated: ['discipline','subdiscipline', 'type', 'season']})
+        .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'season']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -61,6 +61,12 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var discipline_id = competition_post.discipline_id;
         var subdiscipline_id = competition_post.subdiscipline_id;
         var competition_type = competition_post.competition_type;
+
+        console.log('name: ', competition_post.name);
+        console.log('discipline_id: ', competition_post.discipline_id);
+        console.log('subdiscipline_id: ', competition_post.subdiscipline_id);
+        console.log('competition_type: ', competition_post.competition_type);
+        console.log('competition_post: ', competition_post);
 
         new Competition({
             name: name,

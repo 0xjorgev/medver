@@ -1,3 +1,4 @@
+
 exports.up = function(knex, Promise) {
   return Promise.all([
 		knex.schema.createTable('consultas', function(table){

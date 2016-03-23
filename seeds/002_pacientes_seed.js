@@ -1,7 +1,7 @@
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
-    knex('users').del(),
+    knex('pacientes').del(),
 
     /*
             table.increments('id');
@@ -21,17 +21,7 @@ exports.seed = function(knex, Promise) {
     */
 
     // Inserts seed entries
-    knex('pacientes').insert(
-        {nombre:'Jorge', 
-        apellido:'Mendoza', 
-        email:'jorgevmendoza@gmail.com', 
-        alergia:'aspirina', 
-        telefono_principal: '04122630631',
-        sexo:'M',
-        cedula:'V14350280',
-        fecha_nacimiento:"1979-10-08 23:00:00 UTC",
-        historia_id:'1'
-    })
+    knex('pacientes').insert({nombre:'Jorge', apellido:'Mendoza', email:'jorgevmendoza@gmail.com', alergia:'aspirina', telefono_principal: '04122630631',sexo:'M',cedula:'V14350280',fecha_nacimiento:"1979-10-08 23:00:00 UTC",historia_id:'1'})
     ).then(function(){
 		//Add query
         return knex.raw('');

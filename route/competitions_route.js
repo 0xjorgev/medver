@@ -68,12 +68,13 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var description = competition_post.description;
 
         console.log('------------------------------');
+
         console.log('name: ', competition_post.name);
         console.log('discipline_id: ', competition_post.discipline_id);
         console.log('subdiscipline_id: ', competition_post.subdiscipline_id);
         console.log('competition_type_id: ', competition_post.competition_type_id);
         console.log('description: ', competition_post.description);
-        console.log('competition_post: '+ competition_post);
+        console.log('competition_post: ', competition_post);
 
         console.log('------------------------------');
 

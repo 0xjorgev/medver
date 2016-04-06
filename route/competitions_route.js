@@ -114,6 +114,5 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-
     return router;
 });

@@ -198,4 +198,5 @@ fueron definifueron definidas en el modelo en 1.1
 
 //2 La sentancia **team_a: function(){ return this.belongsTo('Team', 'team_a');}** significa una relación 1:N entre Team y Match, donde Match tiene N equipos y cada equipo pertenece a un MATCH especifico. Se agrega el nombre del campo que dicta la relación entre las tablas en este caso para la tabla **match** es **team_a** que contiene el id del team relacionado
 
+Este Error -> "[Error: The model historia could not be resolved from the registry plugin.]" significa que los nombres de las entidades / tablas, estan escritos con minuscula y deben estar con mayusculas ej: Category
 

@@ -1,6 +1,8 @@
   var express = require('express');
   var app = express();
   var bodyParser = require('body-parser');
+  var uuid = require('uuid');
+  var nJwt = require('nJwt');
   var discipline_ws = require('./route/disciplines_route');
   var user_ws = require('./route/users_route');
   var competition_ws = require('./route/competitions_route');
@@ -32,12 +34,16 @@
 	//app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-  app.use(api_prefix+'discipline', discipline_ws);
+  //Non Token Route
   app.use(api_prefix+'user', user_ws);
+
+  //Token Route
+  app.use(api_prefix+'discipline', discipline_ws);
   app.use(api_prefix+'competition', competition_ws);
   app.use(api_prefix+'season', season_ws);
   app.use(api_prefix+'category', category_ws);
   app.use(api_prefix+'gender', gender_ws);
+
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){

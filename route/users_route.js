@@ -6,15 +6,20 @@ if (typeof define !== 'function') {
 }
 
 define(['express',
-    '../model/index',
-    '../util/password_gen_util',
-    '../util/knex_util',
-    '../util/request_message_util',
-    '../util/email_sender_util',
-    '../util/md5_gen_util' ], function (express, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
+        'uuid',
+        'nJwt',
+        '../model/index',
+        '../util/password_gen_util',
+        '../util/knex_util',
+        '../util/request_message_util',
+        '../util/email_sender_util',
+        '../util/md5_gen_util' ],
+        function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
+    var signingKey = uuid.v4(); // For example purposes
+    console.log('secret key:', signingKey);
 
     router.post('/login', function (req, res, next) {
 
@@ -22,7 +27,7 @@ define(['express',
         var user_login = req.body;
         var username = user_login.username;
         var password = user_login.password;
-        console.log('req.body: ', req.body);
+        // console.log('req.body: ', req.body);
         console.log(`Request values: ${username}, ${password}`);
         // res.send(`user_values: ${username} ${password}`);
         return Models.user
@@ -31,6 +36,27 @@ define(['express',
         .where('active',true)
         .fetch().then(function (result) {
              if (result !== null){
+
+                var userid = result.id;
+
+                var claims = {
+                    iss: "https://somosportpocdev.herokuapp.com/",  // The URL of your service
+                    sub: `users/${userid}`,    // The UID of the user in your system
+                    scope: "admins" //Provided by the DB
+                }
+
+                // var usr = new Models.user;
+                //  usr = result;
+                // console.log('usr: ', usr.id);
+                console.log('Result:', result.id );
+                // console.log('UserId: '+ result.id);
+                // var userid = result[0].id;
+
+
+                console.log('claims:', claims);
+                var jwt = nJwt.create(claims,signingKey)
+                console.log('Token:', jwt);
+                console.log('Token Compact:', jwt.compact());
                 Message(res,'Success', '0', result);
                 // res.json(result);
             } else {

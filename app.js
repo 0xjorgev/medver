@@ -1,8 +1,8 @@
   var express = require('express');
   var app = express();
   var bodyParser = require('body-parser');
-  var uuid = require('uuid');
-  var nJwt = require('nJwt');
+  // var uuid = require('uuid');
+  // var nJwt = require('nJwt');
   var discipline_ws = require('./route/disciplines_route');
   var user_ws = require('./route/users_route');
   var competition_ws = require('./route/competitions_route');

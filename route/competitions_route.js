@@ -59,6 +59,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var Competition = Models.competition;
         var competition_post = req.body;
 
+        console.log('Req Values:' + req.body);
+
         var name = competition_post.name;
         var discipline_id = competition_post.discipline_id;
         var subdiscipline_id = competition_post.subdiscipline_id;
@@ -71,7 +73,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('subdiscipline_id: ', competition_post.subdiscipline_id);
         console.log('competition_type_id: ', competition_post.competition_type_id);
         console.log('description: ', competition_post.description);
-        console.log('competition_post: ', competition_post);
+        console.log('competition_post: '+ competition_post);
 
         console.log('------------------------------');
 

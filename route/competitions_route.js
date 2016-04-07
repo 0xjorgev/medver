@@ -9,6 +9,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
 
+    console.log('competition Route');
+
     //List of competitions
     router.get('/', function (req, res) {
 
@@ -24,9 +26,23 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+        //Competitions Types List -> Array of results [Competition_type]
+    router.get('/competition_type', function(req, res){
+        console.log('types');
+        return Models.competition_type
+        .fetchAll()
+        .then(function (result) {
+            console.log('Result:'+result);
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            console.log('Result:'+error);
+             Message(res,error.details, error.code, []);
+        });
+    });
+
     //Competition by Id
     router.get('/:competition_id', function (req, res) {
-
+        console.log('competition_id List');
         var comp_id = req.params.competition_id;
         return Models.competition
         .where({'id':comp_id})
@@ -40,6 +56,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //Seasons by Competition_Id -> Returns array of result
     router.get('/:competition_id/season/', function (req, res) {
+        console.log('/competition_id/season/');
         var competition_id = req.params.competition_id;
         return Models.season
         .where({competition_id:competition_id})

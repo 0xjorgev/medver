@@ -117,6 +117,22 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     });
 
+    //Competition Contact by competition_id
+    router.get('/:competition_id/contact/', function (req, res) {
+        console.log('/:competition_id/contact/:contact_id');
+
+        var competition_id = req.params.competition_id;
+        return Models.contact
+        .where('competition_id','=',competition_id)
+        .fetchAll()
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
+    //Competition Contact by contact_id
     router.get('/:competition_id/contact/:contact_id', function (req, res) {
         console.log('/:competition_id/contact/:contact_id');
 
@@ -210,7 +226,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res, error.detail, error.code, null);
         });
     });
-
 
     //Competition Update
     router.post('/:competition_id/update', function(req, res){

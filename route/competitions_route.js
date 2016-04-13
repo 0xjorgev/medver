@@ -135,11 +135,45 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    //Competition Contact Update
+    router.post('/:competition_id/contact/:contact_id/update', function(req, res){
+        console.log('/:competition_id/contact/:contact_id/update');
+        //Model Instance
+        var Contact = Models.contact;
+
+        var competition_id = req.params.competition_id;
+        var contact_id = req.params.contact_id;
+        var contact_upd = req.body;
+
+        // Knex(competition.tableName)
+        Knex('contacts')
+        .where('id','=',contact_id)
+        .where('competition_id','=',competition_id)
+        .update(contact_upd, ['id'])
+        .then(function(result){
+            if (result.length != 0){
+                console.log('result is not null');
+                console.log(`result: ${result[0]}`);
+                Message(res, 'Success', '0', result);
+            } else {
+                console.log(`{error: ${error}}`);
+                Message(res, 'Wrong Competition_id or contact_id', '404', result);
+            }
+        })
+        .catch(function(err){
+            console.log(`Catch Error: ${err}`);
+          Message(res, err.detail, err.code, null);
+        });
+    });
+
+
+
+
     //Create Competition
     router.post('/create', function (req, res) {
 
         //Model Instance
-
+        console.log('Create Competition');
         var Competition = Models.competition;
         var competition_post = req.body;
 
@@ -180,6 +214,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //Competition Update
     router.post('/:competition_id/update', function(req, res){
+
+        console.log('Competition Update');
         //Model Instance
         var competition = Models.competition;
 

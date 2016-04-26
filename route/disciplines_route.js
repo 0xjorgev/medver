@@ -11,6 +11,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
 
     router.get('/', function (req, res) {
 
+        console.log('Discipline get all');
         // tapping into Knex query builder to modify query being run
         return Models.discipline
         .query(function(qb){
@@ -25,6 +26,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
 
     router.get('/:discipline', function (req, res) {
 
+        console.log('Discipline get /:discipline');
         var dis = req.params.discipline;
         // tapping into Knex query builder to modify query being run
         return Models.discipline.where({'id':dis})
@@ -38,6 +40,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
 
     router.get('/subdiscipline', function (req, res) {
 
+        console.log('Discipline get /subdiscipline');
         // tapping into Knex query builder to modify query being run
         return Models.subdiscipline.query(function(qb){
             qb.limit(25);

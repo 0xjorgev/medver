@@ -11,7 +11,7 @@ exports.up = function(knex, Promise) {
 			table.string('email');
 			table.string('website_url');
 			table.boolean('active').notNullable().defaultTo(true);
-			table.integer('competition_id').references('competitions.id').index();
+			table.integer('organization_id').references('organizations.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
 		})

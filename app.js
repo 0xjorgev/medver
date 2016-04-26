@@ -9,12 +9,38 @@
   var season_ws = require('./route/seasons_route');
   var category_ws = require('./route/categories_route');
   var gender_ws = require('./route/genders_route');
-  //var log = require('./logger.js');
-  //var discipline_ws = require('./route/disciplines_route');
+  var phase_ws = require('./route/phases_route');
+
   var apiVersion = 'v1.0';
   var prefix = 'api';
   var api_prefix = `/${prefix}/${apiVersion}/`; //'template literal syntax' is only available in ES6 (use 'esversion: 6').
-  // var env = require('gulp-env');
+
+  /*
+      app.use(api_prefix+'discipline', discipline_ws);
+      app.use(api_prefix+'competition', competition_ws);
+      app.use(api_prefix+'season', season_ws);
+      app.use(api_prefix+'category', category_ws);
+      app.use(api_prefix+'gender', gender_ws);
+  */
+
+  //routes names
+  var routes = {
+    discipline      : 'discipline',
+    subddiscipline  : 'subddiscipline',
+    competition     : 'competition',
+    season          : 'season',
+    category        : 'category',
+    gender          : 'gender',
+    contact         : 'contact',
+    organization    : 'organization',
+    phase           : 'phase',
+    group           : 'group',
+    round           : 'round',
+    team            : 'team',
+    match           : 'match',
+    rule            : 'rule',
+    ruleset         : 'ruleset'
+  }
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {
@@ -38,12 +64,17 @@
   app.use(api_prefix+'user', user_ws);
 
   //Token Route
-  app.use(api_prefix+'discipline', discipline_ws);
-  app.use(api_prefix+'competition', competition_ws);
-  app.use(api_prefix+'season', season_ws);
-  app.use(api_prefix+'category', category_ws);
-  app.use(api_prefix+'gender', gender_ws);
+  app.use(`${api_prefix}${routes.discipline}`, discipline_ws);
+  app.use(`${api_prefix}${routes.competition}`, competition_ws);
+  app.use(`${api_prefix}${routes.season}`, season_ws);
+  app.use(`${api_prefix}${routes.category}`, category_ws);
+  app.use(`${api_prefix}${routes.gender}`, gender_ws);
+  app.use(`${api_prefix}phase`, phase_ws);
 
+  // app.use(api_prefix+'competition', competition_ws);
+  // app.use(api_prefix+'season', season_ws);
+  // app.use(api_prefix+'category', category_ws);
+  // app.use(api_prefix+'gender', gender_ws);
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){
@@ -54,13 +85,9 @@
 
     response.send({api:'api'});
   });
-  // process.env.NODE_ENV = 'production';
-  // process.env.PORT = '3001';
-  // console.log(process.env.NODE_ENV);
 
   var port = process.env.PORT;
   console.log('Port is: ', process.env.PORT);
-   //(process.env.PORT === undefined) ? 3000 : process.env.PORT;
   console.log('Environment is: ', process.env.NODE_ENV);
   app.listen(port, function(){
     console.log('Running on port ' + port);

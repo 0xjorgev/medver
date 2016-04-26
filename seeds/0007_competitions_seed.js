@@ -15,9 +15,7 @@ exports.seed = function(knex, Promise) {
     */
 
     knex('competitions')
-    .insert(
-        {name:'Mushroom Cup',discipline_id:1, subdiscipline_id:2, competition_type_id:2}
-        )
+    .insert({name:'Mushroom Cup',discipline_id:1, subdiscipline_id:2, competition_type_id:2})
     ).then(function(){
 		//Add query
         return knex.raw('');

@@ -68,7 +68,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.post('/:competition_id/contact/create', function (req, res) {
+    router.post('/:competition_id/contact/', function (req, res) {
         console.log('/:competition_id/contact/create');
 
         var Contact = Models.contact;
@@ -152,7 +152,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
 
     //Competition Contact Update
-    router.post('/:competition_id/contact/:contact_id/update', function(req, res){
+    router.put('/:competition_id/contact/:contact_id', function(req, res){
         console.log('/:competition_id/contact/:contact_id/update');
         //Model Instance
         var Contact = Models.contact;
@@ -186,7 +186,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 
     //Create Competition
-    router.post('/create', function (req, res) {
+    router.post('/', function (req, res) {
 
         //Model Instance
         console.log('Create Competition');
@@ -228,7 +228,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
 
     //Competition Update
-    router.post('/:competition_id/update', function(req, res){
+    router.put('/:competition_id/', function(req, res){
 
         console.log('Competition Update');
         //Model Instance

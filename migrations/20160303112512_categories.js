@@ -10,6 +10,8 @@ exports.up = function(knex, Promise) {
 			table.string('image_url');
 			table.timestamp('inscription_init_at');
 			table.timestamp('inscription_ends_at');
+			table.timestamp('paticipant_init_date_range');
+			table.timestamp('paticipant_end_date_range');
 			table.integer('gender_id').references('genders.id').index();
 			table.integer('season_id').references('seasons.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());

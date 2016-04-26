@@ -5,8 +5,11 @@ exports.up = function(knex, Promise) {
 		knex.schema.createTable('organizations', function(table){
 			table.increments('id');
 			table.string('name').notNullable().unique();
-			table.string('website');
+			table.text('description');
+			table.timestamp('foundation_date');
+			table.boolean('personal');
 			table.boolean('active').notNullable().defaultTo(true);
+			// table.integer('contact_id').references('contacts.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
 		})

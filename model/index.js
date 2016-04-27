@@ -17,9 +17,10 @@ define([
     './competition_type',
     // './country',
     './contact',
-    './phase'
+    './phase',
+    './group'
 
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase) {
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group) {
 
     return {
     	util : Util,
@@ -33,6 +34,7 @@ define([
         competition_type: Competition_type,
         //country:Country
         contact:Contact,
-        phase:Phase
+        phase:Phase,
+        group:Group
     };
 });

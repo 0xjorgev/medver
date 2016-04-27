@@ -10,6 +10,7 @@
   var category_ws = require('./route/categories_route');
   var gender_ws = require('./route/genders_route');
   var phase_ws = require('./route/phases_route');
+  var group_ws = require('./route/groups_route');
 
   var apiVersion = 'v1.0';
   var prefix = 'api';
@@ -70,7 +71,9 @@
   app.use(`${api_prefix}${routes.season}`, season_ws);
   app.use(`${api_prefix}${routes.category}`, category_ws);
   app.use(`${api_prefix}${routes.gender}`, gender_ws);
-  app.use(`${api_prefix}phase`, phase_ws);
+  app.use(`${api_prefix}${routes.phase}`, phase_ws);
+  app.use(`${api_prefix}${routes.group}`, group_ws);
+
 
   // app.use(api_prefix+'competition', competition_ws);
   // app.use(api_prefix+'season', season_ws);

@@ -84,7 +84,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
 
 
-    router.post('/:category_id/update', function(req, res, next){
+    router.put('/:category_id', function(req, res, next){
         //Model Instance
         var category = new Models.category;
 

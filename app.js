@@ -45,7 +45,8 @@
   //Middleware
   var allowCrossDomain = function(req, res, next) {
   	res.header('Access-Control-Allow-Origin', '*');
-    res.header('origins','https://herokuapp.com:* https://somosportpocdev.herokuapp.com:*');
+    res.header('origins','*');
+    // res.header('origins','https://herokuapp.com:* https://somosportpocdev.herokuapp.com:* https://somosport-competition-dev.herokuapp.com:*');
     res.header('Access-Control-Allow-Credentials', 'true');
   	next();
   };

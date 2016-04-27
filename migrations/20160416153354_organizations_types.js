@@ -2,12 +2,10 @@
 exports.up = function(knex, Promise) {
 
 	return Promise.all([
-		knex.schema.createTable('organizations', function(table){
+		knex.schema.createTable('organizations_types', function(table){
 			table.increments('id');
 			table.string('name').notNullable().unique();
 			table.text('description');
-			table.timestamp('foundation_date');
-			table.integer('organization_type_id').references('organizations_types.id').index();
 			table.boolean('active').notNullable().defaultTo(true);
 			// table.integer('contact_id').references('contacts.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());
@@ -18,5 +16,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
- 	return Promise.all([ knex.schema.dropTableIfExists('organizations') ]);
+ 	return Promise.all([ knex.schema.dropTableIfExists('organizations_types') ]);
 };

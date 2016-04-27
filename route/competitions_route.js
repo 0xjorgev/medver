@@ -237,11 +237,11 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var competition_upd = req.body;
         console.log('------------------------------');
         console.log('Competition Update');
-        console.log('name: ', competition_post.name);
-        console.log('description: ', competition_post.description);
-        console.log('discipline_id: ', competition_post.discipline_id);
-        console.log('subdiscipline_id: ', competition_post.subdiscipline_id);
-        console.log('competition_type_id: ', competition_post.competition_type_id);
+        console.log('name: ', competition_upd.name);
+        console.log('description: ', competition_upd.description);
+        console.log('discipline_id: ', competition_upd.discipline_id);
+        console.log('subdiscipline_id: ', competition_upd.subdiscipline_id);
+        console.log('competition_type_id: ', competition_upd.competition_type_id);
         console.log('------------------------------');
         // Knex(competition.tableName)
         Knex('competitions')

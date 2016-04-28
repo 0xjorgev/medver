@@ -49,7 +49,7 @@
          },
          team_b: function(){
              return this.belongsTo('Team', 'team_b');
-         }
+         }l
     });
 
     //3.
@@ -59,7 +59,7 @@
 
 //1. Se importa el modelo base (base_model) y los demas modelos requeridos en caso de existir relaciones entre ellos (en este caso './team')
 
-//2. Se define una instancia del nuevo modelo y se extiende de DB.Model (Knex Model). Se asigna el nombre de la tabla y si contiene timesamps.
+//2. Se define una instancia del nuevo modelo y se extiende de DB.Model (Knex Model). Se asigna el nombre de la tabla y si contiene timestamps.
 
 //3. Se retorna (registra), la instancia de nuestro nuevo modelo y se le asigna un nombre
 

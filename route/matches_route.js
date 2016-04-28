@@ -33,5 +33,25 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
+    router.post('/', function (req, res) {
+        console.log('Creating match', req.body);
+
+        var data = req.body;
+
+        new Models.match({
+            location: data.location,
+            home_team_id: data.home_team_id,
+            visitor_team_id: data.visitor_team_id,
+            round_id: data.round_id,
+            date: data.date
+        }).save().then(function(item){
+            console.log(`Match ${item}}`);
+            Message(res, 'Success', '0', item);
+        }).catch(function(error){
+            console.log(`{error: ${error}}`);
+            Message(res, error.detail, error.code, null);
+        });
+     });
+
     return router;
 });

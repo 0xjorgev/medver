@@ -200,3 +200,10 @@ fueron definifueron definidas en el modelo en 1.1
 
 Este Error -> "[Error: The model historia could not be resolved from the registry plugin.]" significa que los nombres de las entidades / tablas, estan escritos con minuscula y deben estar con mayusculas ej: Category
 
+## Para modificar los niveles de debug de knex/node
+
+```javascript
+DEBUG=knex:query //for just queries
+DEBUG=knex:tx //for transactions
+DEBUG=knex* //for everything.
+```

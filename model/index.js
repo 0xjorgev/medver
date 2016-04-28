@@ -18,9 +18,11 @@ define([
     // './country',
     './contact',
     './phase',
-    './group'
+    './group',
+    './round',
+    './team'
 
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group) {
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Team) {
 
     return {
     	util : Util,
@@ -35,6 +37,8 @@ define([
         //country:Country
         contact:Contact,
         phase:Phase,
-        group:Group
+        group:Group,
+        round:Round,
+        team:Team
     };
 });

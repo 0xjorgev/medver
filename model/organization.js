@@ -12,8 +12,8 @@ define(['./base_model', './user'], function (DB) {
         hasTimestamps: true,
 
         // relations
-        // users: function(){
-        //     return this.hasMany('users');
+        // type: function(){
+        //     return this.belongsTo('users');
         // }
     });
 

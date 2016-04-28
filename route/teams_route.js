@@ -12,7 +12,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //List of seasons (don't seem to be needed) -> Returns Array of result
     router.get('/', function (req, res) {
 
-        console.log('Groups List');
+        console.log('Teams List');
         return Models.group
         .query(function(qb){})
         .where({active:true})

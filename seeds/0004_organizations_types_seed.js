@@ -1,10 +1,15 @@
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
-    knex('organizations').del(),
+    knex('organizations_types').del(),
     // Inserts seed entries
-        knex('organizations').insert({id:1, name:'Alianza de futbtol', description:'http://www.alianzadefutbol.com', foundation_date:'2000-12-24 16:11:56.576272-04:30',personal:false}),
-        knex('organizations').insert({id:2, name:'Barcelona Futbol Club', description:'http://http://www.fcbarcelona.com', foundation_date:'1899-11-29 16:11:56.576272-04:30', personal:false})
+        knex('organizations_types').insert({id:1, name:'Federación', description:''}),
+        knex('organizations_types').insert({id:2, name:'Liga', description:''}),
+        knex('organizations_types').insert({id:3, name:'Club', description:''}),
+        knex('organizations_types').insert({id:4, name:'Selección', description:''}),
+        knex('organizations_types').insert({id:5, name:'Equipo', description:''}),
+        knex('organizations_types').insert({id:6, name:'Unipersonal', description:''}),
+        knex('organizations_types').insert({id:7, name:'Unipersonal', description:''})
     ).then(function(){
 		//Add query
         return knex.raw('');

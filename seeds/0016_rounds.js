@@ -4,14 +4,12 @@ exports.seed = function(knex, Promise) {
     // Deletes ALL existing entries
     knex('rounds').del(),
     /*
-
-			table.increments('id');
+            table.increments('id');
 			table.string('name');
 			table.timestamp('start_date');
 			table.timestamp('end_date');
 			table.boolean('active').notNullable().defaultTo(true);
 			table.integer('group_id').references('groups.id').index();
-
     */
     // Inserts seed entries
     knex('rounds').insert({id: 1, name: 'Primera Ronda', group_id:1}),

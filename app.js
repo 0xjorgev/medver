@@ -12,6 +12,7 @@
   var phase_ws = require('./route/phases_route');
   var group_ws = require('./route/groups_route');
   var round_ws = require('./route/rounds_route');
+  var team_ws = require('./route/teams_route');
 
   var apiVersion = 'v1.0';
   var prefix = 'api';
@@ -75,7 +76,7 @@
   app.use(`${api_prefix}${routes.phase}`, phase_ws);
   app.use(`${api_prefix}${routes.group}`, group_ws);
   app.use(`${api_prefix}${routes.round}`, round_ws);
-
+  app.use(`${api_prefix}${routes.team}`, team_ws);
 
   // app.use(api_prefix+'competition', competition_ws);
   // app.use(api_prefix+'season', season_ws);

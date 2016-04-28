@@ -9,14 +9,14 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
 
-    //List of seasons (don't seem to be needed) -> Returns Array of result
+    //List of teams
     router.get('/', function (req, res) {
 
         console.log('Teams List');
-        return Models.group
+        return Models.team
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['phase']})
+        .fetchAll({withRelated: ['category', 'organization']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -27,17 +27,17 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    //Group by Id -> Returns 1 result
-    router.get('/:group_id', function (req, res) {
+    //Team by Id -> Returns 1 result
+    router.get('/:team_id', function (req, res) {
 
-        console.log('Group by id');
+        console.log('Team by id');
 
-        var group_id = req.params.group_id;
+        var team_id = req.params.team_id;
 
-        return Models.group
-        .where({id:group_id})
+        return Models.team
+        .where({id:team_id})
         .where({active:true})
-        .fetch({withRelated: ['phase']})
+        .fetch({withRelated: ['category', 'organization']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -45,38 +45,45 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.get('/:group_id/round/', function (req, res) {
+    // //'category', 'organization'
+    // router.get('/:org_id/organization/', function (req, res) {
 
-        console.log('Rounds by group_id');
+    //     console.log('Rounds by group_id');
 
-         var group_id = req.params.group_id;
-        return Models.round
-        .where({'group_id':group_id})
-        .fetch({withRelated: ['group']})
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
-    });
+    //      var group_id = req.params.group_id;
+    //     return Models.round
+    //     .where({'group_id':group_id})
+    //     .fetch({withRelated: ['group']})
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
 
-    ///:group_id
+    router.post('/organization/:org_id/category/:cat_id', function (req, res) {
 
-    router.post('/phase/:phase_id', function (req, res) {
-
-        console.log('Groups Create');
+        console.log('Team Create');
         //Model Instance
-        var Group = Models.group;
-        var group_post = req.body;
-        var phase_id = req.params.phase_id;
-        var name = group_post.name;
+        var Team        = Models.team;
+        var team_post   = req.body;
+        var org_id      = req.params.org_id;
+        var cat_id      = req.params.cat_id;
+        var logo_url    =  req.params.logo_url;
+        var short_name  =  req.params.short_name;
+        var description =  req.params.description;
+        var name        = group_post.name;
 
-        new Group({
+        new Team({
             name: name,
-            phase_id: phase_id
-        }).save().then(function(new_group){
-            console.log(`{new_group: ${new_group}}`);
-            Message(res, 'Success', '0', new_group);
+            organization_id: org_id,
+            category_id: cat_id,
+            logo_url: logo_url,
+            short_name: short_name,
+            description: description
+        }).save().then(function(new_team){
+            console.log(`{new_team: ${new_team}}`);
+            Message(res, 'Success', '0', new_team);
         }).catch(function(error){
             console.log(`{error: ${error}}`);
             Message(res, error.detail, error.code, null);
@@ -84,20 +91,20 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
 
 
-    router.put('/:group_id', function(req, res, next){
+    router.put('/:team_id', function(req, res, next){
 
-        console.log('Groups Update');
+        console.log('Team Update');
         //Model Instance
         var group = new Models.group;
 
         //URL Request, Season Id
-        var group_id = req.params.group_id;
-        var group_upd = req.body;
+        var team_id = req.params.team_id;
+        var team_upd = req.body;
 
         Knex(group.tableName)
-        .where('id','=',group_id)
+        .where('id','=',team_id)
         .where('active','=',1)
-        .update(group_upd, ['id'])
+        .update(team_upd, ['id'])
         .then(function(result){
             if (result.length != 0){
                 console.log('result is not null');
@@ -105,7 +112,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res, 'Success', '0', result);
             } else {
 
-                Message(res, 'group not found', '404', result);
+                Message(res, 'team not found', '404', result);
             }
         })
         .catch(function(err){

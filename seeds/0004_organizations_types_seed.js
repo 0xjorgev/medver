@@ -8,8 +8,7 @@ exports.seed = function(knex, Promise) {
         knex('organizations_types').insert({id:3, name:'Club', description:''}),
         knex('organizations_types').insert({id:4, name:'Selección', description:''}),
         knex('organizations_types').insert({id:5, name:'Equipo', description:''}),
-        knex('organizations_types').insert({id:6, name:'Unipersonal', description:''}),
-        knex('organizations_types').insert({id:7, name:'Unipersonal', description:''})
+        knex('organizations_types').insert({id:6, name:'Unipersonal', description:''})
     ).then(function(){
 		//Add query
         return knex.raw('');

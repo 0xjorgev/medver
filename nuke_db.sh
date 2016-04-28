@@ -1,0 +1,1 @@
+dropdb somosport_core && createdb somosport_core && knex migrate:latest && knex seed:run

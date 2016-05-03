@@ -34,7 +34,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.post('/create', function (req, res) {
+    router.post('/', function (req, res) {
 
         //Model Instance
         var Season = Models.season;
@@ -65,7 +65,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
 
 
-    router.post('/:season_id/update', function(req, res, next){
+    router.put('/:season_id', function(req, res, next){
+        console.log('Season PUT');
         //Model Instance
         var season = new Models.season;
 
@@ -73,6 +74,20 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var season_id = req.params.season_id;
         var season_upd = req.body;
 
+        var competition_id = season_upd.competition_id;
+        var name = season_upd.name;
+        var description = season_upd.description;
+        var game_title = season_upd.game_title;
+
+
+
+
+        console.log('--------------------');
+        console.log("competition_id: " + competition_id);
+        console.log("name: " + name);
+        console.log("description: " + description);
+        console.log("game_title: " + game_title);
+        console.log('--------------------');
 
         Knex(season.tableName)
         .where('id','=',season_id)

@@ -52,6 +52,7 @@
     // res.header('origins','https://herokuapp.com:* https://somosportpocdev.herokuapp.com:* https://somosport-competition-dev.herokuapp.com:*');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Content-Type', 'application/json');
   	next();
   };
 

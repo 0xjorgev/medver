@@ -51,6 +51,7 @@
     res.header('origins','*');
     // res.header('origins','https://herokuapp.com:* https://somosportpocdev.herokuapp.com:* https://somosport-competition-dev.herokuapp.com:*');
     res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   	next();
   };
 
@@ -77,11 +78,6 @@
   app.use(`${api_prefix}${routes.group}`, group_ws);
   app.use(`${api_prefix}${routes.round}`, round_ws);
   app.use(`${api_prefix}${routes.team}`, team_ws);
-
-  // app.use(api_prefix+'competition', competition_ws);
-  // app.use(api_prefix+'season', season_ws);
-  // app.use(api_prefix+'category', category_ws);
-  // app.use(api_prefix+'gender', gender_ws);
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){

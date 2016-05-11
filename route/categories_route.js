@@ -41,7 +41,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.post('/create', function (req, res) {
+    router.post('/', function (req, res) {
 
         //Model Instance
         var Category = Models.category;

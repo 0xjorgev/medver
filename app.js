@@ -1,6 +1,7 @@
   var express = require('express');
   var app = express();
   var bodyParser = require('body-parser');
+  var morgan = require('morgan');
   // var uuid = require('uuid');
   // var nJwt = require('nJwt');
   var discipline_ws = require('./route/disciplines_route');
@@ -55,6 +56,8 @@
     res.header('Content-Type', 'application/json');
   	next();
   };
+
+  app.use(morgan('combined'));
 
 	app.use(allowCrossDomain);
 	// parse application/json

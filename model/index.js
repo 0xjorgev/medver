@@ -20,9 +20,10 @@ define([
     './phase',
     './group',
     './round',
+    './match',
     './team'
 
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Team) {
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team) {
 
     return {
     	util : Util,
@@ -39,6 +40,7 @@ define([
         phase:Phase,
         group:Group,
         round:Round,
+        match:Match,
         team:Team
     };
 });

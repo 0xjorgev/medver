@@ -49,7 +49,7 @@
          },
          team_b: function(){
              return this.belongsTo('Team', 'team_b');
-         }
+         }l
     });
 
     //3.
@@ -59,7 +59,7 @@
 
 //1. Se importa el modelo base (base_model) y los demas modelos requeridos en caso de existir relaciones entre ellos (en este caso './team')
 
-//2. Se define una instancia del nuevo modelo y se extiende de DB.Model (Knex Model). Se asigna el nombre de la tabla y si contiene timesamps.
+//2. Se define una instancia del nuevo modelo y se extiende de DB.Model (Knex Model). Se asigna el nombre de la tabla y si contiene timestamps.
 
 //3. Se retorna (registra), la instancia de nuestro nuevo modelo y se le asigna un nombre
 
@@ -200,3 +200,10 @@ fueron definifueron definidas en el modelo en 1.1
 
 Este Error -> "[Error: The model historia could not be resolved from the registry plugin.]" significa que los nombres de las entidades / tablas, estan escritos con minuscula y deben estar con mayusculas ej: Category
 
+## Para modificar los niveles de debug de knex/node
+
+```javascript
+DEBUG=knex:query //for just queries
+DEBUG=knex:tx //for transactions
+DEBUG=knex* //for everything.
+```

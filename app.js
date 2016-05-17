@@ -13,6 +13,7 @@
   var phase_ws = require('./route/phases_route');
   var group_ws = require('./route/groups_route');
   var round_ws = require('./route/rounds_route');
+  var match_ws = require('./route/matches_route');
   var team_ws = require('./route/teams_route');
 
   var apiVersion = 'v1.0';
@@ -50,10 +51,9 @@
   var allowCrossDomain = function(req, res, next) {
   	res.header('Access-Control-Allow-Origin', '*');
     res.header('origins','*');
-    // res.header('origins','https://herokuapp.com:* https://somosportpocdev.herokuapp.com:* https://somosport-competition-dev.herokuapp.com:*');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Content-Type', 'application/json');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
   	next();
   };
 
@@ -81,6 +81,7 @@
   app.use(`${api_prefix}${routes.phase}`, phase_ws);
   app.use(`${api_prefix}${routes.group}`, group_ws);
   app.use(`${api_prefix}${routes.round}`, round_ws);
+  app.use(`${api_prefix}${routes.match}`, match_ws);
   app.use(`${api_prefix}${routes.team}`, team_ws);
 
   app.get(api_prefix, function(request, response){

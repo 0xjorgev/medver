@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
   return Promise.all([
 		knex.schema.createTable('matches', function(table){
 			table.increments('id');
-			table.text('place');
+			table.text('location');
 			table.integer('home_team_id').references('teams.id').index();
 			table.integer('visitor_team_id').references('teams.id').index();
 			table.integer('round_id').references('rounds.id').index();

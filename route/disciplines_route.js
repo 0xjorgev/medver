@@ -24,6 +24,20 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
+    // router.get('/subdiscipline', function (req, res) {
+
+    //     console.log('Discipline get /subdiscipline');
+    //     // tapping into Knex query builder to modify query being run
+    //     return Models.subdiscipline.query(function(qb){
+    //         qb.limit(25);
+    //     }).fetchAll({withRelated: ['discipline'], debug: true})
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
+
     router.get('/:discipline', function (req, res) {
 
         console.log('Discipline get /:discipline');
@@ -35,16 +49,16 @@ define(['express', '../model/index', '../util/request_message_util'], function (
             Message(res,'Success', '0', result);
         }).catch(function(error){
             Message(res,error.details, error.code, []);
-        });;
+        });
     });
 
-    router.get('/subdiscipline', function (req, res) {
+    router.get('/:discipline/subdiscipline/', function (req, res) {
 
-        console.log('Discipline get /subdiscipline');
+        console.log('SubDiscipline by Discipline');
+        var dis = req.params.discipline;
         // tapping into Knex query builder to modify query being run
-        return Models.subdiscipline.query(function(qb){
-            qb.limit(25);
-        }).fetchAll({withRelated: ['discipline'], debug: true})
+        return Models.subdiscipline.where({'discipline_id':dis})
+        .fetchAll()
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

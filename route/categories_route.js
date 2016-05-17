@@ -53,17 +53,25 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var image_url = category_post.image_url;
         var inscription_init_at = category_post.inscription_init_at;
         var inscription_ends_at = category_post.inscription_ends_at;
+        //V 1.1
+        var minimun_value = category_post.minimun_value;
+        var maximun_value = category_post.maximun_value;
 
         /*
+            table.increments('id');
             table.string('name');
             table.text('description');
             table.boolean('active').notNullable().defaultTo(true);
             table.string('image_url');
             table.timestamp('inscription_init_at');
             table.timestamp('inscription_ends_at');
+            table.string('condition');
+            table.integer('minimun_value');
+            table.integer('maximun_value');
             table.integer('gender_id').references('genders.id').index();
             table.integer('season_id').references('seasons.id').index();
-
+            table.timestamp('created_at').defaultTo(knex.fn.now());
+            table.timestamp('updated_at').defaultTo(knex.fn.now());
         */
 
         new Category({
@@ -73,7 +81,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             inscription_init_at:inscription_init_at,
             inscription_ends_at:inscription_init_at,
             gender_id: gender_id,
-            season_id: season_id
+            season_id: season_id,
+            minimun_value: minimun_value,
+            maximun_value: maximun_value
         }).save().then(function(new_category){
             console.log(`{new_category: ${new_category}}`);
             Message(res, 'Success', '0', new_category);
@@ -105,7 +115,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res, 'Success', '0', result);
             } else {
 
-                Message(res, 'Username or email not found', '404', result);
+                Message(res, 'Category not found', '404', result);
             }
         })
         .catch(function(err){

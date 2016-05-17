@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
 
     var router = express.Router();
 
@@ -34,12 +34,12 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.post('/', function (req, res) {
+    router.post('/:competition_id', function (req, res) {
 
         //Model Instance
         var Season = Models.season;
         var season_post = req.body;
-        var competition_id = season_post.competition_id;
+        var competition_id = req.params.competition_id;
         var name = season_post.name;
         var description = season_post.description;
         var game_title = season_post.game_title;
@@ -78,9 +78,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var name = season_upd.name;
         var description = season_upd.description;
         var game_title = season_upd.game_title;
-
-
-
 
         console.log('--------------------');
         console.log("competition_id: " + competition_id);

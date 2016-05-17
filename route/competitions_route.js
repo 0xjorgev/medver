@@ -67,7 +67,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res,error.details, error.code, []);
         });
     });
+//Move to an independent Router
 
+//--------------------------
     router.post('/:competition_id/contact/', function (req, res) {
         console.log('/:competition_id/contact/create');
 
@@ -143,7 +145,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         return Models.contact
         .where({competition_id:competition_id, id:contact_id})
-        .fetch()
+        .fetchAll()
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -181,7 +183,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           Message(res, err.detail, err.code, null);
         });
     });
-
+//--------------------------
 
 
 

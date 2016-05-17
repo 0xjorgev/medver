@@ -25,8 +25,7 @@ exports.seed = function(knex, Promise) {
         {name:'Sub 15',description:'Players under 15 years old', gender_id:1, season_id:1},
         {name:'Sub 14',description:'Players under 14 years old', gender_id:1, season_id:1},
         {name:'Infant',description:'Kids under 13 years old', gender_id:1, season_id:1}
-        ]
-        )
+        ])
     ).then(function(){
 		//Add query
         return knex.raw('');

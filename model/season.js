@@ -5,19 +5,21 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./competition'], function (DB) {
+define(['./base_model','./competition', './category'], function (DB) {
 
     var Season = DB.Model.extend({
         tableName: 'seasons',
         hasTimestamps: true,
 
         //relations
-        competition: function(){
-            return this.belongsTo('Competition', 'competition_id');
-        }
+        // competition: function(){
+        //     return this.belongsTo('Competition', 'competition_id');
+        // },
 
+        category: function(){
+            return this.hasMany('Category');
+        }
     });
-    //solving unable to resolve host ip-10-0-0-187
     // uses Registry plugin
     return DB.model('Season', Season);
 });

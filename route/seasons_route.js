@@ -11,9 +11,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //List of seasons (don't seem to be needed) -> Returns Array of result
     router.get('/', function (req, res) {
+        console.log('Get all Seasons');
         return Models.season
         .query(function(qb){})
-        .fetchAll({withRelated: ['competition']})
+        .fetchAll({debug:true, withRelated: ['category']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

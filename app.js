@@ -2,6 +2,8 @@
   var app = express();
   var bodyParser = require('body-parser');
   var morgan = require('morgan');
+  var my_knex = require('./model/util')
+  var knex_logger = require('knex-logger');
   // var uuid = require('uuid');
   // var nJwt = require('nJwt');
   var discipline_ws = require('./route/disciplines_route');
@@ -56,6 +58,8 @@
     res.header('Access-Control-Allow-Headers', 'Content-Type');
   	next();
   };
+
+  app.use(knex_logger(my_knex));
 
   app.use(morgan('combined'));
 

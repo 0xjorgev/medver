@@ -27,7 +27,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var season_id = req.params.season_id;
         return Models.season
         .where({id:season_id})
-        .fetch({withRelated: ['competition']})
+        .fetch({withRelated: ['category']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -35,12 +35,12 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.post('/:competition_id', function (req, res) {
+    router.post('/', function (req, res) {
 
         //Model Instance
         var Season = Models.season;
         var season_post = req.body;
-        var competition_id = req.params.competition_id;
+        var competition_id = season_post.season_post;
         var name = season_post.name;
         var description = season_post.description;
         var game_title = season_post.game_title;

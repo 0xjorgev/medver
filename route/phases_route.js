@@ -20,7 +20,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .query(function(qb){
             qb.limit(25);
         })
-        .fetchAll({withRelated: ['category']} )
+        .fetchAll({withRelated: ['group']} )
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);
@@ -35,7 +35,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
          var phase_id = req.params.phase_id;
         return Models.phase
         .where({'id':phase_id})
-        .fetch({withRelated: ['category']})
+        .fetch({withRelated: ['group']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -43,46 +43,46 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    //Groups by Phase_id
-    router.get('/:phase_id/group/', function (req, res) {
+    // //Groups by Phase_id
+    // router.get('/:phase_id/group/', function (req, res) {
 
-        console.log('Group by phase_id');
+    //     console.log('Group by phase_id');
 
-        var phase_id = req.params.phase_id;
+    //     var phase_id = req.params.phase_id;
 
-        return Models.group
-        .where({phase_id:phase_id})
-        .where({active:true})
-        .fetch({withRelated: ['phase']})
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
-    });
+    //     return Models.group
+    //     .where({phase_id:phase_id})
+    //     .where({active:true})
+    //     .fetch({withRelated: ['phase']})
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
 
-    //Phases by category_id -> Returns array of result
-    router.get('/category/:category_id', function (req, res) {
-        console.log('/category/:category_id/');
-        var category_id = req.params.category_id;
-        return Models.phase
-        .where({category_id:category_id})
-        .fetchAll()
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
-    });
+    // //Phases by category_id -> Returns array of result
+    // router.get('/category/:category_id', function (req, res) {
+    //     console.log('/category/:category_id/');
+    //     var category_id = req.params.category_id;
+    //     return Models.phase
+    //     .where({category_id:category_id})
+    //     .fetchAll()
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
 
 
-    router.post('/:category_id', function (req, res) {
+    router.post('/', function (req, res) {
     	var Phase = Models.phase;
     	var phase_post = req.body;
-    	var category_id = req.params.category_id;
+
 
     	console.log('Req Values:' + req.body);
-
+        var category_id = phase_post.category_id;
     	var name = phase_post.name;
     	var position = phase_post.position;
 

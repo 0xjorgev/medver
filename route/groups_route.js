@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.group
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['phase']})
+        .fetchAll({withRelated: ['round']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -37,7 +37,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.group
         .where({id:group_id})
         .where({active:true})
-        .fetch({withRelated: ['phase']})
+        .fetch({withRelated: ['round']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -45,7 +45,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.get('/:group_id/round/', function (req, res) {
+    router.get('/:group_id', function (req, res) {
 
         console.log('Rounds by group_id');
 
@@ -62,13 +62,13 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     ///:group_id
 
-    router.post('/phase/:phase_id', function (req, res) {
+    router.post('/', function (req, res) {
 
         console.log('Groups Create');
         //Model Instance
         var Group = Models.group;
         var group_post = req.body;
-        var phase_id = req.params.phase_id;
+        var phase_id = group_post.phase_id;
         var name = group_post.name;
 
         new Group({

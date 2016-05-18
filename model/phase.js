@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./category'], function (DB) {
+define(['./base_model','./category', './group'], function (DB) {
 
     var Phase = DB.Model.extend({
         tableName: 'phases',
@@ -14,6 +14,9 @@ define(['./base_model','./category'], function (DB) {
         //relations
         category: function(){
             return this.belongsTo('Category', 'category_id');
+        },
+        group:  function(){
+            return this.hasMany('Group');
         }
     });
 

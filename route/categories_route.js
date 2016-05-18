@@ -14,7 +14,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.category
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['gender']})
+        .fetchAll({withRelated: ['gender', 'phase']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -33,7 +33,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.category
         .where({id:category_id})
         .where({active:true})
-        .fetch({withRelated: ['gender']})
+        .fetch({withRelated: ['gender','phase']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

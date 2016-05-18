@@ -18,7 +18,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         return Models.round
         .query(function(qb){})
-        .fetchAll({withRelated: ['group']} )
+        .fetchAll({withRelated: ['match']} )
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);
@@ -33,7 +33,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
          var round_id = req.params.round_id;
         return Models.round
         .where({'id':round_id})
-        .fetch({withRelated: ['group']})
+        .fetch({withRelated: ['match']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -74,10 +74,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     // });
 
 
-    router.post('/:group_id', function (req, res) {
+    router.post('/', function (req, res) {
     	var Round = Models.round;
     	var round_post = req.body;
-    	var group_id = req.params.group_id;
+    	var group_id = round_post.group_id;
     	var name = round_post.name;
     	var start_date = round_post.start_date;
     	var end_date = round_post.end_date;

@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./group'], function (DB) {
+define(['./base_model','./group', './match'], function (DB) {
 
     var Round = DB.Model.extend({
         tableName: 'rounds',
@@ -14,6 +14,10 @@ define(['./base_model','./group'], function (DB) {
         //relations
         group: function(){
             return this.belongsTo('Group', 'group_id');
+        },
+
+        match: function(){
+            return this.hasMany('Match');
         }
     });
 

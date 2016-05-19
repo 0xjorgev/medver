@@ -11,6 +11,14 @@ define(['./base_model', './round'], function (DB) {
         //relations
         round: function(){
             return this.belongsTo('Round', 'round_id');
+        },
+
+        home_team: function(){
+            return this.belongsTo('Team', 'home_team_id');
+        },
+
+        visitor_team: function(){
+            return this.belongsTo('Team', 'visitor_team_id');
         }
     });
 

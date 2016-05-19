@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.group
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['round']})
+        .fetchAll({withRelated: ['rounds']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -37,7 +37,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.group
         .where({id:group_id})
         .where({active:true})
-        .fetch({withRelated: ['round']})
+        .fetch({withRelated: ['rounds']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

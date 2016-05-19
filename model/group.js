@@ -15,7 +15,7 @@ define(['./base_model','./phase','./round'], function (DB) {
         phase: function(){
             return this.belongsTo('Phase', 'phase_id');
         },
-        round: function(){
+        rounds: function(){
             return this.hasMany('Round');
         }
     });

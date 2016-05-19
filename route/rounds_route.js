@@ -18,7 +18,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         return Models.round
         .query(function(qb){})
-        .fetchAll({withRelated: ['match']} )
+        .fetchAll({withRelated: ['matches']} )
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);
@@ -33,7 +33,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
          var round_id = req.params.round_id;
         return Models.round
         .where({'id':round_id})
-        .fetch({withRelated: ['match']})
+        .fetch({withRelated: ['matches']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

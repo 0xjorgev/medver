@@ -12,7 +12,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         // tapping into Knex query builder to modify query being run
         return Models.match
         .query(function(qb){})
-        .fetchAll()
+        .fetchAll({withRelated: ['home_team', 'visitor_team']} )
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -27,7 +27,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         // tapping into Knex query builder to modify query being run
         return Models.match
         .where({'id':match_id})
-        .fetch()
+        .fetch({withRelated: ['home_team', 'visitor_team']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

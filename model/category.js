@@ -20,7 +20,7 @@ define(['./base_model','./gender','./season', './phase'], function (DB) {
             return this.belongsTo('Season', 'season_id');
         },
 
-        phase: function(){
+        phases: function(){
             return this.hasMany('Phase');
         }
     });

@@ -17,7 +17,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('Competition List');
         return Models.competition
         .query(function(qb){})
-        .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'season']})
+        .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']})
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);
@@ -46,7 +46,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var comp_id = req.params.competition_id;
         return Models.competition
         .where({'id':comp_id})
-        .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'season']} )
+        .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']} )
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

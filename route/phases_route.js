@@ -20,7 +20,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .query(function(qb){
             qb.limit(25);
         })
-        .fetchAll({withRelated: ['group']} )
+        .fetchAll({withRelated: ['groups']} )
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);
@@ -35,7 +35,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
          var phase_id = req.params.phase_id;
         return Models.phase
         .where({'id':phase_id})
-        .fetch({withRelated: ['group']})
+        .fetch({withRelated: ['groups']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

@@ -28,7 +28,7 @@ define(['./base_model', './discipline', './subdiscipline', './competition_type',
             return this.belongsTo('Subdiscipline', 'subdiscipline_id');
         },
 
-        season: function(){
+        seasons: function(){
             return this.hasMany('Season');
         },
 

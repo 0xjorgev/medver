@@ -15,7 +15,7 @@ define(['./base_model','./category', './group'], function (DB) {
         category: function(){
             return this.belongsTo('Category', 'category_id');
         },
-        group:  function(){
+        groups:  function(){
             return this.hasMany('Group');
         }
     });

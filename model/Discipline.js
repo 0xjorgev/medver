@@ -12,7 +12,7 @@ define(['./base_model', './subdiscipline'], function (DB) {
         hasTimestamps: true,
 
         // relations
-        subdiscipline: function(){
+        subdisciplines: function(){
             return this.hasMany('Subdiscipline');
         },
     });

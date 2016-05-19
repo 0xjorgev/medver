@@ -30,6 +30,9 @@ define(['./base_model', './category', './organization'], function (DB) {
         organization: function(){
             return this.belongsTo('Organization', 'organization_id');
         }
+
+
+
     });
 
     // uses Registry plugin

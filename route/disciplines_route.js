@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         return Models.discipline
         .query(function(qb){
             qb.limit(25);
-        }).fetchAll({withRelated: ['subdiscipline']})
+        }).fetchAll({withRelated: ['subdisciplines']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -44,7 +44,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         var dis = req.params.discipline;
         // tapping into Knex query builder to modify query being run
         return Models.discipline.where({'id':dis})
-        .fetch({withRelated: ['subdiscipline']})
+        .fetch({withRelated: ['subdisciplines']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

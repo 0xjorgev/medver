@@ -79,7 +79,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             description:description,
             image_url:image_url,
             inscription_init_at:inscription_init_at,
-            inscription_ends_at:inscription_init_at,
+            inscription_ends_at:inscription_ends_at,
             gender_id: gender_id,
             season_id: season_id,
             minimun_value: minimun_value,

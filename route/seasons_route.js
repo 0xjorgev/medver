@@ -40,7 +40,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         //Model Instance
         var Season = Models.season;
         var season_post = req.body;
-        var competition_id = season_post.season_post;
+        var competition_id = season_post.competition_id;
         var name = season_post.name;
         var description = season_post.description;
         var game_title = season_post.game_title;

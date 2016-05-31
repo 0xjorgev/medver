@@ -16,7 +16,7 @@ define(['./base_model','./group', './match'], function (DB) {
             return this.belongsTo('Group', 'group_id');
         },
 
-        match: function(){
+        matches: function(){
             return this.hasMany('Match');
         }
     });

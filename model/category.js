@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./gender','./season', './phase'], function (DB) {
+define(['./base_model','./gender','./season', './phase', './clasification'], function (DB) {
 
     var Category = DB.Model.extend({
         tableName: 'categories',
@@ -22,6 +22,9 @@ define(['./base_model','./gender','./season', './phase'], function (DB) {
 
         phases: function(){
             return this.hasMany('Phase');
+        },
+        clasification:  function(){
+            return this.belongsTo('Clasification', 'clasification_id');
         }
     });
 

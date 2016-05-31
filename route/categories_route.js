@@ -14,7 +14,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.category
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['gender', 'phases']})
+        .fetchAll({withRelated: ['gender', 'phases', 'clasification']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -33,7 +33,26 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.category
         .where({id:category_id})
         .where({active:true})
-        .fetch({withRelated: ['gender','phases']})
+        .fetch({withRelated: ['gender','phases', 'clasification']})
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
+
+    //Teams by Category
+    router.get('/:category_id/team', function (req, res) {
+
+        console.log("Teams by Category");
+
+        var category_id = req.params.category_id;
+
+        return Models.team
+        .where({category_id:category_id})
+        .where({active:true})
+        .fetch()
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

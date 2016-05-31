@@ -18,6 +18,15 @@ define(['./base_model','./category', './group'], function (DB) {
         groups:  function(){
             return this.hasMany('Group');
         }
+
+        // next: function(){
+        //     return this.belongsTo('Phase');
+        // },
+
+        // previous: function(){
+        //     return this.belongsTo('Phase');
+        // }
+
     });
 
     // uses Registry plugin

@@ -190,6 +190,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //Create Competition
     router.post('/', function (req, res) {
 
+
+        //ADD URL
         //Model Instance
         console.log('Create Competition');
         var Competition = Models.competition;
@@ -202,6 +204,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var subdiscipline_id = competition_post.subdiscipline_id;
         var competition_type_id = competition_post.competition_type_id;
         var description = competition_post.description;
+        var img_url = competition.post.img_url;
 
         console.log('------------------------------');
 
@@ -219,7 +222,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             description: description,
             discipline_id:discipline_id,
             subdiscipline_id:subdiscipline_id,
-            competition_type_id:competition_type_id
+            competition_type_id:competition_type_id,
+            img_url: competition.post.img_url
         }).save().then(function(new_competition){
             console.log(`{new_competition: ${new_competition}}`);
             Message(res, 'Success', '0', new_competition);

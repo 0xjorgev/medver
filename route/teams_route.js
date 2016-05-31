@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.team
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['category', 'organization']})
+        .fetchAll({withRelated: ['category', 'organization', 'player']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -34,15 +34,25 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         var team_id = req.params.team_id;
 
-        return Models.team
-        .where({id:team_id})
+        return Models.player_team
+        .where({team_id:team_id})
         .where({active:true})
-        .fetch({withRelated: ['category', 'organization']})
+        .fetchAll({withRelated: ['player'], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
             Message(res,error.details, error.code, []);
         });
+
+        // return Models.team
+        // .where({id:team_id})
+        // .where({active:true})
+        // .fetch({withRelated: ['category']})
+        // .then(function (result) {
+        //     Message(res,'Success', '0', result);
+        // }).catch(function(error){
+        //     Message(res,error.details, error.code, []);
+        // });
     });
 
     // //'category', 'organization'

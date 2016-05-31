@@ -21,9 +21,11 @@ define([
     './group',
     './round',
     './match',
-    './team'
+    './team',
+    './clasification',
+    './player_team'
 
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team) {
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team, Clasification, Player_team) {
 
     return {
     	util : Util,
@@ -41,6 +43,8 @@ define([
         group:Group,
         round:Round,
         match:Match,
-        team:Team
+        team:Team,
+        clasification:Clasification,
+        player_team:Player_team
     };
 });

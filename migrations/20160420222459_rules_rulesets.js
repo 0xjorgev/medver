@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
 	return Promise.all([
 		knex.schema.createTable('rules_rulesets', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.integer('rule_id').references('rules.id').index();
 			table.integer('ruleset_id').references('rulesets.id').index();
 			table.boolean('active').notNullable().defaultTo(true);

@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
   return Promise.all([
 		knex.schema.createTable('phases', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name');
 			table.integer('position');
 			table.integer('participant_team');

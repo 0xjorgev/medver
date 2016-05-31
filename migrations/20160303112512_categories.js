@@ -2,7 +2,7 @@ exports.up = function(knex, Promise) {
 
 	return Promise.all([
 		knex.schema.createTable('categories', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name');
 			table.text('description');
 			table.boolean('active').notNullable().defaultTo(true);

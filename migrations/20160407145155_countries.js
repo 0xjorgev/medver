@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
   return Promise.all([
 		knex.schema.createTable('countries', function(table){
-			table.string('name');
+			table.string('name').primary();
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());

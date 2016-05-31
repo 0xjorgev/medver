@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
 
 	return Promise.all([
 		knex.schema.createTable('seasons', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name').notNullable();
 			table.string('description');
 			table.string('game_title');

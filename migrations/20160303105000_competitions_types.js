@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
 
 	return Promise.all([
 		knex.schema.createTable('competitions_types', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name').notNullable().unique();
 			table.string('image_url');
 			table.boolean('active').notNullable().defaultTo(true);

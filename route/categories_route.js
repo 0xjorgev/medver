@@ -52,7 +52,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.team
         .where({category_id:category_id})
         .where({active:true})
-        .fetch()
+        .fetchAll()
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

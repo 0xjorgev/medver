@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
   return Promise.all([
 		knex.schema.createTable('contacts', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('country');
 			table.string('state');
 			table.string('city');

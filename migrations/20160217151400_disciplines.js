@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
   return Promise.all([
 		knex.schema.createTable('disciplines', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name').notNullable();
 			table.text('description').notNullable();
 			table.text('image_url');

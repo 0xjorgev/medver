@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
 
 	return Promise.all([
 		knex.schema.createTable('organizations_types', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name').notNullable().unique();
 			table.text('description');
 			table.boolean('active').notNullable().defaultTo(true);

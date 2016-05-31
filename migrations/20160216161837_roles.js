@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
     return Promise.all([
 		knex.schema.createTable('roles', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('description').notNullable();
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('created_at').defaultTo(knex.fn.now());

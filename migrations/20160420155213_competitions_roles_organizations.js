@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
     return Promise.all([
 		knex.schema.createTable('competitions_roles_organizations', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.integer('competition_id').references('competitions.id').index();
 			table.integer('organization_id').references('organizations.id').index();
 			table.integer('rol_id').references('roles.id').index();

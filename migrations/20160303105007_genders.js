@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
 
 	return Promise.all([
 		knex.schema.createTable('genders', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name');
 			table.string('image_url');
 			table.boolean('active').notNullable().defaultTo(true);

@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
    return Promise.all([
 		knex.schema.createTable('groups', function(table){
-			table.increments('id');
+			table.increments('id').primary();
 			table.string('name');
 			table.boolean('active').notNullable().defaultTo(true);
 			table.integer('phase_id').references('phases.id').index();

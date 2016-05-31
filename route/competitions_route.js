@@ -223,7 +223,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             discipline_id:discipline_id,
             subdiscipline_id:subdiscipline_id,
             competition_type_id:competition_type_id,
-            img_url: competition.post.img_url
+            img_url: competition.img_url,
+            is_published: competition.is_published
         }).save().then(function(new_competition){
             console.log(`{new_competition: ${new_competition}}`);
             Message(res, 'Success', '0', new_competition);

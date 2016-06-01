@@ -25,6 +25,9 @@ define(['./base_model', './discipline'], function (DB) {
         discipline: function(){
             return this.belongsTo('Discipline');
         },
+        event: function(){
+            return this.hasMany('Event');
+        }
     });
 
     // uses Registry plugin

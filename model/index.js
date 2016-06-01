@@ -23,9 +23,10 @@ define([
     './match',
     './team',
     './clasification',
-    './player_team'
+    './player_team',
+    './event'
 
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team, Clasification, Player_team) {
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team, Clasification, Player_team, Event) {
 
     return {
     	util : Util,
@@ -45,6 +46,7 @@ define([
         match:Match,
         team:Team,
         clasification:Clasification,
-        player_team:Player_team
+        player_team:Player_team,
+        event:Event
     };
 });

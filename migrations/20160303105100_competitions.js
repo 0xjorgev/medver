@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
 			table.string('name');
 			table.text('description');
 			table.string('img_url');
-			table.boolean('is_published').notNullable.defaultTo(false);
+			table.boolean('is_published').notNullable().defaultTo(false);
 			table.boolean('active').notNullable().defaultTo(true);
 			table.integer('discipline_id').references('disciplines.id').index();
 			table.integer('subdiscipline_id').references('subdisciplines.id').index();

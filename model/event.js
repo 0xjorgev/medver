@@ -8,7 +8,7 @@ if (typeof define !== 'function') {
 define(['./base_model', './subdiscipline'], function (DB) {
 
     var Event = DB.Model.extend({
-        tableName: 'contacts',
+        tableName: 'events',
         hasTimestamps: true,
 
         // relations

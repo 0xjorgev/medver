@@ -66,5 +66,24 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
+        router.get('/subdiscipline/:subdiscipline_id/event', function (req, res) {
+
+        console.log('-----------------------');
+        console.log('Events By subDiscipline');
+        console.log('-----------------------');
+        // var dis = req.params.discipline_id;
+        var sub = req.params.subdiscipline_id;
+        // tapping into Knex query builder to modify query being run
+        //console.log(Models.event);
+        return Models.event
+        .where({'subdiscipline_id':sub})
+        .fetchAll({debug:true})
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
     return router;
 });

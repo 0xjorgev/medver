@@ -6,6 +6,16 @@
 //     Subdiscipline: function() {
 //        return this.hasMany(Subdiscipline, 'disciplineId');
 //     }
+
+/*
+
+zadmin Password :: 2EygOK5LqRLO66nx
+MySQL Root Password :: sHrgxOVxAKfbdJSN
+MySQL Postfix Password : o7fPogL8jXLnsyhe
+Ip Address :: 52.40.44.107
+Panel Domain :: zpanel.vacationerideas.com
+
+*/
 // });
 
 /**

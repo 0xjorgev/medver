@@ -33,7 +33,7 @@ define(['./base_model', './category', './organization', './player_team'], functi
 
         player_team: function(){
             return this.hasMany('Player_team', 'team_id');
-        },
+        }
 
         // player: function(){
         //     return this.hasMany('Player');

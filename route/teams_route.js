@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.team
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['category', 'organization', 'player']})
+        .fetchAll({withRelated: ['category', 'organization']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -37,7 +37,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.player_team
         .where({team_id:team_id})
         .where({active:true})
-        .fetchAll({withRelated: ['player'], debug: true})
+        .fetchAll({withRelated: [], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

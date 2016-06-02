@@ -16,6 +16,10 @@ define(['./base_model', './organization'], function (DB) {
         // organizations: function(){
         //     return this.hasMany('Organization');
         // }
+
+        referee: function(){
+            return this.hasMany('Match_referee');
+        }
     });
 
     // uses Registry plugin

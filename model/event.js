@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './subdiscipline'], function (DB) {
+define(['./base_model', './subdiscipline', './event_match_player'], function (DB) {
 
     var Event = DB.Model.extend({
         tableName: 'events',
@@ -14,6 +14,10 @@ define(['./base_model', './subdiscipline'], function (DB) {
         // relations
         subdiscipline: function(){
             return this.belongsTo('Subdiscipline', 'subdiscipline_id');
+        },
+
+        result: function(){
+            return this.hasMany('Event_match_player');
         }
     });
 

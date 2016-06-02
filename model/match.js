@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './round'], function (DB) {
+define(['./base_model', './round', './event_match_player'], function (DB) {
 
     var Match = DB.Model.extend({
         tableName: 'matches',
@@ -19,7 +19,16 @@ define(['./base_model', './round'], function (DB) {
 
         visitor_team: function(){
             return this.belongsTo('Team', 'visitor_team_id');
+        },
+
+        result: function(){
+            return this.hasMany('Event_match_player');
+        },
+
+        referee: function(){
+            return this.hasMany('Match_referee');
         }
+
     });
 
     // uses Registry plugin

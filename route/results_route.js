@@ -12,16 +12,16 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //List of Events
     //Event by Subdiscipline_id -> Returns array
     //
-    router.get('/:subdiscipline_id', function (req, res) {
+    router.get('/:match_id', function (req, res) {
 
-        console.log('Events by Subdiscipline');
+        console.log('Match Player Events by match_id');
 
-        var subdiscipline_id = req.params.subdiscipline_id;
+        var match_id = req.params.match_id;
 
-        return Models.event
-        .where({subdiscipline_id:subdiscipline_id})
+        return Models.event_match_player
+        .where({match_id:match_id})
         .where({active:true})
-        .fetchAll({withRelated: [], debug: true})
+        .fetchAll({withRelated: ['match_id', 'event_id', 'player_in', 'player_out'], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

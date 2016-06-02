@@ -28,16 +28,45 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
 
     //Team by Id -> Returns 1 result
-    router.get('/:team_id', function (req, res) {
+    router.get('/:team_id/player', function (req, res) {
 
-        console.log('Team by id');
+    console.log('Team Players by team_id');
+
 
         var team_id = req.params.team_id;
 
         return Models.player_team
         .where({team_id:team_id})
         .where({active:true})
-        .fetchAll({withRelated: [], debug: true})
+        .fetchAll({withRelated: ['player'], debug: true})
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+
+        // return Models.team
+        // .where({id:team_id})
+        // .where({active:true})
+        // .fetch({withRelated: ['category']})
+        // .then(function (result) {
+        //     Message(res,'Success', '0', result);
+        // }).catch(function(error){
+        //     Message(res,error.details, error.code, []);
+        // });
+    });
+
+        //Team by Id -> Returns 1 result
+    router.get('/:team_id', function (req, res) {
+
+        console.log('Team by id');
+
+        var team_id = req.params.team_id;
+
+        return Models.team
+        .where({id:team_id})
+        .where({active:true})
+        .fetchAll({withRelated: ['category'], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

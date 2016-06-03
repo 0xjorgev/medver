@@ -6,7 +6,7 @@ info:
   description: Basic description of services provided by Somosport Core
   version: "1.0"
 # the domain of the service
-host: api.uber.com
+host: somosportpocdev.herokuapp.com
 # array of all schemes that your API supports
 schemes:
   - https

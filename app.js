@@ -37,26 +37,26 @@
   // Set api-doc path
   swagger.configureSwaggerPaths('', 'api-docs', '');
 
-  // Configure the API domain
-  var domain = 'localhost';
-  if(argv.domain !== undefined)
-      domain = argv.domain;
-  else
-      console.log('No --domain=xxx specified, taking default hostname "localhost".')
+  // // Configure the API domain
+  // var domain = 'localhost';
+  // if(argv.domain !== undefined)
+  //     domain = argv.domain;
+  // else
+  //     console.log('No --domain=xxx specified, taking default hostname "localhost".')
 
-  // Configure the API port
-  var port = 8080;
-  if(argv.port !== undefined)
-      port = argv.port;
-  else
-      console.log('No --port=xxx specified, taking default port ' + port + '.')
+  // // Configure the API port
+  // var port = 8080;
+  // if(argv.port !== undefined)
+  //     port = argv.port;
+  // else
+  //     console.log('No --port=xxx specified, taking default port ' + port + '.')
 
-  // Set and display the application URL
-  var applicationUrl = 'http://' + domain + ':' + port;
-  console.log('snapJob API running on ' + applicationUrl);
+  // // Set and display the application URL
+  // var applicationUrl = 'http://' + domain + ':' + port;
+  // console.log('snapJob API running on ' + applicationUrl);
 
 
-  swagger.configure(applicationUrl, '1.0.0');
+  // swagger.configure(applicationUrl, '1.0.0');
 
 
 //==========================================================================

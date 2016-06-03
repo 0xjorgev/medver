@@ -26,7 +26,7 @@ define([
     './player_team',
     './event',
     './event_match_player',
-    './Match_referee'
+    './match_referee'
 
 ], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team, Clasification, Player_team, Event, Event_match_player, Match_referee) {
 

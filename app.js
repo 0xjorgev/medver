@@ -3,6 +3,66 @@
   var bodyParser = require('body-parser');
   var morgan = require('morgan');
   var my_knex = require('./model/util')
+
+
+//==========================================================================
+// swagger stuff
+//==========================================================================
+
+  var argv = require('minimist')(process.argv.slice(2));
+  var swagger = require("swagger-node-express");
+
+  var subpath = express();
+
+  app.use(bodyParser());
+  app.use("/v1", subpath);
+
+  swagger.setAppHandler(subpath);
+
+  app.use(express.static('docs'));
+
+  swagger.setApiInfo({
+    title: "example API",
+    description: "API to do something, manage something...",
+    termsOfServiceUrl: "",
+    contact: "yourname@something.com",
+    license: "",
+    licenseUrl: ""
+  });
+
+  app.get('/', function (req, res) {
+      res.sendFile(__dirname + '/docs/index.html');
+  });
+
+  // Set api-doc path
+  swagger.configureSwaggerPaths('', 'api-docs', '');
+
+  // Configure the API domain
+  var domain = 'localhost';
+  if(argv.domain !== undefined)
+      domain = argv.domain;
+  else
+      console.log('No --domain=xxx specified, taking default hostname "localhost".')
+
+  // Configure the API port
+  var port = 8080;
+  if(argv.port !== undefined)
+      port = argv.port;
+  else
+      console.log('No --port=xxx specified, taking default port ' + port + '.')
+
+  // Set and display the application URL
+  var applicationUrl = 'http://' + domain + ':' + port;
+  console.log('snapJob API running on ' + applicationUrl);
+
+
+  swagger.configure(applicationUrl, '1.0.0');
+
+
+//==========================================================================
+// end swagger stuff
+//==========================================================================
+
   // var uuid = require('uuid');
   // var nJwt = require('nJwt');
   var discipline_ws = require('./route/disciplines_route');
@@ -102,8 +162,6 @@
   });
 
   var port = process.env.PORT;
-  console.log('Port is: ', process.env.PORT);
-  console.log('Environment is: ', process.env.NODE_ENV);
   app.listen(port, function(){
-    console.log('Running on port ' + port);
+    console.log('Running ' + process.env.NODE_ENV +' on port ' + port);
   });

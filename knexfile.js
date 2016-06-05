@@ -2,13 +2,23 @@
 module.exports = {
   development: {
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    ssl: true,
+    connection: {
+      user: "tolocgcxmivdaf",
+      password: "OlikTEmeH4rIe6IKCHDoTpjAZW",
+      database: "d6bdusqa89c19t",
+      port: 5432,
+      host: "ec2-54-225-151-64.compute-1.amazonaws.com",
+      ssl: true
+
+    },
     migrations: { tableName: 'schema_info'},
     pool: { min:1, max:5},
     seeds: { directory: 'seeds'}
   },
    production: {
      client: 'pg',
+     ssl: true,
      connection: process.env.DATABASE_URL,
      migrations: { tableName: 'schema_info'},
      pool: { min:1, max:5},

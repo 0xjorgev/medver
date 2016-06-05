@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
 		knex.schema.createTable('historias', function(table){
 			table.increments('id');
 			table.string('historia_anterior');
+			table.text('evolucion');
 			table.text('contenido');
 			table.text('antecedente');
 			table.boolean('active').notNullable().defaultTo(true);

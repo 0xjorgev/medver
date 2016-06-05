@@ -13,7 +13,7 @@ exports.seed = function(knex, Promise) {
     */
 
     // Inserts seed entries
-    knex('consultas').insert({antecedente:'something in the past', tratamiento: 'Mucho reposo',fecha:'1979-10-08 23:00:00 UTC',historia_id:1,tipo_consulta_id:1})
+    knex('consultas').insert({antecedente:'something in the past', tratamiento: 'Mucho reposo',fecha:'2015-10-08 23:00:00 UTC',historia_id:1,tipo_consulta_id:1})
 
     ).then(function(){
 		//Add query

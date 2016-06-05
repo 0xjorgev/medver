@@ -7,23 +7,17 @@ if (typeof define !== 'function') {
 
 define([
 	'./util',
-    './discipline',
-    './subdiscipline',
-    './user',
-    './competition',
-    './season'
+    './paciente',
+    './historia'
     // './category',
     // './gender'
-], function (Util, Discipline, Subdiscipline, User, Competition, Season) {
+], function (Util, Paciente, Historia) {
     //, Category, Gender
 
     return {
     	util : Util,
-    	user: User,
-    	discipline: Discipline,
-        subdiscipline: Subdiscipline,
-        competition: Competition,
-        season: Season
+    	paciente: Paciente,
+        historia: Historia
         // category: Category,
         // gender: Gender
     };

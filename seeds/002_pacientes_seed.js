@@ -21,7 +21,10 @@ exports.seed = function(knex, Promise) {
     */
 
     // Inserts seed entries
-    knex('pacientes').insert({nombre:'Jorge', apellido:'Mendoza', email:'jorgevmendoza@gmail.com', alergia:'aspirina', telefono_principal: '04122630631',sexo:'M',cedula:'V14350280',fecha_nacimiento:"1979-10-08 23:00:00 UTC",historia_id:'1'})
+    knex('pacientes').insert({nombre:'Juan Jose', apellido:'Minuta Troconiz', email:'jminuta@gmail.com', alergia:'Penicilina, Iboprofeno, Ampicilina', telefono_principal: '04123135070',sexo:'M',cedula:'V13309935',fecha_nacimiento:"1978-11-18 23:00:00 UTC",historia_id:'2'}),
+    knex('pacientes').insert({nombre:'Jorge Vicente', apellido:'Mendoza Salazar', email:'jorgevmendoza@gmail.com', alergia:'aspirina', telefono_principal: '04122630631',sexo:'M',cedula:'V14350280',fecha_nacimiento:"1979-10-08 23:00:00 UTC",historia_id:'1'}),
+    knex('pacientes').insert({nombre:'Ricardo Jose', apellido:'Sekermestrovic Simon', email:'rj_seker@gmail.com', alergia:'', telefono_principal: '02129796443',sexo:'M',cedula:'V13350280',fecha_nacimiento:"1978-11-27 23:00:00 UTC",historia_id:'3'})
+
     ).then(function(){
 		//Add query
         return knex.raw('');

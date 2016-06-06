@@ -197,7 +197,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var Competition = Models.competition;
         var competition_post = req.body;
 
-        console.log('Req Values:' + req.body);
+        //console.log('Req Values:' + req.body);
 
         var name = competition_post.name;
         var discipline_id = competition_post.discipline_id;
@@ -250,6 +250,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('discipline_id: ', competition_upd.discipline_id);
         console.log('subdiscipline_id: ', competition_upd.subdiscipline_id);
         console.log('competition_type_id: ', competition_upd.competition_type_id);
+        console.log('is_published: ', competition_upd.is_published);
         console.log('------------------------------');
         // Knex(competition.tableName)
         Knex('competitions')

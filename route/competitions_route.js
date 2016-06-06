@@ -197,14 +197,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var Competition = Models.competition;
         var competition_post = req.body;
 
-        console.log('Req Values:' + req.body);
+        //console.log('Req Values:' + req.body);
 
         var name = competition_post.name;
         var discipline_id = competition_post.discipline_id;
         var subdiscipline_id = competition_post.subdiscipline_id;
         var competition_type_id = competition_post.competition_type_id;
         var description = competition_post.description;
-        var img_url = competition.post.img_url;
+        var img_url = competition_post.img_url;
+        var is_published = competition_post.is_published;
 
         console.log('------------------------------');
 
@@ -223,8 +224,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             discipline_id:discipline_id,
             subdiscipline_id:subdiscipline_id,
             competition_type_id:competition_type_id,
-            img_url: competition.img_url,
-            is_published: competition.is_published
+            img_url: img_url,
+            is_published: is_published
         }).save().then(function(new_competition){
             console.log(`{new_competition: ${new_competition}}`);
             Message(res, 'Success', '0', new_competition);
@@ -249,6 +250,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('discipline_id: ', competition_upd.discipline_id);
         console.log('subdiscipline_id: ', competition_upd.subdiscipline_id);
         console.log('competition_type_id: ', competition_upd.competition_type_id);
+        console.log('is_published: ', competition_upd.is_published);
         console.log('------------------------------');
         // Knex(competition.tableName)
         Knex('competitions')

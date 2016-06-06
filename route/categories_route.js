@@ -73,9 +73,19 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var inscription_init_at = category_post.inscription_init_at;
         var inscription_ends_at = category_post.inscription_ends_at;
         //V 1.1
-        var minimun_value = category_post.minimun_value;
-        var maximun_value = category_post.maximun_value;
+        var minimum_value = category_post.minimum_value;
+        var maximum_value = category_post.maximum_value;
 
+        console.log('--------------------');
+        console.log("season_id: " + competition_id);
+        console.log("name: " + name);
+        console.log("gender_id: " + gender_id);
+        console.log("inscription_init_at: " + inscription_init_at);
+        console.log("inscription_ends_at: " + inscription_ends_at);
+        console.log("minimum_value: " + minimum_value);
+        console.log("maximum_value: " + maximum_value);
+        console.log("image_url: " + image_url);        
+        console.log('--------------------');
         /*
             table.increments('id');
             table.string('name');
@@ -101,8 +111,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             inscription_ends_at:inscription_ends_at,
             gender_id: gender_id,
             season_id: season_id,
-            minimun_value: minimun_value,
-            maximun_value: maximun_value
+            minimun_value: minimum_value,
+            maximun_value: maximum_value
         }).save().then(function(new_category){
             console.log(`{new_category: ${new_category}}`);
             Message(res, 'Success', '0', new_category);
@@ -120,6 +130,17 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         //URL Request, Season Id
         var category_id = req.params.category_id;
         var category_upd = req.body;
+
+        console.log('--------------------');
+        console.log("season_id: " + competition_id);
+        console.log("name: " + name);
+        console.log("gender_id: " + gender_id);
+        console.log("inscription_init_at: " + inscription_init_at);
+        console.log("inscription_ends_at: " + inscription_ends_at);
+        console.log("minimum_value: " + minimum_value);
+        console.log("maximum_value: " + maximum_value);
+        console.log("image_url: " + image_url);        
+        console.log('--------------------');
 
         Knex(category.tableName)
         .where('id','=',category_id)

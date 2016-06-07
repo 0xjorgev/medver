@@ -10,15 +10,16 @@ exports.up = function(knex, Promise) {
 			table.timestamp('inscription_ends_at');
 
 			//New Updates, Team participation req
-			table.integer('other_minimum_participant');
-			table.integer('other_maximum_participant');
-			table.integer('player_minimum_participant');
-			table.integer('player_maximum_participant');
-			table.integer('coach_minimum_participant');
-			table.integer('coach_maximum_participant');
+			table.integer('other_minimum_participant').defaultTo(0);
+			table.integer('other_maximum_participant').defaultTo(0);
+			table.integer('player_minimum_participant').defaultTo(0);
+			table.integer('player_maximum_participant').defaultTo(0);
+			table.integer('coach_minimum_participant').defaultTo(0);
+			table.integer('coach_maximum_participant').defaultTo(0);
+			table.integer('team_quantity').defaultTo(0);
 			//?
-			table.timestamp('paticipant_init_date_range');
-			table.timestamp('paticipant_end_date_range');
+			table.timestamp('paticipant_minimum');
+			table.timestamp('paticipant_maximum');
 
 			table.integer('gender_id').references('genders.id').index();
 			table.integer('season_id').references('seasons.id').index();

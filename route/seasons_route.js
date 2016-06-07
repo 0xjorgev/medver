@@ -113,16 +113,53 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('Season_category');
         var season_id = req.params.season_id;
         return Models.category_season
-        .where({id:season_id})
+        .where({season_id:season_id})
         //.fetchAll({withRelated: ['phases'], debug:true})
-        .fetchAll({withRelated: ['category', 'season', 'clasification','gender'], debug:true})
+        .fetchAll({withRelated: ['category', 'season', 'clasification','gender', 'phases'], debug:true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
             Message(res,error.details, error.code, []);
         });
-        //, 'phase'
     });
+
+
+    router.get('/:season_id/category/:cat_id', function (req, res) {
+        console.log('Season_category by ID');
+        var season_id = req.params.season_id;
+        var cat_id = req.params.cat_id;
+
+        return Models.category_season
+        .where({season_id:season_id})
+        .where({id:cat_id})
+        //.fetchAll({withRelated: ['phases'], debug:true})
+        .fetch({withRelated: ['category', 'season', 'clasification','gender', 'phases'], debug:true})
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
+
+    // // ---------------------------------------------------
+    //     //Category Season Methods
+    // router.get('/test/test', function (req, res) {
+    //     console.log('TEST Season_category');
+    //     // var season_id = req.params.season_id;
+    //     return Models.category_season
+    //     .query(function(qb){})
+    //     // .where({season_id:season_id})
+    //     //.fetchAll({withRelated: ['phases'], debug:true})
+    //     .fetchAll({withRelated: ['category_season'], debug:true})
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
+
+    // // ---------------------------------------------------
 
 
     router.post('/:season_id/category', function (req, res) {

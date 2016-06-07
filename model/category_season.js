@@ -29,7 +29,7 @@ define(['./base_model','./gender','./season', './phase', './clasification', './c
         },
 
         phases: function(){
-            return this.hasMany('Phase');
+            return this.hasMany('Phase', 'category_season_id');
         }
     });
 

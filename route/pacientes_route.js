@@ -38,6 +38,20 @@ define(['express',
 	        });
 	    });
 
+	    //Create new Paciente
+	   	router.post('/', function (req, res) {
+	    	// var paciente_id = req.params.id;
+
+	        return Models.paciente
+	        .where({id:paciente_id})
+	        .fetch()
+	        .then(function (result) {
+	            Message(res,'Success', '0', result);
+	        }).catch(function(error){
+	            Message(res,error.details, error.code, []);
+	        });
+	    });
+
 	   	router.get('/:id/historia', function (req, res) {
 	    	var paciente_id = req.params.id;
 	    	console.log('user id: ', paciente_id);

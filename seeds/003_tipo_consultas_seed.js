@@ -6,7 +6,8 @@ exports.seed = function(knex, Promise) {
     // Inserts seed entries
     knex('tipo_consultas').insert({descripcion:'Primera consulta'}),
     knex('tipo_consultas').insert({descripcion:'control'}),
-    knex('tipo_consultas').insert({descripcion:'Emergencia'})
+    knex('tipo_consultas').insert({descripcion:'Emergencia'}),
+    knex('tipo_consultas').insert({descripcion:'Post Operatorio'})
     ).then(function(){
 		//Add query
         return knex.raw('');

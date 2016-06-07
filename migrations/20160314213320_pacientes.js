@@ -10,7 +10,6 @@ exports.up = function(knex, Promise) {
 			table.string('telefono_principal');
 			table.string('sexo');
 			table.string('cedula');
-			table.integer('historia_anterior');
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('fecha_nacimiento');
 			table.integer('historia_id').references('historias.id').index();

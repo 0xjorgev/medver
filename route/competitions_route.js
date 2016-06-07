@@ -101,14 +101,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('------------------------------');
 
         new Contact({
-            country: contact_post.country,
-            state: contact_post.state,
-            city:contact_post.city,
-            zip_code:contact_post.zip_code,
-            phone:contact_post.phone,
-            email:contact_post.email,
-            website_url:contact_post.website_url,
-            competition_id: competition_id
+            // country: contact_post.country,
+            // state: contact_post.state,
+            // city:contact_post.city,
+            // zip_code:contact_post.zip_code,
+            // phone:contact_post.phone,
+            // email:contact_post.email,
+            // website_url:contact_post.website_url,
+            // competition_id: competition_id
+            contact_post
         }).save().then(function(new_contact){
             console.log(`{new_contact: ${new_contact}}`);
             Message(res, 'Success', '0', new_contact);
@@ -219,13 +220,14 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('------------------------------');
 
         new Competition({
-            name: name,
-            description: description,
-            discipline_id:discipline_id,
-            subdiscipline_id:subdiscipline_id,
-            competition_type_id:competition_type_id,
-            img_url: img_url,
-            is_published: is_published
+            competition_post
+            // name: name,
+            // description: description,
+            // discipline_id:discipline_id,
+            // subdiscipline_id:subdiscipline_id,
+            // competition_type_id:competition_type_id,
+            // img_url: img_url,
+            // is_published: is_published
         }).save().then(function(new_competition){
             console.log(`{new_competition: ${new_competition}}`);
             Message(res, 'Success', '0', new_competition);

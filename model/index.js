@@ -8,16 +8,18 @@ if (typeof define !== 'function') {
 define([
 	'./util',
     './paciente',
-    './historia'
+    './historia',
+    './consulta'
     // './category',
     // './gender'
-], function (Util, Paciente, Historia) {
+], function (Util, Paciente, Historia, Consulta) {
     //, Category, Gender
 
     return {
     	util : Util,
     	paciente: Paciente,
-        historia: Historia
+        historia: Historia,
+        consulta: Consulta
         // category: Category,
         // gender: Gender
     };

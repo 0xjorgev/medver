@@ -26,11 +26,12 @@ define(['express',
 	    });
 
 	    router.get('/:historia_id', function (req, res) {
-	    	var historia_id = req.params.id;
 
+	    	var historia_id = req.params.historia_id;
+			console.log('History Id :'+ historia_id);
 	        return Models.historia
 	        .where({id:historia_id})
-	        .fetch()
+	        .fetch({withRelated:['consultas'], debug:true})
 	        .then(function (result) {
 	            Message(res,'Success', '0', result);
 	        }).catch(function(error){
@@ -73,28 +74,6 @@ define(['express',
         	});
 	    });
 
-	   // 	router.post('/', function (req, res) {
-
-    //     console.log('Groups Create');
-    //     //Model Instance
-    //     var Group = Models.group;
-    //     var group_post = req.body;
-    //     var phase_id = group_post.phase_id;
-    //     var name = group_post.name;
-
-    //     new Group({
-    //         name: name,
-    //         phase_id: phase_id
-    //     }).save().then(function(new_group){
-    //         console.log(`{new_group: ${new_group}}`);
-    //         Message(res, 'Success', '0', new_group);
-    //     }).catch(function(error){
-    //         console.log(`{error: ${error}}`);
-    //         Message(res, error.detail, error.code, null);
-    //     });
-    // });
-
-
     router.put('/:historia_id', function(req, res, next){
 
         console.log('Update Historia Medica');
@@ -124,21 +103,6 @@ define(['express',
           Message(res, err.detail, err.code, null);
         });
     });
-
-	   	// router.get('/:id/historia', function (req, res) {
-	    // 	var paciente_id = req.params.id;
-	    // 	console.log('user id: ', paciente_id);
-	    //     return Models.paciente
-	    //     .where({id:paciente_id})
-	    //     .fetch({withRelated: ['historia']})
-	    //     .then(function (result) {
-	    //     	console.log('Result: ', result);
-	    //         Message(res,'Success', '0', result);
-	    //     }).catch(function(error){
-	    //     	console.log('error: ', error);
-	    //         Message(res,error.details, error.code, []);
-	    //     });
-	    // });
 
 		return router;
 	});

@@ -5,22 +5,29 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./historia'], function (DB) {
+define(['./base_model', './paciente'], function (DB) {
 
-    var Paciente = DB.Model.extend({
-        tableName: 'pacientes',
+    var Consulta = DB.Model.extend({
+        tableName: 'consultas',
         hasTimestamps: true,
 
         //relations
         // user n:m
         // organization n:m
+
         historia: function(){
             return this.belongsTo('Historia', 'historia_id');
-        }//,
+        }
 
-        // consultas: function(){
-        //     return this.hasMany('Historia').through('Consulta');
+
+
+
+        // tipo_consulta : function(){
+        //     return this.belongsTo('Tipo', 'historia_id');
         // }
+
+        //TODO Consultas -> R
+
 
         // gender: function(){
         //     return this.belongsTo('gender');
@@ -32,12 +39,5 @@ define(['./base_model','./historia'], function (DB) {
     });
 
     // uses Registry plugin
-    return DB.model('Paciente', Paciente);
+    return DB.model('Consulta', Consulta);
 });
-
-/*
-URB LOS CHORROS AV PPAL RES LOS CHORROS
-PALACE P 2 APTO 2/B MUNICIPIO SUCRE
-CARACAS, MIRANDA 1071
-Venezuela
-*/

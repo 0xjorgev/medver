@@ -4,6 +4,7 @@ var app = express();
 
 var pacientes_ws = require('./route/pacientes_route');
 var historia_ws = require('./route/historias_route');
+var consulta_ws = require('./route/consultas_route');
 
   //Middleware
   var allowCrossDomain = function(req, res, next) {
@@ -25,6 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.use('/paciente', pacientes_ws);
 app.use('/historia', historia_ws);
+app.use('/consulta', consulta_ws);
 
 app.listen(process.env.PORT, function(){
 	console.log('Running on port: '+ process.env.PORT);

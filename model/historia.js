@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './paciente'], function (DB) {
+define(['./base_model', './paciente', './consulta'], function (DB) {
 
     var Historia = DB.Model.extend({
         tableName: 'historias',
@@ -17,6 +17,10 @@ define(['./base_model', './paciente'], function (DB) {
 
         paciente : function(){
             return this.hasOne('Paciente', 'historia_id');
+        },
+
+        consultas : function(){
+          return this.hasMany('Consulta');
         }
 
         //TODO Consultas -> R

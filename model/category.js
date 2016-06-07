@@ -5,26 +5,27 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./gender','./season', './phase', './clasification'], function (DB) {
+define(['./base_model','./gender','./season', './phase', './clasification', './category_season'], function (DB) {
 
     var Category = DB.Model.extend({
         tableName: 'categories',
         hasTimestamps: true,
 
-        //relations
-        gender: function(){
-            return this.belongsTo('Gender', 'gender_id');
-        },
+        // //relations
+        // gender: function(){
+        //     return this.belongsTo('Gender', 'gender_id');
+        // },
 
-        season: function(){
-            return this.belongsTo('Season', 'season_id');
-        },
+        // season: function(){
+        //     return this.belongsTo('Season', 'season_id');
+        // },
 
-        phases: function(){
-            return this.hasMany('Phase');
-        },
-        clasification:  function(){
-            return this.belongsTo('Clasification', 'clasification_id');
+        // phases: function(){
+        //     return this.hasMany('Phase');
+        // },
+
+        categories_seasons:  function(){
+            return this.hasMany('Category_season');
         }
     });
 

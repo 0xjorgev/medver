@@ -8,14 +8,14 @@ if (typeof define !== 'function') {
 define(['./base_model','./category'], function (DB) {
 
     var Clasification = DB.Model.extend({
-        tableName: 'clasification',
+        tableName: 'clasifications_types',
         hasTimestamps: true,
 
         //relations
 
-        // phases: function(){
-        //     return this.hasMany('Phase');
-        // }
+        category_season: function(){
+            return this.hasMany('category_season');
+        }
     });
 
     // uses Registry plugin

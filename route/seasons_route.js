@@ -14,7 +14,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('Get all Seasons');
         return Models.season
         .query(function(qb){})
-        .fetchAll({debug:true, withRelated: ['categories']})
+        .fetchAll({debug:true, withRelated: ['categories_seasons']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -24,10 +24,11 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //Seasons by Id -> Returns 1 result
     router.get('/:season_id', function (req, res) {
+        console.log('Get Season by ID');
         var season_id = req.params.season_id;
         return Models.season
         .where({id:season_id})
-        .fetch({withRelated: ['categories']})
+        .fetch({withRelated: ['categories_seasons']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -107,5 +108,54 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    //Category Season Methods
+    router.get('/:season_id/category', function (req, res) {
+        console.log('Season_category');
+        var season_id = req.params.season_id;
+        return Models.category_season
+        .where({id:season_id})
+        //.fetchAll({withRelated: ['phases'], debug:true})
+        .fetchAll({withRelated: ['category', 'season', 'clasification','gender'], debug:true})
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+        //, 'phase'
+    });
+
+
+    router.post('/:season_id/category', function (req, res) {
+        console.log('Season_category Create');
+        var season_id = req.params.season_id;
+        //Model Instance
+        var Category_Season = Models.category_season;
+        var category_season_post = req.body;
+        var competition_id = category_season_post.competition_id;
+        var name = category_season_post.name;
+        var description = category_season_post.description;
+        var game_title = category_season_post.game_title;
+        var init_at = category_season_post.init_at;
+        var ends_at = category_season_post.ends_at;
+
+        console.log('req.body: ', req.body);
+
+        new Category_Season({
+            name: name,
+            description:description,
+            game_title:game_title,
+            init_at:init_at,
+            ends_at:ends_at,
+            competition_id: competition_id
+        }).save().then(function(new_season){
+            console.log(`{new_season: ${new_season}}`);
+            Message(res, 'Success', '0', new_season);
+        }).catch(function(error){
+            console.log(`{error: ${error}}`);
+            Message(res, error.detail, error.code, null);
+        });
+    });
+
+    //,'gender'
     return router;
 });

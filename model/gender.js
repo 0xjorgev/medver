@@ -5,18 +5,18 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model'], function (DB) {
+define(['./base_model','./category_season'], function (DB) {
 
     var Gender = DB.Model.extend({
         tableName: 'genders',
-        hasTimestamps: true
+        hasTimestamps: true,
 
         //relations
         // user n:m
         // organization n:m
-        // organizations: function(){
-        //     return this.hasMany('Organization');
-        // }
+        category_season: function(){
+            return this.hasMany('Category_season');
+        }
     });
 
     // uses Registry plugin

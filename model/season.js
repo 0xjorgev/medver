@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./competition', './category'], function (DB) {
+define(['./base_model','./competition', './category_season'], function (DB) {
 
     var Season = DB.Model.extend({
         tableName: 'seasons',
@@ -16,8 +16,8 @@ define(['./base_model','./competition', './category'], function (DB) {
         //     return this.belongsTo('Competition', 'competition_id');
         // },
 
-        categories: function(){
-            return this.hasMany('Category');
+        categories_seasons: function(){
+            return this.hasMany('Category_season');
         }
     });
     // uses Registry plugin

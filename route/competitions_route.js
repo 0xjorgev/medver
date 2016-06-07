@@ -239,6 +239,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     router.put('/:competition_id/', function(req, res){
 
         console.log('Competition Update');
+
         //Model Instance
         var competition = Models.competition;
         var competition_id = req.params.competition_id;
@@ -252,6 +253,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('competition_type_id: ', competition_upd.competition_type_id);
         console.log('is_published: ', competition_upd.is_published);
         console.log('------------------------------');
+
         // Knex(competition.tableName)
         Knex('competitions')
         .where('id','=',competition_id)

@@ -8,7 +8,7 @@ exports.up = function(knex, Promise) {
 			table.integer('participant_team');
 			table.integer('classified_team');
 			table.boolean('active').notNullable().defaultTo(true);
-			table.integer('category_id').references('categories.id').index();
+			table.integer('category_season_id').references('categories_seasons.id').index();
 			// table.integer('previous').references('phases.id').index();
 			// table.integer('next').references('phases.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());

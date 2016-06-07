@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
 
 	return Promise.all([
-		knex.schema.createTable('clasifications_type', function(table){
+		knex.schema.createTable('clasifications_types', function(table){
 			table.increments('id').primary();
 			table.string('name');
 			table.text('description');
@@ -14,5 +14,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
- 	return Promise.all([ knex.schema.dropTableIfExists('clasifications_type') ]);
+ 	return Promise.all([ knex.schema.dropTableIfExists('clasifications_types') ]);
 };

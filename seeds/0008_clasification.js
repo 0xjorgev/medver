@@ -1,7 +1,7 @@
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
-    knex('categories').del(),
+    knex('clasifications_types').del(),
 
     // Inserts seed entries
 
@@ -13,10 +13,10 @@ exports.seed = function(knex, Promise) {
             table.string('image_url');
     */
 
-    knex('categories')
+    knex('clasifications_types')
     .insert([
-        {name:'Simple Elimination',description:'Simple elimination model'},
-        {name:'Custom Elimination',description:'Custom elimination model'}
+        {id:1, name:'Simple Elimination',description:'Simple elimination model'},
+        {id:2, name:'Custom Elimination',description:'Custom elimination model'}
         ])
     ).then(function(){
 		//Add query

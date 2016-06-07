@@ -26,9 +26,10 @@ define([
     './player_team',
     './event',
     './event_match_player',
-    './match_referee'
+    './match_referee',
+    './category_season'
 
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team, Clasification, Player_team, Event, Event_match_player, Match_referee) {
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team, Clasification, Player_team, Event, Event_match_player, Match_referee, Category_season) {
 
     return {
     	util : Util,
@@ -51,6 +52,7 @@ define([
         player_team:Player_team,
         event:Event,
         event_match_player:Event_match_player,
-        match_referee:Match_referee
+        match_referee:Match_referee,
+        category_season:Category_season
     };
 });

@@ -30,6 +30,10 @@ define(['./base_model','./gender','./season', './phase', './clasification', './c
 
         phases: function(){
             return this.hasMany('Phase', 'category_season_id');
+        },
+
+        teams: function(){
+            return this.hasMany('Team', 'category_id');
         }
     });
 

@@ -9,6 +9,23 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
 
+        //Teams by Category
+    router.get('/:category_id/team', function (req, res) {
+
+        console.log("Teams by Category");
+        var category_id = req.params.category_id;
+
+        return Models.team
+        .where({category_id:category_id})
+        .where({active:true})
+        .fetchAll()
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
     //List of seasons (don't seem to be needed) -> Returns Array of result
     router.get('/', function (req, res) {
         return Models.category
@@ -42,25 +59,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res,error.details, error.code, []);
         });
     });
-
-
-    //Teams by Category
-    // router.get('/:category_id/team', function (req, res) {
-
-    //     console.log("Teams by Category");
-
-    //     var category_id = req.params.category_id;
-
-    //     return Models.team
-    //     .where({category_id:category_id})
-    //     .where({active:true})
-    //     .fetchAll()
-    //     .then(function (result) {
-    //         Message(res,'Success', '0', result);
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
 
     // router.post('/', function (req, res) {
 

@@ -16,7 +16,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './category', './organization', './player_team'], function (DB) {
+define(['./base_model', './category_season', './organization', './player_team'], function (DB) {
 
     var Team = DB.Model.extend({
         tableName: 'teams',
@@ -24,7 +24,7 @@ define(['./base_model', './category', './organization', './player_team'], functi
 
         // relations
         category: function(){
-            return this.belongsTo('Category', 'category_id');
+            return this.belongsTo('Category_season', 'category_season_id');
         },
 
         organization: function(){

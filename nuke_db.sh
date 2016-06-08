@@ -1,1 +1,1 @@
-PG_USER=postgres dropdb somosport_core && PG_USER=postgres createdb somosport_core && knex migrate:latest && knex seed:run
+PGUSER=postgres dropdb somosport_core && PGUSER=postgres createdb somosport_core && knex migrate:latest && knex seed:run

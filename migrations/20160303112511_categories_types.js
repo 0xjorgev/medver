@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
 
 	return Promise.all([
-		knex.schema.createTable('categories', function(table){
+		knex.schema.createTable('categories_types', function(table){
 			table.increments('id').primary();
 			table.string('name');
 			table.text('description');
@@ -10,9 +10,9 @@ exports.up = function(knex, Promise) {
 			// table.timestamp('inscription_init_at');
 			// table.timestamp('inscription_ends_at');
 			//Conditions
-			table.string('condition');
-			table.integer('minimum_value');
-			table.integer('maximum_value');
+			// table.string('condition');
+			// table.integer('minimum_value');
+			// table.integer('maximum_value');
 			//New Updates, Team participation req
 			// table.integer('other_minimum_participant');
 			// table.integer('other_maximum_participant');
@@ -32,5 +32,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
- 	return Promise.all([ knex.schema.dropTableIfExists('categories') ]);
+ 	return Promise.all([ knex.schema.dropTableIfExists('categories_types') ]);
 };

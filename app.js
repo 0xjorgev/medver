@@ -78,6 +78,7 @@
   var team_ws = require('./route/teams_route');
   var event_ws = require('./route/results_route');
   var referee_ws = require('./route/referees_route');
+  var category_type_ws = require('./route/categories_types_route');
 
   var apiVersion = 'v1.0';
   var prefix = 'api';
@@ -109,7 +110,8 @@
     rule            : 'rule',
     ruleset         : 'ruleset',
     event           : 'event',
-    referee         : 'referee'
+    referee         : 'referee',
+    category_type   : 'category_type'
   }
 
   //Middleware
@@ -150,6 +152,7 @@
   app.use(`${api_prefix}${routes.team}`, team_ws);
   app.use(`${api_prefix}${routes.event}`, event_ws);
   app.use(`${api_prefix}${routes.referee}`, referee_ws);
+  app.use(`${api_prefix}${routes.category_type}`, category_type_ws);
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){

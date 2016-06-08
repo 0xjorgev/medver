@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./category_season'], function (DB) {
+define(['./base_model','./category'], function (DB) {
 
     var Gender = DB.Model.extend({
         tableName: 'genders',
@@ -14,8 +14,8 @@ define(['./base_model','./category_season'], function (DB) {
         //relations
         // user n:m
         // organization n:m
-        category_season: function(){
-            return this.hasMany('Category_season');
+        category: function(){
+            return this.hasMany('Category');
         }
     });
 

@@ -7,17 +7,17 @@ if (typeof define !== 'function') {
 
 define(['./base_model','./category'], function (DB) {
 
-    var Clasification = DB.Model.extend({
-        tableName: 'clasifications_types',
+    var Classification = DB.Model.extend({
+        tableName: 'classifications_types',
         hasTimestamps: true,
 
         //relations
 
-        category_season: function(){
-            return this.hasMany('category_season');
+        category: function(){
+            return this.hasMany('category');
         }
     });
 
     // uses Registry plugin
-    return DB.model('Clasification', Clasification);
+    return DB.model('Classification', Classification);
 });

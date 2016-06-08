@@ -1,7 +1,7 @@
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
-    knex('categories').del(),
+    knex('categories_types').del(),
 
     // Inserts seed entries
 
@@ -23,7 +23,7 @@ exports.seed = function(knex, Promise) {
 
     */
 
-    knex('categories')
+    knex('categories_types')
     .insert([
         {id: 1, name:'Professional',description:'Professional Futbol'},
         {id: 2, name:'Sub 23',description:'Players under 23 years old'},

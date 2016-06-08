@@ -110,12 +110,12 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //Category Season Methods
     router.get('/:season_id/category', function (req, res) {
-        console.log('Season_category');
+        console.log('category');
         var season_id = req.params.season_id;
-        return Models.category_season
+        return Models.category
         .where({season_id:season_id})
         //.fetchAll({withRelated: ['phases'], debug:true})
-        .fetchAll({withRelated: ['category', 'season', 'clasification','gender', 'phases'], debug:true})
+        .fetchAll({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug:true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -125,15 +125,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 
     router.get('/:season_id/category/:cat_id', function (req, res) {
-        console.log('Season_category by ID');
+        console.log('Category by ID');
         var season_id = req.params.season_id;
         var cat_id = req.params.cat_id;
 
-        return Models.category_season
+        return Models.category
         .where({season_id:season_id})
         .where({id:cat_id})
         //.fetchAll({withRelated: ['phases'], debug:true})
-        .fetch({withRelated: ['category', 'season', 'clasification','gender', 'phases'], debug:true})
+        .fetch({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug:true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -163,17 +163,17 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 
     router.post('/:season_id/category', function (req, res) {
-        console.log('Season_category Create');
+        console.log('category Create');
         var season_id = req.params.season_id;
         //Model Instance
-        var Category_Season = Models.category_season;
-        var category_season_post = req.body;
-        var competition_id = category_season_post.competition_id;
-        var name = category_season_post.name;
-        var description = category_season_post.description;
-        var game_title = category_season_post.game_title;
-        var init_at = category_season_post.init_at;
-        var ends_at = category_season_post.ends_at;
+        var Category = Models.category;
+        var category_post = req.body;
+        var competition_id = category_post.competition_id;
+        var name = category_post.name;
+        var description = category_post.description;
+        var game_title = category_post.game_title;
+        var init_at = category_post.init_at;
+        var ends_at = category_post.ends_at;
 
         console.log('req.body: ', req.body);
 
@@ -184,9 +184,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             init_at:init_at,
             ends_at:ends_at,
             competition_id: competition_id
-        }).save().then(function(new_season){
-            console.log(`{new_season: ${new_season}}`);
-            Message(res, 'Success', '0', new_season);
+        }).save().then(function(new_category){
+            console.log(`{new_season: ${new_category}}`);
+            Message(res, 'Success', '0', new_category);
         }).catch(function(error){
             console.log(`{error: ${error}}`);
             Message(res, error.detail, error.code, null);

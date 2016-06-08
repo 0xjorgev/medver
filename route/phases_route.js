@@ -20,7 +20,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .query(function(qb){
             qb.limit(25);
         })
-        .fetchAll({withRelated: ['groups', 'category_season']} )
+        .fetchAll({withRelated: ['groups', 'category']} )
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);

@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
 			table.string('logo_url');
 			table.string('short_name');
 			table.string('description');
-			table.integer('category_id').references('categories_seasons.id').index();
+			table.integer('category_id').references('categories.id').index();
 			table.integer('organization_id').references('organizations.id').index();
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('created_at').defaultTo(knex.fn.now());

@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
 
 	return Promise.all([
-		knex.schema.createTable('categories_seasons', function(table){
+		knex.schema.createTable('categories', function(table){
 			table.increments('id').primary();
 			table.string('name');
 			table.boolean('active').notNullable().defaultTo(true);
@@ -23,8 +23,8 @@ exports.up = function(knex, Promise) {
 
 			table.integer('gender_id').references('genders.id').index();
 			table.integer('season_id').references('seasons.id').index();
-			table.integer('category_id').references('categories.id').index();
-			table.integer('clasification_type_id').references('clasifications_types.id').index();
+			table.integer('category_type_id').references('categories_types.id').index();
+			table.integer('classification_type_id').references('classifications_types.id').index();
 
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
@@ -33,5 +33,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
- 	return Promise.all([ knex.schema.dropTableIfExists('categories_seasons') ]);
+ 	return Promise.all([ knex.schema.dropTableIfExists('categories') ]);
 };

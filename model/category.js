@@ -5,27 +5,35 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./gender','./season', './phase', './clasification', './category_season'], function (DB) {
+define(['./base_model','./gender','./season', './phase', './classification', './category_type'], function (DB) {
 
     var Category = DB.Model.extend({
         tableName: 'categories',
         hasTimestamps: true,
 
         // //relations
-        // gender: function(){
-        //     return this.belongsTo('Gender', 'gender_id');
-        // },
+        category: function(){
+            return this.belongsTo('Category_type', 'category_type_id');
+        },
 
-        // season: function(){
-        //     return this.belongsTo('Season', 'season_id');
-        // },
+        gender: function(){
+            return this.belongsTo('Gender', 'gender_id');
+        },
 
-        // phases: function(){
-        //     return this.hasMany('Phase');
-        // },
+        season: function(){
+            return this.belongsTo('Season', 'season_id');
+        },
 
-        categories_seasons:  function(){
-            return this.hasMany('Category_season');
+        classification:  function(){
+            return this.belongsTo('Classification', 'classification_type_id');
+        },
+
+        phases: function(){
+            return this.hasMany('Phase', 'category_id');
+        },
+        //later
+        teams: function(){
+            return this.hasMany('Team', 'category_id');
         }
     });
 

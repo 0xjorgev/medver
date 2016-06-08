@@ -16,7 +16,7 @@ define(['./base_model','./competition', './category'], function (DB) {
         //     return this.belongsTo('Competition', 'competition_id');
         // },
 
-        categories_seasons: function(){
+        categories: function(){
             return this.hasMany('Category');
         }
     });

@@ -14,7 +14,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('Get all Seasons');
         return Models.season
         .query(function(qb){})
-        .fetchAll({debug:true, withRelated: ['categories_seasons']})
+        .fetchAll({debug:true, withRelated: ['categories']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -28,7 +28,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var season_id = req.params.season_id;
         return Models.season
         .where({id:season_id})
-        .fetch({withRelated: ['categories_seasons']})
+        .fetch({withRelated: ['categories']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

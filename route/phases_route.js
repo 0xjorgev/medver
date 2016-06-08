@@ -8,6 +8,14 @@ if (typeof define !== 'function') {
 define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
 
     var router = express.Router();
+    var _ = require('lodash');
+    function teamMap(match){
+        return [match.relations.home_team, match.relations.visitor_team];
+    }
+
+    function flatArray(xs){
+        return _.flatten(xs);
+    }
 
     console.log('Phases Route');
 
@@ -42,6 +50,62 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res,error.details, error.code, []);
         });
     });
+
+    //Groups with teams by Phase_id
+    router.get('/:phase_id/group', function (req, res) {
+        console.log('List groups by Phase Id');
+        var phase_id = req.params.phase_id;
+        return Models.group
+        .where({'id':phase_id})
+        .fetch({withRelated: ['rounds']})
+        .then(function (round) {
+              var round_id = round.id;
+            return Models.match
+            .where({'round_id':round_id})
+            .fetchAll({withRelated: ['home_team', 'visitor_team']})
+            .then(function (result) {
+                var zip = result.map(teamMap);
+                console.log("++**++")
+                var flat = flatArray(zip);
+                console.log("++--++")
+                console.log("flat:", flat);
+                // console.log("mapped", result.map(teamMap));
+                //console.log(_.flatten(result));
+                Message(res,'Success', '0', flat);
+
+            }).catch(function(error){
+                Message(res,error.details, error.code, []);
+            });
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
+
+
+    // this.getGroup(group_id) {
+    //     return Models.round
+    //     .where({'group_id':group_id})
+    //     .fetch({withRelated: ['rounds']})
+    //     .then(function (result) {
+    //        return result;
+    //     }).catch(function(error){
+    //         return error;
+    //     });
+    // }
+
+    // function getMatch(round_id) {
+    //     console.log("Round function!", round_id);
+    //     return Models.match
+    //     .where({'round_id':round_id})
+    //     .fetchAll({withRelated: ['home_team', 'visitor_team']})
+    //     .then(function (result) {
+    //        return result;
+    //     }).catch(function(error){
+    //         return error;
+    //     });
+    // };
+
 
     // //Groups by Phase_id
     // router.get('/:phase_id/group/', function (req, res) {
@@ -121,11 +185,11 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .update(phase_upd, ['id'])
         .then(function(result){
             if (result.length != 0){
-                console.log('result is not null');
-                console.log(`result: ${result[0]}`);
+                // console.log('result is not null');
+                // console.log(`result: ${result[0]}`);
                 Message(res, 'Success', '0', result);
             } else {
-                console.log(`{error: ${error}}`);
+                // console.log(`{error: ${error}}`);
                 Message(res, 'Wrong phase_id', '404', result);
             }
         })

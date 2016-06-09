@@ -18,8 +18,8 @@ exports.up = function(knex, Promise) {
 			table.integer('coach_maximum_participant').defaultTo(0);
 			table.integer('team_quantity').defaultTo(0);
 			//?
-			table.timestamp('paticipant_minimum');
-			table.timestamp('paticipant_maximum');
+			table.integer('participant_minimum');
+			table.integer('participant_maximum');
 
 			table.integer('gender_id').references('genders.id').index();
 			table.integer('season_id').references('seasons.id').index();

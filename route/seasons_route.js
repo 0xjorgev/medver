@@ -50,14 +50,16 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         console.log('req.body: ', req.body);
 
-        new Season({
-            name: name,
-            description:description,
-            game_title:game_title,
-            init_at:init_at,
-            ends_at:ends_at,
-            competition_id: competition_id
-        }).save().then(function(new_season){
+        new Season(season_post
+        // {
+        //     name: name,
+        //     description:description,
+        //     game_title:game_title,
+        //     init_at:init_at,
+        //     ends_at:ends_at,
+        //     competition_id: competition_id
+        // }
+        ).save().then(function(new_season){
             console.log(`{new_season: ${new_season}}`);
             Message(res, 'Success', '0', new_season);
         }).catch(function(error){
@@ -108,6 +110,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+
+    //Add to new schemma
     //Category Season Methods
     router.get('/:season_id/category', function (req, res) {
         console.log('category');

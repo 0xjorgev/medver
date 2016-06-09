@@ -59,17 +59,46 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             console.log(`referee_id:${referee_id}`);
             console.log('------------------------------');
 
-            new Match_referee({
-                match_id: match_id,
-                referee_id: referee_id
-            }).save().then(function(new_match_referee){
+            new Match_referee(match_referee_post
+            // {
+            //     match_id: match_id,
+            //     referee_id: referee_id
+            // }
+            ).save().then(function(new_match_referee){
                 console.log(`{new_match_referee: ${new_match_referee}}`);
                 Message(res, 'Success', '0', new_match_referee);
             }).catch(function(error){
                 console.log(`{error: ${error}}`);
                 Message(res, error.detail, error.code, null);
             });
+    });
 
+        router.put('/:match_referee_id', function (req, res) {
+
+        console.log('update /:match_referee_id');
+        //Model Instance
+        var match_referee_id = req.params.match_referee_id
+        var Match_referee = Models.match_referee;
+        var match_referee_post = req.body;
+
+        // Knex(competition.tableName)
+        Knex(Match_referee.tableName)
+        .where('id','=',match_referee_id)
+        .update(phase_upd, ['id'])
+        .then(function(result){
+            if (result.length != 0){
+                console.log('result is not null');
+                console.log(`result: ${result[0]}`);
+                Message(res, 'Success', '0', result);
+            } else {
+                console.log(`{error: ${error}}`);
+                Message(res, 'Wrong phase_id', '404', result);
+            }
+        })
+        .catch(function(err){
+            console.log(`Catch Error: ${err}`);
+          Message(res, err.detail, err.code, null);
+        });
     });
 
     //Phase by phase_id
@@ -146,36 +175,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //         Message(res, error.detail, error.code, null);
     //     });
 
-    // });
-
-
-    // router.put('/:phase_id', function (req, res) {
-
-    //     console.log('update /:phase_id');
-    //     //Model Instance
-    //     var Phase = Models.phase;
-
-    //     var phase_id = req.params.phase_id;
-    //     var phase_upd = req.body;
-
-    //     // Knex(competition.tableName)
-    //     Knex('phases')
-    //     .where('id','=',phase_id)
-    //     .update(phase_upd, ['id'])
-    //     .then(function(result){
-    //         if (result.length != 0){
-    //             console.log('result is not null');
-    //             console.log(`result: ${result[0]}`);
-    //             Message(res, 'Success', '0', result);
-    //         } else {
-    //             console.log(`{error: ${error}}`);
-    //             Message(res, 'Wrong phase_id', '404', result);
-    //         }
-    //     })
-    //     .catch(function(err){
-    //         console.log(`Catch Error: ${err}`);
-    //       Message(res, err.detail, err.code, null);
-    //     });
     // });
 
     return router;

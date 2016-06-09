@@ -11,8 +11,8 @@ exports.up = function(knex, Promise) {
 			// table.timestamp('inscription_ends_at');
 			//Conditions
 			// table.string('condition');
-			// table.integer('minimum_value');
-			// table.integer('maximum_value');
+			table.integer('minimum_value');
+			table.integer('maximum_value');
 			//New Updates, Team participation req
 			// table.integer('other_minimum_participant');
 			// table.integer('other_maximum_participant');

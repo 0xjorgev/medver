@@ -71,7 +71,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         return Models.phase
         .query(function(qb){
-            qb.limit(25);
+            // qb.limit(25);
         })
         .where({active:true})
         .fetchAll({withRelated: ['groups', 'category']} )
@@ -211,20 +211,22 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 
     	console.log('Req Values:' + req.body);
-        var category_id = phase_post.category_id;
-    	var name = phase_post.name;
-    	var position = phase_post.position;
+     //    var category_id = phase_post.category_id;
+    	// var name = phase_post.name;
+    	// var position = phase_post.position;
 
-        console.log('------------------------------');
-        console.log(`name:${name}`);
-        console.log(`position:${position}`);
-        console.log('------------------------------');
+     //    console.log('------------------------------');
+     //    console.log(`name:${name}`);
+     //    console.log(`position:${position}`);
+     //    console.log('------------------------------');
 
-        new Phase({
-            name: name,
-            position: position,
-            category_id:category_id
-        }).save().then(function(new_phase){
+        new Phase(phase_post
+        // {
+        //     name: name,
+        //     position: position,
+        //     category_id:category_id
+        // }
+        ).save().then(function(new_phase){
             console.log(`{new_phase: ${new_phase}}`);
             Message(res, 'Success', '0', new_phase);
         }).catch(function(error){

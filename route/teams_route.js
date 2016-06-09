@@ -113,14 +113,17 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var description =  req.params.description;
         var name        = group_post.name;
 
-        new Team({
-            name: name,
-            organization_id: org_id,
-            category_id: cat_id,
-            logo_url: logo_url,
-            short_name: short_name,
-            description: description
-        }).save().then(function(new_team){
+        new Team(
+            team_post
+        // {
+        //     name: name,
+        //     organization_id: org_id,
+        //     category_id: cat_id,
+        //     logo_url: logo_url,
+        //     short_name: short_name,
+        //     description: description
+        // }
+        ).save().then(function(new_team){
             console.log(`{new_team: ${new_team}}`);
             Message(res, 'Success', '0', new_team);
         }).catch(function(error){

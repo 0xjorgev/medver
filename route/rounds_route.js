@@ -103,12 +103,14 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log(`group_id:${group_id}`);
         console.log('------------------------------');
 
-        new Round({
-            name: name,
-            start_date: start_date,
-            end_date:end_date,
-            group_id:group_id
-        }).save().then(function(new_round){
+        new Round(round_post
+        // {
+        //     name: name,
+        //     start_date: start_date,
+        //     end_date:end_date,
+        //     group_id:group_id
+        // }
+        ).save().then(function(new_round){
             console.log(`{new_round: ${new_round}}`);
             Message(res, 'Success', '0', new_round);
         }).catch(function(error){

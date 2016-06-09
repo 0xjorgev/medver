@@ -69,12 +69,14 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var Group = Models.group;
         var group_post = req.body;
         var phase_id = group_post.phase_id;
-        var name = group_post.name;
+        // var name = group_post.name;
 
-        new Group({
-            name: name,
-            phase_id: phase_id
-        }).save().then(function(new_group){
+        new Group(group_post
+        // {
+        //     name: name,
+        //     phase_id: phase_id
+        // }
+        ).save().then(function(new_group){
             console.log(`{new_group: ${new_group}}`);
             Message(res, 'Success', '0', new_group);
         }).catch(function(error){

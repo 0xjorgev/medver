@@ -48,14 +48,14 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.category
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: []})
-        //.fetchAll({withRelated: ['gender', 'phases', 'clasification']})
+        //.fetchAll({withRelated: []})
+        .fetchAll({withRelated: ['gender', 'phases', 'classification']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
-            console.log('result: ' + result);
+             // console.log('result: ' + result);
             Message(res,'Success', '0', result);
         }).catch(function(error){
-            console.log('Error: ' + error);
+            // console.log('Error: ' + error);
             Message(res,error.details, error.code, []);
         });
     });

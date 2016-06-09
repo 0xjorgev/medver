@@ -16,15 +16,15 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './category', './organization', './player_team', './category_group_phase_team'], function (DB) {
+define(['./base_model', './category_type', './organization', './player_team', './category_group_phase_team'], function (DB) {
 
     var Team = DB.Model.extend({
         tableName: 'teams',
         hasTimestamps: true,
 
         // relations
-        category: function(){
-            return this.belongsTo('Category', 'category_id');
+        category_type: function(){
+            return this.belongsTo('Category_type', 'category_type_id');
         },
 
         organization: function(){
@@ -42,9 +42,6 @@ define(['./base_model', './category', './organization', './player_team', './cate
         // player: function(){
         //     return this.hasMany('Player');
         // }
-
-
-
     });
 
     // uses Registry plugin

@@ -66,7 +66,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
-        router.get('/subdiscipline/:subdiscipline_id/event', function (req, res) {
+    router.get('/subdiscipline/:subdiscipline_id/event', function (req, res) {
 
         console.log('-----------------------');
         console.log('Events By subDiscipline');

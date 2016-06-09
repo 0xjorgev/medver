@@ -20,8 +20,12 @@ define(['./base_model','./gender', './player_team', './event_match_player'], fun
             return this.hasMany('Player_team');
         },
 
-        result: function(){
-            return this.hasMany('Event_match_player');
+        player_in: function(){
+            return this.hasMany('Event_match_player', 'player_in');
+        },
+
+        player_out: function() {
+         return this.hasMany('Event_match_player', 'player_out');
         }
 
     });

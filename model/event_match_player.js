@@ -17,7 +17,7 @@ if (typeof define !== 'function') {
         --table.integer('event_id').references('events.id').index();
 */
 
-define(['./base_model','./player', './match', './event'], function (DB) {
+define(['./base_model','./player', './match', './event', './team'], function (DB) {
 
     var Event_match_player = DB.Model.extend({
         tableName: 'events_matches_players',
@@ -37,6 +37,10 @@ define(['./base_model','./player', './match', './event'], function (DB) {
         },
         event_id: function(){
             return this.belongsTo('Event');
+        },
+
+        team: function(){
+            return this.belongsTo('Team', 'team_id');
         }
     });
 

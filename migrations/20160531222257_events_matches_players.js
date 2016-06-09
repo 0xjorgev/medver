@@ -12,6 +12,8 @@ exports.up = function(knex, Promise) {
 			table.integer('player_out').references('players.id').index();
 			table.integer('match_id').references('matches.id').index();
 			table.integer('event_id').references('events.id').index();
+			//Temporal Fix
+			table.integer('team_id').references('teams.id').index();
 		})
 		.then(function(){
 			//Add query

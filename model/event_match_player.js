@@ -25,11 +25,11 @@ define(['./base_model','./player', './match', './event'], function (DB) {
 
         //relations
         player_in: function(){
-            return this.belongsTo('Player');
+            return this.belongsTo('Player', 'player_in');
         },
 
         player_out: function(){
-            return this.belongsTo('Player');
+            return this.belongsTo('Player', 'player_out');
         },
 
         match_id: function(){

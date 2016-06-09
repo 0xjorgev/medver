@@ -10,15 +10,32 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     var router = express.Router();
 
         //Teams by Category
+    // router.get('/:category_id/team', function (req, res) {
+
+    //     console.log("Teams by Category");
+    //     var category_id = req.params.category_id;
+
+    //     return Models.team
+    //     .where({category_id:category_id})
+    //     .where({active:true})
+    //     .fetchAll()
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
+
+    //Teams by Category
     router.get('/:category_id/team', function (req, res) {
 
         console.log("Teams by Category");
         var category_id = req.params.category_id;
 
-        return Models.team
+        return Models.category_group_phase_team
         .where({category_id:category_id})
         .where({active:true})
-        .fetchAll()
+        .fetchAll({withRelated:['team']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

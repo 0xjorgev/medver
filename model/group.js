@@ -17,6 +17,9 @@ define(['./base_model','./phase','./round'], function (DB) {
         },
         rounds: function(){
             return this.hasMany('Round');
+        },
+        category_group_phase_team: function(){
+            return this.hasMany('Category_group_phase_team', 'group_id');
         }
     });
 

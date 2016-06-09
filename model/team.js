@@ -16,7 +16,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './category', './organization', './player_team'], function (DB) {
+define(['./base_model', './category', './organization', './player_team', './category_group_phase_team'], function (DB) {
 
     var Team = DB.Model.extend({
         tableName: 'teams',
@@ -33,6 +33,10 @@ define(['./base_model', './category', './organization', './player_team'], functi
 
         player_team: function(){
             return this.hasMany('Player_team', 'team_id');
+        },
+
+        category_group_phase_team: function(){
+            return this.hasMany('Category_group_phase_team', 'team_id');
         }
 
         // player: function(){

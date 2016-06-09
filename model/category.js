@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./gender','./season', './phase', './classification', './category_type'], function (DB) {
+define(['./base_model','./gender','./season', './phase', './classification', './category_type','./category_group_phase_team'], function (DB) {
 
     var Category = DB.Model.extend({
         tableName: 'categories',
@@ -34,6 +34,10 @@ define(['./base_model','./gender','./season', './phase', './classification', './
         //later
         teams: function(){
             return this.hasMany('Team', 'category_id');
+        },
+
+        category_group_phase_team: function(){
+            return this.hasMany('Category_group_phase_team', 'category_id');
         }
     });
 

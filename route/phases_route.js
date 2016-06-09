@@ -8,14 +8,59 @@ if (typeof define !== 'function') {
 define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
 
     var router = express.Router();
-    var _ = require('lodash');
-    function teamMap(match){
-        return [match.relations.home_team, match.relations.visitor_team];
+    // var _ = require('lodash');
+    function teamMap(team){
+        return team.relations;
     }
 
-    function flatArray(xs){
-        return _.flatten(xs);
+    function groupMap(group){
+        var innerObject = group.relations.category_group_phase_team.models;
+        var delta_group = group;
+        delta_group.relations = null;
+        return { group:delta_group, teams:innerObject.map(innerMap)  };
     }
+
+    function innerMap(inner){
+        return inner.relations.team;
+    }
+
+    //Teams by Phase
+    router.get('/:phase_id/team', function (req, res) {
+
+        console.log("Teams by Phase");
+        var phase_id = req.params.phase_id;
+
+        return Models.category_group_phase_team
+        .where({phase_id:phase_id})
+        .where({active:true})
+        .fetchAll({withRelated:['team']})
+        .then(function (result) {
+            Message(res,'Success', '0', result.models.map(teamMap));
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
+    //Groups & teams by Phase
+    router.get('/:phase_id/group_team', function (req, res) {
+
+        console.log("Groups and Teams by Phase");
+        var phase_id = req.params.phase_id;
+
+        return Models.group
+        .query(function(qb){})
+        .where({'phase_id':phase_id})
+        .where({active:true})
+        .fetchAll({withRelated: ['category_group_phase_team.team']})
+        .then(function (result) {
+            // console.log("Res :", result);
+            //console.log("Res Map:", result.models.map(groupMap));
+            Message(res,'Success', '0', result.models.map(groupMap));
+        }).catch(function(error){
+            console.log("Error :", error);
+            Message(res,error.details, error.code, []);
+        });
+    });
 
     console.log('Phases Route');
 
@@ -28,6 +73,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .query(function(qb){
             qb.limit(25);
         })
+        .where({active:true})
         .fetchAll({withRelated: ['groups', 'category']} )
         .then(function (result) {
             console.log('result :', result);
@@ -43,6 +89,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
          var phase_id = req.params.phase_id;
         return Models.phase
         .where({'id':phase_id})
+        .where({active:true})
         .fetch({withRelated: ['groups']})
         .then(function (result) {
             Message(res,'Success', '0', result);
@@ -51,35 +98,53 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    //Groups with teams by Phase_id
-    router.get('/:phase_id/group', function (req, res) {
-        console.log('List groups by Phase Id');
-        var phase_id = req.params.phase_id;
-        return Models.group
-        .where({'id':phase_id})
-        .fetch({withRelated: ['rounds']})
-        .then(function (round) {
-              var round_id = round.id;
-            return Models.match
-            .where({'round_id':round_id})
-            .fetchAll({withRelated: ['home_team', 'visitor_team']})
-            .then(function (result) {
-                var zip = result.map(teamMap);
-                console.log("++**++")
-                var flat = flatArray(zip);
-                console.log("++--++")
-                console.log("flat:", flat);
-                // console.log("mapped", result.map(teamMap));
-                //console.log(_.flatten(result));
-                Message(res,'Success', '0', flat);
+    //teams by Phase_id
+    // router.get('/:phase_id/team', function (req, res) {
+    //     console.log('List teams by Phase Id');
+    //     var phase_id = req.params.phase_id;
+    //     return Models.group
+    //     .where({'id':phase_id})
+    //     .fetch({withRelated: ['rounds']})
+    //     .then(function (round) {
+    //           var round_id = round.id;
+    //         return Models.match
+    //         .where({'round_id':round_id})
+    //         .fetchAll({withRelated: ['home_team', 'visitor_team']})
+    //         .then(function (result) {
+    //             var zip = result.map(teamMap);
+    //             var flat = flatArray(zip);
+    //             Message(res,'Success', '0', flat);
+    //         }).catch(function(error){
+    //             Message(res,error.details, error.code, []);
+    //         });
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
 
-            }).catch(function(error){
-                Message(res,error.details, error.code, []);
-            });
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
-    });
+    // //teams by Phase_id
+    // router.get('/:phase_id/group', function (req, res) {
+    //     console.log('List groups by Phase Id');
+    //     var phase_id = req.params.phase_id;
+    //     return Models.group
+    //     .where({'id':phase_id})
+    //     .fetch({withRelated: ['rounds']})
+    //     .then(function (round) {
+    //         var round_id = round.id;
+    //         return Models.match
+    //         .where({'round_id':round_id})
+    //         .fetchAll({withRelated: ['home_team', 'visitor_team']})
+    //         .then(function (result) {
+    //             var zip = result.map(teamMap);
+    //             var flat = flatArray(zip);
+    //             Message(res,'Success', '0', flat);
+    //         }).catch(function(error){
+    //             Message(res,error.details, error.code, []);
+    //         });
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
 
 
 

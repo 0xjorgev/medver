@@ -41,6 +41,20 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    //NOP!
+    // router.get('/:round/team', function (req, res) {
+    //     console.log('Teams By Round List');
+    //      var round_id = req.params.round_id;
+    //     return Models.round
+    //     .where({'id':round_id})
+    //     .fetch({withRelated: ['matches']})
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    // });
+
     // //Groups by Phase_id
     // router.get('/:group_id/group/', function (req, res) {
 

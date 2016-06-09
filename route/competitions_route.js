@@ -219,8 +219,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         console.log('------------------------------');
 
-        new Competition({
-            competition_post
+         new Competition( competition_post
+            //{
+        //     competition_post
             // name: name,
             // description: description,
             // discipline_id:discipline_id,
@@ -228,7 +229,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             // competition_type_id:competition_type_id,
             // img_url: img_url,
             // is_published: is_published
-        }).save().then(function(new_competition){
+        // }
+        ).save().then(function(new_competition){
             console.log(`{new_competition: ${new_competition}}`);
             Message(res, 'Success', '0', new_competition);
         }).catch(function(error){

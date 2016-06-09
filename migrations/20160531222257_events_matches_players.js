@@ -6,6 +6,7 @@ exports.up = function(knex, Promise) {
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
+			table.integer('instant').defaultTo(0);
 			//Relationships
 			table.integer('player_in').references('players.id').index();
 			table.integer('player_out').references('players.id').index();

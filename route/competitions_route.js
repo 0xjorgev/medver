@@ -301,7 +301,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     router.post('/:comp_id/admin_user/', function(req, res, next){
 
-        console.log('Competitions Admins');
+        console.log('Create Competitions Admins');
         var Competition_user = Models.competition_user
         var comp_user = req.body;
 
@@ -314,6 +314,26 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res, error.detail, error.code, null);
         });
     });
+
+    // router.put('/:comp_id/admin_user/', function(req, res, next){
+
+    //     console.log('Update Competitions Admins');
+    //     var Competition_user = Models.competition_user
+    //     var comp_user = req.body;
+    //     var id = req.body.id;
+
+    //     Knex('competitions_users')
+    //     .where({active:true})
+    //     .where({id:id})
+    //     .update(comp_user, ['id'])
+    //     .then(function(result){
+    //         console.log(`{admin_user: ${result}}`);
+    //         Message(res, 'Success', '0', result);
+    //     }).catch(function(error){
+    //         console.log(`{error: ${error}}`);
+    //         Message(res, error.detail, error.code, null);
+    //     });
+    // });
 
     return router;
 });

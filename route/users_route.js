@@ -155,10 +155,10 @@ define(['express',
         .catch(function(err){
           Message(res, err.detail, err.code, null);
         });
-
     });
-        //TODO:
-        //Add update Profile
+
+    //TODO:
+    //Add update Profile
 
     return router;
 });

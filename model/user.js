@@ -19,6 +19,10 @@ define(['./base_model', './organization'], function (DB) {
 
         referee: function(){
             return this.hasMany('Match_referee');
+        },
+
+        competition_user: function(){
+            return this.hasMany('Competition_user','user_id');
         }
     });
 

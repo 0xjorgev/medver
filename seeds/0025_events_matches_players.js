@@ -32,8 +32,6 @@ exports.seed = function(knex, Promise) {
 		match_id:5
 		Teams on Match: 4 5
 		Players on teams: 4 & 5, 1 - 22
-
-
     */
 
     // Inserts seed entries

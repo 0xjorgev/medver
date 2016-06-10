@@ -34,6 +34,10 @@ define(['./base_model', './discipline', './subdiscipline', './competition_type',
 
         competition_type: function(){
             return this.belongsTo('Competition_type','competition_type_id');
+        },
+
+        competition_user: function(){
+            return this.hasMany('Competition_user','competition_id');
         }
     });
 

@@ -11,6 +11,26 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     console.log('competition Route');
 
+
+    router.get('/:comp_id/admin_user/', function(req, res, next){
+
+        console.log('Competitions Admins');
+        var comp_id = req.params.comp_id;
+        // console.log('Model: ' , Models.competition_user.tableName);
+        return Models.competition_user
+         .where({competition_id :comp_id})
+        .where({active:true})
+        .fetchAll({withRelated: ['users']})
+        .then(function(result){
+            //console.log('Res: ', result);
+            Message(res,'Success', '0', result);
+        })
+        .catch(function(err){
+            console.log('err: ', err);
+          Message(res, err.detail, err.code, null);
+        });
+    });
+
     //List of competitions
     router.get('/', function (req, res) {
 
@@ -276,6 +296,22 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .catch(function(err){
             console.log(`error: ${err}`);
           Message(res, err.detail, err.code, null);
+        });
+    });
+
+    router.post('/:comp_id/admin_user/', function(req, res, next){
+
+        console.log('Competitions Admins');
+        var Competition_user = Models.competition_user
+        var comp_user = req.body;
+
+        new Competition_user( comp_user
+        ).save().then(function(new_admin_user){
+            console.log(`{new_admin_user: ${new_admin_user}}`);
+            Message(res, 'Success', '0', new_admin_user);
+        }).catch(function(error){
+            console.log(`{error: ${error}}`);
+            Message(res, error.detail, error.code, null);
         });
     });
 

@@ -73,7 +73,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .query(function(qb){})
         .where({'phase_id':phase_id})
         .where({active:true})
-        .fetchAll({withRelated: ['rounds.matches']})
+        .fetchAll({withRelated: ['rounds.matches.home_team', 'rounds.matches.visitor_team']})
         .then(function (result) {
             console.log("Res :", result);
             //console.log("Res Map:", result.models.map(groupMap));

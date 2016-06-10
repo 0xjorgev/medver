@@ -62,6 +62,28 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+
+    //Phase, group, round team by Phase_id
+    router.get('/:phase_id/group_round_match', function (req, res) {
+
+        console.log("Group_round_match");
+        var phase_id = req.params.phase_id;
+
+        return Models.group
+        .query(function(qb){})
+        .where({'phase_id':phase_id})
+        .where({active:true})
+        .fetchAll({withRelated: ['rounds.matches']})
+        .then(function (result) {
+            console.log("Res :", result);
+            //console.log("Res Map:", result.models.map(groupMap));
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            console.log("Error :", error);
+            Message(res,error.details, error.code, []);
+        });
+    });
+
     console.log('Phases Route');
 
     //List of competitions

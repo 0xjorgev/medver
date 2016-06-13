@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.team
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['category_type', 'organization']})
+        .fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug:true})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -27,10 +27,35 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    //Team by Id -> Returns 1 result
-    router.get('/:team_id/player', function (req, res) {
+    //Team by Id -> Returns  [] result
+    // router.get('/:team_id/player', function (req, res) {
+    //
+    // console.log('Team Players by team_id');
+    //     var team_id = req.params.team_id;
+    //
+    //     return Models.player_team
+    //     .where({team_id:team_id})
+    //     .where({active:true})
+    //     .fetchAll({withRelated: ['player'], debug: true})
+    //     .then(function (result) {
+    //         Message(res,'Success', '0', result);
+    //     }).catch(function(error){
+    //         Message(res,error.details, error.code, []);
+    //     });
+    //
+    //     // return Models.team
+    //     // .where({id:team_id})
+    //     // .where({active:true})
+    //     // .fetch({withRelated: ['category']})
+    //     // .then(function (result) {
+    //     //     Message(res,'Success', '0', result);
+    //     // }).catch(function(error){
+    //     //     Message(res,error.details, error.code, []);
+    //     // });
+    // });
 
-    console.log('Team Players by team_id');
+    router.get('/:team_id/player', function (req, res) {
+        console.log('Team Players by team_id');
         var team_id = req.params.team_id;
 
         return Models.player_team
@@ -42,16 +67,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         }).catch(function(error){
             Message(res,error.details, error.code, []);
         });
-
-        // return Models.team
-        // .where({id:team_id})
-        // .where({active:true})
-        // .fetch({withRelated: ['category']})
-        // .then(function (result) {
-        //     Message(res,'Success', '0', result);
-        // }).catch(function(error){
-        //     Message(res,error.details, error.code, []);
-        // });
     });
 
         //Team by Id -> Returns 1 result
@@ -64,7 +79,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.team
         .where({id:team_id})
         .where({active:true})
-        .fetchAll({withRelated: ['category_type'], debug: true})
+        //.fetchAll({withRelated: ['category_type'], debug: true})
+        .fetch({withRelated: ['category_type', 'organization', 'player_team.player'], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

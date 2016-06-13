@@ -64,7 +64,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.team
         .where({id:team_id})
         .where({active:true})
-        .fetchAll({withRelated: ['category'], debug: true})
+        .fetchAll({withRelated: ['category_type'], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

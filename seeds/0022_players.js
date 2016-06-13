@@ -6,30 +6,30 @@ exports.seed = function(knex, Promise) {
 
     // Inserts seed entries
     //Team 1
-    knex('players').insert({id:1, first_name:'José Pablo',last_name:'Pérez Fernández',nickname:'PEPE',birthday:'28/05/07',number:'1',position:'P',email:'PErezFernandez@somos.com', gender_id:1}),
-    knex('players').insert({id:2, first_name:'José Carlos',last_name:'Sandino Pérez Arce',nickname:'JOE',birthday:'30/05/08',number:'5',position:'D',email:'SandinoPerez@somos.com', gender_id:1}),
-    knex('players').insert({id:3, first_name:'Iker',last_name:'Torrescano Sánchez ',nickname:'IKER',birthday:'24/02/07',number:'7',position:'D',email:'TorrescanoSanchez@somos.com', gender_id:1}),
-    knex('players').insert({id:4, first_name:'José María',last_name:'Arizmendi Santamaría ',nickname:'CHEMA',birthday:'27/04/07',number:'8',position:'P',email:'ArizmendiSantamaria@somos.com', gender_id:1}),
-    knex('players').insert({id:5, first_name:'Luc',last_name:'Deveruz Chávez ',nickname:'LUC',birthday:'08/02/08',number:'2',position:'M',email:'DeveruzChavez@somos.com', gender_id:1}),
-    knex('players').insert({id:6, first_name:'Luis Gerardo',last_name:'Pablos Ralph ',nickname:'LUIGI',birthday:'03/09/07',number:'10',position:'DEL',email:'PablosRalph@somos.com', gender_id:1}),
-    knex('players').insert({id:7, first_name:'Santiago',last_name:'Carrillo Angeles ',nickname:'SANTI',birthday:'21/05/07',number:'9',position:'D',email:'CarrilloAngeles@somos.com', gender_id:1}),
-    knex('players').insert({id:8, first_name:'Mariana',last_name:'Castillo Silva ',nickname:'MAR',birthday:'29/11/07',number:'3',position:'M',email:'CastilloSilva@somos.com', gender_id:2}),
-    knex('players').insert({id:9, first_name:'Max',last_name:'Sierra Guerra ',nickname:'MAX',birthday:'19/04/07',number:'11',position:'M',email:'SierraGuerra@somos.com', gender_id:1}),
-    knex('players').insert({id:10, first_name:'Sofía',last_name:'Alarcón Diez De Bonilla',nickname:'SOFI',birthday:'03/03/08',number:'4',position:'DEL',email:'AlarconDiez@somos.com', gender_id:2}),
+    knex('players').insert({id:1, first_name:'José Pablo',last_name:'Pérez Fernández',nickname:'PEPE',birthday:'28/05/07',email:'PErezFernandez@somos.com', gender_id:1}),
+    knex('players').insert({id:2, first_name:'José Carlos',last_name:'Sandino Pérez Arce',nickname:'JOE',birthday:'30/05/08',email:'SandinoPerez@somos.com', gender_id:1}),
+    knex('players').insert({id:3, first_name:'Iker',last_name:'Torrescano Sánchez ',nickname:'IKER',birthday:'24/02/07',email:'TorrescanoSanchez@somos.com', gender_id:1}),
+    knex('players').insert({id:4, first_name:'José María',last_name:'Arizmendi Santamaría ',nickname:'CHEMA',birthday:'27/04/07',email:'ArizmendiSantamaria@somos.com', gender_id:1}),
+    knex('players').insert({id:5, first_name:'Luc',last_name:'Deveruz Chávez ',nickname:'LUC',birthday:'08/02/08',email:'DeveruzChavez@somos.com', gender_id:1}),
+    knex('players').insert({id:6, first_name:'Luis Gerardo',last_name:'Pablos Ralph ',nickname:'LUIGI',birthday:'03/09/07',email:'PablosRalph@somos.com', gender_id:1}),
+    knex('players').insert({id:7, first_name:'Santiago',last_name:'Carrillo Angeles ',nickname:'SANTI',birthday:'21/05/07',email:'CarrilloAngeles@somos.com', gender_id:1}),
+    knex('players').insert({id:8, first_name:'Mariana',last_name:'Castillo Silva ',nickname:'MAR',birthday:'29/11/07',email:'CastilloSilva@somos.com', gender_id:2}),
+    knex('players').insert({id:9, first_name:'Max',last_name:'Sierra Guerra ',nickname:'MAX',birthday:'19/04/07',email:'SierraGuerra@somos.com', gender_id:1}),
+    knex('players').insert({id:10, first_name:'Sofía',last_name:'Alarcón Diez De Bonilla',nickname:'SOFI',birthday:'03/03/08',email:'AlarconDiez@somos.com', gender_id:2})
 
     // //Team 2
-    knex('players').insert({id:11, first_name:'Enzo',last_name:'Lozada Oropeza ',nickname:'ENZO',birthday:'30/05/07',number:'13',position:'M',email:'LozadaOropeza@sport.com', gender_id:1}),
-    knex('players').insert({id:12, first_name:'Pablo Emilio',last_name:'Contreras Lozoya',nickname:'PUL',birthday:'07/01/07',number:'7',position:'DEL',email:'ContrerasLozoya@sport.com', gender_id:1}),
-    knex('players').insert({id:13, first_name:'Karina',last_name:'Espinosa Cruz ',nickname:'KAR',birthday:'15/10/07',number:'3',position:'D',email:'EspinosaCruz@sport.com', gender_id:2}),
-    knex('players').insert({id:14, first_name:'Joaquín',last_name:'Guarín Correa ',nickname:'JOAK',birthday:'16/04/06',number:'2',position:'DEL',email:'GuarinCorrea@sport.com', gender_id:1}),
-    knex('players').insert({id:15, first_name:'Diego',last_name:'Hernández Quevedo ',nickname:'DRAK',birthday:'17/08/07',number:'5',position:'D',email:'HernandezQuevedo@sport.com', gender_id:1}),
-    knex('players').insert({id:16, first_name:'Andrés Gerardo',last_name:'Rosas Camarena ',nickname:'ANDY',birthday:'20/10/07',number:'17',position:'M',email:'RosasCamarena@sport.com', gender_id:1}),
-    knex('players').insert({id:17, first_name:'Mirna',last_name:'Delgado Escobar',nickname:'MIR',birthday:'15/02/07',number:'1',position:'P',email:'DelgadoEscobar@sport.com', gender_id:2}),
-    knex('players').insert({id:18, first_name:'Santiago',last_name:'Esqueda Rivas ',nickname:'CHANCHA',birthday:'15/10/07',number:'8',position:'M',email:'EsquedaRivas@sport.com', gender_id:1}),
-    knex('players').insert({id:19, first_name:'José Emilio',last_name:'Cedillo Estrada ',nickname:'EMI',birthday:'30/09/07',number:'5',position:'D',email:'Cedillo@sport.com', gender_id:1}),
-    knex('players').insert({id:20, first_name:'Santiago',last_name:'Arizmendi Santamaría ',nickname:'SAN',birthday:'16/04/07',number:'99',position:'DEL',email:'Santamaria@sport.com', gender_id:1}),
-    knex('players').insert({id:21, first_name:'Bruno',last_name:'Serrano Rodríguez ',nickname:'BRU',birthday:'08/08/05',number:'9',position:'M',email:'Serrano@sport.com', gender_id:1}),
-    knex('players').insert({id:22, first_name:'Nicol',last_name:'Quezada Paul',nickname:'NICOL',birthday:'07/01/07',number:'10',position:'DEL',email:'Paul@sport.com', gender_id:2})
+    // knex('players').insert({id:11, first_name:'Enzo',last_name:'Lozada Oropeza ',nickname:'ENZO',birthday:'30/05/07',number:'13',position:'M',email:'LozadaOropeza@sport.com', gender_id:1}),
+    // knex('players').insert({id:12, first_name:'Pablo Emilio',last_name:'Contreras Lozoya',nickname:'PUL',birthday:'07/01/07',number:'7',position:'DEL',email:'ContrerasLozoya@sport.com', gender_id:1}),
+    // knex('players').insert({id:13, first_name:'Karina',last_name:'Espinosa Cruz ',nickname:'KAR',birthday:'15/10/07',number:'3',position:'D',email:'EspinosaCruz@sport.com', gender_id:2}),
+    // knex('players').insert({id:14, first_name:'Joaquín',last_name:'Guarín Correa ',nickname:'JOAK',birthday:'16/04/06',number:'2',position:'DEL',email:'GuarinCorrea@sport.com', gender_id:1}),
+    // knex('players').insert({id:15, first_name:'Diego',last_name:'Hernández Quevedo ',nickname:'DRAK',birthday:'17/08/07',number:'5',position:'D',email:'HernandezQuevedo@sport.com', gender_id:1}),
+    // knex('players').insert({id:16, first_name:'Andrés Gerardo',last_name:'Rosas Camarena ',nickname:'ANDY',birthday:'20/10/07',number:'17',position:'M',email:'RosasCamarena@sport.com', gender_id:1}),
+    // knex('players').insert({id:17, first_name:'Mirna',last_name:'Delgado Escobar',nickname:'MIR',birthday:'15/02/07',number:'1',position:'P',email:'DelgadoEscobar@sport.com', gender_id:2}),
+    // knex('players').insert({id:18, first_name:'Santiago',last_name:'Esqueda Rivas ',nickname:'CHANCHA',birthday:'15/10/07',number:'8',position:'M',email:'EsquedaRivas@sport.com', gender_id:1}),
+    // knex('players').insert({id:19, first_name:'José Emilio',last_name:'Cedillo Estrada ',nickname:'EMI',birthday:'30/09/07',number:'5',position:'D',email:'Cedillo@sport.com', gender_id:1}),
+    // knex('players').insert({id:20, first_name:'Santiago',last_name:'Arizmendi Santamaría ',nickname:'SAN',birthday:'16/04/07',number:'99',position:'DEL',email:'Santamaria@sport.com', gender_id:1}),
+    // knex('players').insert({id:21, first_name:'Bruno',last_name:'Serrano Rodríguez ',nickname:'BRU',birthday:'08/08/05',number:'9',position:'M',email:'Serrano@sport.com', gender_id:1}),
+    // knex('players').insert({id:22, first_name:'Nicol',last_name:'Quezada Paul',nickname:'NICOL',birthday:'07/01/07',number:'10',position:'DEL',email:'Paul@sport.com', gender_id:2})
     );
 };
     // //Team 3

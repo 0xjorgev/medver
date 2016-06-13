@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.team
         .query(function(qb){})
         .where({active:true})
-        .fetchAll({withRelated: ['category', 'organization']})
+        .fetchAll({withRelated: ['category_type', 'organization']})
         //.fetchAll({withRelated: ['gender', 'season']})
         .then(function (result) {
             console.log('result: ' + result);
@@ -31,8 +31,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     router.get('/:team_id/player', function (req, res) {
 
     console.log('Team Players by team_id');
-
-
         var team_id = req.params.team_id;
 
         return Models.player_team
@@ -153,7 +151,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                 console.log(`result: ${result[0]}`);
             Message(res, 'Success', '0', result);
             } else {
-
                 Message(res, 'team not found', '404', result);
             }
         })

@@ -9,8 +9,8 @@ exports.up = function(knex, Promise) {
 			table.string('nickname');
 			table.string('birthday');
 			//to be changed --> move to Players_team
-			table.string('number');
-			table.string('position');
+			// table.string('number');
+			// table.string('position');
 			table.string('email');
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('created_at').defaultTo(knex.fn.now());

@@ -335,5 +335,22 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //     });
     // });
 
+    //---------------------------------------------------------------
+    //                    Testing Stuff
+    //---------------------------------------------------------------
+    router.get('/rcompetition/:competition_id', function (req, res) {
+        console.log('competition_id List');
+        var comp_id = req.params.competition_id;
+        return Models.competition
+        .where({'id':comp_id})
+        .fetch( {withRelated: ['discipline.subdisciplines', 'competition_type', 'seasons','seasons.categories.classification', 'seasons.categories.phases', 'seasons.categories.category_group_phase_team.group.rounds.matches.home_team', 'seasons.categories.category_group_phase_team.group.rounds.matches.visitor_team']} )
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+    //---------------------------------------------------------------
+
     return router;
 });

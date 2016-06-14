@@ -23,7 +23,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .fetchAll({withRelated: ['users']})
         .then(function(result){
             //console.log('Res: ', result);
-            Message(res,'Success', '0', result);
+            Message(res,'Success', ' 0', result);
         })
         .catch(function(err){
             console.log('err: ', err);
@@ -343,7 +343,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var comp_id = req.params.competition_id;
         return Models.competition
         .where({'id':comp_id})
-        .fetch( {withRelated: ['discipline.subdisciplines', 'competition_type', 'seasons','seasons.categories.classification', 'seasons.categories.phases', 'seasons.categories.category_group_phase_team.group.rounds.matches.home_team', 'seasons.categories.category_group_phase_team.group.rounds.matches.visitor_team']} )
+        .fetch( {withRelated: ['discipline.subdisciplines', 'competition_type', 'seasons','seasons.categories.classification', 'seasons.categories.phases', 'seasons.categories.phases.groups','seasons.categories.category_group_phase_team.group.rounds.matches.home_team', 'seasons.categories.category_group_phase_team.group.rounds.matches.visitor_team']} )
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

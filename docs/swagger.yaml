@@ -22,15 +22,8 @@ paths:
       summary: Team services
       description:
         Get info of all teams
-      parameters:
-        - name: team_id
-          in: path
-          description: Team ID
-          required: true
-          type: integer
-          format: integer
       tags:
-        - Products
+        - Team
       responses:
         200:
           description: An array of products
@@ -42,6 +35,45 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /team/{team_id}:
+    get:
+      summary: Team services
+      description:
+        Get info of all teams
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Team
+      responses:
+        200:
+          description: An array of products
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /player/{player_id}:
+    get:
+      summary: Gets player's info
+      description: Gets player's info
+      parameters:
+        - name: player_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Player
+      responses:
+        200:
+          description: Information about a single player
   /estimates/price:
     get:
       summary: Price Estimates

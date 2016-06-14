@@ -15,7 +15,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     router.get('/:player_id', function (req, res) {
 
         console.log('Player Profile');
-
         var player_id = req.params.player_id;
 
         return Models.player

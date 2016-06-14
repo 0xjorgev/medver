@@ -21,7 +21,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.event_match_player
         .where({match_id:match_id})
         .where({active:true})
-        .fetchAll({withRelated: ['match_id', 'event_id', 'player_in.player_team', 'player_out.player_team', 'team'], debug: true})
+        .fetchAll({withRelated: ['match_id', 'event_id', 'player_in.player_team', 'player_out.player_team', 'team', { player_in:
+          function(qb) { qb.where('team_id', team.id) }}], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

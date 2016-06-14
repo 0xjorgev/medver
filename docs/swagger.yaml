@@ -6,36 +6,29 @@ info:
   description: Basic description of services provided by Somosport Core
   version: "1.0"
 # the domain of the service
-host: somosportpocdev.herokuapp.com
+# host: somosportpocdev.herokuapp.com
+host: localhost:3000
 # array of all schemes that your API supports
 schemes:
+  - http
   - https
 # will be prefixed to all paths
-basePath: /v1
+basePath: /api/v1.0
 produces:
   - application/json
 paths:
-  /products:
+  /team:
     get:
-      summary: Product Types
-      description: |
-        The Products endpoint returns information about the *Uber* products
-        offered at a given location. The response includes the display name
-        and other details about each product, and lists the products in the
-        proper display order.
+      summary: Team services
+      description:
+        Get info of all teams
       parameters:
-        - name: latitude
-          in: query
-          description: Latitude component of location.
+        - name: team_id
+          in: path
+          description: Team ID
           required: true
-          type: number
-          format: double
-        - name: longitude
-          in: query
-          description: Longitude component of location.
-          required: true
-          type: number
-          format: double
+          type: integer
+          format: integer
       tags:
         - Products
       responses:
@@ -180,24 +173,48 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 definitions:
-  Product:
+  Team:
     type: object
     properties:
-      product_id:
+      id:
         type: string
-        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
+        description: <<add id description>>
+      name:
+        type: string
+        description: <<add name description>>
+      logo_url:
+        type: string
+        description: <<add logo_url description>>
+      short_name:
+        type: string
+        description: <<add short_name description>>
       description:
         type: string
-        description: Description of product.
-      display_name:
+        description: <<add description description>>
+      category_type_id:
         type: string
-        description: Display name of product.
-      capacity:
+        description: <<add category_typ description>>
+      organization_id:
         type: string
-        description: Capacity of product. For example, 4 people.
-      image:
+        description: <<add organization description>>
+      active:
         type: string
-        description: Image URL representing the product.
+        description: <<add active description>>
+      created_at:
+        type: string
+        description: <<add created_at description>>
+      updated_at:
+        type: string
+        description: <<add updated_at description>>
+      category_type:
+        type: string
+        description: <<add category_typ description>>
+      organization:
+        type: string
+        description: <<add organization description>>
+      player_team:
+        type: string
+        description: <<add player_team description>>
   PriceEstimate:
     type: object
     properties:

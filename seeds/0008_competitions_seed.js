@@ -1,4 +1,4 @@
-console.log('008 competition seed')
+console.log('0008 seeding competition')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -22,3 +22,4 @@ exports.seed = function(knex, Promise) {
         return knex.raw('');
     });
 };
+console.log('0008 OK')

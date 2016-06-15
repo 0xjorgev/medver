@@ -1,4 +1,4 @@
-console.log('0022 player seed')
+console.log('0022 seeding player')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -32,6 +32,9 @@ exports.seed = function(knex, Promise) {
     knex('players').insert({id:22, first_name:'Nicol',last_name:'Quezada Paul',nickname:'NICOL',birthday:'07/01/07',email:'Paul@sport.com', gender_id:2})
     );
 };
+
+console.log('0022 OK')
+
     // //Team 3
     // knex('players').insert({id:23, first_name:'Javier',last_name:'Alvarez Rodríguez ',nickname:'JAVI',birthday:'28/01/07',number:'13',position:'D',email:'Javier@nity.com', gender_id:1}),
     // knex('players').insert({id:24, first_name:'Luis',last_name:'Corominas Peralta ',nickname:'LUIS',birthday:'28/07/07',number:'7',position:'D',email:'Luisnity.com', gender_id:1}),

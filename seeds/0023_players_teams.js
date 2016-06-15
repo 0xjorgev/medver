@@ -1,4 +1,4 @@
-console.log('0023 players_teams seed')
+console.log('0023 seeding players_teams')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -32,6 +32,9 @@ exports.seed = function(knex, Promise) {
 
     );
 };
+
+console.log('0023 OK')
+
     // //Team 3
     // knex('players_teams').insert({player_id:23, team_id:6}),
     // knex('players_teams').insert({player_id:24, team_id:6}),

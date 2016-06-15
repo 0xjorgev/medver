@@ -1,4 +1,4 @@
-console.log('0018 matches seed')
+console.log('0018 seeding matches')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -43,3 +43,4 @@ exports.seed = function(knex, Promise) {
         date:'2016-06-02 16:30:56.576272-04:30'})
   );
 };
+console.log('0018 OK')

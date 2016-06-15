@@ -96,7 +96,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             // qb.limit(25);
         })
         .where({active:true})
-        .fetchAll({withRelated: ['groups', 'category']} )
+        .fetchAll({withRelated: ['category' , { groups:
+          function(qb) { qb.where('active', true) }}]
+        , debug:true})
+        //
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);

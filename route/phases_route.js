@@ -235,15 +235,16 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     	var phase_post = req.body;
 
 
-    	console.log('Req Values:' + req.body);
-     //    var category_id = phase_post.category_id;
-    	// var name = phase_post.name;
-    	// var position = phase_post.position;
+    	console.log('Req Values:' , req.body);
+      var category_id = phase_post.category_id;
+    	var name = phase_post.name;
+    	var position = phase_post.position;
 
-     //    console.log('------------------------------');
-     //    console.log(`name:${name}`);
-     //    console.log(`position:${position}`);
-     //    console.log('------------------------------');
+        console.log('------------------------------');
+        console.log(`name:${name}`);
+        console.log(`position:${position}`);
+        console.log(`category:${phase_post.category_id}`);
+        console.log('------------------------------');
 
         new Phase(phase_post
         // {

@@ -1,4 +1,4 @@
-
+console.log('0022 player seed')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries

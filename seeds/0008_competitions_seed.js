@@ -1,3 +1,4 @@
+console.log('008 competition seed')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -15,7 +16,7 @@ exports.seed = function(knex, Promise) {
     */
 
     knex('competitions')
-    .insert({name:'Mushroom Cup',discipline_id:1, subdiscipline_id:2, competition_type_id:2})
+    .insert({name:'Mushroom Cup',discipline_id:1, subdiscipline_id:2, competition_type_id:2, description: 'description of Mushroom Cup'})
     ).then(function(){
 		//Add query
         return knex.raw('');

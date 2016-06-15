@@ -9,6 +9,38 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
 
+    var mapper = function(phase) {
+      // console.log('Phase:', phase.attributes);
+      phase.relations.groups.models.map(groupMapper);
+      phaseDelete(phase.attributes.id);
+    }
+
+    var groupMapper = function(group){
+      groupDelete(group);
+    }
+
+    var groupDelete = function(group){
+      console.log('Group Delete');
+      Knex(group.tableName)
+      .where({id:group.id})
+      .del().then(function(del_group){
+        console.log('del_group', del_group);
+      }).catch(function(error){
+        console.log('del_group error:', error);
+      })
+    }
+
+    var phaseDelete = function(phase){
+      console.log('Phase Delete');
+      //console.log('Phase id:', phase.attributes);
+      Knex('phases')
+      .where({id:phase}, ['id'])
+      .del().then(function(del_phase){
+        console.log('del_phase', del_phase);
+      }).catch(function(error){
+        console.log('del_phase error:', error);
+      })
+    }
         //Teams by Category
     // router.get('/:category_id/team', function (req, res) {
 
@@ -163,6 +195,33 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           Message(res, err.detail, err.code, null);
         });
     });
+
+    //Cascade delete for Phases -> Groups
+    router.delete('/:category_id', function(req, res, next){
+        var category_id = req.params.category_id;
+
+        console.log('--------------------');
+        console.log(`-----Category / Phase / ${category_id} Delete-----`);
+        console.log('--------------------');
+
+        return Models.phase
+        .query(function(qb){})
+        .where('category_id','=',category_id)
+        .where({active:true})
+        .fetchAll({withRelated:['groups']})
+        .then(function(result){
+          console.log('result: delete cascade');
+          result.map(mapper);
+          //this.phaseDelete(result.attributes.id);
+          Message(res, 'Delete successfull', 0, null);
+        }).catch(function(err){
+            console.log(`error: ${err}`);
+            Message(res, err.detail, err.code, null);
+        });
+    });
+
+
+
 
     return router;
 });

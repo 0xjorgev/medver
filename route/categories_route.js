@@ -250,7 +250,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var summarizeMatchResults = function(events){
             return function(match){
                 events.forEach(function(event){
-                    if(event.match_id == match.id){
+                    // console.log('>>>>>>>> summarizeMatchResults', match)
+                    if(event.match_id == match.match_id){
+
+
                         match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
                         match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
                     }
@@ -274,7 +277,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         }
 
         var assignPointsByMatch = function(m){
-
             if(m.home_team_goals == m.visitor_team_goals){
                 m.home_team_points = 1
                 m.visitor_team_points = 1
@@ -283,7 +285,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                 m.home_team_points = m.home_team_goals > m.visitor_team_goals ? 3 : 0
                 m.visitor_team_points = m.home_team_goals < m.visitor_team_goals ? 3 : 0
             }
-
             return m
         }
 
@@ -345,6 +346,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
             var standing_table = Knex.raw(goalsByMatchSQL).then(function(result){
                 goals = result.rows
+                goals.map((g) => g.goals = parseInt(g.goals))
+
+                // console.log('goals', goals)
 
                 var matchesWithResults = matches
                     .map(prepMatch)

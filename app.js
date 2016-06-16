@@ -156,7 +156,6 @@
   app.use(`${api_prefix}${routes.referee}`, referee_ws);
   app.use(`${api_prefix}${routes.category_type}`, category_type_ws);
   app.use(`${api_prefix}${routes.player}`, player_ws);
-  
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){
@@ -167,6 +166,48 @@
 
     response.send({api:'api'});
   });
+
+  //==========================================================================
+  // TEST STUFF!
+  //==========================================================================
+
+  var http = require("http");
+
+  var testOptions = {
+    host: 'localhost',
+    port: 3000,
+    path: '/api/v1.0/category/1/standing_table'
+  };
+
+  var testReq = http.get(testOptions, function(res) {
+    console.log('\n=======================================================\n')
+    console.log('STATUS: ' + res.statusCode);
+    console.log('\n=======================================================\n')
+    console.log('HEADERS: ' + JSON.stringify(res.headers));
+
+    // Buffer the body entirely for processing as a whole.
+    var bodyChunks = [];
+    res.on('data', function(chunk) {
+      // You can process streamed parts here...
+      bodyChunks.push(chunk);
+    }).on('end', function() {
+      var body = Buffer.concat(bodyChunks);
+      console.log('\n=======================================================\n')
+      console.log('BODY: ' + body);
+      console.log('\n=======================================================\n')
+      console.log(JSON.stringify(JSON.parse(body), null, 2 ))
+      // ...and/or process the entire body here.
+    })
+  });
+
+  testReq.on('error', function(e) {
+    console.log('ERROR: ' + e.message);
+  });
+
+
+  //==========================================================================
+  // END OF TEST STUFF
+  //==========================================================================
 
   var port = process.env.PORT;
   app.listen(port, function(){

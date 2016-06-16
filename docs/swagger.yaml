@@ -17,6 +17,23 @@ basePath: /api/v1.0
 produces:
   - application/json
 paths:
+  /category/{category_id}/standing_table:
+    get:
+      summary: Gets the current standing table for a given category_id
+      description: Gets the current standing table for a given category_id
+      tags:
+        - Category
+          standing_table
+      responses:
+        200:
+          description: the current standing_table of the category
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
   /team:
     get:
       summary: Team services

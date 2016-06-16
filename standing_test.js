@@ -94,11 +94,9 @@ var assignPointsByMatch = function(m){
 
 //sacar todos los ids de equipo, en home y visitor, then uniq
 var buildStandingTable = function(table,match){
-
 	table.find(function(team){
 		return team.team_id == match.home_team_id
 	})
-
 }
 
 /*
@@ -109,59 +107,67 @@ expected results [{
 	matches: 3
 },]
 */
-var calculateStandingTable = function(table, result){
 
-}
 
 console.log('\n=======================================================\n')
 
 // console.log('prepped matches', matches.map(prepMatch))
 
-var finalResult = matches
+var matchesWithResults = matches
 	.map(prepMatch)
 	.map(summarizeMatchResults(golesXmatchXequipo))
 	.map(assignPointsByMatch)
 
 //esto me retorna un resultado por match
-console.log('finalResult:', finalResult)
+console.log('matchesWithResults:', matchesWithResults)
 console.log('\n=======================================================\n')
 
 
-// var cosa = {}
+var pickTeams = function(match){
+	return [match.home_team_id, match.visitor_team_id]
+}
 
-// var innerObj = {key:0, values:[]}
-// //var data = [innerObj]
+var teams = matchesWithResults.map(pickTeams)
+teams = _(teams).flatten().uniq().value()
 
-// var match_ids = golesXmatchXequipo.map(function(element){
-// 	return element.match_id
-// })
+console.log('teams:', teams)
 
-// var keysUnique = _.unique(match_ids)
+//se extraen los matches donde ha participado el equipo y se normaliza en una estructura estandar
+var normalizeTeamResults = function(teamId){
+	var pointsPerMatch = matchesWithResults.map(function(match){
+		var result = {team_id: teamId, points: 0, goals: 0, matches: 0}
+		if(match.home_team_id == teamId){
+			result.points = match.home_team_points
+			result.goals = match.home_team_goals
+			result.matches = 1
+		}else if(match.visitor_team_id == teamId){
+			result.points = match.visitor_team_points
+			result.goals = match.visitor_team_goals
+			result.matches = 1
+		}
+		return result
+	})
+	// console.log('\n=======================================================\n')
+	// console.log(`team ${teamId} results`, pointsPerMatch)
+	return pointsPerMatch
+}
 
-// var data = keysUnique.map(function(x){
-// 	golesXmatchXequipo.filter(function(y){
-// 		if (y.match_id == x){
-// 			return y
-// 		}
-// 	})
-// })
+var calculateStandingTable = function(results){
+	return results.reduce(function(total, result){
+		total.team_id = result.team_id
+		total.points += result.points
+		total.goals += result.goals
+		total.matches += result.matches
+		return total
+	},{team_id: null, points: 0, goals: 0, matches: 0})
+}
 
-// console.log('match x id:', data)
-// console.log('unique:', keysUnique)
+//se sumarizan los resultados normalizados de los partidos
+var standingTable = teams
+	.map(normalizeTeamResults)
+	.map(calculateStandingTable)
 
-// var match_ids = golesXmatchXequipo.map(function(element){
-// 	cosa.key = element.match_id
-// 	cosa.values = []
+console.log('\n***************************************************************\n')
+console.log('standing table:', standingTable)
 
-// 	// if(cosa.(element.match_id))
-
-// 	cosa.value = { team_id: element.team_id, count: element.count }
-
-// 	return cosa
-// })
-
-//console.log(match_ids)
-
-// golesXmatchXequipo.filter(function(){
-// })
 

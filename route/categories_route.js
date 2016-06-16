@@ -213,14 +213,45 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           console.log('result: delete cascade');
           result.map(mapper);
           //this.phaseDelete(result.attributes.id);
-          Message(res, 'Delete successfull', 0, null);
+          Message(res, 'Delete successful', 0, null);
         }).catch(function(err){
             console.log(`error: ${err}`);
             Message(res, err.detail, err.code, null);
         });
     });
 
+    //==========================================================================
+    // Standing table service
+    //==========================================================================
 
+    router.get('/:category_id/standing_table', function(req, res){
+
+        var category_id = req.params.category_id;
+
+        console.log('\n=======================================================\n')
+        console.log('standing_table of category', category_id)
+
+        //TODO:  all the functions used in this method should be in a separate js file
+
+        var dummy_data = [ { team_id: 1, points: 6, goals: 3, matches: 3 },
+                          { team_id: 2, points: 7, goals: 4, matches: 3 },
+                          { team_id: 3, points: 0, goals: 2, matches: 3 },
+                          { team_id: 4, points: 4, goals: 3, matches: 3 } ];
+
+        //TODO: se puede colocar la logica de negocio en el model?
+
+        //1- obtener matches de la categoria
+        var test = Models.category//.where('category_id','=',category_id)
+
+        console.log(test)
+        console.log('\n=======================================================\n')
+
+        //2- obtener eventos tipo gol asociados a la categoria
+        //3- ???
+        //4- Profit / standing-non-dummy-table
+
+        return Message(res, 'Success', 0, test);
+    });
 
 
     return router;

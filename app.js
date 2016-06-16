@@ -4,7 +4,6 @@
   var morgan = require('morgan');
   var my_knex = require('./model/util')
 
-
 //==========================================================================
 // swagger stuff
 //==========================================================================
@@ -195,7 +194,7 @@
       console.log('\n=======================================================\n')
       console.log('BODY: ' + body);
       console.log('\n=======================================================\n')
-      console.log(JSON.stringify(JSON.parse(body), null, 2 ))
+      // console.log(JSON.stringify(JSON.parse(body), null, 2 ))
       // ...and/or process the entire body here.
     })
   });

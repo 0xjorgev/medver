@@ -297,17 +297,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         //se extraen los matches donde ha participado el equipo y se normaliza en una estructura estandar
         var normalizeTeamResults = function(matchesWithResults){
-            return function(teamId){
+            return function(team){
                 var pointsPerMatch = matchesWithResults.map(function(match){
-                    var result = {team_id: teamId, points: 0, goals: 0, matches: 0}
-                    if(match.home_team_id == teamId){
+                    var result = {team_id: team.id, points: 0, goals: 0, matches: 1, data: team}
+                    if(match.home_team_id == team.id){
                         result.points = match.home_team_points
                         result.goals = match.home_team_goals
-                        result.matches = 1
-                    }else if(match.visitor_team_id == teamId){
+                    }else if(match.visitor_team_id == team.id){
                         result.points = match.visitor_team_points
                         result.goals = match.visitor_team_goals
-                        result.matches = 1
                     }
                     return result
                 })
@@ -321,6 +319,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                 total.points += result.points
                 total.goals += result.goals
                 total.matches += result.matches
+                total.data = result.data
                 return total
             },{team_id: null, points: 0, goals: 0, matches: 0})
         }
@@ -361,17 +360,31 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                 var teams = matchesWithResults.map(pickTeams)
                 teams = _(teams).flatten().uniq().value()
 
-                // console.log('teams', teams)
 
-                //se sumarizan los resultados normalizados de los partidos
-                var standingTable = teams
-                    .map(normalizeTeamResults(matchesWithResults))
-                    .map(calculateStandingTable)
+                Models.team
+                    .where({active: true})
+                    .where('id', 'in', teams)
+                    .fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug: true})
+                    .then(function (result) {
+                        teams = result.models.map(function(m){
+                            // console.log('team>>>>>>>>>>>>.', m.attributes)
+                            return m.attributes
+                        })
 
-                console.log('standingTable', standingTable)
+                        console.log('teams >>>>>>>>>', teams)
 
-                return Message(res, 'Success', 0, standingTable)
+                        //se sumarizan los resultados normalizados de los partidos
+                        var standingTable = teams
+                            .map(normalizeTeamResults(matchesWithResults))
+                            .map(calculateStandingTable)
 
+                        console.log('standingTable', standingTable)
+
+                        return Message(res, 'Success', 0, standingTable)
+
+                    }).catch(function(error){
+                        console.log(error)
+                    });
             })
         });
     });

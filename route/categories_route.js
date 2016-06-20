@@ -233,14 +233,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		console.log('\n=======================================================\n')
 		console.log('standing_table of category', category_id)
 
-		//TODO:  all the functions used in this method should be in a separate js file
-
-		var dummy_data = [ { team_id: 1, points: 6, goals: 3, matches: 3 },
-						  { team_id: 2, points: 7, goals: 4, matches: 3 },
-						  { team_id: 3, points: 0, goals: 2, matches: 3 },
-						  { team_id: 4, points: 4, goals: 3, matches: 3 } ];
-
-		//TODO: se puede colocar la logica de negocio en el model?
 
 		//==========================================================================
 		//  inner functions
@@ -250,12 +242,14 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var assignGoalsToTeams = function(events){
 			return function(match){
 				events.forEach(function(event){
-					// console.log('>>>>>>>> assignGoalsToTeams', match)
 					if(event.match_id == match.match_id){
 						match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
 						match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
 					}
 				})
+
+				match.total_goals = match.home_team_goals + match.visitor_team_goals
+
 				return match
 			}
 		}
@@ -264,6 +258,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var prepMatch = function(match){
 			match.home_team_goals = 0
 			match.visitor_team_goals = 0
+			match.total_goals = 0
 			return match
 		}
 
@@ -296,21 +291,25 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		var setTeamResults = function(team, match){
 
-			var result = {team_id: team.id, data: 'team', points: 0,
+			var result = {team_id: team.id, data: team, points: 0,
 			goals_in_favor: 0, goals_against: 0,
 			matches_won: 0, matches_lost: 0,
 			matches: 0, matches_draw: 0}
 
+			//si el equipo participó en el match
 			if(match.home_team_id == team.id || match.visitor_team_id == team.id){
+
+				//el team es home
 				if(match.home_team_id == team.id){
 					result.points = match.home_team_points
-					result.goals_in_favor = getTeamResult(team, match) == 1 ? match.home_team_goals : result.goals_in_favor
-					result.goals_against = getTeamResult(team, match) == -1 ? match.visitor_team_goals : result.goals_against
+					result.goals_in_favor = match.home_team_goals
+					result.goals_against = match.visitor_team_goals
 				}
+				//team es visitor
 				else{
 					result.points = match.visitor_team_points
-					result.goals_in_favor = getTeamResult(team, match) == 1 ? match.visitor_team_goals : result.goals_in_favor
-					result.goals_against = getTeamResult(team, match) == -1 ? match.home_team_goals : result.goals_against
+					result.goals_in_favor = match.visitor_team_goals
+					result.goals_against = match.home_team_goals
 				}
 
 				result.matches = 1
@@ -326,7 +325,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 			return result
 		}
-
 
 		//se extraen los matches donde ha participado el equipo y se normaliza en una estructura estandar
 		var normalizeTeamResults = function(matchesWithResults){
@@ -346,7 +344,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 				total.matches_won += result.matches_won
 				total.matches_lost += result.matches_lost
 				total.matches += result.matches
-				total.matches_draw += Math.abs(total.matches_won - total.matches_lost)
+				total.matches_draw += result.matches_draw
 
 				total.data = result.data
 				return total
@@ -367,17 +365,11 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 					result = matchResult.home_team_goals > matchResult.visitor_team_goals ? 1 : -1
 				}
 				else{
-					result = matchResult.visitor_team_id > matchResult.home_team_goals ? 1 : -1
+					result = matchResult.visitor_team_goals > matchResult.home_team_goals ? 1 : -1
 				}
 			}
 
-			// console.log('team result: team', team.id, 'match', matchResult.match_id, result)
-
 			return result
-		}
-
-		var pickTeams = function(match){
-			return [match.home_team_id, match.visitor_team_id]
 		}
 
 		//==========================================================================
@@ -406,7 +398,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 					.map(assignPointsByMatch)
 
 				//extraigo los ID de teams
-				var teams = matchesWithResults.map(pickTeams)
+				var teams = matchesWithResults.map((m) => [m.home_team_id, m.visitor_team_id])
 				teams = _(teams).flatten().uniq().value()
 
 				Models.team
@@ -423,7 +415,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 							.map(normalizeTeamResults(matchesWithResults))
 							.map(calculateStandingTable)
 
-						console.log(standingTable[0])
+						console.log(standingTable)
 
 						return Message(res, 'Success', 0, standingTable)
 

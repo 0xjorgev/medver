@@ -172,34 +172,43 @@
   // change the code.
   //==========================================================================
 
-  // var http = require("http");
+  var http = require("http");
 
-  // var testOptions = {
-  //   host: 'localhost',
-  //   port: 3000,
-  //   path: '/api/v1.0/category/1/standing_table'
-  // };
+  var testOptions = {
+    host: 'localhost',
+    port: 3000,
+    path: '/api/v1.0/category/1/standing_table',
+    printResults: false,
+    active: false
+  };
 
-  // var testReq = http.get(testOptions, function(res) {
-  //   console.log('\n=======================================================\n')
-  //   console.log('STATUS: ' + res.statusCode);
-  //   console.log('\n=======================================================\n')
-  //   console.log('HEADERS: ' + JSON.stringify(res.headers));
+  if(testOptions.active){
+    var testReq = http.get(testOptions, function(res) {
 
-  //   var bodyChunks = [];
-  //   res.on('data', function(chunk) {
-  //     bodyChunks.push(chunk);
-  //   }).on('end', function() {
-  //     var body = Buffer.concat(bodyChunks);
-  //     console.log('\n=======================================================\n')
-  //     console.log('BODY: ' + body);
-  //     console.log('\n=======================================================\n')
-  //   })
-  // });
+      if(testOptions.printResults){
+        console.log('\n=======================================================\n')
+        console.log('STATUS: ' + res.statusCode);
+        console.log('\n=======================================================\n')
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+      }
 
-  // testReq.on('error', function(e) {
-  //   console.log('ERROR: ' + e.message);
-  // });
+      var bodyChunks = [];
+      res.on('data', function(chunk) {
+        bodyChunks.push(chunk);
+      }).on('end', function() {
+        var body = Buffer.concat(bodyChunks);
+        if(testOptions.printResults){
+          console.log('\n=======================================================\n')
+          console.log('BODY: ' + body);
+          console.log('\n=======================================================\n')
+        }
+      })
+    });
+
+    testReq.on('error', function(e) {
+      console.log('ERROR: ' + e.message);
+    });
+  }
 
   //==========================================================================
   // END OF TEST STUFF

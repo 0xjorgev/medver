@@ -6,11 +6,15 @@ var git = require('gulp-git');
 var prompt = require('gulp-prompt');
 var env = require('gulp-env');
 var nodemon = require('nodemon');
+var nodeInspector = require('gulp-node-inspector');
 
-
-// gulp.task('default' ,function() {
-//   // place code for your default task here
-// });
+gulp.task('debug', function() {
+  gulp.src([])
+    .pipe(nodeInspector({
+      webHost: 'localhost',
+      webPort: 3003
+    }));
+});
 
 var options = {
     path: 'app.js'
@@ -100,6 +104,7 @@ gulp.task('nodemon', function() {
   });
 
   nodemon({
+    exec: 'node --debug',
     script: 'app.js',
     ext: 'js html'
     // other config ...
@@ -113,6 +118,6 @@ gulp.task('nodemon', function() {
 
 });
 
-gulp.task( 'default', [/*'jshint',*/'nodemon'], function() {
+gulp.task( 'default', ['nodemon','debug'], function() {
   //add stuff here
 });

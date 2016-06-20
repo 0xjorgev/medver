@@ -32,7 +32,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var phaseDelete = function(phase){
       console.log('Phase Delete');
-      //console.log('Phase id:', phase.attributes);
       Knex('phases')
       .where({id:phase}, ['id'])
       .del().then(function(del_phase){
@@ -40,23 +39,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
       }).catch(function(error){
         console.log('del_phase error:', error);
       })
-    }
-        //Teams by Category
-    // router.get('/:category_id/team', function (req, res) {
-
-    //     console.log("Teams by Category");
-    //     var category_id = req.params.category_id;
-
-    //     return Models.team
-    //     .where({category_id:category_id})
-    //     .where({active:true})
-    //     .fetchAll()
-    //     .then(function (result) {
-    //         Message(res,'Success', '0', result);
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
+    };
 
     //Teams by Category
     router.get('/:category_id/team', function (req, res) {
@@ -114,27 +97,27 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         //Model Instance
         var Category = Models.category;
         var category_post = req.body;
-        // var gender_id = category_post.gender_id;
-        // var season_id = category_post.season_id;
-        // var name = category_post.name;
-        // var description = category_post.description;
-        // var image_url = category_post.image_url;
-        // var inscription_init_at = category_post.inscription_init_at;
-        // var inscription_ends_at = category_post.inscription_ends_at;
-        // //V 1.1
-        // var minimum_value = category_post.minimum_value;
-        // var maximum_value = category_post.maximum_value;
+        var gender_id = category_post.gender_id;
+        var season_id = category_post.season_id;
+        var name = category_post.name;
+        var description = category_post.description;
+        var image_url = category_post.image_url;
+        var inscription_init_at = category_post.inscription_init_at;
+        var inscription_ends_at = category_post.inscription_ends_at;
+        //V 1.1
+        var minimum_value = category_post.minimum_value;
+        var maximum_value = category_post.maximum_value;
 
-        // console.log('--------------------');
-        // console.log("season_id: " + competition_id);
-        // console.log("name: " + name);
-        // console.log("gender_id: " + gender_id);
-        // console.log("inscription_init_at: " + inscription_init_at);
-        // console.log("inscription_ends_at: " + inscription_ends_at);
-        // console.log("minimum_value: " + minimum_value);
-        // console.log("maximum_value: " + maximum_value);
-        // console.log("image_url: " + image_url);
-        // console.log('--------------------');
+        console.log('--------------------');
+        console.log("season_id: " + competition_id);
+        console.log("name: " + name);
+        console.log("gender_id: " + gender_id);
+        console.log("inscription_init_at: " + inscription_init_at);
+        console.log("inscription_ends_at: " + inscription_ends_at);
+        console.log("minimum_value: " + minimum_value);
+        console.log("maximum_value: " + maximum_value);
+        console.log("image_url: " + image_url);
+        console.log('--------------------');
 
         new Category(category_post
         // {

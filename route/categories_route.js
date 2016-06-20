@@ -380,13 +380,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		//TODO: encadenar promises
 		var matchesByCategory = Knex.raw(matchesByCategorySQL).then(function(result){
-			// console.log('call result\n---->',result.rows)
-			matches = result.rows
 
-			var matchIds = matches.map((e) => e.match_id)
-			// console.log('flat', matchIds)
-			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id = 1 and match_id in (${matchIds.join(',')}) group by 1,2,3 order by 1,2,3`
-
+			var matches = result.rows
+			var matchIds = matches.map((e) => e.match_id).join(',')
+			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id = 1 and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`
 			var standing_table = Knex.raw(goalsByMatchSQL).then(function(result){
 				goals = result.rows
 				goals.map((g) => g.goals = parseInt(g.goals))
@@ -406,16 +403,12 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 					.where('id', 'in', teams)
 					.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug: false})
 					.then(function (result) {
-						teams = result.models.map(function(m){
-							return m.attributes
-						})
+						teams = result.models.map((m) => m.attributes)
 
 						//se sumarizan los resultados normalizados de los partidos
 						var standingTable = teams
 							.map(normalizeTeamResults(matchesWithResults))
 							.map(calculateStandingTable)
-
-						console.log(standingTable)
 
 						return Message(res, 'Success', 0, standingTable)
 

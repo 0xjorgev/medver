@@ -111,7 +111,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var maximum_value = category_post.maximum_value;
 
         console.log('--------------------');
-        console.log("season_id: " + competition_id);
+        // console.log("season_id: " + competition_id);
         console.log("name: " + name);
         console.log("gender_id: " + gender_id);
         console.log("inscription_init_at: " + inscription_init_at);

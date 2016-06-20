@@ -5,7 +5,9 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+var _ = require('lodash')
+
+define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
 
     var router = express.Router();
 
@@ -196,14 +198,176 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           console.log('result: delete cascade');
           result.map(mapper);
           //this.phaseDelete(result.attributes.id);
-          Message(res, 'Delete successfull', 0, null);
+          Message(res, 'Delete successful', 0, null);
         }).catch(function(err){
             console.log(`error: ${err}`);
             Message(res, err.detail, err.code, null);
         });
     });
 
+    //==========================================================================
+    // Standing table service
+    //==========================================================================
 
+    router.get('/:category_id/standing_table', function(req, res){
+
+        var category_id = req.params.category_id;
+
+        console.log('\n=======================================================\n')
+        console.log('standing_table of category', category_id)
+
+        //TODO:  all the functions used in this method should be in a separate js file
+
+        var dummy_data = [ { team_id: 1, points: 6, goals: 3, matches: 3 },
+                          { team_id: 2, points: 7, goals: 4, matches: 3 },
+                          { team_id: 3, points: 0, goals: 2, matches: 3 },
+                          { team_id: 4, points: 4, goals: 3, matches: 3 } ];
+
+        //TODO: se puede colocar la logica de negocio en el model?
+
+        //==========================================================================
+        //  inner functions
+        //==========================================================================
+
+        //dados los resultados de un match, se reducen a un objeto
+        var summarizeMatchResults = function(events){
+            return function(match){
+                events.forEach(function(event){
+                    // console.log('>>>>>>>> summarizeMatchResults', match)
+                    if(event.match_id == match.match_id){
+
+
+                        match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
+                        match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+                    }
+                })
+                return match
+            }
+        }
+
+        //dado un match, se le coloca dos propiedades para los scores de cada equipo
+        var prepMatch = function(match){
+            match.home_team_goals = 0
+            match.visitor_team_goals = 0
+            return match
+        }
+
+        //filtro que obtiene los eventos dado un match
+        var filterByMatch = function(match){
+            return function(event){
+                return event.match_id == match.id
+            }
+        }
+
+        var assignPointsByMatch = function(m){
+            if(m.home_team_goals == m.visitor_team_goals){
+                m.home_team_points = 1
+                m.visitor_team_points = 1
+            }
+            else{
+                m.home_team_points = m.home_team_goals > m.visitor_team_goals ? 3 : 0
+                m.visitor_team_points = m.home_team_goals < m.visitor_team_goals ? 3 : 0
+            }
+            return m
+        }
+
+        //sacar todos los ids de equipo, en home y visitor, then uniq
+        var buildStandingTable = function(table,match){
+            table.find(function(team){
+                return team.team_id == match.home_team_id
+            })
+        }
+
+        //se extraen los matches donde ha participado el equipo y se normaliza en una estructura estandar
+        var normalizeTeamResults = function(matchesWithResults){
+            return function(team){
+                var pointsPerMatch = matchesWithResults.map(function(match){
+                    var result = {team_id: team.id, points: 0, goals: 0, matches: 0, data: team}
+                    if(match.home_team_id == team.id){
+                        result.points = match.home_team_points
+                        result.goals = match.home_team_goals
+                        result.matches = 1
+                    }else if(match.visitor_team_id == team.id){
+                        result.points = match.visitor_team_points
+                        result.goals = match.visitor_team_goals
+                        result.matches = 1
+                    }
+                    return result
+                })
+                return pointsPerMatch
+            }
+        }
+
+        var calculateStandingTable = function(results){
+            return results.reduce(function(total, result){
+                total.team_id = result.team_id
+                total.points += result.points
+                total.goals += result.goals
+                total.matches += result.matches
+                total.data = result.data
+                return total
+            },{team_id: null, points: 0, goals: 0, matches: 0})
+        }
+
+        var pickTeams = function(match){
+            return [match.home_team_id, match.visitor_team_id]
+        }
+
+        //==========================================================================
+        //  DB interaction phase
+        //==========================================================================
+
+        var matchesByCategorySQL = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where categories.id = ' + category_id;
+
+        //TODO: encadenar promises
+        var matchesByCategory = Knex.raw(matchesByCategorySQL).then(function(result){
+            // console.log('call result\n---->',result.rows)
+            matches = result.rows
+
+            var matchIds = matches.map((e) => e.match_id)
+            // console.log('flat', matchIds)
+            var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id = 1 and match_id in (${matchIds.join(',')}) group by 1,2,3 order by 1,2,3`
+
+            var standing_table = Knex.raw(goalsByMatchSQL).then(function(result){
+                goals = result.rows
+                goals.map((g) => g.goals = parseInt(g.goals))
+
+                // console.log('goals', goals)
+
+                var matchesWithResults = matches
+                    .map(prepMatch)
+                    .map(summarizeMatchResults(goals))
+                    .map(assignPointsByMatch)
+
+                // console.log('matchesWithResults', matchesWithResults)
+
+                //extraigo los ID de teams
+                var teams = matchesWithResults.map(pickTeams)
+                teams = _(teams).flatten().uniq().value()
+
+
+                Models.team
+                    .where({active: true})
+                    .where('id', 'in', teams)
+                    .fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug: true})
+                    .then(function (result) {
+                        teams = result.models.map(function(m){
+                            return m.attributes
+                        })
+
+                        //se sumarizan los resultados normalizados de los partidos
+                        var standingTable = teams
+                            .map(normalizeTeamResults(matchesWithResults))
+                            .map(calculateStandingTable)
+
+                        return Message(res, 'Success', 0, standingTable)
+
+                    }).catch(function(error){
+                        console.log(error)
+                    });
+            })
+        });
+    });
 
 
     return router;

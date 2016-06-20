@@ -19,10 +19,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var match_id = req.params.match_id;
 
         return Models.event_match_player
-        .where({match_id:match_id})
-        .where({active:true})
-        .fetchAll({withRelated: ['match_id', 'event_id', 'player_in.player_team', 'player_out.player_team', 'team', { player_in:
-          function(qb) { qb.where('team_id', team.id) }}], debug: true})
+        .where({match_id:match_id, active: true})
+        // TODO: @Jorge revisa lo comentado, estaba haciendo que todo llegara vacío
+        .fetchAll({withRelated: ['match_id', 'event_id', 'player_in.player_team', 'player_out.player_team', 'team' /*, { player_in: function(qb) { qb.where('team_id', team.id) }}*/], debug: true})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

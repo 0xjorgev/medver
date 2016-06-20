@@ -106,19 +106,41 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var image_url = category_post.image_url;
         var inscription_init_at = category_post.inscription_init_at;
         var inscription_ends_at = category_post.inscription_ends_at;
+        var team_quantity = category_post.team_quantity;
         //V 1.1
         var minimum_value = category_post.minimum_value;
         var maximum_value = category_post.maximum_value;
+
+        var category_type_id = category_post.category_type_id;
+        var participant_minimum = category_post.participant_minimum;
+        var participant_maximum = category_post.participant_maximum;
+        var other_minimum_participant = category_post.other_minimum_participant;
+        var other_maximum_participant = category_post.other_maximum_participant;
+        var player_minimum_participant = category_post.player_minimum_participant;
+        var player_maximum_participant = category_post.player_maximum_participant;
+        var coach_minimum_participant = category_post.coach_minimum_participant;
+        var coach_maximum_participant = category_post.coach_maximum_participant;
 
         console.log('--------------------');
         // console.log("season_id: " + competition_id);
         console.log("name: " + name);
         console.log("gender_id: " + gender_id);
+        console.log("season_id: " + season_id);
         console.log("inscription_init_at: " + inscription_init_at);
         console.log("inscription_ends_at: " + inscription_ends_at);
+        console.log("team_quantity: " + team_quantity);
         console.log("minimum_value: " + minimum_value);
         console.log("maximum_value: " + maximum_value);
         console.log("image_url: " + image_url);
+        console.log("category_type_id: " + category_type_id);
+        console.log("participant_minimum: " + participant_minimum);
+        console.log("participant_maximum: " + participant_maximum);
+        console.log("other_minimum_participant: " + other_minimum_participant);
+        console.log("other_maximum_participant: " + other_maximum_participant);
+        console.log("player_minimum_participant: " + player_minimum_participant);
+        console.log("player_maximum_participant: " + player_maximum_participant);
+        console.log("coach_minimum_participant: " + coach_minimum_participant);
+        console.log("coach_maximum_participant: " + coach_maximum_participant);
         console.log('--------------------');
 
         new Category(category_post

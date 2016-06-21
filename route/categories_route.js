@@ -220,7 +220,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           console.log('result: delete cascade');
           result.map(mapper);
           //this.phaseDelete(result.attributes.id);
-          Message(res, 'Delete successful', 200, {}});
+          Message(res, 'Delete successful', 200, {});
         }).catch(function(err){
             console.log(`error: ${err}`);
             Message(res, err.detail, err.code, null);

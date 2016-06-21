@@ -158,6 +158,12 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		//TODO: encadenar promises
 		var matchesByCategory = Knex.raw(matchSql).then(function(result){
 			var matches = result.rows
+
+			if(!matches || matches.length == 0){
+				Message(res, 'error', '99', '');
+				return;
+			}
+
 			var matchIds = matches.map((e) => e.match_id).join(',')
 			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id = 1 and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`
 			var standing_table = Knex.raw(goalsByMatchSQL).then(function(result){

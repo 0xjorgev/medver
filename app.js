@@ -79,6 +79,7 @@
   var referee_ws = require('./route/referees_route');
   var category_type_ws = require('./route/categories_types_route');
   var player_ws = require('./route/players_route');
+  var rule_ws = require('./route/rules_route');
 
   var apiVersion = 'v1.0';
   var prefix = 'api';
@@ -112,7 +113,8 @@
     event           : 'event',
     referee         : 'referee',
     category_type   : 'category_type',
-    player          : 'player'
+    player          : 'player',
+    rule            : 'rule'
   }
 
   //Middleware
@@ -155,6 +157,7 @@
   app.use(`${api_prefix}${routes.referee}`, referee_ws);
   app.use(`${api_prefix}${routes.category_type}`, category_type_ws);
   app.use(`${api_prefix}${routes.player}`, player_ws);
+  app.use(`${api_prefix}${routes.rule}`, rule_ws);
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){

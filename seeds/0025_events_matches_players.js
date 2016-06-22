@@ -1,8 +1,8 @@
 console.log('0025 seeding events_matches_players')
 exports.seed = function(knex, Promise) {
-  return Promise.join(
+  return Promise.join();
     // Deletes ALL existing entries
-    knex('events_matches_players').del()
+    // knex('events_matches_players').del()
 
     /*
     // Inserts seed entries
@@ -46,6 +46,6 @@ exports.seed = function(knex, Promise) {
     // knex('events_matches_players').insert({match_id:5, event_id:1, player_in:5, player_out:null, instant:72, team_id:4  }),
     // knex('events_matches_players').insert({match_id:5, event_id:10, player_in:5, player_out:null, instant:90, team_id:4  }),
     // knex('events_matches_players').insert({match_id:5, event_id:8, player_in:null, player_out:null, instant:90, team_id:null })
-    );
+    // );
 };
 console.log('0025 OK')

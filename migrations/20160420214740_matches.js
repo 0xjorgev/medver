@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
 		knex.schema.createTable('matches', function(table){
 			table.increments('id').primary();
 			table.text('location');
+			table.integer('number');
 			table.integer('home_team_id').references('teams.id').index();
       		table.integer('home_team_score');
 			table.integer('visitor_team_id').references('teams.id').index();

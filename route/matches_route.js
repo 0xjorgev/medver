@@ -35,6 +35,23 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         });
     });
 
+
+    router.get('/:match_id/players', function (req, res) {
+
+        var match_id = req.params.match_id;
+        // tapping into Knex query builder to modify query being run
+        return Models.match
+        .where({'id':match_id})
+        .fetch({withRelated: ['home_team.player_team', 'visitor_team.player_team']})
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
+
+//player_team
     //match create
     router.post('/', function (req, res) {
 

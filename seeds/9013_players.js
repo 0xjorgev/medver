@@ -1,4 +1,4 @@
-console.log('0022 seeding player')
+console.log('9013 seeding player')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -87,4 +87,4 @@ exports.seed = function(knex, Promise) {
     );
 };
 
-console.log('0022 OK')
+console.log('9013 OK')

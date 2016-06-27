@@ -1,4 +1,4 @@
-
+console.log('9010 seeding teams')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -12,9 +12,10 @@ exports.seed = function(knex, Promise) {
 			table.integer('group_id').references('groups.id').index();
     */
     // Inserts seed entries
-    knex('rounds').insert({id: 1, name: 'Primera Ronda', group_id:1}),
-    knex('rounds').insert({id: 2, name: 'Segunda Ronda', group_id:1}),
-    knex('rounds').insert({id: 3, name: 'Primera Ronda', group_id:2}),
-    knex('rounds').insert({id: 4, name: 'Segunda Ronda', group_id:2})
+    knex('rounds').insert({name: 'Primera Ronda', group_id:1}),
+    knex('rounds').insert({name: 'Segunda Ronda', group_id:1}),
+    knex('rounds').insert({name: 'Primera Ronda', group_id:2}),
+    knex('rounds').insert({name: 'Segunda Ronda', group_id:2})
   );
 };
+console.log('9010 seeding teams')

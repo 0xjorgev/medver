@@ -1,3 +1,4 @@
+console.log('9005 start')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -25,12 +26,13 @@ exports.seed = function(knex, Promise) {
 
     knex('categories')
     .insert([
-        {id: 1, name:'Koopas',gender_id:1, season_id:1, classification_type_id:1, category_type_id:1},
-        {id: 2, name:'Yoshis',gender_id:1, season_id:1, classification_type_id:1, category_type_id:2},
-        {id: 3, name:'Kuppa Troopas',gender_id:1, season_id:1, classification_type_id:1, category_type_id:2}
+        {name:'Koopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:1},
+        {name:'Yoshis', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2},
+        {name:'Kuppa Troopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2}
         ])
     ).then(function(){
 		//Add query
         return knex.raw('');
     });
 };
+console.log('9005 end')

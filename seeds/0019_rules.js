@@ -15,8 +15,8 @@ exports.seed = function(knex, Promise) {
     //envato
     //Envato2016!
 
-    knex('rules').insert({id: 1, name: 'Partido Ganado', value:'3', short_name:'PG'}),
-    knex('rules').insert({id: 2, name: 'Partido Perdido', value:'0', short_name:'PP'}),
-    knex('rules').insert({id: 3, name: 'Partido Empatado', value:'1', short_name:'PE'})
+    knex('rules').insert({name: 'Partido Ganado', value:'3', short_name:'PG'}),
+    knex('rules').insert({name: 'Partido Perdido', value:'0', short_name:'PP'}),
+    knex('rules').insert({name: 'Partido Empatado', value:'1', short_name:'PE'})
   );
 };

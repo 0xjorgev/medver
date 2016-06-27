@@ -236,7 +236,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 
     	console.log('Req Values:' , req.body);
-      var category_id = phase_post.category_id;
+        var category_id = phase_post.category_id;
     	var name = phase_post.name;
     	var position = phase_post.position;
 

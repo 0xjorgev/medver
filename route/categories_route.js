@@ -391,6 +391,141 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    //==========================================================================
+    // Competition by Simple Elimination
+    //==========================================================================
+    router.post('/:category_id/se', function(req, res){
+
+        var category_id = req.params.category_id;
+        var team_quantity = req.body.team_quantity;
+
+        console.log('\n=======================================================\n')
+        console.log('Category by SE of category ', category_id)
+        console.log('Category by SE with teams ', team_quantity)
+
+        var phaseCount = Math.log2(team_quantity)
+
+        for (var i = 0; i < phaseCount; i++) 
+        {
+            //Creo una fase
+            var numberOfPhase = i+1
+            var name = "Fase " + numberOfPhase
+            var p = {
+                            name            : name,
+                            position        : numberOfPhase,
+                            active          : true,
+                            category_id     : category_id
+                        }
+            //phase.participant_team = $scope.currentCategory.team_quantity/numberOfPhase
+            if(phaseCount == (i+1))
+            {   
+                //SOLO ENTRA EN LA FINAL 
+                p.name = "Final"
+                p.participant_team = 4
+                p.classified_team = 0
+            }   
+            else if(phaseCount == (i+2))
+            {   
+                //SOLO ENTRA EN LA SEMIFINAL 
+                p.name = "Semifinal"
+                p.participant_team = 4
+                p.classified_team = 4
+            }   
+            else
+            {   
+                console.log('Teams '+ team_quantity +' number of phase '+(numberOfPhase-1))
+                console.log('potencia de dos ' + Math.pow(2, numberOfPhase-1))
+                p.participant_team = team_quantity/(Math.pow(2, numberOfPhase-1));
+                p.classified_team = p.participant_team/2
+            }
+            console.log('createPhase');
+
+            var Phase = Models.phase;
+            console.log('------------------------------');
+            console.log(`name               :${p.name}`);
+            console.log(`position           :${p.position}`);
+            console.log(`category           :${p.category_id}`);
+            console.log(`participant_team   :${p.participant_team}`);
+            console.log(`classified_team    :${p.classified_team}`);
+            console.log('------------------------------');
+            new Phase(p).save().then(function(new_phase)
+            {
+                console.log('CREAMOS LOS GRUPOS PARA LA FASE ', new_phase.id);
+                //Se crean los grupos por fase
+                console.log('participant_team' + new_phase.attributes.participant_team);
+                var maxGroups = new_phase.attributes.participant_team/4
+                console.log('maxGroups' + maxGroups);
+                for (var j = 0; j < maxGroups; j++)
+                {                               
+                    var numberOfGroup = j+1;
+                    var groupName = "Group " + numberOfGroup;
+                    //SE CREA EL OBJETO GRUPO
+                    var group_post = {
+                                    name             : groupName,
+                                    active           : true,
+                                    phase_id         : new_phase.id,
+                                    participant_team : 4,
+                                    classified_team  : 2
+                                }
+                    //Model Instance
+                    var Group = Models.group;
+                    console.log('createGroup');
+                    new Group(group_post).save().then(function(new_group)
+                    {
+                        console.log(`CREAMOS LOS ROUNDS PARA El GRUPO ${new_group.id}`);
+                        //SE CREA UN ROUND POR GRUPO
+                        var Round = Models.round;
+                        var round_post = {
+                            group_id : new_group.id,
+                            name : "Round 1"
+                        };
+
+                        console.log(`------------------------------`);
+                        console.log(`name:       ${round_post.name}`);
+                        console.log(`start_date: ${round_post.start_date}`);
+                        console.log(`end_date:   ${round_post.end_date}`);
+                        console.log(`group_id:   ${round_post.group_id}`);
+                        console.log(`------------------------------`);
+
+                        new Round(round_post).save().then(function(new_round)
+                        {
+                            console.log(`Create round successful ${new_round.id}`);
+                            //SE CREAN LOS PARTIDOS DOS PARTIDOS POR ROUND QUE SON CUATRO EQUIPO MINIMO POR GRUPO
+
+                            console.log(`Create a empty match`);
+                            for (var i = 2; i > 0; i--) 
+                            {
+                                var m = {
+                                    round_id : new_round.id,
+                                    location : "",
+                                    active   : true
+                                }
+                                new Models.match(m).save().then(function(item){
+                                    console.log(`Match ${item}`);
+                                }).catch(function(error){
+                                    console.log(`{error: ${error}}`);
+                                    Message(res, error.detail, error.code, null);
+                                });
+                            }
+
+
+                        }).catch(function(error){
+                            console.log(`error: ${error}`);
+                            Message(res, error.detail, error.code, null);
+                        });
+                    }).catch(function(error){
+                        console.log(`{error: ${error}}`);
+                        Message(res, error.detail, error.code, null);
+                    });
+                }
+
+                
+            }).catch(function(error){
+                console.log(`{error: ${error}}`);
+                Message(res, error.detail, error.code, null);
+            });
+        }
+    });
 
     return router;
 });

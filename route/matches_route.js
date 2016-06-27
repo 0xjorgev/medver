@@ -49,7 +49,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         //     date: data.date
         // }
         ).save().then(function(item){
-            console.log(`Match ${item}}`);
+            console.log(`Match ${item}`);
             Message(res, 'Success', '0', item);
         }).catch(function(error){
             console.log(`{error: ${error}}`);

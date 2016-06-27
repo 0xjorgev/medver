@@ -1,7 +1,6 @@
 
 console.log(__filename.slice(__dirname.length + 1) + ' START')
 
-console.log('9005 start')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -38,6 +37,5 @@ exports.seed = function(knex, Promise) {
         return knex.raw('');
     });
 };
-console.log('9005 end')
 
 console.log(__filename.slice(__dirname.length + 1) + ' OK')

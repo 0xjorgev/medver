@@ -1,7 +1,6 @@
 
 console.log(__filename.slice(__dirname.length + 1) + ' START')
 
-  console.log('9000 Events Matches');
     //Deletes ALL existing entries
 
     exports.seed = function(knex, Promise) {
@@ -111,7 +110,5 @@ console.log(__filename.slice(__dirname.length + 1) + ' START')
     knex('events_matches_players').insert({match_id:6, event_id:8, player_in:null, player_out:null, instant:90, team_id:null })
   )
 }
-console.log('9000 OK');
-
 
 console.log(__filename.slice(__dirname.length + 1) + ' OK')

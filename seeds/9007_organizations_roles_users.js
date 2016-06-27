@@ -1,7 +1,6 @@
 
 console.log(__filename.slice(__dirname.length + 1) + ' START')
 
-console.log('9007 start')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -10,6 +9,5 @@ exports.seed = function(knex, Promise) {
     knex('organizations_roles_users').insert({user_id: 2, organization_id: 2, rol_id:2})
   );
 };
-console.log('9007 end')
 
 console.log(__filename.slice(__dirname.length + 1) + ' OK')

@@ -1,4 +1,3 @@
-console.log('0000 start')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -12,4 +11,3 @@ exports.seed = function(knex, Promise) {
     knex('disciplines').insert({name: 'Volleyball', description:"Volleyball is a team sport in which two teams of six players are separated by a net. Each team tries to score points by grounding a ball on the other team's court under organized rules.", image_url:'http://dev.codefuel.me/smsmedia/somosport-vector-icons-fut7.svg'})
   );
 };
-console.log('0000 end')

@@ -1,5 +1,7 @@
 
-console.log('17000 seeding alianza Phases')
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     //==========================================================================
@@ -10,4 +12,6 @@ exports.seed = function(knex, Promise) {
     knex('phases').insert({id: 8, name: 'Final', position:3, category_id:12, participant_team:2, classified_team:1})
   )
 }
-console.log('17000 OK')
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

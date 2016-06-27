@@ -1,5 +1,8 @@
 
-console.log('12000 seeding alianza Teams')
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     //==========================================================================
@@ -158,4 +161,6 @@ exports.seed = function(knex, Promise) {
   )
 }
 
-console.log('12000 OK')
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

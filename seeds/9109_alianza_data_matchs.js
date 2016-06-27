@@ -1,4 +1,6 @@
-console.log('20000 seeding alianza Matchs')
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     //==========================================================================
@@ -48,4 +50,6 @@ exports.seed = function(knex, Promise) {
     knex('matches').insert({id:24, location: 'FIELD 4', home_team_id:15, visitor_team_id:10, round_id:17, home_team_score:0, visitor_team_score:1 ,date:'2016-06-12 17:45:56.576272-05:00'})
   )
 }
-console.log('20000 OK')
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

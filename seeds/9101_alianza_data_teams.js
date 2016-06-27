@@ -1,6 +1,10 @@
 
-console.log('11000 seeding alianza Teams')
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 exports.seed = function(knex, Promise) {
+
+  knex.select('title', 'author', 'year').from('books')
+
   return Promise.join(
     //==========================================================================
     // Team 1: Cholitas - Teams
@@ -37,4 +41,6 @@ exports.seed = function(knex, Promise) {
   )
 }
 
-console.log('11000 OK')
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

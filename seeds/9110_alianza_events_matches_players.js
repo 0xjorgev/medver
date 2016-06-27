@@ -1,4 +1,7 @@
-  console.log('21000 Alianza Events Matches');
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
     //Deletes ALL existing entries
 
     exports.seed = function(knex, Promise) {
@@ -290,4 +293,6 @@
   knex('events_matches_players').insert({match_id:24, event_id:8, player_in:null, player_out:null, instant:90, team_id:null })
 )
 }
-console.log('21000 Ok');
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

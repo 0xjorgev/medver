@@ -1,4 +1,7 @@
-  console.log('22000 Alianza Spiders');
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
     //Deletes ALL existing entries
 
     exports.seed = function(knex, Promise) {
@@ -55,4 +58,6 @@
 
     )
 }
-console.log('22000 Ok');
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

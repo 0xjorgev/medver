@@ -1,5 +1,7 @@
 
-console.log('18000 seeding alianza GRoups')
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     //==========================================================================
@@ -11,4 +13,6 @@ exports.seed = function(knex, Promise) {
     knex('groups').insert({id: 18, name: 'Grupo Final', phase_id:8})
   )
 }
-console.log('18000 OK')
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

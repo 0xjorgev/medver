@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 console.log('9004 start')
 exports.seed = function(knex, Promise) {
   return Promise.join(
@@ -12,3 +15,5 @@ exports.seed = function(knex, Promise) {
     );
 };
 console.log('9004 end')
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

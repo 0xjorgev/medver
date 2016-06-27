@@ -1,4 +1,7 @@
 
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -15,3 +18,5 @@ exports.seed = function(knex, Promise) {
     knex('rules_rulesets').insert({rule_id: 3, ruleset_id:1})
   );
 };
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 console.log('0026 seeding categories_groups_phases_teams')
 exports.seed = function(knex, Promise) {
   return Promise.join(
@@ -26,3 +29,6 @@ exports.seed = function(knex, Promise) {
     // );
 };
 console.log('0026 Ok')
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

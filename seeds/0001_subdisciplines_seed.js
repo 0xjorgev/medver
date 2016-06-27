@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 exports.seed = function(knex, Promise) {
 //var tableName = ''subdisciplines'';
   return Promise.join(
@@ -11,3 +14,5 @@ exports.seed = function(knex, Promise) {
     knex('subdisciplines').insert({name: 'Futsal', description:"Futsal is a variant of association football that is played on a smaller field and mainly played indoors. It can be considered a version of five-a-side football. It originated in Uruguay in 1930", discipline_id:1, image_url:'http://dev.codefuel.me/smsmedia/somosport-vector-icons-fut7.svg'})
   );
 };
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

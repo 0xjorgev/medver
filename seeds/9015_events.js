@@ -1,4 +1,7 @@
 
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -23,3 +26,5 @@ exports.seed = function(knex, Promise) {
     knex('events').insert({id:16, img_url:'', name:'Match Cancel', description:'Match not played', level:2, increments_by:1, subdiscipline_id:2})
     );
 };
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

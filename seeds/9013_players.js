@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 console.log('9013 seeding player')
 exports.seed = function(knex, Promise) {
   return Promise.join(
@@ -88,3 +91,6 @@ exports.seed = function(knex, Promise) {
 };
 
 console.log('9013 OK')
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

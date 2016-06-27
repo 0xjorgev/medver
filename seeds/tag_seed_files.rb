@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 Dir.foreach('./seeds/') do |item|
   next if item == '.' or item == '..'
   puts item
@@ -8,3 +11,6 @@ Dir.foreach('./seeds/') do |item|
 
 end
 
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

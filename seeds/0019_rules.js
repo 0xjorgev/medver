@@ -1,4 +1,7 @@
 
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -20,3 +23,6 @@ exports.seed = function(knex, Promise) {
     knex('rules').insert({name: 'Partido Empatado', value:'1', short_name:'PE'})
   );
 };
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

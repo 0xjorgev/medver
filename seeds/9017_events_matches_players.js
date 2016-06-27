@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
   console.log('9000 Events Matches');
     //Deletes ALL existing entries
 
@@ -109,3 +112,6 @@
   )
 }
 console.log('9000 OK');
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

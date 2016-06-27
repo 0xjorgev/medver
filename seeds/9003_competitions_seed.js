@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 console.log(__filename.slice(__dirname.length + 1));
 
 exports.seed = function(knex, Promise) {
@@ -25,3 +28,5 @@ exports.seed = function(knex, Promise) {
 };
 
 console.log('OK')
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

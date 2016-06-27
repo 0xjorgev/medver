@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -23,3 +26,5 @@ exports.seed = function(knex, Promise) {
         return knex.raw('');
     });
 };
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

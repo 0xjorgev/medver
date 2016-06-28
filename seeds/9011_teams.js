@@ -1,7 +1,6 @@
 
 console.log(__filename.slice(__dirname.length + 1) + ' START')
 
-console.log('9011 seeding teams')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -26,6 +25,5 @@ exports.seed = function(knex, Promise) {
     knex('teams').insert({name: 'Deportivo Tachira', short_name:'DPT', description:'Deportivo Tachira', logo_url:'', category_type_id:3, organization_id:1})
   );
 };
-console.log('9011 OK')
 
 console.log(__filename.slice(__dirname.length + 1) + ' OK')

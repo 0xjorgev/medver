@@ -1,7 +1,6 @@
 
 console.log(__filename.slice(__dirname.length + 1) + ' START')
 
-console.log('9008 seeding teams')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -21,6 +20,5 @@ exports.seed = function(knex, Promise) {
     knex('phases').insert({name: 'Clausura', position:1, category_id:1, participant_team:2, classified_team:1})
   );
 };
-console.log('9008 end')
 
 console.log(__filename.slice(__dirname.length + 1) + ' OK')

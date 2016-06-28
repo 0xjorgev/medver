@@ -4,13 +4,6 @@ console.log(__filename.slice(__dirname.length + 1) + ' START')
 
 exports.seed = function(knex, Promise) {
 
-    console.log('----------------------------------------------')
-    console.log(knex('teams').insert({id: 10, name: 'PEPE', short_name:'Xolas', description:'Cholitas Prueba Alianza Atlanta', logo_url:'', category_type_id:10, organization_id:5}))
-    console.log('----------------------------------------------')
-
-
-
-
   return Promise.join(
     //==========================================================================
     // Team 1: Cholitas - Organizations

@@ -40,8 +40,6 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
 
         var data = req.body;
 
-        // console.log('match creation',data)
-
         new Models.match(data
         ).save().then(function(item){
             console.log(`Match ${item}`);

@@ -140,29 +140,23 @@ paths:
       responses:
         200:
           description: Information about a single player
-  /api/v1.0/discipline/1/subdiscipline:
+  /discipline/{discipline_id}/subdiscipline:
     get:
       description:
-      operationId: Get_Subdiscipline By Discipline ID_
       produces:
       - application/json
-      parameters: []
+      tags:
+        - Discipline
+      parameters:
+        - name: discipline_id
+          in: path
+          required: true
+          type: integer
       responses:
         200:
           description:
       security: []
-  /api/v1.0/team:
-    get:
-      description:
-      operationId: Get_Teams  - all_
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description:
-      security: []
-  /api/v1.0/match:
+  /match:
     get:
       description:
       operationId: get match_
@@ -173,7 +167,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/competition/2:
+  /competition/2:
     put:
       description: Competition Update
       operationId: Update Competition_
@@ -190,7 +184,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/phase/1/group_team:
+  /phase/1/group_team:
     get:
       description:
       operationId: Get_teams by phase_
@@ -201,7 +195,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/season:
+  /season:
     get:
       description:
       operationId: Get_Full Season List_
@@ -218,7 +212,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/competition/:
+  /competition:
     get:
       description: Full Listo of Competitions
       operationId: Get_Competition List_
@@ -245,7 +239,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/phase:
+  /phase:
     get:
       description:
       operationId: get phase_
@@ -256,7 +250,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/competition/145:
+  /competition/145:
     get:
       description: Full competition Object
       operationId: Get_Competition By Competition_id_
@@ -267,7 +261,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/gender:
+  /gender:
     get:
       description:
       operationId: Get_Gender List_
@@ -284,7 +278,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/season/1:
+  /season/1:
     get:
       description:
       operationId: Get_Season by Id_
@@ -317,7 +311,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/gender/1:
+  /gender/1:
     get:
       description:
       operationId: Get_Gender By Gender Id_
@@ -334,7 +328,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/competition/1/season/:
+  /competition/1/season/:
     get:
       description: List of seasons for each competition
       operationId: Get_Seasons by Competition_
@@ -345,7 +339,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/discipline/1:
+  /discipline/1:
     get:
       description: Contains related sub disciplines
       operationId: Get_Discipline By ID_
@@ -356,7 +350,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/round:
+  /round:
     get:
       description:
       operationId: get round_
@@ -367,7 +361,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/season/2:
+  /season/2:
     put:
       description:
       operationId: Update_Season Update_
@@ -384,7 +378,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/competition/competition_type:
+  /competition/competition_type:
     get:
       description: Full List of Competitions Type's
       operationId: Get_Competition Type_
@@ -395,7 +389,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/category/1/team:
+  /category/1/team:
     get:
       description:
       operationId: Get_team x category_
@@ -406,7 +400,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/discipline/:
+  /discipline/:
     get:
       description:
       operationId: Get All Disciplines_
@@ -423,7 +417,7 @@ paths:
         200:
           description:
       security: []
-  /api/v1.0/group/:
+  /group/:
     get:
       description:
       operationId: get Group_

@@ -1,0 +1,18 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
+
+exports.seed = function(knex, Promise) {
+  return Promise.join(
+    //==========================================================================
+    // Alianza Groups Data
+    //==========================================================================
+    knex('groups').insert({id: 15, name: 'Grupo A', phase_id:6}),
+    knex('groups').insert({id: 16, name: 'Grupo B', phase_id:6}),
+    knex('groups').insert({id: 17, name: 'Grupo Semi-final', phase_id:7}),
+    knex('groups').insert({id: 18, name: 'Grupo Final', phase_id:8})
+  )
+}
+
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

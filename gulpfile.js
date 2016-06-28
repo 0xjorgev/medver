@@ -12,7 +12,8 @@ gulp.task('debug', function() {
   gulp.src([])
     .pipe(nodeInspector({
       webHost: 'localhost',
-      webPort: 3003
+      webPort: 3003,
+      saveLiveEdit: false
     }));
 });
 

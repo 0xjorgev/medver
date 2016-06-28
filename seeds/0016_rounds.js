@@ -4,7 +4,7 @@ exports.seed = function(knex, Promise) {
     // Deletes ALL existing entries
     knex('rounds').del(),
     /*
-            table.increments('id');
+      table.increments('id');
 			table.string('name');
 			table.timestamp('start_date');
 			table.timestamp('end_date');

@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+define(['express', '../model/index', '../util/request_message_util', '../util/knex_util','../helpers/standing_table_helper'], function (express, Models, Message, Knex, StandingTable) {
 
     var router = express.Router();
 
@@ -115,6 +115,19 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           Message(res, err.detail, err.code, null);
         });
     });
+
+    router.get('/:group_id/standing_table', function(req, res){
+        var group_id = req.params.group_id;
+        console.log('\n=======================================================\n')
+        console.log('standing_table of group', group_id)
+
+        var matchSql = 'select groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id where groups.id = ' + group_id
+
+        //todo: promisify this
+        StandingTable.getStandingTableByMatches(matchSql, res)
+    })
+
+    ///
 
     return router;
 });

@@ -158,21 +158,40 @@ paths:
       security: []
   /match:
     get:
-      description:
-      operationId: get match_
+      description: Gets all matches
+      tags:
+        - Match
       produces:
       - application/json
       parameters: []
       responses:
         200:
-          description:
+          description: list of all matches
       security: []
-  /competition/2:
-    put:
-      description: Competition Update
-      operationId: Update Competition_
+    post:
+      description: Creates a match
+      tags:
+        - Match
       produces:
       - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateMatchRequest'
+      responses:
+        200:
+          description: list of all matches
+      security: []
+  /competition/{competition_id}:
+    put:
+      description: Competition Update
+      produces:
+      - application/json
+      tags:
+        - Competition
       parameters:
       - name: Body
         in: body
@@ -636,4 +655,30 @@ definitions:
     - discipline_id
     - subdiscipline_id
     - competition_type_id
+  CreateMatchRequest:
+    title: Match Creation Request
+    type: object
+    properties:
+      number:
+        type: integer
+      location:
+        type: string
+      home_team_id:
+        type: integer
+      visitor_team_id:
+        type: integer
+      home_team_score:
+        type: integer
+      visitor_team_score:
+        type: integer
+      round_id:
+        type: integer
+      date:
+        type: date
+    required:
+    - home_team_id
+    - visitor_team_id
+    - date
+    - location
+    - round_id
 

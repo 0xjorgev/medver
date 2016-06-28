@@ -40,14 +40,9 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
 
         var data = req.body;
 
+        // console.log('match creation',data)
+
         new Models.match(data
-        // {
-        //     location: data.location,
-        //     home_team_id: data.home_team_id,
-        //     visitor_team_id: data.visitor_team_id,
-        //     round_id: data.round_id,
-        //     date: data.date
-        // }
         ).save().then(function(item){
             console.log(`Match ${item}`);
             Message(res, 'Success', '0', item);

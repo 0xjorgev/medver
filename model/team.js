@@ -37,6 +37,10 @@ define(['./base_model', './category_type', './organization', './player_team', '.
 
         category_group_phase_team: function(){
             return this.hasMany('Category_group_phase_team', 'team_id');
+        },
+
+        match_player_team: function(){
+            return this.hasMany('Match_team_player', 'team_id');
         }
 
         // player: function(){

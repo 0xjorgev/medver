@@ -35,7 +35,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var referee_id = req.params.referee_id;
         return Models.match_referee
         .where({'referee_id':referee_id})
-        .fetchAll({withRelated: ['match'], debug:true} )
+        .fetchAll({withRelated: ['match.home_team.category_type', 'match.visitor_team.category_type', 'match.round.group.phase.category.season.competition'], debug:true} )
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);

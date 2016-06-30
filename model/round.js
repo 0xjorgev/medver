@@ -19,6 +19,10 @@ define(['./base_model','./group', './match'], function (DB) {
         matches: function(){
             return this.hasMany('Match');
         }
+         //
+        //  category_rel: function() {
+        //    return this.hasMany('Category_group_phase_team')
+        //  }
     });
 
     // uses Registry plugin

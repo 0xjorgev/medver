@@ -17,11 +17,10 @@ produces:
 paths:
   /phase/{phase_id}/group_round_match:
     get:
-      summary: Given a Phase ID, returns the groups, rounds & matches associated
-      description: Given a Phase ID, returns the groups, rounds & matches associated
+      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
+      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
       tags:
         - Phase
-          Match
       responses:
         200:
           description: Match event stream
@@ -233,8 +232,9 @@ paths:
       security: []
   /competition:
     get:
-      description: Full Listo of Competitions
-      operationId: Get_Competition List_
+      description: Full List of Competitions
+      tags:
+        - Competition
       produces:
       - application/json
       parameters: []
@@ -244,7 +244,8 @@ paths:
       security: []
     post:
       description: Competition Creation
-      operationId: Create Competition_
+      tags:
+        - Competition
       produces:
       - application/json
       parameters:
@@ -261,7 +262,8 @@ paths:
   /phase:
     get:
       description:
-      operationId: get phase_
+      tags:
+        - Phase
       produces:
       - application/json
       parameters: []
@@ -272,7 +274,8 @@ paths:
   /competition/145:
     get:
       description: Full competition Object
-      operationId: Get_Competition By Competition_id_
+      tags:
+        - Competition
       produces:
       - application/json
       parameters: []
@@ -350,7 +353,8 @@ paths:
   /competition/1/season/:
     get:
       description: List of seasons for each competition
-      operationId: Get_Seasons by Competition_
+      tags:
+        - Competition
       produces:
       - application/json
       parameters: []

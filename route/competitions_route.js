@@ -37,7 +37,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('Competition List');
         return Models.competition
         .query(function(qb){})
-        .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']})
+        .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']})
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);
@@ -344,11 +344,11 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.competition
         .where({'id':comp_id})
         // .fetch( {withRelated: ['discipline.subdisciplines', 'competition_type', 'seasons','seasons.categories.classification', 'seasons.categories.phases', 'seasons.categories.phases.groups','seasons.categories.category_group_phase_team.group.rounds.matches.home_team', 'seasons.categories.category_group_phase_team.group.rounds.matches.visitor_team']} )
-        .fetch( {withRelated: ['discipline.subdisciplines', 
-            'competition_type', 
+        .fetch( {withRelated: ['discipline.subdisciplines',
+            'competition_type',
             'seasons',
-            'seasons.categories.classification', 
-            'seasons.categories.phases', 
+            'seasons.categories.classification',
+            'seasons.categories.phases',
             'seasons.categories.phases.groups']} )
         .then(function (result) {
             Message(res,'Success', '0', result);

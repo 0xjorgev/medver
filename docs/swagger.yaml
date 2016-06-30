@@ -447,6 +447,23 @@ paths:
         200:
           description:
       security: []
+    post:
+      description: Creates a group
+      tags:
+        - Group
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateGroupRequest'
+      responses:
+        200:
+          description: list of all matches
+      security: []
 definitions:
   UpdateCompetitionRequest:
     title: Update CompetitionRequest
@@ -681,4 +698,20 @@ definitions:
     - date
     - location
     - round_id
+  CreateGroupRequest:
+    title: Match Creation Request
+    type: object
+    properties:
+      name:
+        type: string
+      phase_id:
+        type: integer
+      participant_team:
+        type: integer
+      classified_team:
+        type: integer
+
+    required:
+    - name
+    - phase_id
 

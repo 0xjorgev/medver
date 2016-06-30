@@ -39,9 +39,14 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     router.post('/', function (req, res) {
 
         var data = req.body;
+        var Match = Models.match
 
-        new Models.match(data
-        ).save().then(function(item){
+        console.log(data)
+
+        new Match(data)
+        // .save(data)
+        // new Models.match(data)
+            .save().then(function(item){
             console.log(`Match ${item}`);
             Message(res, 'Success', '0', item);
         }).catch(function(error){

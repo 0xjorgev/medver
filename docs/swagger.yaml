@@ -463,6 +463,51 @@ paths:
       responses:
         200:
           description: list of all matches
+  /category/{category_id}/se:
+    post:
+      summary: Category Create SE
+      description: Create all phases groups, rounds and matches for a category for a competition of simple elimination
+      tags:
+        - Category
+      operationId: Create_Category SE_
+      produces:
+        - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/CategorySERequest'
+      responses:
+        200:
+          description:
+      security: []
+  /competition/rcompetition/{competition_id}:
+    get:
+      summary: Get Complete Competition
+      description: Get All the competition tree
+      tags:
+        - Competition
+      operationId: Get Complete Competition tree
+      produces:
+      - application/json
+      parameters:
+        - name: competition_id
+          in: path
+          description: Competition ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description:
       security: []
 definitions:
   UpdateCompetitionRequest:
@@ -672,6 +717,14 @@ definitions:
     - discipline_id
     - subdiscipline_id
     - competition_type_id
+  CategorySERequest:
+    title: Category SERequest
+    type: object
+    properties:
+      team_quantity:
+        type: string
+    required:
+    - team_quantity
   CreateMatchRequest:
     title: Match Creation Request
     type: object

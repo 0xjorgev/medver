@@ -47,29 +47,29 @@ console.log(__filename.slice(__dirname.length + 1) + ' START')
     //==========================================================================
     // Archi - Sur Carolina Primera Ronda - Grupo A
     //==========================================================================
-    knex('events_matches_players').insert({match_id:11, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }),
-    knex('events_matches_players').insert({match_id:11, event_id:9, player_in:null, player_out:null, instant:0, team_id:null  }),
+    knex('events_matches_players').insert({match_id:14, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }),
+    knex('events_matches_players').insert({match_id:14, event_id:9, player_in:null, player_out:null, instant:0, team_id:null  }),
 
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:163, player_out:null, instant:1, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:152, player_out:null, instant:7, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:152, player_out:null, instant:11, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:163, player_out:null, instant:16, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:153, player_out:null, instant:25, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:150, player_out:null, instant:32, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:151, player_out:null, instant:36, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:150, player_out:null, instant:38, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:165, player_out:null, instant:41, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:165, player_out:null, instant:42, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:163, player_out:null, instant:1, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:152, player_out:null, instant:7, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:152, player_out:null, instant:11, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:163, player_out:null, instant:16, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:153, player_out:null, instant:25, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:150, player_out:null, instant:32, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:151, player_out:null, instant:36, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:150, player_out:null, instant:38, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:165, player_out:null, instant:41, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:165, player_out:null, instant:42, team_id:15 }),
 
         //middle
-    knex('events_matches_players').insert({match_id:11, event_id:10, player_in:null, player_out:null,instant:45, team_id:null  }),
-    knex('events_matches_players').insert({match_id:11, event_id:9, player_in:null, player_out:null, instant:45, team_id:null  }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:165, player_out:null, instant:47, team_id:15 }),
-    knex('events_matches_players').insert({match_id:11, event_id:1, player_in:165, player_out:null, instant:50, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:10, player_in:null, player_out:null,instant:45, team_id:null  }),
+    knex('events_matches_players').insert({match_id:14, event_id:9, player_in:null, player_out:null, instant:45, team_id:null  }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:165, player_out:null, instant:47, team_id:15 }),
+    knex('events_matches_players').insert({match_id:14, event_id:1, player_in:165, player_out:null, instant:50, team_id:15 }),
 
         //end match
-    knex('events_matches_players').insert({match_id:11, event_id:10, player_in:null, player_out:null, instant:90, team_id:null  }),
-    knex('events_matches_players').insert({match_id:11, event_id:8, player_in:null, player_out:null, instant:90, team_id:null }),
+    knex('events_matches_players').insert({match_id:14, event_id:10, player_in:null, player_out:null, instant:90, team_id:null  }),
+    knex('events_matches_players').insert({match_id:14, event_id:8, player_in:null, player_out:null, instant:90, team_id:null }),
 
 
     //======================================================

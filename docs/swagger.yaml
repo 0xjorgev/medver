@@ -412,13 +412,20 @@ paths:
         200:
           description:
       security: []
-  /category/1/team:
+  /category/{category_id}/team:
     get:
       description:
-      operationId: Get_team x category_
+      tags:
+        - Category
       produces:
       - application/json
-      parameters: []
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
       responses:
         200:
           description:

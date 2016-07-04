@@ -14,6 +14,17 @@ schemes:
 basePath: /api/v1.0
 produces:
   - application/json
+
+##################################################
+#  _____                 _
+# /  ___|               (_)
+# \ `--.  ___ _ ____   ___  ___ ___  ___
+#  `--. \/ _ \ '__\ \ / / |/ __/ _ \/ __|
+# /\__/ /  __/ |   \ V /| | (_|  __/\__ \
+# \____/ \___|_|    \_/ |_|\___\___||___/
+#
+###################################################
+
 paths:
   /phase/{phase_id}/group_round_match:
     get:
@@ -526,6 +537,39 @@ paths:
         200:
           description:
       security: []
+
+  /category/{category_id}/teams/{team_id}/matches:
+    get:
+      summary: Returns the matches of a given team, under a category
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+        - name: team_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of matches given a category and a team
+
+#######################################################################
+#      _       __ _       _ _   _
+#     | |     / _(_)     (_) | (_)
+#   __| | ___| |_ _ _ __  _| |_ _  ___  _ __  ___
+#  / _` |/ _ \  _| | '_ \| | __| |/ _ \| '_ \/ __|
+# | (_| |  __/ | | | | | | | |_| | (_) | | | \__ \
+#  \__,_|\___|_| |_|_| |_|_|\__|_|\___/|_| |_|___/
+#
+#######################################################################
+
 definitions:
   UpdateCompetitionRequest:
     title: Update CompetitionRequest

@@ -14,6 +14,17 @@ schemes:
 basePath: /api/v1.0
 produces:
   - application/json
+
+##################################################
+#  _____                 _
+# /  ___|               (_)
+# \ `--.  ___ _ ____   ___  ___ ___  ___
+#  `--. \/ _ \ '__\ \ / / |/ __/ _ \/ __|
+# /\__/ /  __/ |   \ V /| | (_|  __/\__ \
+# \____/ \___|_|    \_/ |_|\___\___||___/
+#
+###################################################
+
 paths:
   /phase/{phase_id}/group_round_match:
     get:
@@ -202,21 +213,27 @@ paths:
         200:
           description:
       security: []
-  /phase/1/group_team:
+  /phase/{:phase_id}/group_team:
     get:
-      description:
-      operationId: Get_teams by phase_
+      description: returns groups & teams associated to this phase
+      tags:
+        - Phase
       produces:
       - application/json
-      parameters: []
+      parameters:
+        - name: phase_id
+          in: path
+          required: true
+          type: integer
       responses:
         200:
           description:
       security: []
   /season:
     get:
-      description:
-      operationId: Get_Full Season List_
+      description: returns all seasons
+      tags:
+        - Season
       produces:
       - application/json
       parameters:
@@ -300,26 +317,26 @@ paths:
         200:
           description:
       security: []
-  /season/1:
+  /season/{season_id}:
     get:
       description:
-      operationId: Get_Season by Id_
+      parameters:
+        - name: season_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Season
       produces:
       - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/SeasonbyIdRequest'
       responses:
         200:
           description:
       security: []
     post:
-      description:
-      operationId: Create_Season Creation_
+      description: Creates a Season
+      tags:
+        - Season
       produces:
       - application/json
       parameters:
@@ -333,19 +350,19 @@ paths:
         200:
           description:
       security: []
-  /gender/1:
+  /gender/{gender_id}:
     get:
-      description:
+      description: Return info of a given gender
       operationId: Get_Gender By Gender Id_
       produces:
       - application/json
       parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/GenderByGenderIdRequest'
+        - name: gender_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Gender
       responses:
         200:
           description:
@@ -520,6 +537,39 @@ paths:
         200:
           description:
       security: []
+
+  /category/{category_id}/teams/{team_id}/matches:
+    get:
+      summary: Returns the matches of a given team, under a category
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+        - name: team_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of matches given a category and a team
+
+#######################################################################
+#      _       __ _       _ _   _
+#     | |     / _(_)     (_) | (_)
+#   __| | ___| |_ _ _ __  _| |_ _  ___  _ __  ___
+#  / _` |/ _ \  _| | '_ \| | __| |/ _ \| '_ \/ __|
+# | (_| |  __/ | | | | | | | |_| | (_) | | | \__ \
+#  \__,_|\___|_| |_|_| |_|_|\__|_|\___/|_| |_|___/
+#
+#######################################################################
+
 definitions:
   UpdateCompetitionRequest:
     title: Update CompetitionRequest

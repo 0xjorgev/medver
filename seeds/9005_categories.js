@@ -26,16 +26,10 @@ exports.seed = function(knex, Promise) {
 
     */
 
-    knex('categories')
-    .insert([
-        {name:'Koopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:1},
-        {name:'Yoshis', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2},
-        {name:'Kuppa Troopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2}
-        ])
-    ).then(function(){
-		//Add query
-        return knex.raw('');
-    });
+    knex('categories').insert({name:'Koopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:1}),
+    knex('categories').insert({name:'Yoshis', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2}),
+    knex('categories').insert({name:'Kuppa Troopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2})
+  )
 };
 
 console.log(__filename.slice(__dirname.length + 1) + ' OK')

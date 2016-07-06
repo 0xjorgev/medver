@@ -25,13 +25,20 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		});
 	});
 
-	router.get('/:player_id/events', function (req, res) {
+	router.get('/:player_id/category/:category_id/events', function (req, res) {
 
 		console.log('Player Profile');
 		var playerId = req.params.player_id;
+		var categoryId = req.params.category_id;
 
 		return Models.event_match_player.query(function(qb){
-				qb.where('active','=', true)
+				qb.innerJoin('matches', 'matches.id', 'events_matches_players.match_id')
+				qb.innerJoin('rounds', 'rounds.id', 'matches.round_id')
+				qb.innerJoin('groups', 'groups.id', 'rounds.group_id')
+				qb.innerJoin('phases', 'phases.id', 'groups.phase_id')
+				qb.innerJoin('categories', 'categories.id', 'phases.category_id')
+				qb.where('categories.id', '=', categoryId)
+				qb.where('matches.active', '=', true)
 				qb.where('player_in', '=', playerId)
 				qb.orWhere('player_out', '=', playerId)
 			})
@@ -39,7 +46,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){
-			Message(res,error.details, error.code, []);
+
+			console.log(error)
+
+			Message(res, error, error.code, []);
 		});
 	});
 

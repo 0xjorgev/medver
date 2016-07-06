@@ -150,11 +150,15 @@ paths:
       responses:
         200:
           description: Information about a single player
-  /player/{player_id}/events:
+  /player/{player_id}/category/{category_id}/events:
     get:
-      summary: Gets all player's events
-      description: Gets all player's events
+      summary: Gets all player's events in a specific category
+      description: Gets all player's events in a specific category
       parameters:
+        - name: category_id
+          in: path
+          required: true
+          type: integer
         - name: player_id
           in: path
           required: true

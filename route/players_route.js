@@ -42,7 +42,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 				qb.where('player_in', '=', playerId)
 				qb.orWhere('player_out', '=', playerId)
 			})
-		.fetchAll({withRelated: ['player_in', 'player_out', 'match_id', 'event_id', 'team']})
+		.fetchAll({withRelated: ['player_in', 'player_out', 'match_id.home_team','match_id.visitor_team', 'event_id', 'team']})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){

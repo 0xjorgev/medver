@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -15,11 +18,13 @@ exports.seed = function(knex, Promise) {
 
     knex('classifications_types')
     .insert([
-        {id:1, name:'Simple Elimination',description:'Simple elimination model'},
-        {id:2, name:'Custom Elimination',description:'Custom elimination model'}
+        {name:'Simple Elimination',description:'Simple elimination model'},
+        {name:'Custom Elimination',description:'Custom elimination model'}
         ])
     ).then(function(){
 		//Add query
         return knex.raw('');
     });
 };
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

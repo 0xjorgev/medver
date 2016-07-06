@@ -1,8 +1,6 @@
-# this is an example of the Uber API
-# as a demonstration of an API spec in YAML
 swagger: '2.0'
 info:
-  title: Somosport Core API
+  title: Somosport Core API!
   description: Basic description of services provided by Somosport Core
   version: "1.0"
 # the domain of the service
@@ -16,7 +14,34 @@ schemes:
 basePath: /api/v1.0
 produces:
   - application/json
+
+##################################################
+#  _____                 _
+# /  ___|               (_)
+# \ `--.  ___ _ ____   ___  ___ ___  ___
+#  `--. \/ _ \ '__\ \ / / |/ __/ _ \/ __|
+# /\__/ /  __/ |   \ V /| | (_|  __/\__ \
+# \____/ \___|_|    \_/ |_|\___\___||___/
+#
+###################################################
+
 paths:
+  /phase/{phase_id}/group_round_match:
+    get:
+      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
+      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
+      tags:
+        - Phase
+      responses:
+        200:
+          description: Match event stream
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
 
   /event/{match_id}:
     get:
@@ -125,253 +150,682 @@ paths:
       responses:
         200:
           description: Information about a single player
-  /estimates/price:
+  /discipline/{discipline_id}/subdiscipline:
     get:
-      summary: Price Estimates
-      description: |
-        The Price Estimates endpoint returns an estimated price range
-        for each product offered at a given location. The price estimate is
-        provided as a formatted string with the full price range and the localized
-        currency symbol.<br><br>The response also includes low and high estimates,
-        and the [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code for
-        situations requiring currency conversion. When surge is active for a particular
-        product, its surge_multiplier will be greater than 1, but the price estimate
-        already factors in this multiplier.
-      parameters:
-        - name: start_latitude
-          in: query
-          description: Latitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: start_longitude
-          in: query
-          description: Longitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: end_latitude
-          in: query
-          description: Latitude component of end location.
-          required: true
-          type: number
-          format: double
-        - name: end_longitude
-          in: query
-          description: Longitude component of end location.
-          required: true
-          type: number
-          format: double
+      description:
+      produces:
+      - application/json
       tags:
-        - Estimates
-      responses:
-        200:
-          description: An array of price estimates by product
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/PriceEstimate'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /estimates/time:
-    get:
-      summary: Time Estimates
-      description: The Time Estimates endpoint returns ETAs for all products offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.
+        - Discipline
       parameters:
-        - name: start_latitude
-          in: query
-          description: Latitude component of start location.
+        - name: discipline_id
+          in: path
           required: true
-          type: number
-          format: double
-        - name: start_longitude
-          in: query
-          description: Longitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: customer_uuid
-          in: query
-          type: string
-          format: uuid
-          description: Unique customer identifier to be used for experience customization.
-        - name: product_id
-          in: query
-          type: string
-          description: Unique identifier representing a specific product for a given latitude & longitude.
-      tags:
-        - Estimates
-      responses:
-        200:
-          description: An array of products
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /me:
-    get:
-      summary: User Profile
-      description: The User Profile endpoint returns information about the Uber user that has authorized with the application.
-      tags:
-        - User
-      responses:
-        200:
-          description: Profile information for a user
-          schema:
-            $ref: '#/definitions/Profile'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /history:
-    get:
-      summary: User Activity
-      description: The User Activity endpoint returns data about a user's lifetime activity with Uber. The response will include pickup locations and times, dropoff locations and times, the distance of past requests, and information about which products were requested.<br><br>The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.
-      parameters:
-        - name: offset
-          in: query
           type: integer
-          format: int32
-          description: Offset the list of returned results by this amount. Default is zero.
-        - name: limit
-          in: query
-          type: integer
-          format: int32
-          description: Number of items to retrieve. Default is 5, maximum is 100.
-      tags:
-        - User
       responses:
         200:
-          description: History information for the given user
+          description:
+      security: []
+  /match:
+    get:
+      description: Gets all matches
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: list of all matches
+      security: []
+    post:
+      description: Creates a match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateMatchRequest'
+      responses:
+        200:
+          description: list of all matches
+      security: []
+  /competition/{competition_id}:
+    put:
+      description: Competition Update
+      produces:
+      - application/json
+      tags:
+        - Competition
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/UpdateCompetitionRequest'
+      responses:
+        200:
+          description:
+      security: []
+  /phase/{:phase_id}/group_team:
+    get:
+      description: returns groups & teams associated to this phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description:
+      security: []
+  /season:
+    get:
+      description: returns all seasons
+      tags:
+        - Season
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/FullSeasonListRequest'
+      responses:
+        200:
+          description:
+      security: []
+  /competition:
+    get:
+      description: Full List of Competitions
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+    post:
+      description: Competition Creation
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateCompetitionRequest'
+      responses:
+        200:
+          description:
+      security: []
+  /phase:
+    get:
+      description:
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+  /competition/145:
+    get:
+      description: Full competition Object
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+  /gender:
+    get:
+      description:
+      operationId: Get_Gender List_
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/GenderListRequest'
+      responses:
+        200:
+          description:
+      security: []
+  /season/{season_id}:
+    get:
+      description:
+      parameters:
+        - name: season_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Season
+      produces:
+      - application/json
+      responses:
+        200:
+          description:
+      security: []
+    post:
+      description: Creates a Season
+      tags:
+        - Season
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/SeasonCreationRequest'
+      responses:
+        200:
+          description:
+      security: []
+  /gender/{gender_id}:
+    get:
+      description: Return info of a given gender
+      operationId: Get_Gender By Gender Id_
+      produces:
+      - application/json
+      parameters:
+        - name: gender_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Gender
+      responses:
+        200:
+          description:
+      security: []
+  /competition/1/season/:
+    get:
+      description: List of seasons for each competition
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+  /discipline/1:
+    get:
+      description: Contains related sub disciplines
+      operationId: Get_Discipline By ID_
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+  /round:
+    get:
+      description:
+      operationId: get round_
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+  /season/2:
+    put:
+      description:
+      operationId: Update_Season Update_
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/SeasonUpdateRequest'
+      responses:
+        200:
+          description:
+      security: []
+  /competition/competition_type:
+    get:
+      description: Full List of Competitions Type's
+      operationId: Get_Competition Type_
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+  /category/{category_id}/team:
+    get:
+      description:
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description:
+      security: []
+  /discipline/:
+    get:
+      description:
+      operationId: Get All Disciplines_
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/GetAllDisciplinesRequest'
+      responses:
+        200:
+          description:
+      security: []
+  /group/:
+    get:
+      description:
+      operationId: get Group_
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description:
+      security: []
+    post:
+      description: Creates a group
+      tags:
+        - Group
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateGroupRequest'
+      responses:
+        200:
+          description: list of all matches
+  /category/{category_id}/se:
+    post:
+      summary: Category Create SE
+      description: Create all phases groups, rounds and matches for a category for a competition of simple elimination
+      tags:
+        - Category
+      operationId: Create_Category SE_
+      produces:
+        - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
           schema:
-            $ref: '#/definitions/Activities'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/CategorySERequest'
+      responses:
+        200:
+          description:
+      security: []
+  /competition/rcompetition/{competition_id}:
+    get:
+      summary: Get Complete Competition
+      description: Get All the competition tree
+      tags:
+        - Competition
+      operationId: Get Complete Competition tree
+      produces:
+      - application/json
+      parameters:
+        - name: competition_id
+          in: path
+          description: Competition ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description:
+      security: []
+
+  /category/{category_id}/teams/{team_id}/matches:
+    get:
+      summary: Returns the matches of a given team, under a category
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+        - name: team_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of matches given a category and a team
+
+#######################################################################
+#      _       __ _       _ _   _
+#     | |     / _(_)     (_) | (_)
+#   __| | ___| |_ _ _ __  _| |_ _  ___  _ __  ___
+#  / _` |/ _ \  _| | '_ \| | __| |/ _ \| '_ \/ __|
+# | (_| |  __/ | | | | | | | |_| | (_) | | | \__ \
+#  \__,_|\___|_| |_|_| |_|_|\__|_|\___/|_| |_|___/
+#
+#######################################################################
+
 definitions:
-  Team:
+  UpdateCompetitionRequest:
+    title: Update CompetitionRequest
     type: object
     properties:
-      id:
-        type: string
-        description: <<add id description>>
       name:
         type: string
-        description: <<add name description>>
-      logo_url:
-        type: string
-        description: <<add logo_url description>>
-      short_name:
-        type: string
-        description: <<add short_name description>>
       description:
         type: string
-        description: <<add description description>>
-      category_type_id:
+      discipline_id:
+        type: integer
+        format: int32
+      subdiscipline_id:
+        type: integer
+        format: int32
+      competition_type_id:
+        type: integer
+        format: int32
+    required:
+    - name
+    - description
+    - discipline_id
+    - subdiscipline_id
+    - competition_type_id
+  FullSeasonListRequest:
+    title: Full Season ListRequest
+    type: object
+    properties:
+      name:
         type: string
-        description: <<add category_typ description>>
-      organization_id:
+      description:
         type: string
-        description: <<add organization description>>
+      discipline_id:
+        type: integer
+        format: int32
+      subdiscipline_id:
+        type: integer
+        format: int32
+      competition_type_id:
+        type: integer
+        format: int32
+    required:
+    - name
+    - description
+    - discipline_id
+    - subdiscipline_id
+    - competition_type_id
+  GenderListRequest:
+    title: Gender ListRequest
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      discipline_id:
+        type: integer
+        format: int32
+      subdiscipline_id:
+        type: integer
+        format: int32
+      competition_type_id:
+        type: integer
+        format: int32
+    required:
+    - name
+    - description
+    - discipline_id
+    - subdiscipline_id
+    - competition_type_id
+  SeasonbyIdRequest:
+    title: Season by IdRequest
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      discipline_id:
+        type: integer
+        format: int32
+      subdiscipline_id:
+        type: integer
+        format: int32
+      competition_type_id:
+        type: integer
+        format: int32
+    required:
+    - name
+    - description
+    - discipline_id
+    - subdiscipline_id
+    - competition_type_id
+  GenderByGenderIdRequest:
+    title: Gender By Gender IdRequest
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      discipline_id:
+        type: integer
+        format: int32
+      subdiscipline_id:
+        type: integer
+        format: int32
+      competition_type_id:
+        type: integer
+        format: int32
+    required:
+    - name
+    - description
+    - discipline_id
+    - subdiscipline_id
+    - competition_type_id
+  CreateCompetitionRequest:
+    title: Create CompetitionRequest
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      discipline_id:
+        type: integer
+        format: int32
+      subdiscipline_id:
+        type: integer
+        format: int32
+      competition_type_id:
+        type: integer
+        format: int32
+    required:
+    - name
+    - description
+    - discipline_id
+    - subdiscipline_id
+    - competition_type_id
+  SeasonUpdateRequest:
+    title: Season UpdateRequest
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      game_title:
+        type: string
       active:
+        type: boolean
+      init_at:
         type: string
-        description: <<add active description>>
-      created_at:
+      ends_at:
         type: string
-        description: <<add created_at description>>
-      updated_at:
-        type: string
-        description: <<add updated_at description>>
-      category_type:
-        type: string
-        description: <<add category_typ description>>
-      organization:
-        type: string
-        description: <<add organization description>>
-      player_team:
-        type: string
-        description: <<add player_team description>>
-  PriceEstimate:
+    required:
+    - name
+    - description
+    - game_title
+    - active
+    - init_at
+    - ends_at
+  SeasonCreationRequest:
+    title: Season CreationRequest
     type: object
     properties:
-      product_id:
+      name:
         type: string
-        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles
-      currency_code:
+      description:
         type: string
-        description: "[ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code."
-      display_name:
+      game_title:
         type: string
-        description: Display name of product.
-      estimate:
+      active:
+        type: boolean
+      init_at:
         type: string
-        description: Formatted string of estimate in local currency of the start location. Estimate could be a range, a single number (flat rate) or "Metered" for TAXI.
-      low_estimate:
-        type: number
-        description: Lower bound of the estimated price.
-      high_estimate:
-        type: number
-        description: Upper bound of the estimated price.
-      surge_multiplier:
-        type: number
-        description: Expected surge multiplier. Surge is active if surge_multiplier is greater than 1. Price estimate already factors in the surge multiplier.
-  Profile:
+      ends_at:
+        type: string
+    required:
+    - name
+    - description
+    - game_title
+    - active
+    - init_at
+    - ends_at
+  GetAllDisciplinesRequest:
+    title: Get All DisciplinesRequest
     type: object
     properties:
-      first_name:
+      name:
         type: string
-        description: First name of the Uber user.
-      last_name:
+      description:
         type: string
-        description: Last name of the Uber user.
-      email:
-        type: string
-        description: Email address of the Uber user
-      picture:
-        type: string
-        description: Image URL of the Uber user.
-      promo_code:
-        type: string
-        description: Promo code of the Uber user.
-  Activity:
-    type: object
-    properties:
-      uuid:
-        type: string
-        description: Unique identifier for the activity
-  Activities:
-    type: object
-    properties:
-      offset:
+      discipline_id:
         type: integer
         format: int32
-        description: Position in pagination.
-      limit:
+      subdiscipline_id:
         type: integer
         format: int32
-        description: Number of items to retrieve (100 max).
-      count:
+      competition_type_id:
         type: integer
         format: int32
-        description: Total number of items available.
-      history:
-        type: array
-        items:
-          $ref: '#/definitions/Activity'
-  Error:
+    required:
+    - name
+    - description
+    - discipline_id
+    - subdiscipline_id
+    - competition_type_id
+  CategorySERequest:
+    title: Category SERequest
     type: object
     properties:
-      code:
+      team_quantity:
+        type: string
+    required:
+    - team_quantity
+  CreateMatchRequest:
+    title: Match Creation Request
+    type: object
+    properties:
+      number:
         type: integer
-        format: int32
-      message:
+      location:
         type: string
-      fields:
+      home_team_id:
+        type: integer
+      visitor_team_id:
+        type: integer
+      home_team_score:
+        type: integer
+      visitor_team_score:
+        type: integer
+      round_id:
+        type: integer
+      date:
+        type: date
+    required:
+    - home_team_id
+    - visitor_team_id
+    - date
+    - location
+    - round_id
+  CreateGroupRequest:
+    title: Match Creation Request
+    type: object
+    properties:
+      name:
         type: string
+      phase_id:
+        type: integer
+      participant_team:
+        type: integer
+      classified_team:
+        type: integer
+
+    required:
+    - name
+    - phase_id
+

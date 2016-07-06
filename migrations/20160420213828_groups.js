@@ -5,8 +5,8 @@ exports.up = function(knex, Promise) {
 			table.increments('id').primary();
 			table.string('name');
 			table.boolean('active').notNullable().defaultTo(true);
-      table.integer('participant_team');
-      table.integer('classified_team');
+			table.integer('participant_team');
+			table.integer('classified_team');
 			table.integer('phase_id').references('phases.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());

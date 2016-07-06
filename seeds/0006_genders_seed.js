@@ -1,3 +1,6 @@
+
+console.log(__filename.slice(__dirname.length + 1) + ' START')
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -6,12 +9,14 @@ exports.seed = function(knex, Promise) {
     // Inserts seed entries
     knex('genders')
     .insert([
-        {id:1, name:'Masculine',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-league.svg'},
-        {id:2, name:'Femenine',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-cup.svg'},
-        {id:3, name:'Mixed',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-championship.svg'}
+        {name:'Masculine',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-league.svg'},
+        {name:'Femenine',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-cup.svg'},
+        {name:'Mixed',image_url:'https://s3.amazonaws.com/codefuel/media/somosport-vector-icons-championship.svg'}
         ])
     ).then(function(){
 		//Add query
         return knex.raw('');
     });
 };
+
+console.log(__filename.slice(__dirname.length + 1) + ' OK')

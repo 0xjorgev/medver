@@ -77,17 +77,17 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     router.post('/', function (req, res) {
 
         var data = req.body;
+        var Match = Models.match
 
-        new Models.match(data
-        // {
-        //     location: data.location,
-        //     home_team_id: data.home_team_id,
-        //     visitor_team_id: data.visitor_team_id,
-        //     round_id: data.round_id,
-        //     date: data.date
-        // }
-        ).save().then(function(item){
-            console.log(`Match ${item}}`);
+        console.log(data)
+
+        //TODO: grabar en la spider
+
+        new Match(data)
+        // .save(data)
+        // new Models.match(data)
+            .save().then(function(item){
+            console.log(`Match ${item}`);
             Message(res, 'Success', '0', item);
         }).catch(function(error){
             console.log(`{error: ${error}}`);

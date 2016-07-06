@@ -6,8 +6,12 @@ exports.up = function(knex, Promise) {
 			table.string('name');
 			table.string('logo_url');
 			table.string('short_name');
+<<<<<<< HEAD
 			table.string('description');
       // table.boolean('played').notNullable().defaultTo(false);
+=======
+			table.text('description');
+>>>>>>> 1685efb258d34f274d72148b6d9cc59aaa6fab7a
 			//Category_id or Category_type???????
 			table.integer('category_type_id').references('categories_types.id').index();
 			table.integer('organization_id').references('organizations.id').index();

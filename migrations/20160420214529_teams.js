@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
 			table.string('name');
 			table.string('logo_url');
 			table.string('short_name');
-			table.string('description');
+			table.text('description');
 			//Category_id or Category_type???????
 			table.integer('category_type_id').references('categories_types.id').index();
 			table.integer('organization_id').references('organizations.id').index();

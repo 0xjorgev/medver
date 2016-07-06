@@ -150,6 +150,20 @@ paths:
       responses:
         200:
           description: Information about a single player
+  /player/{player_id}/events:
+    get:
+      summary: Gets all player's events
+      description: Gets all player's events
+      parameters:
+        - name: player_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Player
+      responses:
+        200:
+          description: Information about a single player
   /discipline/{discipline_id}/subdiscipline:
     get:
       description:

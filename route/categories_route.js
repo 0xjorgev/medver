@@ -381,6 +381,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 				qb.innerJoin('categories', 'categories.id', 'phases.category_id')
 				qb.where('categories.id', '=', categoryId)
 				qb.where('matches.active', '=', true)
+				qb.where('matches.home_team_id', '=', teamId)
+				qb.orWhere('matches.visitor_team_id', '=', teamId)
 			})
 			.fetchAll({withRelated:['round',
 				'round.group',

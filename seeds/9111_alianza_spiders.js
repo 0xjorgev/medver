@@ -35,26 +35,26 @@ console.log(__filename.slice(__dirname.length + 1) + ' START')
     */
 
     //Grupo A Fase 1
-    knex('categories_groups_phases_teams').insert({team_id:10, category_id:12, group_id:15, phase_id:6}),
-    knex('categories_groups_phases_teams').insert({team_id:11, category_id:12, group_id:15, phase_id:6}),
-    knex('categories_groups_phases_teams').insert({team_id:12, category_id:12, group_id:15, phase_id:6}),
-    knex('categories_groups_phases_teams').insert({team_id:13, category_id:12, group_id:15, phase_id:6}),
+    knex('categories_groups_phases_teams').insert({team_id:10, category_id:4, group_id:4, phase_id:3}),
+    knex('categories_groups_phases_teams').insert({team_id:11, category_id:4, group_id:4, phase_id:3}),
+    knex('categories_groups_phases_teams').insert({team_id:12, category_id:4, group_id:4, phase_id:3}),
+    knex('categories_groups_phases_teams').insert({team_id:13, category_id:4, group_id:4, phase_id:3}),
 
     //Grupo B Fase 1
-    knex('categories_groups_phases_teams').insert({team_id:14, category_id:12, group_id:16, phase_id:6}),
-    knex('categories_groups_phases_teams').insert({team_id:15, category_id:12, group_id:16, phase_id:6}),
-    knex('categories_groups_phases_teams').insert({team_id:16, category_id:12, group_id:16, phase_id:6}),
-    knex('categories_groups_phases_teams').insert({team_id:17, category_id:12, group_id:16, phase_id:6}),
+    knex('categories_groups_phases_teams').insert({team_id:14, category_id:4, group_id:5, phase_id:3}),
+    knex('categories_groups_phases_teams').insert({team_id:15, category_id:4, group_id:5, phase_id:3}),
+    knex('categories_groups_phases_teams').insert({team_id:16, category_id:4, group_id:5, phase_id:3}),
+    knex('categories_groups_phases_teams').insert({team_id:17, category_id:4, group_id:5, phase_id:3}),
 
     //Grupo Semi
-    knex('categories_groups_phases_teams').insert({team_id:10, category_id:12, group_id:17, phase_id:7}),
-    knex('categories_groups_phases_teams').insert({team_id:12, category_id:12, group_id:17, phase_id:7}),
-    knex('categories_groups_phases_teams').insert({team_id:14, category_id:12, group_id:17, phase_id:7}),
-    knex('categories_groups_phases_teams').insert({team_id:15, category_id:12, group_id:17, phase_id:7}),
+    knex('categories_groups_phases_teams').insert({team_id:10, category_id:4, group_id:6, phase_id:4}),
+    knex('categories_groups_phases_teams').insert({team_id:12, category_id:4, group_id:6, phase_id:4}),
+    knex('categories_groups_phases_teams').insert({team_id:14, category_id:4, group_id:6, phase_id:4}),
+    knex('categories_groups_phases_teams').insert({team_id:15, category_id:4, group_id:6, phase_id:4}),
 
     //Grupo Finalista
-    knex('categories_groups_phases_teams').insert({team_id:10, category_id:12, group_id:18, phase_id:8}),
-    knex('categories_groups_phases_teams').insert({team_id:15, category_id:12, group_id:18, phase_id:8})
+    knex('categories_groups_phases_teams').insert({team_id:10, category_id:4, group_id:7, phase_id:5}),
+    knex('categories_groups_phases_teams').insert({team_id:15, category_id:4, group_id:7, phase_id:5})
 
     )
 }

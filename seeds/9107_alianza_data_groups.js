@@ -7,10 +7,10 @@ exports.seed = function(knex, Promise) {
     //==========================================================================
     // Alianza Groups Data
     //==========================================================================
-    knex('groups').insert({id: 15, name: 'Grupo A', phase_id:6}),
-    knex('groups').insert({id: 16, name: 'Grupo B', phase_id:6}),
-    knex('groups').insert({id: 17, name: 'Grupo Semi-final', phase_id:7}),
-    knex('groups').insert({id: 18, name: 'Grupo Final', phase_id:8})
+    knex('groups').insert({name: 'Grupo A', phase_id: 3	}),
+    knex('groups').insert({name: 'Grupo B', phase_id: 3	}),
+    knex('groups').insert({name: 'Grupo Semi-final', phase_id: 4 }),
+    knex('groups').insert({name: 'Grupo Final', phase_id: 5 })
   )
 }
 

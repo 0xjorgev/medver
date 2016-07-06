@@ -7,7 +7,7 @@ exports.seed = function(knex, Promise) {
     //==========================================================================
     // Alianza Category Data
     //==========================================================================
-    knex('categories').insert({id: 12, name:'Atlanta Copa Coca-Cola Girls U-15',gender_id:2, season_id:12, classification_type_id:2, category_type_id:10})
+    knex('categories').insert({name:'Atlanta Copa Coca-Cola Girls U-15',gender_id:2, season_id:2, classification_type_id:2, category_type_id:10})
   )
 }
 

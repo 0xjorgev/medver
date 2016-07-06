@@ -7,7 +7,7 @@ exports.seed = function(knex, Promise) {
     //==========================================================================
     // Alianza Seasons Data
     //==========================================================================
-    knex('seasons').insert({id:12, name:'Atlanta 2016',description:'Altanta 2016, Copa Coca-Cola',game_title:'Coca-Cola Cup',competition_id:10 })
+    knex('seasons').insert({name:'Atlanta 2016',description:'Altanta 2016, Copa Coca-Cola',game_title:'Coca-Cola Cup',competition_id:2 })
   )
 }
 

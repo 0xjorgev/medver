@@ -373,16 +373,29 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		var categoryId = req.params.category_id
 		var teamId = req.params.team_id
-		var sql = 'select * from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where category_id = '+ categoryId +' and (home_team_id = ' + teamId + ' or visitor_team_id =' + teamId + ')'
 
-		return Knex.raw(sql).then(function(matches){
-			// console.log(matches)
-			Message(res, 'Success', '0', matches.rows);
-		})
+		return Models.match.query(function(qb){
+				qb.innerJoin('rounds', 'rounds.id', 'matches.round_id')
+				qb.innerJoin('groups', 'groups.id', 'rounds.group_id')
+				qb.innerJoin('phases', 'phases.id', 'groups.phase_id')
+				qb.innerJoin('categories', 'categories.id', 'phases.category_id')
+				qb.where('categories.id', '=', categoryId)
+				qb.where('matches.active', '=', true)
+			})
+			.fetchAll({withRelated:['round',
+				'round.group',
+				'round.group.phase',
+				'round.group.phase.category',
+				'home_team',
+				'visitor_team']})
+			.then(function(result){
+				Message(res, 'Success', 0, result)
+			}).catch(function(err){
+				console.log(`error: ${err}`);
+				Message(res, err.detail, err.code, null)
+			})
 	})
 
-
 	return router;
-
 
 });

@@ -44,14 +44,19 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         console.log(data)
 
         //TODO: grabar en la spider
+        //TODO: grabar en matches referee
 
-        new Match(data)
-        // .save(data)
-        // new Models.match(data)
-            .save().then(function(item){
-            console.log(`Match ${item}`);
-            Message(res, 'Success', '0', item);
-        }).catch(function(error){
+        new Match(data).save().then(function(match){
+            console.log(`Match ${match}`)
+            Message(res, 'Success', '0', match)
+            return match
+        })
+        .then(function(match){
+            Model.category_group_phase_team({
+
+            })
+        })
+        .catch(function(error){
             console.log(`{error: ${error}}`);
             Message(res, error.detail, error.code, null);
         });

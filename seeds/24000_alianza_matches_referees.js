@@ -1,4 +1,4 @@
-console.log('0024 Matches Referees')
+console.log('24000 Matches Referees')
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -8,4 +8,4 @@ exports.seed = function(knex, Promise) {
 
     )
 };
-console.log('0024 Ok')
+console.log('24000 Ok')

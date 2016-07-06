@@ -279,7 +279,7 @@
   knex('events_matches_players').insert({match_id:24, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }),
   knex('events_matches_players').insert({match_id:24, event_id:9, player_in:null, player_out:null, instant:0, team_id:null  }),
   //GOL
-  knex('events_matches_players').insert({match_id:24, event_id:1, player_in:75, player_out:null, instant:43, team_id:10 }),
+  // knex('events_matches_players').insert({match_id:24, event_id:1, player_in:75, player_out:null, instant:43, team_id:10 }),
 
   //middle
   knex('events_matches_players').insert({match_id:24, event_id:10, player_in:null, player_out:null,instant:45, team_id:null  }),

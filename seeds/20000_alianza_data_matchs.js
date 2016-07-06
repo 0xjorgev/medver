@@ -45,7 +45,7 @@ exports.seed = function(knex, Promise) {
     knex('matches').insert({id:22, location: 'FIELD 3', home_team_id:14, visitor_team_id:15, round_id:16, home_team_score:1, visitor_team_score:4 ,date:'2016-06-12 15:35:56.576272-05:00'}),
     knex('matches').insert({id:23, location: 'FIELD 4', home_team_id:10, visitor_team_id:12, round_id:16, home_team_score:7, visitor_team_score:0 ,date:'2016-06-12 15:35:56.576272-05:00'}),
     //Final
-    knex('matches').insert({id:24, location: 'FIELD 4', home_team_id:15, visitor_team_id:10, round_id:17, home_team_score:0, visitor_team_score:1 ,date:'2016-06-12 17:45:56.576272-05:00'})
+    knex('matches').insert({id:24, location: 'FIELD 4', home_team_id:15, visitor_team_id:10, round_id:17, home_team_score:0, visitor_team_score:0 ,date:'2016-06-12 17:45:56.576272-05:00'})
   )
 }
 console.log('20000 OK')

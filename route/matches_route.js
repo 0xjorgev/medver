@@ -123,7 +123,5 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             Message(res, err.detail, err.code, null);
         })
     });
-
-
     return router;
 });

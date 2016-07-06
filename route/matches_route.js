@@ -43,18 +43,51 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
 
         console.log(data)
 
+        var matchData = {
+            number: data.number,
+            location: data.location,
+            home_team_id: data.home_team_id,
+            visitor_team_id: data.visitor_team_id,
+            home_team_score: data.home_team_score,
+            visitor_team_score: data.visitor_team_score,
+            round_id: data.round_id,
+            date: data.date
+        }
+
+        var groupData = {
+            category_id: match.category_id,
+            phase_id: match.phase_id,
+            group_id: match.group_id
+        }
+
+        var refereeData = {
+            referee_id: 2
+        }
+
         //TODO: grabar en la spider
         //TODO: grabar en matches referee
 
         new Match(data).save().then(function(match){
             console.log(`Match ${match}`)
-            Message(res, 'Success', '0', match)
             return match
         })
         .then(function(match){
+            //spider
             Model.category_group_phase_team({
 
             })
+            return match
+        })
+        .then(function(match){
+            //referee
+            Model.category_group_phase_team({
+
+            })
+            return match
+        })
+        .then(function(match){
+            //finally
+            Message(res, 'Match created', '0', match)
         })
         .catch(function(error){
             console.log(`{error: ${error}}`);

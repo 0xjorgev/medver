@@ -822,6 +822,8 @@ definitions:
         type: integer
       round_id:
         type: integer
+      referee_id:
+        type: integer
       date:
         type: date
     required:

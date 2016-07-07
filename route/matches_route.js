@@ -41,7 +41,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         var data = req.body;
         var Match = Models.match
 
-        console.log(data)
+        console.log('POST /match', data)
 
         var matchData = {
             number: data.number,
@@ -64,9 +64,26 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             referee_id: data.referee_id
         }
 
+        var roundData = {
+            group_id: data.group_id,
+            name: `Round of Group ${data.group_id}`
+        }
+
+        if(data.round_id){
+            roundData.id = data.round_id
+        }
+
+        //para almacenar el match creado
         var _match = undefined
 
-        new Match(matchData).save().then(function(match){
+        //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
+        //en caso de que la ronda exista, solo se hace update
+        new Models.round(roundData).save().then(function(round){
+            console.log('round saved')
+            matchData.round_id = round.attributes.id
+            return new Match(matchData).save()
+        })
+        .then(function(match){
             console.log(`saved match`, match)
             _match = match.attributes
             return match
@@ -82,7 +99,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             return new Models.category_group_phase_team(categoryData).save()
         })
         .then(function(result){
-            console.log('referee savin\'')
+            console.log('saving referee')
             refereeData.match_id = _match.id
             return new Models.match_referee(refereeData).save()
         })

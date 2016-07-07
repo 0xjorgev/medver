@@ -85,6 +85,37 @@ paths:
           required: true
           type: integer
           format: integer
+  /category/{category_id}:
+    get:
+      summary: Gets a category given an id
+      description: Gets a category given an id
+      tags:
+        - Category
+      responses:
+        200:
+          description: A category
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+    delete:
+      summary: Deletes a category and all its related children
+      description: Deletes a category and all its related children
+      tags:
+        - Category
+      responses:
+        200:
+          description: the current standing_table of the category
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
 
   /group/{group_id}/standing_table:
     get:

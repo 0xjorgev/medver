@@ -822,10 +822,16 @@ definitions:
         type: integer
       round_id:
         type: integer
-      referee_id:
-        type: integer
       date:
         type: date
+      category_id:
+        type: integer
+      phase_id:
+        type: integer
+      group_id:
+        type: integer
+      referee_id:
+        type: integer
     required:
     - home_team_id
     - visitor_team_id

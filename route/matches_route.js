@@ -54,46 +54,48 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             date: data.date
         }
 
-        var groupData = {
-            category_id: match.category_id,
-            phase_id: match.phase_id,
-            group_id: match.group_id
+        var categoryData = {
+            category_id: data.category_id,
+            phase_id: data.phase_id,
+            group_id: data.group_id
         }
 
         var refereeData = {
-            referee_id: 2
+            referee_id: data.referee_id
         }
 
-        //TODO: grabar en la spider
-        //TODO: grabar en matches referee
+        var _match = undefined
 
-        new Match(data).save().then(function(match){
-            console.log(`Match ${match}`)
+        new Match(matchData).save().then(function(match){
+            console.log(`saved match`, match)
+            _match = match.attributes
             return match
         })
-        .then(function(match){
-            //spider
-            Model.category_group_phase_team({
-
-            })
-            return match
+        .then(function(result){
+            categoryData.team_id = _match.home_team_id
+            console.log(`saving spider home`, categoryData)
+            return new Models.category_group_phase_team(categoryData).save()
         })
-        .then(function(match){
-            //referee
-            Model.category_group_phase_team({
-
-            })
-            return match
+        .then(function(result){
+            categoryData.team_id = _match.visitor_team_id
+            console.log(`saving spider visitor`, categoryData)
+            return new Models.category_group_phase_team(categoryData).save()
         })
-        .then(function(match){
+        .then(function(result){
+            console.log('referee savin\'')
+            refereeData.match_id = _match.id
+            return new Models.match_referee(refereeData).save()
+        })
+        .then(function(result){
             //finally
-            Message(res, 'Match created', '0', match)
+            _match.referee_id = result.attributes.referee_id
+            Message(res, 'Match created', '0', _match)
         })
         .catch(function(error){
-            console.log(`{error: ${error}}`);
+            console.log(`{error:}`, error);
             Message(res, error.detail, error.code, null);
-        });
-     });
+        })
+     })
 
     //match update
     router.put('/:match_id', function (req, res) {

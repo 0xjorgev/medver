@@ -26,6 +26,15 @@ produces:
 ###################################################
 
 paths:
+  /user:
+    get:
+      summary: Returns the list of active users
+      description: Returns the list of active users
+      tags:
+        - User
+      responses:
+        200:
+          description: Active user list
   /phase/{phase_id}/group_round_match:
     get:
       summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase

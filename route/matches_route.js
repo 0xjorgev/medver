@@ -89,16 +89,6 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             return match
         })
         .then(function(result){
-            categoryData.team_id = _match.home_team_id
-            console.log(`saving spider home`, categoryData)
-            return new Models.category_group_phase_team(categoryData).save()
-        })
-        .then(function(result){
-            categoryData.team_id = _match.visitor_team_id
-            console.log(`saving spider visitor`, categoryData)
-            return new Models.category_group_phase_team(categoryData).save()
-        })
-        .then(function(result){
             console.log('saving referee')
             refereeData.match_id = _match.id
             return new Models.match_referee(refereeData).save()

@@ -160,5 +160,14 @@ define(['express',
     //TODO:
     //Add update Profile
 
+    router.get('/', function(req, res){
+        return Models.user.where({active:true}).fetchAll()
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    })
+
     return router;
 });

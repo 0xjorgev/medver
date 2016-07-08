@@ -166,6 +166,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             }
         }
 
+        teamData.short_name = teamData.short_name ? teamData.short_name : teamData.name.substr(0,2).toUpperCase()
+        teamData.description = teamData.description ? teamData.description : teamData.name
+
         console.log('saving/updating org', orgData)
         //TODO: Aqui se esta haciendo update de la org si existe... no he encontrado la forma de hacer un promise chain condicional
         //dado que se debería hacer el save solo en el caso de que la org no exista.
@@ -179,7 +182,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         })
         .then(function(new_team){
             console.log('saved team:', new_team.attributes)
-            Message(res, 'Success', '0', {})
+            Message(res, 'Success', '0', new_team)
         })
         .catch(function(error){
             console.log('error', error)

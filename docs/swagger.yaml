@@ -135,14 +135,14 @@ paths:
           format: integer
   /team:
     get:
-      summary: Team services
+      summary: Get info of all teams
       description:
         Get info of all teams
       tags:
         - Team
       responses:
         200:
-          description: An array of products
+          description: List of teams
           schema:
             type: array
             items:
@@ -151,6 +151,23 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+    post:
+      description: Creates a team
+      tags:
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateTeamRequest'
+      responses:
+        200:
+          description: team creation OK
+      security: []
   /team/{team_id}:
     get:
       summary: Team services
@@ -890,8 +907,29 @@ definitions:
         type: integer
       classified_team:
         type: integer
-
     required:
     - name
     - phase_id
+
+  CreateTeamRequest:
+    title: Team Creation Request
+    type: object
+    properties:
+      name:
+        type: string
+      logo_url:
+        type: string
+      short_name:
+        type: string
+      description:
+        type: string
+      category_type_id:
+        type: integer
+      organization_id:
+        type: integer
+    required:
+      - name
+      - category_type_id
+
+
 

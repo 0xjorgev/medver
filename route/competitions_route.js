@@ -9,9 +9,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
 
-    console.log('competition Route');
-
-
     router.get('/:comp_id/admin_user/', function(req, res, next){
 
         console.log('Competitions Admins');

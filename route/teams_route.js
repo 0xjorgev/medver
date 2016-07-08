@@ -114,6 +114,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //     });
     // });
 
+
+    //TODO: Esto parece no estar en uso, deberia arrojar error al probar
     router.post('/organization/:org_id/category/:cat_id', function (req, res) {
 
         console.log('Team Create');
@@ -146,6 +148,22 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    router.post('/team', function (req, res) {
+        var Team = Models.team;
+        var team_post = req.body;
+
+        console.log('Team create', team_post);
+
+        // TODO: crear club para este equipo, si no se envía un organization ID
+
+        new Team(team_post).save().then(function(new_team){
+            console.log(`saved team:`, new_team);
+            Message(res, 'Success', '0', new_team);
+        }).catch(function(error){
+            console.log(`{error: ${error}}`);
+            Message(res, error.detail, error.code, null);
+        });
+    });
 
     router.put('/:team_id', function(req, res, next){
 

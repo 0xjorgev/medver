@@ -9,8 +9,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
 
-    console.log('Rounds Route');
-
     //List of rounds
     router.get('/', function (req, res) {
 

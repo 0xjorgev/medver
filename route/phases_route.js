@@ -84,8 +84,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    console.log('Phases Route');
-
     //List of competitions
     router.get('/', function (req, res) {
 

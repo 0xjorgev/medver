@@ -12,7 +12,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //List of Events
     //Event by Subdiscipline_id -> Returns array
     //
-    router.get('/:subdiscipline_id', function (req, res) {
+    router.get('/:subdiscipline_id/event', function (req, res) {
 
         console.log('Events by Subdiscipline');
 

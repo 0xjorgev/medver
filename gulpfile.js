@@ -110,7 +110,7 @@ gulp.task('nodemon', function() {
     ext: 'js html'
     // other config ...
   }).on('restart', function () {
-    console.info('Restarting... ⎈ Yep, your code has been reloaded');
+    console.info('Restarting... ⎈ \n\n\n\n\n');
   }).on('start', () => {
     console.info('Loading ' + environmentType + ' environment on port ' + process.env.PORT);
   }).on('quit', () => {

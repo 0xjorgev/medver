@@ -114,6 +114,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //     });
     // });
 
+
+    //TODO: Esto parece no estar en uso, deberia arrojar error al probar
     router.post('/organization/:org_id/category/:cat_id', function (req, res) {
 
         console.log('Team Create');
@@ -146,6 +148,48 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    router.post('/', function (req, res) {
+        var teamData = req.body
+        console.log('\n\n\n\n\n\nTeam create params\n\n\n', teamData)
+
+        var orgData = {}
+
+        if(teamData.organization_id){
+            orgData.id = teamData.organization_id
+        }
+        else{
+            orgData = {
+                //TODO: reemplazar el id por un code, en lugar del ID directo de base de datos
+                organization_type_id: 3, //organizacion tipo club
+                name: teamData.name + ' Club',
+                description: teamData.description,
+            }
+        }
+
+        teamData.short_name = teamData.short_name ? teamData.short_name : teamData.name.substr(0,2).toUpperCase()
+        teamData.description = teamData.description ? teamData.description : teamData.name
+
+        console.log('saving/updating org', orgData)
+        //TODO: Aqui se esta haciendo update de la org si existe... no he encontrado la forma de hacer un promise chain condicional
+        //dado que se debería hacer el save solo en el caso de que la org no exista.
+        new Models.organization(orgData).save().then(function(result){
+            teamData.organization_id = result.attributes.id
+            console.log('org created/updated', result)
+            return teamData
+        })
+        .then(function(teamData){
+            return new Models.team(teamData).save()
+        })
+        .then(function(new_team){
+            console.log('saved team:', new_team.attributes)
+            Message(res, 'Success', '0', new_team)
+        })
+        .catch(function(error){
+            console.log('error', error)
+            Message(res, error.detail, error.code, null)
+        })
+
+    });
 
     router.put('/:team_id', function(req, res, next){
 

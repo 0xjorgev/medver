@@ -943,6 +943,7 @@ definitions:
         type: integer
       organization_id:
         type: integer
+        description: If not sent, a new 'club' organization will be created under the same name as the team
     required:
       - name
       - category_type_id

@@ -9,8 +9,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
 
-    console.log('Phases Route');
-
     //List of Referees by Match
     router.get('/match/:match_id', function (req, res) {
 

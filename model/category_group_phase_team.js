@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './category', './group', './phase', './team'], function (DB) {
+define(['./base_model', './category', './group', './phase', './team', './round'], function (DB) {
 
     var Category_group_phase_team = DB.Model.extend({
         tableName: 'categories_groups_phases_teams',
@@ -25,6 +25,10 @@ define(['./base_model', './category', './group', './phase', './team'], function 
 
         phase: function(){
             return this.belongsTo('Phase', 'phase_id');
+        },
+
+        round: function(){
+          return this.belongsTo('Round', 'round_id');
         }
 
     });

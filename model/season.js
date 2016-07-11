@@ -12,10 +12,9 @@ define(['./base_model','./competition', './category'], function (DB) {
         hasTimestamps: true,
 
         //relations
-        // competition: function(){
-        //     return this.belongsTo('Competition', 'competition_id');
-        // },
-
+        competition: function(){
+            return this.belongsTo('Competition', 'competition_id');
+        },
         categories: function(){
             return this.hasMany('Category');
         }

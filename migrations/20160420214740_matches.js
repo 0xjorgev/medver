@@ -10,6 +10,7 @@ exports.up = function(knex, Promise) {
 			table.integer('visitor_team_id').references('teams.id').index();
       		table.integer('visitor_team_score');
 			table.integer('round_id').references('rounds.id').index();
+      table.boolean('played').notNullable().defaultTo(false);
 			table.timestamp('date');
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('created_at').defaultTo(knex.fn.now());

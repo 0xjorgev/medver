@@ -289,8 +289,70 @@ console.log(__filename.slice(__dirname.length + 1) + ' START')
   knex('events_matches_players').insert({match_id:21, event_id:9, player_in:null, player_out:null, instant:45, team_id:null  }),
 
   //end match
-  knex('events_matches_players').insert({match_id:21, event_id:10, player_in:null, player_out:null, instant:90, team_id:null  }),
-  knex('events_matches_players').insert({match_id:21, event_id:8, player_in:null, player_out:null, instant:90, team_id:null })
+  knex('events_matches_players').insert({match_id:21, event_id:10, player_in:null, player_out:null, instant:90, team_id:null  })
+// <<<<<<< HEAD:seeds/21000_alianza_events_matches_players.js
+//   knex('events_matches_players').insert({match_id:21, event_id:8, player_in:null, player_out:null, instant:90, team_id:null }),
+//
+//   //======================================================
+//   //  Academia 1 - Archi 4 Segunda Ronda
+//   //======================================================
+//   knex('events_matches_players').insert({match_id:22, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }),
+//   knex('events_matches_players').insert({match_id:22, event_id:9, player_in:null, player_out:null, instant:0, team_id:null  }),
+//   //GOL
+//   knex('events_matches_players').insert({match_id:22, event_id:1, player_in:155, player_out:null, instant:5, team_id:15 }),
+//   knex('events_matches_players').insert({match_id:22, event_id:1, player_in:156, player_out:null, instant:27, team_id:15 }),
+//   knex('events_matches_players').insert({match_id:22, event_id:1, player_in:138, player_out:null, instant:42, team_id:14 }),
+//   //middle
+//   knex('events_matches_players').insert({match_id:22, event_id:10, player_in:null, player_out:null,instant:45, team_id:null  }),
+//   knex('events_matches_players').insert({match_id:22, event_id:9, player_in:null, player_out:null, instant:45, team_id:null  }),
+//
+//   knex('events_matches_players').insert({match_id:22, event_id:1, player_in:157, player_out:null, instant:47, team_id:15 }),
+//   knex('events_matches_players').insert({match_id:22, event_id:1, player_in:156, player_out:null, instant:53, team_id:15 }),
+//
+//   //end match
+//   knex('events_matches_players').insert({match_id:22, event_id:10, player_in:null, player_out:null, instant:90, team_id:null  }),
+//   knex('events_matches_players').insert({match_id:22, event_id:8, player_in:null, player_out:null, instant:90, team_id:null }),
+//
+//   //======================================================
+//   //  Xolas 7 - Eagles 0 Segunda Ronda
+//   //======================================================
+//   knex('events_matches_players').insert({match_id:23, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }),
+//   knex('events_matches_players').insert({match_id:23, event_id:9, player_in:null, player_out:null, instant:0, team_id:null  }),
+//   //GOL
+//   knex('events_matches_players').insert({match_id:23, event_id:1, player_in:75, player_out:null, instant:5, team_id:10 }),
+//   knex('events_matches_players').insert({match_id:23, event_id:1, player_in:73, player_out:null, instant:27, team_id:10 }),
+//   knex('events_matches_players').insert({match_id:23, event_id:1, player_in:74, player_out:null, instant:42, team_id:10 }),
+//   //middle
+//   knex('events_matches_players').insert({match_id:23, event_id:10, player_in:null, player_out:null,instant:45, team_id:null  }),
+//   knex('events_matches_players').insert({match_id:23, event_id:9, player_in:null, player_out:null, instant:45, team_id:null  }),
+//
+//   knex('events_matches_players').insert({match_id:23, event_id:1, player_in:81, player_out:null, instant:47, team_id:10 }),
+//   knex('events_matches_players').insert({match_id:23, event_id:1, player_in:82, player_out:null, instant:53, team_id:10 }),
+//   knex('events_matches_players').insert({match_id:23, event_id:1, player_in:75, player_out:null, instant:79, team_id:10 }),
+//   knex('events_matches_players').insert({match_id:23, event_id:1, player_in:75, player_out:null, instant:88, team_id:10 }),
+//
+//   //end match
+//   knex('events_matches_players').insert({match_id:23, event_id:10, player_in:null, player_out:null, instant:90, team_id:null  }),
+//   knex('events_matches_players').insert({match_id:23, event_id:8, player_in:null, player_out:null, instant:90, team_id:null }),
+//
+//   //======================================================
+//   //  Archi 0 - Cholas 1 Final
+//   //======================================================
+//   knex('events_matches_players').insert({match_id:24, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }),
+//   knex('events_matches_players').insert({match_id:24, event_id:9, player_in:null, player_out:null, instant:0, team_id:null  }),
+//   //GOL
+//   // knex('events_matches_players').insert({match_id:24, event_id:1, player_in:75, player_out:null, instant:43, team_id:10 }),
+//
+//   //middle
+//   knex('events_matches_players').insert({match_id:24, event_id:10, player_in:null, player_out:null,instant:45, team_id:null  }),
+//   knex('events_matches_players').insert({match_id:24, event_id:9, player_in:null, player_out:null, instant:45, team_id:null  }),
+//
+//   //end match
+//   knex('events_matches_players').insert({match_id:24, event_id:10, player_in:null, player_out:null, instant:90, team_id:null  }),
+//   knex('events_matches_players').insert({match_id:24, event_id:8, player_in:null, player_out:null, instant:90, team_id:null })
+// =======
+//   knex('events_matches_players').insert({match_id:21, event_id:8, player_in:null, player_out:null, instant:90, team_id:null })
+// >>>>>>> 1685efb258d34f274d72148b6d9cc59aaa6fab7a:seeds/9110_alianza_events_matches_players.js
 )
 }
 

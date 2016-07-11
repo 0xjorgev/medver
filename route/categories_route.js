@@ -147,24 +147,48 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var category_upd = req.body;
 
 		console.log('--------------------');
-		// console.log("season_id: " + competition_id);
-		// console.log("name: " + name);
-		// console.log("gender_id: " + gender_id);
-		// console.log("inscription_init_at: " + inscription_init_at);
-		// console.log("inscription_ends_at: " + inscription_ends_at);
-		// console.log("minimum_value: " + minimum_value);
-		// console.log("maximum_value: " + maximum_value);
-		// console.log("image_url: " + image_url);
-		console.log('--------------------');
+		console.log("season_id: " + category_upd.season_id);
+
+			name = category_upd.name
+			other_minimum_participant = category_upd.other_minimum_participant
+			other_maximum_participant = category_upd.other_maximum_participant
+			player_minimum_participant = category_upd.player_minimum_participant
+			player_maximum_participant = category_upd.player_maximum_participant
+			coach_minimum_participant = category_upd.coach_minimum_participant
+			coach_maximum_participant = category_upd.coach_maximum_participant
+			team_quantity = category_upd.team_quantity
+			gender_id = category_upd.gender_id
+			season_id = category_upd.season_id
+			category_type_id = category_upd.category_type_id
+			classification_type_id = category_upd.classification_type_id
+			inscription_init_at = category_upd.inscription_init_at
+			inscription_ends_at = category_upd.inscription_ends_at
+			image_url = category_upd.image_url
 
 		Knex(category.tableName)
 		.where('id','=',category_id)
 		.where('active','=',1)
-		.update(category_upd, ['id'])
+		.update({
+			'name' : name,
+			'other_minimum_participant' :  other_minimum_participant,
+			'other_maximum_participant' :  other_maximum_participant,
+			'player_minimum_participant' : player_minimum_participant,
+			'player_maximum_participant' : player_maximum_participant,
+			'coach_minimum_participant' : coach_minimum_participant,
+			'coach_maximum_participant' : coach_maximum_participant,
+			'team_quantity' : team_quantity,
+			'gender_id' : gender_id,
+			'season_id' : season_id,
+			'category_type_id' : category_type_id,
+			'classification_type_id' : classification_type_id,
+			'inscription_init_at' : inscription_init_at,
+			'inscription_ends_at' : inscription_ends_at,
+			'image_url' : image_url }, ['id'])
 		.then(function(result){
 			if (result.length != 0){
 				console.log('result is not null');
 				console.log(`result: ${result[0]}`);
+				console.log(`result: ${result}`);
 				Message(res, 'Success', '0', result);
 			} else {
 				Message(res, 'Category not found', '404', result);

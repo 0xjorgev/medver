@@ -1,20 +1,18 @@
 
 exports.up = function(knex, Promise) {
   return Promise.all([
-		knex.schema.createTable('events', function(table){
+		knex.schema.createTable('matches_teams_players', function(table){
 			table.increments('id').primary();
 			table.boolean('active').notNullable().defaultTo(true);
-			table.string('img_url');
-			table.string('name');
-			table.string('description');
-			table.integer('level');
-			table.integer('increments_by');
-      table.string('code');
-
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
+      table.integer('number');
+      table.string('position');
 			//Relationships
-			table.integer('subdiscipline_id').references('subdisciplines.id').index();
+			table.integer('team_id').references('teams.id').index();
+			table.integer('player_id').references('players.id').index();
+      table.integer('match_id').references('matches.id').index();
+
 		})
 		.then(function(){
 			//Add query
@@ -24,5 +22,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  return Promise.all([ knex.schema.dropTableIfExists('events') ]);
+  return Promise.all([ knex.schema.dropTableIfExists('matches_teams_players') ]);
 };

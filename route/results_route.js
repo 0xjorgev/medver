@@ -29,6 +29,26 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    router.post('/', function (req, res) {
+
+        console.log('Results Create');
+        //Model Instance
+        //{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
+        var Event_match_player        = Models.event_match_player;
+        var match_result  = req.body;
+        var match_id = match_result.match_id;
+        console.log('Values: ', match_id)
+        console.log('log:',Event_match_player)
+        new Event_match_player(match_result).save().then(function(new_team){
+            console.log(`{match_result: ${match_result}}`);
+            Message(res, 'Success', '0', match_result);
+        }).catch(function(error){
+            console.log(`{error: ${error}}`);
+            Message(res, error.detail, error.code, null);
+        });
+    });
+
+
     // //'category', 'organization'
     // router.get('/:org_id/organization/', function (req, res) {
 
@@ -45,34 +65,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //     });
     // });
 
-    // router.post('/organization/:org_id/category/:cat_id', function (req, res) {
-
-    //     console.log('Team Create');
-    //     //Model Instance
-    //     var Team        = Models.team;
-    //     var team_post   = req.body;
-    //     var org_id      = req.params.org_id;
-    //     var cat_id      = req.params.cat_id;
-    //     var logo_url    =  req.params.logo_url;
-    //     var short_name  =  req.params.short_name;
-    //     var description =  req.params.description;
-    //     var name        = group_post.name;
-
-    //     new Team({
-    //         name: name,
-    //         organization_id: org_id,
-    //         category_id: cat_id,
-    //         logo_url: logo_url,
-    //         short_name: short_name,
-    //         description: description
-    //     }).save().then(function(new_team){
-    //         console.log(`{new_team: ${new_team}}`);
-    //         Message(res, 'Success', '0', new_team);
-    //     }).catch(function(error){
-    //         console.log(`{error: ${error}}`);
-    //         Message(res, error.detail, error.code, null);
-    //     });
-    // });
 
 
     // router.put('/:team_id', function(req, res, next){

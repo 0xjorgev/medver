@@ -29,6 +29,9 @@ define(['./base_model', './round', './event_match_player'], function (DB) {
             return this.hasMany('Match_referee');
         }
 
+        // category: function() {
+        //   return this.hasMany('Category_group_phase_team')
+        // }
     });
 
     // uses Registry plugin

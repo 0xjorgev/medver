@@ -635,6 +635,22 @@ paths:
         200:
           description: List of matches given a category and a team
 
+  /subdiscipline/{subdiscipline_id}/event:
+    get:
+      summary: Returns the list of subdiscipline Available Events
+      description: Returns the list of subdiscipline Available Events
+      tags:
+        - Subdiscipline
+      parameters:
+        - name: subdiscipline_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: Active subdiscipline Available Events
+
 #######################################################################
 #      _       __ _       _ _   _
 #     | |     / _(_)     (_) | (_)
@@ -931,6 +947,3 @@ definitions:
     required:
       - name
       - category_type_id
-
-
-

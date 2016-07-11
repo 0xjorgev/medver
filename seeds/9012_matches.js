@@ -12,7 +12,7 @@ exports.seed = function(knex, Promise) {
         home_team_id:1,
         visitor_team_id:2,
         round_id:1,
-        date:'2016-06-01 16:30:56.576272-04:30'}),
+        date:'2016-06-03 16:30:56.576272-04:30'}),
     knex('matches').insert({
         location: 'La Guaira, Vargas, Venezuela',
         home_team_id:3,

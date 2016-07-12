@@ -69,10 +69,6 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         });
     });
 
-
-
-
-//player_team
     //match create
     router.post('/', function (req, res) {
 
@@ -146,31 +142,26 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     router.put('/:match_id', function (req, res) {
 
         var data = req.body;
+        data.id = req.params.match_id
         var Match = Models.match
 
         console.log('PUT /match', data)
 
-        var matchData = {
-            id: data.id,
-            number: data.number,
-            location: data.location,
-            home_team_id: data.home_team_id,
-            visitor_team_id: data.visitor_team_id,
-            home_team_score: data.home_team_score,
-            visitor_team_score: data.visitor_team_score,
-            round_id: data.round_id,
-            date: data.date
-        }
+        var matchData = {}
 
-        var categoryData = {
-            category_id: data.category_id,
-            phase_id: data.phase_id,
-            group_id: data.group_id
-        }
+        if(data.id) matchData.id = data.id
+        if(data.number) matchData.number = data.number
+        if(data.location) matchData.location = data.location
+        if(data.home_team_id) matchData.home_team_id = data.home_team_id
+        if(data.visitor_team_id) matchData.visitor_team_id = data.visitor_team_id
+        if(data.home_team_score) matchData.home_team_score = data.home_team_score
+        if(data.visitor_team_score) matchData.visitor_team_score = data.visitor_team_score
+        if(data.round_id) matchData.round_id = data.round_id
+        if(data.date) matchData.date = data.date
+        if(data.played) matchData.played = data.played
 
-        var refereeData = {
-            referee_id: data.referee_id
-        }
+        var refereeData = {}
+        if(data.referee_id) matchData.referee_id = data.referee_id
 
         var roundData = {
             group_id: data.group_id,

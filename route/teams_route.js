@@ -191,8 +191,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			spiderData.id = data.category_group_phase_team_id
 		}
 
-		console.log('>>>>>>>>>>>>>>>',spiderData)
-
 		var _team = undefined
 
 		//let's lookup the organization by id or by the previously-trimmed name

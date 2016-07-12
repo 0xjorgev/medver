@@ -298,6 +298,48 @@ paths:
         200:
           description: match creation OK
       security: []
+  /match/{match_id}:
+    get:
+      description: Gets one match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: list of all matches
+      security: []
+    put:
+      description: Updates a match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateMatchRequest'
+      responses:
+        200:
+          description: match creation OK
+      security: []
+
   /competition/{competition_id}:
     put:
       description: Competition Update

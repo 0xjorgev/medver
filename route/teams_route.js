@@ -244,6 +244,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	router.put('/:team_id', function(req, res, next){
 		var data = req.body
+		//setting the ID on the object to be saved is the way to signal bookshelf to create or update
 		data.id = req.params.team_id
 		console.log('PUT', data)
 		saveTeam(data, res)

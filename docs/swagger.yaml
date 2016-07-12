@@ -981,6 +981,9 @@ definitions:
       group_id:
           type: integer
           description: send if assigned to a group
+      category_group_phase_team_id:
+          type: integer
+          description: sent on update only, it's the id of the 'category_group_phase_team' table
     required:
       - name
       - category_type_id

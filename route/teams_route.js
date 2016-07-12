@@ -180,11 +180,18 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
 		teamData.description = data.description ? data.description : data.name
 
+		// spider is the 'category_group_phase_team' table
 		var spiderData = {
 			category_id: data.category_id,
 			phase_id: data.phase_id,
 			group_id: data.group_id,
 		}
+
+		if(data.category_group_phase_team_id){
+			spiderData.id = data.category_group_phase_team_id
+		}
+
+		console.log('>>>>>>>>>>>>>>>',spiderData)
 
 		var _team = undefined
 
@@ -196,7 +203,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.then(function(found){
 			//if found, let's put its id on teamData
 			if(found){
-				console.log('org found!', found)
+				console.log('org found!', found.attributes)
 				teamData.organization_id = found.attributes.id
 				return teamData
 			}
@@ -220,12 +227,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			_team = new_team.attributes
 			console.log('team saved', _team)
 			spiderData.team_id = new_team.attributes.id
+			console.log('about to save in spider', spiderData)
 			return new Models.category_group_phase_team(spiderData).save()
 		})
 		.then(function(spiderData){
+			console.log('spider saved', spiderData.attributes)
+
 			//all ok, let's return the created team
-			console.log(spiderData)
-			Message(res, 'Success', '0', _team)
+			var action = data.id ? 'updated' : 'created'
+			Message(res, `Team ${_team.id} ${action}`, '0', _team)
 		})
 		.catch(function(error){
 			// something has happened

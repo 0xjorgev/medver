@@ -248,32 +248,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		data.id = req.params.team_id
 		console.log('PUT', data)
 		saveTeam(data, res)
-
-		// console.log('Team Update');
-		// //Model Instance
-		// var group = new Models.group;
-
-		// //URL Request, Season Id
-		// var team_id = req.params.team_id;
-		// var team_upd = req.body;
-
-		// Knex(group.tableName)
-		// .where('id','=',team_id)
-		// .where('active','=',1)
-		// .update(team_upd, ['id'])
-		// .then(function(result){
-		//     if (result.length != 0){
-		//         console.log('result is not null');
-		//         console.log(`result: ${result[0]}`);
-		//     Message(res, 'Success', '0', result);
-		//     } else {
-		//         Message(res, 'team not found', '404', result);
-		//     }
-		// })
-		// .catch(function(err){
-		//     console.log(`error: ${err}`);
-		//   Message(res, err.detail, err.code, null);
-		// });
 	});
 
 	return router;

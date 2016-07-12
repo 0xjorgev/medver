@@ -28,7 +28,7 @@ define([
     './event_match_player',
     './match_referee',
     './category_type',
-    './category_group_phase_team',
+    './category_group_phase_team', //<- esta es la famosa spider table
     './competition_user',
     './player',
     './rule',

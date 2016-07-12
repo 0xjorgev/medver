@@ -135,9 +135,8 @@ paths:
           format: integer
   /team:
     get:
-      summary: Get info of all teams
-      description:
-        Get info of all teams
+      summary: Gets the info of all teams
+      description: Gets the info of all teams
       tags:
         - Team
       responses:
@@ -152,6 +151,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
+      summary: Creates a team
       description: Creates a team
       tags:
         - Team
@@ -170,9 +170,8 @@ paths:
       security: []
   /team/{team_id}:
     get:
-      summary: Team services
-      description:
-        Get info of all teams
+      summary: Returns the detail of one team
+      description: Returns the detail of one team
       parameters:
         - name: team_id
           in: path
@@ -180,6 +179,35 @@ paths:
           required: true
           type: integer
           format: integer
+      tags:
+        - Team
+      responses:
+        200:
+          description: An array of products
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a team
+      description: Updates a team
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+        - name: team data
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/CreateTeamRequest'
       tags:
         - Team
       responses:
@@ -270,6 +298,48 @@ paths:
         200:
           description: match creation OK
       security: []
+  /match/{match_id}:
+    get:
+      description: Gets one match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: list of all matches
+      security: []
+    put:
+      description: Updates a match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateMatchRequest'
+      responses:
+        200:
+          description: match creation OK
+      security: []
+
   /competition/{competition_id}:
     put:
       description: Competition Update
@@ -944,6 +1014,18 @@ definitions:
       organization_id:
         type: integer
         description: If not sent, a new 'club' organization will be created under the same name as the team
+      category_id:
+          type: integer
+          description: send if assigned to a category
+      phase_id:
+          type: integer
+          description: send if assigned to a phase
+      group_id:
+          type: integer
+          description: send if assigned to a group
+      category_group_phase_team_id:
+          type: integer
+          description: sent on update only, it's the id of the 'category_group_phase_team' table
     required:
       - name
       - category_type_id

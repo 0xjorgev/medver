@@ -230,9 +230,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.catch(function(error){
 			// something has happened
 			console.log('error', error)
-			console.log('error 1', error.code)
-			console.log('error 2', error.detail)
-			console.log('error 3', error[0])
+
+			//TODO: no todo el tiempo se envia el detail... manejar el error en este tipo de casos
 			Message(res, `${error.error} - detail: ${error.detail}`, error.code, error)
 		})
 	}

@@ -29,6 +29,7 @@ exports.seed = function(knex, Promise) {
     knex('categories').insert({name:'Koopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:1}),
     knex('categories').insert({name:'Yoshis', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2}),
     knex('categories').insert({name:'Kuppa Troopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2})
+    // knex('categories').insert({name:'Atlanta Copa Coca-Cola Girls U-15',gender_id:2, season_id:2, classification_type_id:2, category_type_id:10})
   )
 };
 

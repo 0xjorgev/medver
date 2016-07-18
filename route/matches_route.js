@@ -161,7 +161,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         if(data.played) matchData.played = data.played
 
         var refereeData = {}
-        if(data.referee_id) matchData.referee_id = data.referee_id
+        if(data.referee_id) refereeData.referee_id = data.referee_id
 
         var roundData = {
             group_id: data.group_id,

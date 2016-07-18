@@ -223,6 +223,26 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /team/{team_id}/player:
+    get:
+      summary: Gets the team's roster of players
+      description: Gets the team's roster of players
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Team
+        - Player
+      responses:
+        200:
+          description: An array of players
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     post:
       summary: Creates a player and inserts it in the team roster
       description: Creates a player and inserts it in the team roster
@@ -233,32 +253,49 @@ paths:
           required: true
           type: integer
           format: integer
-        - name: team data
+        - name: player and team data
           in: body
           required: true
           x-is-map: false
           schema:
-            $ref: '#/definitions/CreateTeamRequest'
-        - name: player data
-          in: body
-          required: true
-          x-is-map: false
-          schema:
-            $ref: '#/definitions/CreateTeamRequest'
+            $ref: '#/definitions/PlayerTeamRequest'
       tags:
         - Team
         - Player
       responses:
         200:
-          description: An array of products
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
+          description:
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+    put:
+      summary: Updates a player and inserts it in the team roster
+      description: Updates a player and inserts it in the team roster
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+        - name: player and team data
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/PlayerTeamRequest'
+      tags:
+        - Team
+        - Player
+      responses:
+        200:
+          description:
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /player/{player_id}:
     get:
       summary: Gets player's info
@@ -1087,3 +1124,13 @@ definitions:
     required:
       - name
       - category_type_id
+
+    #TODO: cargar este ejemplo
+    PlayerTeamRequest:
+      title: PlayerTeam Request
+      type: object
+      properties:
+        player:
+          $ref: '#/definitions/CreateTeamRequest'
+        team:
+          $ref: '#/definitions/CreateGroupRequest'

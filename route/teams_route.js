@@ -258,5 +258,69 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		saveTeam(data, res)
 	});
 
+
+	//==========================================================================
+	// players_teams relations ... AKA team roster
+	//
+	// {
+	//     "team_id":"1",
+	//     "team_player":{
+	//         "id":1,
+	//         "active":true,
+	//         "number":1,
+	//         "position":"P",
+	//         "player_id":1,
+	//         "team_id":1
+	//     },
+	//     "player":
+	//         {
+	//         "id":1,
+	//         "first_name":"José Pablo",
+	//         "last_name":"Pérez Fernández",
+	//         "img_url":null,
+	//         "portrait_url":null,
+	//         "nickname":"PEPE",
+	//         "birthday":"2007-05-28T04:00:00.000Z",
+	//         "email":"PErezFernandez@somos.com",
+	//         "gender_id":1
+	//     }
+	// }
+	//
+	//==========================================================================
+
+	var savePlayerTeam = (playerTeamData, res) => {
+		var playerData = playerTeamData.player
+		var teamData = playerTeamData.team
+
+		//TODO: check player existance
+
+		//version 1 -> insert into team roster without checking existance
+		new Models.player(playerData).save().then((result) => {
+			console.log('player saved', result)
+			return new Models.player_team(teamData).save()
+		}).then((result) => {
+			Message(res, 'Success', '0', {})
+		}).catch(function(error){
+			console.log('error', error);
+			Message(res, error.detail, error.code, null);
+		})
+	}
+
+	// Saves into players_teams, the roster of this team
+	router.post('/:team_id/player', function(req, res){
+		var data = req.body
+		data.id = req.params.team_id
+		console.log('POST team - team_id', data.id, 'data', data )
+		savePlayerTeam(data, res)
+	})
+
+	// updates players_teams, the roster of this team
+	router.put('/:team_id/player', function(req, res){
+		var data = req.body
+		data.id = req.params.team_id
+		console.log('PUT team - team_id', data.id, 'data', data )
+		savePlayerTeam(data, res)
+	})
+
 	return router;
 });

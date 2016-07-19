@@ -14,6 +14,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('Get all Seasons');
         return Models.season
         .query(function(qb){})
+        .where({active:true})
         .fetchAll({debug:true, withRelated: ['categories']})
         .then(function (result) {
             Message(res,'Success', '0', result);

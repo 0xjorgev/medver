@@ -5,10 +5,10 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
+define(['express', '../model/index', '../util/request_message_util', '../util/knex_util','../util/email_sender_util'], function (express, Models, Message, Knex, Email) {
 
     var router = express.Router();
-
+    var send_email_from = Email(process.env.SENDER_EMAIL);
     router.get('/:comp_id/admin_user/', function(req, res, next){
 
         console.log('Competitions Admins');
@@ -256,45 +256,45 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    //Competition Update
-    router.put('/:competition_id/', function(req, res){
+    // //Competition Update
+    // router.put('/:competition_id/', function(req, res){
 
-        console.log('Competition Update');
+    //     console.log('Competition Update');
 
-        //Model Instance
-        var competition = Models.competition;
-        var competition_id = req.params.competition_id;
-        var competition_upd = req.body;
-        console.log('------------------------------');
-        console.log('Competition Update');
-        console.log('name: ', competition_upd.name);
-        console.log('description: ', competition_upd.description);
-        console.log('discipline_id: ', competition_upd.discipline_id);
-        console.log('subdiscipline_id: ', competition_upd.subdiscipline_id);
-        console.log('competition_type_id: ', competition_upd.competition_type_id);
-        console.log('is_published: ', competition_upd.is_published);
-        console.log('------------------------------');
+    //     //Model Instance
+    //     var competition = Models.competition;
+    //     var competition_id = req.params.competition_id;
+    //     var competition_upd = req.body;
+    //     console.log('------------------------------');
+    //     console.log('Competition Update');
+    //     console.log('name: ', competition_upd.name);
+    //     console.log('description: ', competition_upd.description);
+    //     console.log('discipline_id: ', competition_upd.discipline_id);
+    //     console.log('subdiscipline_id: ', competition_upd.subdiscipline_id);
+    //     console.log('competition_type_id: ', competition_upd.competition_type_id);
+    //     console.log('is_published: ', competition_upd.is_published);
+    //     console.log('------------------------------');
 
-        // Knex(competition.tableName)
-        Knex('competitions')
-        .where('id','=',competition_id)
-        .where('active','=',1)
-        .update(competition_upd, ['id'])
-        .then(function(result){
-            if (result.length != 0){
-                console.log('result is not null');
-                console.log(`result: ${result[0]}`);
-                Message(res, 'Success', '0', result);
-            } else {
-                console.log(`{error: ${error}}`);
-                Message(res, 'Username or email not found', '404', result);
-            }
-        })
-        .catch(function(err){
-            console.log(`error: ${err}`);
-          Message(res, err.detail, err.code, null);
-        });
-    });
+    //     // Knex(competition.tableName)
+    //     Knex('competitions')
+    //     .where('id','=',competition_id)
+    //     .where('active','=',1)
+    //     .update(competition_upd, ['id'])
+    //     .then(function(result){
+    //         if (result.length != 0){
+    //             console.log('result is not null');
+    //             console.log(`result: ${result[0]}`);
+    //             Message(res, 'Success', '0', result);
+    //         } else {
+    //             console.log(`{error: ${error}}`);
+    //             Message(res, 'Username or email not found', '404', result);
+    //         }
+    //     })
+    //     .catch(function(err){
+    //         console.log(`error: ${err}`);
+    //       Message(res, err.detail, err.code, null);
+    //     });
+    // });
 
     router.post('/:comp_id/admin_user/', function(req, res, next){
 
@@ -354,6 +354,66 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
     //---------------------------------------------------------------
+
+    //Competition Publish
+    router.put('/:competition_id/', function(req, res)
+    {
+        console.log('Competition Publish')
+
+        //Model Instance
+        var competition = Models.competition
+        var competition_id = req.params.competition_id
+        var competition_upd = req.body
+        var upd_published = false
+        console.log('------------------------------')
+        console.log('Competition Update')
+        console.log('name: ', competition_upd.name)
+        console.log('description: ', competition_upd.description)
+        console.log('discipline_id: ', competition_upd.discipline_id)
+        console.log('subdiscipline_id: ', competition_upd.subdiscipline_id)
+        console.log('competition_type_id: ', competition_upd.competition_type_id)
+        console.log('is_published: ', competition_upd.is_published)
+        console.log('------------------------------')
+        // Knex(competition.tableName)
+        Models.competition
+        .where({'id':competition_id})
+        .fetch()
+        .then(function (result) {
+            console.log('Competition old is_published ' + competition_upd.is_published)
+            console.log('Competition new is_published ' + result.attributes.is_published)
+            if(competition_upd.is_published != result.attributes.is_published)
+                upd_published = true
+
+            // Knex(competition.tableName)
+            Knex('competitions')
+            .where('id','=',competition_id)
+            .where('active','=',1)
+            .update(competition_upd, ['id'])
+            .then(function(result){
+                if (result.length != 0){
+
+                    console.log('upd_published ', upd_published)
+                    if(upd_published)
+                    {
+                        var fullUrl = req.protocol + '://' + req.get('host') + '/' + competition_id;
+                        console.log('Envio de email de actualizacion de la competition ' + fullUrl) 
+                        send_email_from('franciscodlb@somosport.com', 'Competition is published is change!', `Competition is published is change to ` +  competition_upd.is_published + '\n' + 
+                                        'Puede ver su portal en ' + fullUrl)
+                    }
+                    Message(res, 'Success', '0', result)
+                } else {
+                    console.log(`{error: ${error}}`)
+                    Message(res, 'Username or email not found', '404', result)
+                }
+            })
+            .catch(function(err){
+                console.log(`error: ${err}`)
+              Message(res, err.detail, err.code, null);
+            });
+        })
+        
+    });
+
 
     return router;
 });

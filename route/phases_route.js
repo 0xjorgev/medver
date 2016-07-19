@@ -75,7 +75,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .where({active:true})
         .fetchAll({withRelated: ['rounds.matches.home_team', 'rounds.matches.visitor_team']})
         .then(function (result) {
-            console.log("Res :", result);
+            // console.log("Res :", result);
             //console.log("Res Map:", result.models.map(groupMap));
             Message(res,'Success', '0', result);
         }).catch(function(error){

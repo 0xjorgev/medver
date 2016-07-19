@@ -24,33 +24,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		});
 	});
 
-	//Team by Id -> Returns  [] result
-	// router.get('/:team_id/player', function (req, res) {
-	//
-	// console.log('Team Players by team_id');
-	//     var team_id = req.params.team_id;
-	//
-	//     return Models.player_team
-	//     .where({team_id:team_id})
-	//     .where({active:true})
-	//     .fetchAll({withRelated: ['player'], debug: true})
-	//     .then(function (result) {
-	//         Message(res,'Success', '0', result);
-	//     }).catch(function(error){
-	//         Message(res,error.details, error.code, []);
-	//     });
-	//
-	//     // return Models.team
-	//     // .where({id:team_id})
-	//     // .where({active:true})
-	//     // .fetch({withRelated: ['category']})
-	//     // .then(function (result) {
-	//     //     Message(res,'Success', '0', result);
-	//     // }).catch(function(error){
-	//     //     Message(res,error.details, error.code, []);
-	//     // });
-	// });
-
 	router.get('/:team_id/player', function (req, res) {
 		console.log('Team Players by team_id');
 		var team_id = req.params.team_id;
@@ -58,7 +31,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		return Models.player_team
 		.where({team_id:team_id})
 		.where({active:true})
-		.fetchAll({withRelated: ['player'], debug: true})
+		.fetchAll({withRelated: ['player'], debug: false})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){
@@ -295,14 +268,18 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		//TODO: check player existance
 
 		//version 1 -> insert into team roster without checking existance
+
+		var _playerResult = undefined
+
 		new Models.player(playerData).save().then((result) => {
 			console.log('player saved', result)
+			_playerResult = result
 			return new Models.player_team(teamData).save()
 		}).then((result) => {
-			Message(res, 'Success', '0', {})
+			Message(res, 'Success', '0', {player: _playerResult, player_team: result})
 		}).catch(function(error){
 			console.log('error', error);
-			Message(res, error.detail, error.code, null);
+			Message(res, error.detail, error.code, error);
 		})
 	}
 
@@ -310,16 +287,45 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	router.post('/:team_id/player', function(req, res){
 		var data = req.body
 		data.id = req.params.team_id
+
+		//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
+
 		console.log('POST team - team_id', data.id, 'data', data )
 		savePlayerTeam(data, res)
 	})
 
 	// updates players_teams, the roster of this team
-	router.put('/:team_id/player', function(req, res){
+	router.put('/:team_id/player/:player_id', function(req, res){
 		var data = req.body
 		data.id = req.params.team_id
 		console.log('PUT team - team_id', data.id, 'data', data )
 		savePlayerTeam(data, res)
+	})
+
+	//inactivates the player from the roster
+	router.delete('/:team_id/player/:player_id', function(req, res){
+
+		var PlayerTeam = new Models.player_team()
+		var playerId = req.params.player_id
+		var teamId = req.params.team_id
+
+		console.log('DELETE team - team_id', req.params )
+
+		var _found = undefined
+
+		PlayerTeam.where({team_id: teamId, player_id: playerId}).fetch().then((result) => {
+			console.log('player found', result.attributes)
+			return new Models.player_team({id: result.attributes.id}).save()
+		})
+		.then((result) => {
+			console.log('player updated', result.attributes)
+			Message(res, 'Success', '0', result)
+		})
+		.catch(function(error){
+			console.log('error', error);
+			console.log('error', error.stack);
+			Message(res, error.detail, error.code, error);
+		})
 	})
 
 	return router;

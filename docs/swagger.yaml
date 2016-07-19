@@ -440,6 +440,82 @@ paths:
           description: match creation OK
       security: []
 
+  /match/{match_id}/player:
+    get:
+      summary: Returns the player list for this match, grouped by home_team & visitor_team
+      description: Returns the player list for this match, grouped by home_team & visitor_team
+      tags:
+        - Match
+        - Player
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: list of players available for this match
+
+  /match/{match_id}/team/{team_id}/player:
+    get:
+      summary: Gets the player list for this team & match
+      description: Gets the player list for this team & match
+      tags:
+        - Match
+        - Player
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        description: Team ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: List of players assigned to this match & team
+    put:
+      summary: Toggles the participation of the given player in this match
+      description: Toggles the participation of the given player in this match
+      tags:
+        - Match
+        - Player
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        description: Team ID
+        required: true
+        type: integer
+        format: integer
+      - name: player_data
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/MatchPlayerTeamRequest'
+      responses:
+        200:
+          description: Correct update of match player list
+
   /competition/{competition_id}:
     put:
       description: Competition Update
@@ -1116,6 +1192,20 @@ definitions:
     required:
     - name
     - phase_id
+
+  MatchPlayerTeamRequest:
+    title: Match Creation Request
+    type: object
+    properties:
+      position:
+        type: string
+      number:
+        type: integer
+      player_id:
+        type: integer
+    required:
+    - player_id
+
 
   CreateTeamRequest:
     title: Team Creation Request

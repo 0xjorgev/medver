@@ -42,30 +42,19 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		//Team by Id -> Returns 1 result
 	router.get('/:team_id', function (req, res) {
 
-		console.log('Team by id');
-
 		var team_id = req.params.team_id;
 
+		console.log('GET Team', team_id);
+
 		return Models.team
-		.where({id:team_id})
-		.where({active:true})
-		//.fetchAll({withRelated: ['category_type'], debug: true})
-		.fetch({withRelated: ['category_type', 'organization', 'player_team.player'], debug: true})
+		.where({id:team_id, active:true})
+		.fetch({withRelated: ['category_type', 'organization', 'player_team.player'], debug: false})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){
 			Message(res,error.details, error.code, []);
 		});
 
-		// return Models.team
-		// .where({id:team_id})
-		// .where({active:true})
-		// .fetch({withRelated: ['category']})
-		// .then(function (result) {
-		//     Message(res,'Success', '0', result);
-		// }).catch(function(error){
-		//     Message(res,error.details, error.code, []);
-		// });
 	});
 
 	// //'category', 'organization'
@@ -263,7 +252,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	var savePlayerTeam = (playerTeamData, res) => {
 		var playerData = playerTeamData.player
-		var teamData = playerTeamData.team
+		var teamData = playerTeamData.team_player
 
 		//TODO: check player existance
 
@@ -272,25 +261,26 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var _playerResult = undefined
 
 		new Models.player(playerData).save().then((result) => {
-			console.log('player saved', result)
+			console.log('player saved', result.attributes)
 			_playerResult = result
+			teamData.player_id = result.attributes.id
 			return new Models.player_team(teamData).save()
 		}).then((result) => {
 			Message(res, 'Success', '0', {player: _playerResult, player_team: result})
 		}).catch(function(error){
-			console.log('error', error);
-			Message(res, error.detail, error.code, error);
+			console.log('error', error)
+			console.log('error', error.stack)
+			res.status(500);
+			res.json({message: error.name, code: 500, data: error.detail});
 		})
 	}
 
 	// Saves into players_teams, the roster of this team
 	router.post('/:team_id/player', function(req, res){
 		var data = req.body
-		data.id = req.params.team_id
 
 		//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
-
-		console.log('POST team - team_id', data.id, 'data', data )
+		console.log('POST team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
 	})
 
@@ -298,7 +288,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	router.put('/:team_id/player/:player_id', function(req, res){
 		var data = req.body
 		data.id = req.params.team_id
-		console.log('PUT team - team_id', data.id, 'data', data )
+		console.log('PUT team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
 	})
 

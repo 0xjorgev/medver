@@ -36,24 +36,20 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     });
 
     //=========================================================================
-    // WIP
-    // Pending now ...
-    // Create new tables matches_players_teams
+    // Returns the player list for a given match
     //=========================================================================
     router.get('/:match_id/player', function (req, res) {
-
         var match_id = req.params.match_id;
         // tapping into Knex query builder to modify query being run
         return Models.match
-        .where({'id':match_id})
-        .fetch({withRelated: ['home_team.player_team.player', 'visitor_team.player_team.player']})
+        .where({'id': match_id})
+        .fetch({withRelated: ['home_team.match_player_team.player', 'visitor_team.match_player_team.player']})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
             Message(res,error.details, error.code, []);
         });
     });
-
 
     router.get('/:match_id/team', function (req, res) {
 
@@ -67,6 +63,55 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         }).catch(function(error){
             Message(res,error.details, error.code, []);
         });
+    });
+
+
+    //==========================================================================
+    // gets the player list for a given match & team
+    //==========================================================================
+
+    router.get('/:match_id/team/:team_id/player', function (req, res) {
+
+        var data = {
+            match_id: req.params.match_id,
+            team_id: req.params.team_id,
+            player_id: req.params.player_id
+        }
+
+        console.log('GET /:match_id/team/:team_id/player', data)
+
+        return Models.match_team_player
+            .where({match_id: data.match_id, team_id: data.team_id})
+            .fetchAll()
+            .then(function (result) {
+                Message(res,'Success', '0', result);
+            }).catch(function(error){
+                Message(res,error.details, error.code, [])
+        })
+    });
+
+    //==========================================================================
+    // updates the player list for a given match & team
+    //==========================================================================
+
+    router.put('/:match_id/team/:team_id/player', function (req, res) {
+
+        var data = {
+            match_id: req.params.match_id,
+            team_id: req.params.team_id,
+            player_id: req.body.player_id,
+            position: req.body.position,
+            number: req.body.number
+        }
+
+        console.log('PUT /:match_id/team/:team_id/player/', req.params, req.body, data)
+
+        return new Models.match_team_player(data).save()
+            .then(function (result) {
+                Message(res,'Success', '0', result);
+            }).catch(function(error){
+                Message(res,error.details, error.code, [])
+        })
     });
 
     //match create

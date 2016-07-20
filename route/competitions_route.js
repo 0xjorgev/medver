@@ -9,6 +9,19 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
+
+    var userMap = function(user){
+        //console.log('Inner User :', user)
+        return user.attributes.email
+    }
+
+    var userReduce = function(acum, email)
+    {
+        console.log("Email: ", email)
+        console.log("Acum: ", acum)
+        return acum += ", " + email
+    }
+
     router.get('/:comp_id/admin_user/', function(req, res, next){
 
         console.log('Competitions Admins');
@@ -357,7 +370,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
     //---------------------------------------------------------------
 
-    //Competition Publish
+    //Competition Update
     router.put('/:competition_id/', function(req, res)
     {
         console.log('Competition Publish')
@@ -376,31 +389,47 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         console.log('competition_type_id: ', competition_upd.competition_type_id)
         console.log('is_published: ', competition_upd.is_published)
         console.log('------------------------------')
-        // Knex(competition.tableName)
+        // Obtengo los datos de la competition antes de actualizar
         Models.competition
         .where({'id':competition_id})
         .fetch()
-        .then(function (result) {
-            console.log('Competition old is_published ' + competition_upd.is_published)
-            console.log('Competition new is_published ' + result.attributes.is_published)
-            if(competition_upd.is_published != result.attributes.is_published)
-                upd_published = true
+        .then(function (result)
+        {
+            var new_is_published = competition_upd.is_published
+            var old_is_published = result.attributes.is_published
 
-            // Knex(competition.tableName)
+            // Se hace el update de la competition
             Knex('competitions')
             .where('id','=',competition_id)
             .where('active','=',1)
             .update(competition_upd, ['id'])
             .then(function(result){
-                if (result.length != 0){
-
-                    console.log('upd_published ', upd_published)
-                    if(upd_published)
+                if (result.length != 0)
+                {
+                    // Se verifica si se modifico el estado de la competition como publicada
+                    if(new_is_published != old_is_published)
                     {
-                        var fullUrl = req.protocol + '://' + req.get('host') + '/' + competition_id;
+                        var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id
                         console.log('Envio de email de actualizacion de la competition ' + fullUrl)
-                        send_email_from('franciscodlb@somosport.com', 'Competition is published is change!', `Competition is published is change to ` +  competition_upd.is_published + '\n' +
+
+                        //////// Codigo provisional hasta que se envie el usuario por el token
+                        Models.user
+                        .where('active',true)
+                        .fetchAll().then(function (result) {
+                            //console.log('Result:', result)
+                            var us = result.map(userMap)
+                            // console.log('Users email:', us.reduce(userReduce))
+                            for (var i = us.length - 1; i >= 0; i--) {
+                                send_email_from(us[i], 'Competition is published has changed!', 'Competition is published has changed to ' +  competition_upd.is_published + '\n' +
                                         'Puede ver su portal en ' + fullUrl)
+                            }
+
+                        }).catch(function(err){
+                            console.log(`Error: ${err}`);
+                        });
+
+                        // send_email_from('franciscodlb@somosport.com', 'Competition is published is change!', `Competition is published is change to ` +  competition_upd.is_published + '\n' +
+                        //                 'Puede ver su portal en ' + fullUrl)
                     }
                     Message(res, 'Success', '0', result)
                 } else {
@@ -415,7 +444,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         })
 
     });
-
 
     return router;
 });

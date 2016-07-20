@@ -7,5 +7,6 @@
 	"DB_SSL": false,
 	"SENDGRID_USERNAME":"app46243864@heroku.com",
 	"SENDGRID_PASSWORD":"h8167juz0757",
-	"SENDER_EMAIL":"info@somosport.com"
+	"SENDER_EMAIL":"info@somosport.com",
+	"COMPETITION_PORTAL_URL":"http://ss-competition-portal-dev.herokuapp.com"
 }

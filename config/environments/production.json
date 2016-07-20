@@ -3,5 +3,8 @@
 	"DB_USER":"postgres",
 	"DB_PASSWORD":"postgres",
 	"DB_NAME":"somosport_core",
-	"DB_HOST":"127.0.0.1"
+	"DB_HOST":"127.0.0.1",
+	"SENDGRID_USERNAME":"app46243864@heroku.com",
+	"SENDGRID_PASSWORD":"h8167juz0757",
+	"SENDER_EMAIL":"info@somosport.com"
 }

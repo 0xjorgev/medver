@@ -36,9 +36,11 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .query(function(qb){})
         .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']})
         .then(function (result) {
-            console.log('result :', result);
+            // console.log('result :', result);
             Message(res,'Success', '0', result);
         }).catch(function(error){
+            console.log(error)
+            console.log(error.stack)
             Message(res,error.details, error.code, []);
         });
     });
@@ -396,8 +398,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                     if(upd_published)
                     {
                         var fullUrl = req.protocol + '://' + req.get('host') + '/' + competition_id;
-                        console.log('Envio de email de actualizacion de la competition ' + fullUrl) 
-                        send_email_from('franciscodlb@somosport.com', 'Competition is published is change!', `Competition is published is change to ` +  competition_upd.is_published + '\n' + 
+                        console.log('Envio de email de actualizacion de la competition ' + fullUrl)
+                        send_email_from('franciscodlb@somosport.com', 'Competition is published is change!', `Competition is published is change to ` +  competition_upd.is_published + '\n' +
                                         'Puede ver su portal en ' + fullUrl)
                     }
                     Message(res, 'Success', '0', result)
@@ -411,7 +413,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
               Message(res, err.detail, err.code, null);
             });
         })
-        
+
     });
 
 

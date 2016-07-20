@@ -8,7 +8,7 @@ exports.up = function(knex, Promise) {
 			table.string('img_url');
 			table.string('portrait_url');
 			table.string('nickname');
-			table.date('birthday');
+			table.string('birthday');
 			table.integer('status_id').notNullable().defaultTo(1);
 			table.string('email');
 			table.boolean('active').notNullable().defaultTo(true);

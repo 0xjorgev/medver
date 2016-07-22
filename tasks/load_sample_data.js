@@ -4,13 +4,11 @@ var _ = require('lodash')
 var Knex = require('knex')
 var Config = require('../knexfile.js')
 var Models = require('../model/index.js')
-var knex = new Knex(process.env.NODE_ENV || Config.development);
-
+var knex = new Knex(process.env.NODE_ENV ? Config[process.env.NODE_ENV] : Config['development']);
 
 var _log = (obj) => console.log(inspect(obj, { colors: true, depth: Infinity }))
 
-
-_log(Config)
+// _log(Config)
 
 //read file
 const data = xlsx.parse(`${__dirname}/SabanaCompTestV1.xlsx`)

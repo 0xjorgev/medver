@@ -409,8 +409,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                     {
                         var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id
                         console.log('Envio de email de actualizacion de la competition ' + fullUrl) 
-
-                        //////// Codigo provisional hasta que se envie el usuario por el token
+                        
                         Models.user
                         .where('active',true)
                         .fetchAll().then(function (result) {
@@ -426,11 +425,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                             console.log(`Error: ${err}`);
                         });
 
-                        
-                        ///////////////////////
-                        
-                        // send_email_from('franciscodlb@somosport.com', 'Competition is published is change!', `Competition is published is change to ` +  competition_upd.is_published + '\n' + 
-                        //                 'Puede ver su portal en ' + fullUrl)
                     }
                     Message(res, 'Success', '0', result)
                 } else {

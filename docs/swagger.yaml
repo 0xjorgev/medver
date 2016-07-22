@@ -884,6 +884,7 @@ paths:
       summary: Returns the matches of a given team, under a category
       tags:
         - Category
+        - Team
       produces:
       - application/json
       parameters:

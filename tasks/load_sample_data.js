@@ -42,7 +42,7 @@ var result = data.forEach((sheet) => {
 				//datos de la tabla player
  				first_name: player[0].trim(),
  				last_name: player[1].trim(),
- 				img_url: player[3] == 'M' ? `https://s3.amazonaws.com/somosport-s3/male-players/Boy-${getRandomNumber(1,68)}.png` : `https://s3.amazonaws.com/somosport-s3/male-players/girl-${getRandomNumber(1,10)}.png`,
+ 				img_url: player[3] == 'M' ? `https://s3.amazonaws.com/somosport-s3/male-players/Boy-${getRandomNumber(1,68)}.png` : `https://s3.amazonaws.com/somosport-s3/female-players/girl-${getRandomNumber(1,10)}.png`,
  				portrait_url: '',
  				nickname: player[6].trim(),
  				birthday: parseExcelDate(player[5]),

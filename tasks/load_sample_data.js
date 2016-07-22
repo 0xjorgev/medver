@@ -4,7 +4,7 @@ var _ = require('lodash')
 var Knex = require('knex')
 var Config = require('../knexfile.js')
 var Models = require('../model/index.js')
-var knex = new Knex(Config.development);
+var knex = new Knex(process.env.NODE_ENV || Config.development);
 
 var _log = (obj) => console.log(inspect(obj, { colors: true, depth: Infinity }))
 

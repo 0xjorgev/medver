@@ -143,15 +143,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		teamData.description = data.description ? data.description : data.name
 
 		// spider is the 'category_group_phase_team' table
-		var spiderData = {
-			category_id: data.category_id,
-			phase_id: data.phase_id,
-			group_id: data.group_id,
-		}
+		// var spiderData = {
+		// 	category_id: data.category_id,
+		// 	phase_id: data.phase_id,
+		// 	group_id: data.group_id,
+		// }
 
-		if(data.category_group_phase_team_id){
-			spiderData.id = data.category_group_phase_team_id
-		}
+		// if(data.category_group_phase_team_id){
+		// 	spiderData.id = data.category_group_phase_team_id
+		// }
 
 		var _team = undefined
 
@@ -179,24 +179,25 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		})
 		.then(function(teamData){
 			//with the organization stuff all sorted out, let's create the team
-			console.log('before saving team', teamData.attributes)
-			return new Models.team(teamData).save()
+			console.log('before saving team', teamData)
+			new Models.team(teamData).save()
+			Message(res, 'Success', '0', teamData);
 		})
-		.then(function(new_team){
-			//now let's associate the newly created team with the category
-			_team = new_team.attributes
-			console.log('team saved', _team)
-			spiderData.team_id = new_team.attributes.id
-			console.log('about to save in spider', spiderData)
-			return new Models.category_group_phase_team(spiderData).save()
-		})
-		.then(function(spiderData){
-			console.log('spider saved', spiderData.attributes)
+		// .then(function(new_team){
+		// 	//now let's associate the newly created team with the category
+		// 	_team = new_team.attributes
+		// 	console.log('team saved', _team)
+		// 	spiderData.team_id = new_team.attributes.id
+		// 	console.log('about to save in spider', spiderData)
+		// 	return new Models.category_group_phase_team(spiderData).save()
+		// })
+		// .then(function(spiderData){
+		// 	console.log('spider saved', spiderData.attributes)
 
-			//all ok, let's return the created team
-			var action = data.id ? 'updated' : 'created'
-			Message(res, `Team ${_team.id} ${action}`, '0', _team)
-		})
+		// 	//all ok, let's return the created team
+		// 	var action = data.id ? 'updated' : 'created'
+		// 	Message(res, `Team ${_team.id} ${action}`, '0', _team)
+		// })
 		.catch(function(error){
 			// something has happened
 			console.log('error', error)

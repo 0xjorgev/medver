@@ -11,6 +11,11 @@ var _log = (obj) => console.log(inspect(obj, { colors: true, depth: Infinity }))
 //read file
 const data = xlsx.parse(`${__dirname}/SabanaCompTestV1.xlsx`)
 
+var getRandomNumber = (min, max) => {
+	var tmp = Math.floor(Math.random() * (max - min + 1)) + min
+	return tmp < 10 ? '0'+tmp : tmp
+}
+
 //process file
 
 //list teams
@@ -38,7 +43,7 @@ var result = data.forEach((sheet) => {
 				//datos de la tabla player
  				first_name: player[0].trim(),
  				last_name: player[1].trim(),
- 				img_url: player[3] == 'M' ? 'https://s3.amazonaws.com/somosport-s3/male-players/Boy-01.png' : 'https://s3.amazonaws.com/somosport-s3/male-players/girl-01.png',
+ 				img_url: player[3] == 'M' ? `https://s3.amazonaws.com/somosport-s3/male-players/Boy-${getRandomNumber(1,68)}.png` : `https://s3.amazonaws.com/somosport-s3/male-players/girl-${getRandomNumber(1,10)}.png`,
  				portrait_url: '',
  				nickname: player[6].trim(),
  				birthday: parseExcelDate(player[5]),
@@ -50,7 +55,7 @@ var result = data.forEach((sheet) => {
 		}
 	})
 })
-
+console.log('file read')
 // _log(playerInsert)
 // write to db
 var teamList = undefined
@@ -60,11 +65,10 @@ knex.transaction((tr) => {
 	return Promise.all(teams.map( (t) => knex('teams').insert(t, ['id', 'name']).transacting(tr) ))
 })
 .then((result, tr) => {
+	console.log('saved teams')
 	teamList = _.flatten(result)
-
 	// save players
 	return Promise.all(playerInsert.map( (player) => {
-
 		//el player que sera salvado
 		var p = _.clone(player)
 		delete p.number
@@ -73,9 +77,7 @@ knex.transaction((tr) => {
 
 		return knex('players').insert(p, 'id').transacting(tr).then((result) => {
 			thisTeam = teamList.filter((pt) => pt.name == player.team)
-
-			_log(result)
-
+			// _log(result)
 			playerTeam.push({
 				team_id: thisTeam[0].id,
 				player_id: result[0],
@@ -86,16 +88,19 @@ knex.transaction((tr) => {
 	}))
 })
 .then( (result, tr) => {
+	console.log('saved players')
 	//player_team
 	return Promise.all(playerTeam.map( (t) => knex('players_teams').insert(t, ['id']).transacting(tr) ))
 })
 .then((result) => {
+	console.log('saved players_teams')
 	// _log(result)
-	console.log('all done!!')
+	console.log('all done!! 🤘')
+	//profit!
+	process.exit(0)
 })
 .catch((error, tr) => {
 	console.log(error)
+	process.exit(1)
 })
 
-
-//profit!

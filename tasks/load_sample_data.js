@@ -20,9 +20,8 @@ var getRandomNumber = (min, max) => {
 
 //list teams
 var teams = data.map( (item) => {
-	return {name: item.name}
+	return {name: item.name, short_name: 'T' + getRandomNumber(1,99)}
 } )
-// _log(teams)
 
 var parseExcelDate = (dateNumber) => new Date((new Date(1900,0,1)).getTime() + 86400000*(dateNumber - 2))
 

@@ -106,6 +106,7 @@ gulp.task('nodemon', function() {
 
   nodemon({
     exec: 'node --debug',
+    // script: 'tasks/load_sample_data.js',
     script: 'app.js',
     ext: 'js html'
     // other config ...

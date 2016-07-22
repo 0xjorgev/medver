@@ -9,7 +9,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
-   
+
     var userMap = function(user){
         //console.log('Inner User :', user)
         return user.attributes.email
@@ -19,7 +19,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     {
         console.log("Email: ", email)
         console.log("Acum: ", acum)
-        return acum += ", " + email 
+        return acum += ", " + email
     }
 
     router.get('/:comp_id/admin_user/', function(req, res, next){
@@ -49,9 +49,11 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .query(function(qb){})
         .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']})
         .then(function (result) {
-            console.log('result :', result);
+            // console.log('result :', result);
             Message(res,'Success', '0', result);
         }).catch(function(error){
+            console.log(error)
+            console.log(error.stack)
             Message(res,error.details, error.code, []);
         });
     });
@@ -391,7 +393,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         Models.competition
         .where({'id':competition_id})
         .fetch()
-        .then(function (result) 
+        .then(function (result)
         {
             var new_is_published = competition_upd.is_published
             var old_is_published = result.attributes.is_published
@@ -409,7 +411,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                     {
                         var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id
                         console.log('Envio de email de actualizacion de la competition ' + fullUrl) 
-                        
+                    
                         Models.user
                         .where('active',true)
                         .fetchAll().then(function (result) {
@@ -417,14 +419,13 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                             var us = result.map(userMap)
                             // console.log('Users email:', us.reduce(userReduce))
                             for (var i = us.length - 1; i >= 0; i--) {
-                                send_email_from(us[i], 'Competition is published has changed!', 'Competition is published has changed to ' +  competition_upd.is_published + '\n' + 
+                                send_email_from(us[i], 'Competition is published has changed!', 'Competition is published has changed to ' +  competition_upd.is_published + '\n' +
                                         'Puede ver su portal en ' + fullUrl)
                             }
-                            
+
                         }).catch(function(err){
                             console.log(`Error: ${err}`);
                         });
-
                     }
                     Message(res, 'Success', '0', result)
                 } else {
@@ -437,7 +438,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
               Message(res, err.detail, err.code, null);
             });
         })
-        
+
     });
 
     return router;

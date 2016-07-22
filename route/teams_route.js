@@ -13,7 +13,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		return Models.team
 		.query(function(qb){})
 		.where({active:true})
-		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug:true})
+		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug:false})
 		//.fetchAll({withRelated: ['gender', 'season']})
 		.then(function (result) {
 			console.log('result: ' + result);

@@ -97,15 +97,15 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     router.put('/:match_id/team/:team_id/player', function (req, res) {
 
         var data = {}
-        if(req.body.id !== undefined) data.id = req.body.id
-        if(req.params.match_id !== undefined) data.match_id = req.params.match_id
-        if(req.params.team_id !== undefined) data.team_id = req.params.team_id
-        if(req.body.player_id !== undefined) data.player_id = req.body.player_id
-        if(req.body.position !== undefined) data.position = req.body.position
-        if(req.body.number !== undefined) data.number = req.body.number
-        if(req.body.active !== undefined) data.active = req.body.active
+        if(req.body.id != undefined) data.id = req.body.id
+        if(req.params.match_id != undefined) data.match_id = req.params.match_id
+        if(req.params.team_id != undefined) data.team_id = req.params.team_id
+        if(req.body.player_id != undefined) data.player_id = req.body.player_id
+        if(req.body.position != undefined) data.position = req.body.position
+        if(req.body.number != undefined) data.number = req.body.number
+        if(req.body.active != undefined) data.active = req.body.active
 
-        console.log('PUT /:match_id/team/:team_id/player/', req.params, req.body, data)
+        console.log('PUT /:match_id/team/:team_id/player/', data)
 
         return new Models.match_team_player(data).save()
             .then(function (result) {

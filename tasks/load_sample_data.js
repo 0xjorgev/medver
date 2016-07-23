@@ -21,8 +21,14 @@ var getRandomNumber = (min, max) => {
 //process file
 
 //list teams
-var teams = data.map( (item) => {
-	return {name: item.name, short_name: 'T' + getRandomNumber(1,99)}
+var teams = data.map( (item, i) => {
+	var tmp = i + 7
+	tmp = tmp < 10 ? '0' + tmp : tmp
+	return {
+		name: item.name,
+		short_name: 'T' + getRandomNumber(1,99),
+		logo_url: `https://s3.amazonaws.com/codefuel/media/${tmp}.png`
+	}
 } )
 
 var parseExcelDate = (dateNumber) => new Date((new Date(1900,0,1)).getTime() + 86400000*(dateNumber - 2))

@@ -1,4 +1,4 @@
-console.log('0028 Matches Teams Players')
+
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
@@ -39,4 +39,4 @@ exports.seed = function(knex, Promise) {
      knex('matches_teams_players').insert({player_id:32, match_id:21, team_id:10, position:'', number:14})
     )
 };
-console.log('0028 Ok')
+

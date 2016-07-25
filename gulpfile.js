@@ -1,6 +1,6 @@
 var gulp = require('gulp');
-server = require( 'gulp-develop-server' );
-livereload = require( 'gulp-livereload' );
+var server = require( 'gulp-develop-server' );
+var livereload = require( 'gulp-livereload' );
 var jshint = require('gulp-jshint');
 var git = require('gulp-git');
 var prompt = require('gulp-prompt');

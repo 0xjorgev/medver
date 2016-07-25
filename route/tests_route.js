@@ -179,5 +179,39 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
+    //----------------------------------
+    // Match update
+    // Temporary
+    //----------------------------------
+
+    router.put('/match/:match_id', function (req, res) {
+
+        var match_id = req.params.match_id;
+        var updt = req.body;
+        console.log('>>>>>>>>>>>>>>>>>>>>>>>', match_id);
+        console.log('>>>>>>>>>>>>>>>>>>>>>>>', req.body);
+        Knex('matches')
+        .where('id','=',match_id)
+        .update(updt, ['id'])
+        .then(function(result){
+          console.log('Success', result);
+          Message(res, 'Success', '0', result);
+        })
+        .catch(function(err){
+          console.log('inside catch');
+          res.code = err.code;
+          res.json({message:err.detail, code: err.code, data: {} });
+        });
+
+          // .where('id','=',match_id)
+          // .update(updt, ['id'])
+          // .then(function(result){
+          //   Message(res, 'Success', '0', result);
+          // })
+          // .catch(function(error){
+          //   res.json({message:error.detail, code: error.code, data: {} });
+          // });
+      });
+
     return router;
 });

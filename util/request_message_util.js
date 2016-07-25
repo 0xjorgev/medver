@@ -16,7 +16,7 @@ define(['express'], function (express) {
 		if ( (array && obj.length > 0) || (isUndefined && !isEmpty)  ) {
 			//200 Ok
 			// console.log('Success Response');
-        	res.json({message:mess,code: code, data:obj});
+        	res.json({message:mess, code: code, data:obj});
 		} else {
 			//empty array??
 			// console.log('Failure');

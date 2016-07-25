@@ -52,7 +52,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		return Models.category_group_phase_team
 		.where({category_id:category_id})
-		.where({active:true})
+		// .where({active:true})
 		.fetchAll({withRelated:['team']})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
@@ -387,8 +387,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         }
     });
 
-
-
 	//==========================================================================
 	// Given a category and a team, returns the list of matches
 	//==========================================================================
@@ -421,6 +419,52 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 				Message(res, err.detail, err.code, null)
 			})
 	})
+
+	//==========================================================================
+	// Create a category group phase team
+	//==========================================================================
+	router.post('/:category_id/team/:team_id/invite', function(req, res){
+		var data = req.body
+		console.log('POST', data)
+		saveCategory_group_phase_team(data, res)
+	})
+
+	//==========================================================================
+	// Update a category group phase team
+	//==========================================================================
+	router.put('/:category_id/team/:team_id/invite/:id', function(req, res){
+		var data = req.body
+		console.log('PUT', data)
+		saveCategory_group_phase_team(data, res)
+	})
+	//==========================================================================
+	// Save Category Group Phase Team
+	//==========================================================================
+	var saveCategory_group_phase_team = function(data, res){
+
+		var spiderData = {
+			category_id: data.category_id,
+			team_id: data.team_id,
+			phase_id: data.phase_id,
+			group_id: data.group_id,
+			active: data.active
+		}
+		if(data.id){
+			console.log("data id: ", data.id)
+			spiderData.id = data.id
+		}
+
+		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation)
+		{
+			console.log(`{new_invitation: ${new_invitation}}`);
+			Message(res, 'Success', '0', new_invitation);
+		}).catch(function(error){
+			console.log(`{error: ${error}`);
+			console.log(` ------ error: ${error.detail}`);
+			Message(res, error.detail, error.code, null);
+		});
+	}
+
 
 	return router;
 

@@ -26,11 +26,13 @@ exports.seed = function(knex, Promise) {
 
     */
 
-    knex('categories').insert({name:'Koopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:1}),
-    knex('categories').insert({name:'Yoshis', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2}),
-    knex('categories').insert({name:'Kuppa Troopas', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2})
+    knex('categories').insert({inscription_init_at: '03/01/2016', inscription_ends_at: '04/01/2016', is_published: true, name:'Junior', gender_id:1, season_id:1, classification_type_id:1, category_type_id:1}),
+    knex('categories').insert({inscription_init_at: '03/01/2016', inscription_ends_at: '04/01/2016', is_published: true, name:'Open', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2}),
+    knex('categories').insert({inscription_init_at: '03/01/2016', inscription_ends_at: '04/01/2016', is_published: true, name:'Master', gender_id:1, season_id:1, classification_type_id:1, category_type_id:2})
     // knex('categories').insert({name:'Atlanta Copa Coca-Cola Girls U-15',gender_id:2, season_id:2, classification_type_id:2, category_type_id:10})
   )
 };
 
 console.log(__filename.slice(__dirname.length + 1) + ' OK')
+
+

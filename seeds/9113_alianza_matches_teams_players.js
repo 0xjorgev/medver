@@ -2,7 +2,7 @@
 exports.seed = function(knex, Promise) {
   return Promise.join(
     // Deletes ALL existing entries
-    knex('matches_teams_players').del(),
+    // knex('matches_teams_players').del(),
     // Archies
      knex('matches_teams_players').insert({player_id:1, match_id:21, team_id:15, position:'',number:5}),
      knex('matches_teams_players').insert({player_id:2, match_id:21, team_id:15, position:'',number:14}),

@@ -410,8 +410,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                     if(new_is_published != old_is_published)
                     {
                         var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id
-                        console.log('Envio de email de actualizacion de la competition ' + fullUrl) 
-                    
+                        console.log('Envio de email de actualizacion de la competition ' + fullUrl)
+
                         Models.user
                         .where('active',true)
                         .fetchAll().then(function (result) {
@@ -419,8 +419,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                             var us = result.map(userMap)
                             // console.log('Users email:', us.reduce(userReduce))
                             for (var i = us.length - 1; i >= 0; i--) {
-                                send_email_from(us[i], 'Competition is published has changed!', 'Competition is published has changed to ' +  competition_upd.is_published + '\n' +
-                                        'Puede ver su portal en ' + fullUrl)
+                                send_email_from(us[i], 'Your competition has been published!',
+                                    'Your new competition portal is now live!\n' +
+                                        'Check it out at ' + fullUrl)
                             }
 
                         }).catch(function(err){

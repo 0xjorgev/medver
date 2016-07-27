@@ -516,6 +516,26 @@ paths:
         200:
           description: Correct update of match player list
 
+  /match/{match_id}/team:
+    get:
+      summary: (???)
+      description: (???)
+      tags:
+        - Match
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: (???)
+
   /competition/{competition_id}:
     put:
       description: Competition Update

@@ -129,7 +129,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		//     maximun_value: maximum_value
 		// }
 		).save().then(function(new_category){
-			console.log(`{new_category: ${new_category}}`);
+			console.log('new_category: ',new_category);
 			Message(res, 'Success', '0', new_category);
 		}).catch(function(error){
 			console.log(`{error: ${error}`);
@@ -150,6 +150,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		console.log("season_id: " + category_upd.season_id);
 
 			name = category_upd.name
+
+			participant_minimum = category_upd.participant_minimum 
+			participant_maximum = category_upd.participant_maximum
 			other_minimum_participant = category_upd.other_minimum_participant
 			other_maximum_participant = category_upd.other_maximum_participant
 			player_minimum_participant = category_upd.player_minimum_participant
@@ -170,6 +173,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.where('active','=',1)
 		.update({
 			'name' : name,
+			'participant_minimum' : participant_minimum,
+			'participant_maximum' : participant_maximum,
 			'other_minimum_participant' :  other_minimum_participant,
 			'other_maximum_participant' :  other_maximum_participant,
 			'player_minimum_participant' : player_minimum_participant,

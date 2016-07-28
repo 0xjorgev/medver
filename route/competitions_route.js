@@ -410,8 +410,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                     if(new_is_published != old_is_published)
                     {
                         var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id
-                        console.log('Envio de email de actualizacion de la competition ' + fullUrl) 
-                    
+                        console.log('Envio de email de actualizacion de la competition ' + fullUrl)
+
                         Models.user
                         .where('active',true)
                         .fetchAll().then(function (result) {
@@ -419,8 +419,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                             var us = result.map(userMap)
                             // console.log('Users email:', us.reduce(userReduce))
                             for (var i = us.length - 1; i >= 0; i--) {
-                                send_email_from(us[i], 'Competition is published has changed!', 'Competition is published has changed to ' +  competition_upd.is_published + '\n' +
-                                        'Puede ver su portal en ' + fullUrl)
+                                send_email_from(us[i], 'Your competition has been published!',
+                                    'Your new competition portal is now live!\n' +
+                                        'Check it out at ' + fullUrl)
                             }
 
                         }).catch(function(err){
@@ -438,7 +439,74 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
               Message(res, err.detail, err.code, null);
             });
         })
+    });
 
+    //Publish a competition
+    router.put('/:competition_id/season/:season_id/category/:category_id/publish', function(req, res)
+    {
+        console.log('Competition Publish')
+
+        //Model Instance
+        var competition_id = req.params.competition_id
+        var season_id = req.params.season_id
+        var category_id = req.params.category_id
+        var competition_upd = {
+            "is_published":req.body.is_published
+        }
+        var category_upd = {
+            "is_published":req.body.is_published
+        }
+        console.log('------------------------------')
+        console.log('Publish a category of a competition')
+        console.log('competition_id: ', competition_id)
+        console.log('season_id: ', season_id)
+        console.log('category_id: ', category_id)
+        console.log('Competition is_published: ', competition_upd.is_published)
+        console.log('Category is_published: ', category_upd.is_published)
+
+        console.log('------------------------------')
+        // Obtengo los datos de la competition antes de actualizar
+        Knex('competitions')
+        .where({'id':competition_id})
+        .update(competition_upd, ['id'])
+        .then(function(result)
+        {
+            Knex('categories')
+            .where({'id':category_id})
+            .update(category_upd, ['id'])
+            .then(function(result)
+            {
+                if (result.length != 0)
+                {
+                    var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id + '/season/' + season_id + 
+                                    '/category/' + category_id  + '/home'
+                    console.log('Envio de email de actualizacion de la competition ' + fullUrl)
+                    Models.user
+                    .where('active',true)
+                    .fetchAll().then(function (result) {
+                        //console.log('Result:', result)
+                        var us = result.map(userMap)
+                        // console.log('Users email:', us.reduce(userReduce))
+                        for (var i = us.length - 1; i >= 0; i--) {
+                            send_email_from(us[i], 'Your competition has been published!',
+                                'Your new competition portal is now live!\n' +
+                                    'Check it out at ' + fullUrl)
+                        }
+
+                        
+                    })
+                }
+                Message(res, 'Success', '0', result)
+
+            }).catch(function(err){
+                    console.log(`error: ${err}`)
+                  Message(res, err.detail, err.code, null);
+            });
+
+        }).catch(function(err){
+            console.log(`error: ${err}`)
+            Message(res, err.detail, err.code, null);
+        });
     });
 
     return router;

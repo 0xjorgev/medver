@@ -2,9 +2,11 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util','../util/knex_util'], function (express, Models, Message, Knex) {
+define(['express', '../model/index', '../util/request_message_util','../util/knex_util', 'util'], function (express, Models, Message, Knex, util) {
 
     var router = express.Router();
+
+    inspect = util.inspect
 
     //matches index
     router.get('/', function (req, res) {
@@ -57,9 +59,16 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         // tapping into Knex query builder to modify query being run
         return Models.match
         .where({'id':match_id})
-        .fetch({withRelated: ['home_team.match_player_team.player.gender', 'visitor_team.match_player_team.player.gender', 'round.group.phase.category.category', 'round.group.phase.category.season.competition'], debug:true})
+        .fetch({withRelated: ['home_team.match_player_team.player.gender', 'visitor_team.match_player_team.player.gender', 'round.group.phase.category.category', 'round.group.phase.category.season.competition'], debug: false})
         .then(function (result) {
+
+            // console.log(result.attributes)
+
+            // console.log(result)
+            // console.log(inspect(result, { colors: true, depth: Infinity }))
+
             Message(res,'Success', '0', result);
+
         }).catch(function(error){
             Message(res,error.details, error.code, []);
         });

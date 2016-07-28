@@ -3,11 +3,16 @@ if(process.env.NODE_ENV == 'production'){
   require('newrelic');
 }
 
-  var express = require('express');
-  var app = express();
-  var bodyParser = require('body-parser');
-  var morgan = require('morgan');
-  var my_knex = require('./model/util')
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
+var nJwt = require('nJwt')
+
+//logging lib, reaaaaally useful
+var inspect = require('util').inspect
+//log helper function
+var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
 //==========================================================================
 // swagger stuff
@@ -58,7 +63,6 @@ if(process.env.NODE_ENV == 'production'){
   // // Set and display the application URL
   // var applicationUrl = 'http://' + domain + ':' + port;
   // console.log('snapJob API running on ' + applicationUrl);
-
 
   // swagger.configure(applicationUrl, '1.0.0');
 
@@ -149,6 +153,22 @@ if(process.env.NODE_ENV == 'production'){
 
 	//app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+  var validateToken = function (req, res, next) {
+    console.log(' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ')
+
+    var token = req.headers.token
+    var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
+
+    var verifiedJwt = nJwt.verify(token, secretKey)
+
+    req.currentApiUserId = verifiedJwt.body.user_id
+
+    console.log(' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ')
+    next()
+  }
+
+  app.use(validateToken)
 
   //Non Token Route
   app.use(api_prefix+'user', user_ws);

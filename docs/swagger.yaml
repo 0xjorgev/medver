@@ -23,6 +23,8 @@ produces:
 # /\__/ /  __/ |   \ V /| | (_|  __/\__ \
 # \____/ \___|_|    \_/ |_|\___\___||___/
 #
+# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NvbW9zcG9ydHBvY2Rldi5oZXJva3VhcHAuY29tLyIsInN1YiI6InVzZXJzLzEiLCJzY29wZSI6ImFkbWlucyIsImp0aSI6ImFkYzI5Y2FkLTdlMTItNGFhMS1iNGRhLWYzYzJjNTc0ZWI5NyIsImlhdCI6MTQ2OTcxNTMxOCwiZXhwIjoxNDY5NzE4OTE4fQ.h_Bo-R5NrlZG4oyFaTtkx7UDMrKzPM7cuTB4skbPt-I
+# e10adc3949ba59abbe56e057f20f883e
 ###################################################
 
 paths:
@@ -32,6 +34,27 @@ paths:
       description: Returns the list of active users
       tags:
         - User
+      parameters:
+        - name: token
+          in: header
+          type: string
+          required: true
+      responses:
+        200:
+          description: Active user list
+  /user/login:
+    post:
+      summary: Returns the list of active users
+      description: Returns the list of active users
+      tags:
+        - User
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/UserLogin'
       responses:
         200:
           description: Active user list
@@ -1260,6 +1283,15 @@ definitions:
     required:
       - name
       - category_type_id
+
+  UserLogin:
+    title: User login info
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
 
     #TODO: cargar este ejemplo
     PlayerTeamRequest:

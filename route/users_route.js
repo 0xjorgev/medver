@@ -6,16 +6,16 @@ if (typeof define !== 'function') {
 }
 
 define(['express',
-        // 'uuid',
-        // 'nJwt',
+        'uuid',
+        'nJwt',
         '../model/index',
         '../util/password_gen_util',
         '../util/knex_util',
         '../util/request_message_util',
         '../util/email_sender_util',
         '../util/md5_gen_util' ],
-        // function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
-            function (express, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
+        function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
+            // function (express, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -24,58 +24,53 @@ define(['express',
 
     router.post('/login', function (req, res, next) {
 
-        // tapping into Knex query builder to modify query being run
         var user_login = req.body;
         var username = user_login.username;
         var password = user_login.password;
-        // console.log('req.body: ', req.body);
-        console.log(`Request values: ${username}, ${password}`);
-        // res.send(`user_values: ${username} ${password}`);
-        return Models.user
-        .where(function(){ this.where('username',username).orWhere('email',username) })
-        .where('password',password)
-        .where('active',true)
-        .fetch().then(function (result) {
-             if (result !== null){
 
-                // var userid = result.id;
+        console.log(`Request values`, user_login);
 
-                // var claims = {
-                //     iss: "https://somosportpocdev.herokuapp.com/",  // The URL of your service
-                //     sub: `users/${userid}`,    // The UID of the user in your system
-                //     scope: "admins" //Provided by the DB
-                // }
+        return Models.user.query((qb) => {
+            qb.where('username', username)
+            qb.orWhere('email', username)
+            qb.where('password',password)
+            qb.where('active',true)
+        })
+        .fetch().then((result) => {
 
-                // var usr = new Models.user;
-                //  usr = result;
-                // console.log('usr: ', usr.id);
-                console.log('Result:', result.id );
-                // console.log('UserId: '+ result.id);
-                // var userid = result[0].id;
+            if (result !== null){
+                var userId = result.id
+                var claims = {
+                    // iss: "https://ss-core-dev.herokuapp.com/",  // The URL of your service
+                    // sub: `users/${userid}`,    // The UID of the user in your system
+                    // scope: "admins", //Provided by the DB
+                    user: userId,
+                    roles: ['admin']
+                }
 
+                // console.log('claims:', claims)
+                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+                var jwt = nJwt.create(claims, signingKey)
 
-                // console.log('claims:', claims);
-                // var jwt = nJwt.create(claims,signingKey)
-                // console.log('Token:', jwt);
-                // console.log('Token Compact:', jwt.compact());
-                Message(res,'Success', '0', result);
-                // res.json(result);
-            } else {
+                //TODO: does not expire, for now
+                jwt.setExpiration()
+
+                result.attributes.token = jwt.compact()
+
+                Message(res,'Success', '0', result)
+            }
+            else{
                 Message(res,'Wrong user/password combination', '404', result);
-            //     console.log('user not found');
-
-            //     // res.json({'error':'wrong user/password combination'});
-             }
-        }).catch(function(err){
-            console.log(`Error: ${err}`);
+            }
+    })
+    .catch((err) => {
+            console.log(`Error`, error)
+            console.log(error.stack)
             Message(res,err.detail, err.code, null);
-            // res.json({'error':err});
         });
     });
 
-    //TODO: Add translation to errors!
     router.post('/register', function(req, res, next){
-
         var new_user = req.body;
         var username = new_user.username;
         var password = new_user.password;
@@ -161,6 +156,9 @@ define(['express',
     //Add update Profile
 
     router.get('/', function(req, res){
+
+        console.log('currentApiUser >>', req.currentApiUserId)
+
         return Models.user.where({active:true}).fetchAll()
         .then(function (result) {
             Message(res,'Success', '0', result);

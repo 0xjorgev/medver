@@ -40,12 +40,15 @@ define(['express',
 
             if (result !== null){
                 var userId = result.id
+
                 var claims = {
                     // iss: "https://ss-core-dev.herokuapp.com/",  // The URL of your service
                     // sub: `users/${userid}`,    // The UID of the user in your system
                     // scope: "admins", //Provided by the DB
                     user: userId,
-                    roles: ['admin']
+                    roles: ['admin'],
+                    permissions: ['list-all'],
+                    lang: 'en'
                 }
 
                 // console.log('claims:', claims)
@@ -157,14 +160,17 @@ define(['express',
 
     router.get('/', function(req, res){
 
-        console.log('currentApiUser >>', req.currentApiUserId)
+        console.log('currentApiUser >>', req._currentUser )
 
-        return Models.user.where({active:true}).fetchAll()
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
+        return Models.user
+            .where({active:true})
+            .fetchAll()
+            .then(function (result) {
+                // Message(res,'Success', '0', result);
+                res.status(200).json({ message: 'test', code: '0', data: result});
+            }).catch(function(error){
+                Message(res,error.details, error.code, []);
+            });
     })
 
     return router;

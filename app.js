@@ -8,6 +8,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var nJwt = require('nJwt')
+var Message = require('./util/request_message_util')
 
 //logging lib, reaaaaally useful
 var inspect = require('util').inspect
@@ -155,17 +156,29 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
   var validateToken = function (req, res, next) {
-    console.log(' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ')
 
     var token = req.headers.token
     var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
 
-    var verifiedJwt = nJwt.verify(token, secretKey)
+    try{
+      var verifiedJwt = nJwt.verify(token, secretKey)
 
-    req.currentApiUserId = verifiedJwt.body.user_id
+      //si se entrega un token válido, se inyectan los datos del usuario al request
+      //estos valores se obtienen al hacer login
+      req._currentUser = {
+        id: verifiedJwt.body.user,
+        roles: verifiedJwt.body.roles,
+        permissions: verifiedJwt.body.permissions,
+        lang: verifiedJwt.body.lang
+      }
 
-    console.log(' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ')
-    next()
+      next()
+    }
+    catch(error){
+      console.log('invalid token received')
+      _log(error)
+      Message(res, error.userMessage, 403, null)
+    }
   }
 
   app.use(validateToken)

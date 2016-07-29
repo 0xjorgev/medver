@@ -6,23 +6,41 @@ if (typeof define !== 'function') {
 }
 
 define(['express'], function (express) {
+
 	var message =  function(res, mess, code, obj){
 
 		var array = Array.isArray(obj)
 		var isUndefined = (typeof obj != 'undefined')
 		var isEmpty = (obj === null)
 
-		// console.log(`isArray: ${array} isUndefined: ${isUndefined} isEmpty: ${isEmpty}`);
-		if ( (array && obj.length > 0) || (isUndefined && !isEmpty)  ) {
-			//200 Ok
-			// console.log('Success Response');
-        	res.json({message:mess, code: code, data:obj});
-		} else {
-			//empty array??
-			// console.log('Failure');
-			res.status(404);
-			res.json({message:'Resource not found',code: 404, data:obj});
+		// // console.log(`isArray: ${array} isUndefined: ${isUndefined} isEmpty: ${isEmpty}`);
+		// if ( (array && obj.length > 0) || (isUndefined && !isEmpty)  ) {
+		// 	//200 Ok
+		// 	// console.log('Success Response');
+  		//res.json({message:mess, code: code, data:obj});
+		// } else {
+		// 	//empty array??
+		// 	// console.log('Failure');
+		// 	res.status(404);
+		// 	res.json({message:'Resource not found',code: 404, data:obj});
+		// }
+
+		// Lista de codigos HTTP y sus usos
+		// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+		switch(code){
+			case 200:
+				res.status(code).json({ message: mess, code: '0', data: obj});
+				break;
+			case 403:
+				res.status(code).json({ message: 'Unauthorized: ' + mess, code: code});
+				break;
+			case 404:
+				res.status(code).json({ message: 'Resource not found', code: code, data: obj});
+				break;
+			default:
+				res.status(code).json({ message: mess, code: code, data: obj});
 		}
     }
+
     return message;
 });

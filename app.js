@@ -160,7 +160,9 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
     var token = req.headers.token
 
     if(token === undefined || token === null){
-      console.log('No token received. Continuing as anonymous user')
+      if(!process.env.NODE_ENV  || process.env.NODE_ENV != 'production'){
+        console.log('No token received. Continuing as anonymous user')
+      }
       next()
     }
     else{

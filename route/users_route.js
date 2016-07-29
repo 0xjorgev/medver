@@ -19,11 +19,8 @@ define(['express',
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
-    // var signingKey = uuid.v4(); // For example purposes
-    // console.log('secret key:', signingKey);
 
     router.post('/login', function (req, res, next) {
-
         var user_login = req.body;
         var username = user_login.username;
         var password = user_login.password;
@@ -32,12 +29,11 @@ define(['express',
 
         return Models.user.query((qb) => {
             qb.where('username', username)
-            qb.orWhere('email', username)
-            qb.where('password',password)
-            qb.where('active',true)
+            // qb.orWhere('email', username)
+            qb.where('password', password)
+            qb.where('active', true)
         })
         .fetch().then((result) => {
-
             if (result !== null){
                 var userId = result.id
 
@@ -59,17 +55,25 @@ define(['express',
                 jwt.setExpiration()
 
                 result.attributes.token = jwt.compact()
+                delete result.attributes.password
+
+                //TODO: test only!
+                result.attributes.roles = ['admin', 'player']
+                result.attributes.permissions = ['list', 'create', 'update', 'delete']
 
                 Message(res,'Success', '0', result)
             }
             else{
-                Message(res,'Wrong user/password combination', '404', result);
+
+                console.log('Wrong user/pass combo!')
+
+                Message(res,'Wrong user/password combination', 404, result);
             }
     })
-    .catch((err) => {
+    .catch((error) => {
             console.log(`Error`, error)
             console.log(error.stack)
-            Message(res,err.detail, err.code, null);
+            Message(res,error.detail, error.code, null);
         });
     });
 

@@ -88,6 +88,7 @@ if(process.env.NODE_ENV == 'production'){
   var match_event_ws = require('./route/events_route');
   var subdiscipline_ws = require('./route/subdisciplines_route');
   var test_ws =  require('./route/tests_route');
+  var position_ws =  require('./route/positions_route');
 
   var apiVersion = 'v1.0';
   var prefix = 'api';
@@ -125,7 +126,8 @@ if(process.env.NODE_ENV == 'production'){
     rule            : 'rule',
     match_event     : 'matchevent',
     subdiscipline   : 'subdiscipline',
-    test            : 'test'
+    test            : 'test',
+    position        : 'position'
   }
 
   //Middleware
@@ -172,6 +174,7 @@ if(process.env.NODE_ENV == 'production'){
   app.use(`${api_prefix}${routes.match_event}`, match_event_ws);
   app.use(`${api_prefix}${routes.subdiscipline}`, subdiscipline_ws);
   app.use(`${api_prefix}${routes.test}`, test_ws);
+  app.use(`${api_prefix}${routes.position}`, position_ws);
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){

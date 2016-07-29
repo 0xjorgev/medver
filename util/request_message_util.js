@@ -8,11 +8,9 @@ if (typeof define !== 'function') {
 define(['express'], function (express) {
 
 	var message =  function(res, mess, code, obj){
-
-		var array = Array.isArray(obj)
-		var isUndefined = (typeof obj != 'undefined')
-		var isEmpty = (obj === null)
-
+		// var array = Array.isArray(obj)
+		// var isUndefined = (typeof obj != 'undefined')
+		// var isEmpty = (obj === null)
 		// // console.log(`isArray: ${array} isUndefined: ${isUndefined} isEmpty: ${isEmpty}`);
 		// if ( (array && obj.length > 0) || (isUndefined && !isEmpty)  ) {
 		// 	//200 Ok
@@ -27,6 +25,8 @@ define(['express'], function (express) {
 
 		// Lista de codigos HTTP y sus usos
 		// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+		code = code == '0' ? 200 : code
+
 		switch(code){
 			case 200:
 				res.status(code).json({ message: mess, code: '0', data: obj});
@@ -36,6 +36,9 @@ define(['express'], function (express) {
 				break;
 			case 404:
 				res.status(code).json({ message: 'Resource not found', code: code, data: obj});
+				break;
+			case 500:
+				res.status(code).json({ message: 'General error: ' + mess, code: code, data: obj});
 				break;
 			default:
 				res.status(code).json({ message: mess, code: code, data: obj});

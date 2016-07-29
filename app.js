@@ -158,26 +158,32 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   var validateToken = function (req, res, next) {
 
     var token = req.headers.token
-    var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
 
-    try{
-      var verifiedJwt = nJwt.verify(token, secretKey)
-
-      //si se entrega un token válido, se inyectan los datos del usuario al request
-      //estos valores se obtienen al hacer login
-      req._currentUser = {
-        id: verifiedJwt.body.user,
-        roles: verifiedJwt.body.roles,
-        permissions: verifiedJwt.body.permissions,
-        lang: verifiedJwt.body.lang
-      }
-
+    if(token === undefined || token === null){
+      console.log('No token received. Continuing as anonymous user')
       next()
     }
-    catch(error){
-      console.log('invalid token received')
-      _log(error)
-      Message(res, error.userMessage, 403, null)
+    else{
+      try{
+        var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
+        var verifiedJwt = nJwt.verify(token, secretKey)
+
+        //si se entrega un token válido, se inyectan los datos del usuario al request
+        //estos valores se obtienen al hacer login
+        req._currentUser = {
+          id: verifiedJwt.body.user,
+          roles: verifiedJwt.body.roles,
+          permissions: verifiedJwt.body.permissions,
+          lang: verifiedJwt.body.lang
+        }
+
+        next()
+      }
+      catch(error){
+        console.log('invalid token received')
+        _log(error)
+        Message(res, error.userMessage, 403, null)
+      }
     }
   }
 

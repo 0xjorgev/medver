@@ -8,7 +8,7 @@ if (typeof define !== 'function') {
 define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
 
     var router = express.Router();
-    // var _ = require('lodash');
+
     function teamMap(team){
         return team.relations;
     }
@@ -84,9 +84,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    //List of competitions
-    router.get('/', function (req, res) {
 
+    router.get('/', function (req, res) {
         console.log('Phase List');
 
         return Models.phase
@@ -94,12 +93,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             // qb.limit(25);
         })
         .where({active:true})
-        .fetchAll({withRelated: ['category' , { groups:
-          function(qb) { qb.where('active', true) }}]
-        , debug:true})
-        //
+        .fetchAll({withRelated: ['category' , { groups: function(qb) { qb.where('active', true) }}], debug: false})
         .then(function (result) {
-            console.log('result :', result);
+            // console.log('result :', result);
             Message(res,'Success', '0', result);
         }).catch(function(error){
             Message(res,error.details, error.code, []);

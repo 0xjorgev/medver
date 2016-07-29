@@ -26,5 +26,20 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         });
     });
 
+    router.get('/:subdiscipline_id/position', function (req, res) {
+
+        var subdiscipline_id = req.params.subdiscipline_id;
+
+        return Models.position
+        .where({'subdiscipline_id':subdiscipline_id})
+        .where({active:true})
+        .fetchAll()
+        .then(function (result) {
+            Message(res,'Success', '0', result);
+        }).catch(function(error){
+            Message(res,error.details, error.code, []);
+        });
+    });
+
     return router;
 });

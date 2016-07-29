@@ -105,7 +105,6 @@ if(process.env.NODE_ENV == 'production'){
   //routes names
   var routes = {
     discipline      : 'discipline',
-    subddiscipline  : 'subddiscipline',
     competition     : 'competition',
     season          : 'season',
     category        : 'category',

@@ -10,12 +10,7 @@ define(['../node_modules/lodash/lodash.min', '../util/request_message_util'], fu
 
 		permissions = (typeof permissions == Array) ? permissions : [permissions]
 
-		console.log(user, permissions)
-
 		if(user && _.includes(user.roles, permissions)){
-
-			console.log('>>>>>>', user, user.roles, permissions, '<<<<<')
-
 			return {code: 403,  message: 'Insufficient privileges to access this resource'}
 		}
 		else {

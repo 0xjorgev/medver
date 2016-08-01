@@ -63,11 +63,11 @@ define(['express',
                 // qb.where(req._currentUser.id)
             })
             .fetchAll({ withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']} )
-            .then(function (result) {
+            .then((result) => {
                 // console.log('result :', result);
                 Message(res,'Success', '0', result);
             })
-            .catch(function(error){
+            .catch((error) => {
                 console.log(error)
                 console.log(error.stack)
                 Message(res,error.details, error.code, []);

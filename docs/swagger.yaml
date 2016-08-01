@@ -577,7 +577,7 @@ paths:
         200:
           description:
       security: []
-  /phase/{:phase_id}/group_team:
+  /phase/{phase_id}/group_team:
     get:
       description: returns groups & teams associated to this phase
       tags:

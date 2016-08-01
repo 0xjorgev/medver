@@ -6,9 +6,9 @@ if(process.env.NODE_ENV == 'production'){
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var morgan = require('morgan');
-var nJwt = require('nJwt')
-var Message = require('./util/request_message_util')
+var morgan = require('morgan'); //node js logger
+var nJwt = require('nJwt') //jwt token generator
+var Message = require('./util/request_message_util') //in-house message handler
 
 //logging lib, reaaaaally useful
 var inspect = require('util').inspect
@@ -143,7 +143,7 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   	next();
   };
 
-  app.use(morgan('combined'));
+  app.use(morgan('dev'));
 
 	app.use(allowCrossDomain);
 	// parse application/json
@@ -191,10 +191,7 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
   app.use(validateToken)
 
-  //Non Token Route
   app.use(api_prefix+'user', user_ws);
-
-  //Token Route
   app.use(`${api_prefix}${routes.discipline}`, discipline_ws);
   app.use(`${api_prefix}${routes.competition}`, competition_ws);
   app.use(`${api_prefix}${routes.season}`, season_ws);

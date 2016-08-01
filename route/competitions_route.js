@@ -5,7 +5,13 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util','../util/email_sender_util'], function (express, Models, Message, Knex, Email) {
+define(['express',
+        '../model/index',
+        '../util/request_message_util',
+        '../util/knex_util',
+        '../util/email_sender_util',
+        '../helpers/auth_helper'],
+        function (express, Models, Message, Knex, Email, auth) {
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -28,7 +34,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var comp_id = req.params.comp_id;
         // console.log('Model: ' , Models.competition_user.tableName);
         return Models.competition_user
-         .where({competition_id :comp_id})
+        .where({competition_id :comp_id})
         .where({active:true})
         .fetchAll({withRelated: ['users']})
         .then(function(result){
@@ -37,25 +43,35 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         })
         .catch(function(err){
             console.log('err: ', err);
-          Message(res, err.detail, err.code, null);
+            Message(res, err.detail, err.code, null);
         });
     });
 
     //List of competitions
     router.get('/', function (req, res) {
 
-        console.log('Competition List');
+        var chk = auth.checkPermissions(req._currentUser, ['admin', 'admin-competition'])
+
+        if (chk.code != 0){
+            Message(res, chk.message, chk.code, null)
+            return
+        }
+
         return Models.competition
-        .query(function(qb){})
-        .fetchAll({withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']})
-        .then(function (result) {
-            // console.log('result :', result);
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            console.log(error)
-            console.log(error.stack)
-            Message(res,error.details, error.code, []);
-        });
+            .query(function(qb){
+                //TODO: necesitamos asociar la competicion al usuario
+                // qb.where(req._currentUser.id)
+            })
+            .fetchAll({ withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']} )
+            .then(function (result) {
+                // console.log('result :', result);
+                Message(res,'Success', '0', result);
+            })
+            .catch(function(error){
+                console.log(error)
+                console.log(error.stack)
+                Message(res,error.details, error.code, []);
+            });
     });
 
     //Competitions Types List -> Array of results [Competition_type]
@@ -478,7 +494,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             {
                 if (result.length != 0)
                 {
-                    var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id + '/season/' + season_id + 
+                    var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id + '/season/' + season_id +
                                     '/category/' + category_id  + '/home'
                     console.log('Envio de email de actualizacion de la competition ' + fullUrl)
                     Models.user
@@ -493,7 +509,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
                                     'Check it out at ' + fullUrl)
                         }
 
-                        
+
                     })
                 }
                 Message(res, 'Success', '0', result)

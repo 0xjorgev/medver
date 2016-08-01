@@ -618,10 +618,14 @@ paths:
         - Competition
       produces:
       - application/json
-      parameters: []
+      parameters:
+        - name: token
+          in: header
+          type: string
+          required: true
       responses:
         200:
-          description:
+          description: List of competition managed by token user
       security: []
     post:
       description: Competition Creation

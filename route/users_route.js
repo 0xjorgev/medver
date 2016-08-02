@@ -54,7 +54,7 @@ define(['express',
                 //TODO: does not expire, for now
                 jwt.setExpiration()
 
-                result.attributes.token = jwt.compact()
+                result.attributes['Authorization-Token'] = jwt.compact()
                 delete result.attributes.password
 
                 //TODO: test only!

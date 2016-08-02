@@ -139,13 +139,14 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
     res.header('origins','*');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization-Token');
   	next();
   };
 
+  app.use(allowCrossDomain);
+
   app.use(morgan('dev'));
 
-	app.use(allowCrossDomain);
 	// parse application/json
 	app.use(bodyParser.json());
 
@@ -157,7 +158,7 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
   var validateToken = function (req, res, next) {
 
-    var token = req.headers.token
+    var token = req.headers['Authorization-Token']
 
     if(token === undefined || token === null){
       if(!process.env.NODE_ENV  || process.env.NODE_ENV != 'production'){

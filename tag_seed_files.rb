@@ -1,3 +1,7 @@
+#
+# coloca un header y footer en los archivos de seed
+#
+
 
 dirname = './seeds/'
 header = "\nconsole.log(__filename.slice(__dirname.length + 1) + ' START')\n\n"
@@ -14,4 +18,3 @@ Dir.foreach(dirname) do |item|
 		File.rename(filename + '~', filename)
 	end
 end
-

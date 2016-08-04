@@ -7,7 +7,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan'); //node js logger
-var nJwt = require('nJwt') //jwt token generator
+var nJwt = require('njwt') //jwt token generator
 var Message = require('./util/request_message_util') //in-house message handler
 
 //logging lib, reaaaaally useful

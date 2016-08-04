@@ -7,7 +7,7 @@ if (typeof define !== 'function') {
 
 define(['express',
         'uuid',
-        'nJwt',
+        'njwt',
         '../model/index',
         '../util/password_gen_util',
         '../util/knex_util',

@@ -1,1 +1,1 @@
-heroku run knex migrate:latest -a ss-core-dev && heroku run knex seed:run -a ss-core-dev  && heroku run node tasks/load_sample_data.js -a ss-core-dev 
+heroku pg:reset DATABASE_URL -a ss-core-dev --confirm ss-core-dev && heroku run knex migrate:latest -a ss-core-dev && heroku run knex seed:run -a ss-core-dev  && heroku run node tasks/load_sample_data.js -a ss-core-dev 

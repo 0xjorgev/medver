@@ -41,6 +41,7 @@ define(['express'], function (express) {
 				res.status(code).json({ message: 'General error: ' + mess, code: code, data: obj});
 				break;
 			default:
+				console.log('code', code, 'message', mess)
 				res.status(code).json({ message: mess, code: code, data: obj});
 		}
     }

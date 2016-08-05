@@ -154,14 +154,13 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 
 		// var matchesByCategorySQL = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where categories.id = ' + category_id;
 
-
 		//TODO: encadenar promises
 		var matchesByCategory = Knex.raw(matchSql).then(function(result){
 			var matches = result.rows
 
 			if(!matches || matches.length == 0){
-				Message(res, 'error', '99', '');
-				return;
+				Message(res, 'No matches found', 404, '')
+				return
 			}
 
 			var matchIds = matches.map((e) => e.match_id).join(',')
@@ -199,12 +198,11 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 						// console.log(a)
 						Message(res, 'Success', '0', standingTable);
 
-					}).catch(function(error){
+					})
+					.catch(function(error){
 						console.log(error)
 						// return Promise.reject(error)
 					})
-
-
 			})
 		})
 	}

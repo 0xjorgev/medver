@@ -358,6 +358,16 @@ paths:
       responses:
         200:
           description: Information about a single player
+  /player:
+    get:
+      summary: Get all players
+      description: Get all players
+      parameters: []
+      tags:
+        - Player
+      responses:
+        200:
+          description: List of all players 
   /player/{player_id}/category/{category_id}/events:
     get:
       summary: Gets all player's events in a specific category

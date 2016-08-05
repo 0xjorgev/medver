@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan'); //node js logger
 var nJwt = require('njwt') //jwt token generator
 var Message = require('./util/request_message_util') //in-house message handler
+var compression = require('compression');
 
 //logging lib, reaaaaally useful
 var inspect = require('util').inspect
@@ -23,7 +24,7 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   var swagger = require("swagger-node-express");
 
   var subpath = express();
-
+  app.use(compression());
   app.use(bodyParser());
   app.use("/v1", subpath);
 
@@ -32,8 +33,8 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   app.use(express.static('docs'));
 
   swagger.setApiInfo({
-    title: "example API",
-    description: "API to do something, manage something...",
+    title: "SomoSport API",
+    description: "SomoSport API",
     termsOfServiceUrl: "",
     contact: "yourname@something.com",
     license: "",
@@ -45,14 +46,14 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   });
 
   // Set api-doc path
-  swagger.configureSwaggerPaths('', 'api-docs', '');
+  swagger.configureSwaggerPaths('', 'api-docs', 'docs');
 
   // // Configure the API domain
-  // var domain = 'localhost';
-  // if(argv.domain !== undefined)
-  //     domain = argv.domain;
-  // else
-  //     console.log('No --domain=xxx specified, taking default hostname "localhost".')
+  var domain = 'localhost';
+  if(argv.domain !== undefined)
+      domain = argv.domain;
+  else
+      console.log('No --domain=xxx specified, taking default hostname "localhost".')
 
   // // Configure the API port
   // var port = 8080;
@@ -61,9 +62,9 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   // else
   //     console.log('No --port=xxx specified, taking default port ' + port + '.')
 
-  // // Set and display the application URL
-  // var applicationUrl = 'http://' + domain + ':' + port;
-  // console.log('snapJob API running on ' + applicationUrl);
+  // Set and display the application URL
+  var applicationUrl = 'http://' + domain + ':' + port;
+  console.log('snapJob API running on ' + applicationUrl);
 
   // swagger.configure(applicationUrl, '1.0.0');
 

@@ -6,76 +6,78 @@ if (typeof define !== 'function') {
 }
 
 define(['express',
-        // 'uuid',
-        // 'nJwt',
+        'uuid',
+        'njwt',
         '../model/index',
         '../util/password_gen_util',
         '../util/knex_util',
         '../util/request_message_util',
         '../util/email_sender_util',
         '../util/md5_gen_util' ],
-        // function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
-            function (express, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
+        function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
+            // function (express, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
-    // var signingKey = uuid.v4(); // For example purposes
-    // console.log('secret key:', signingKey);
 
     router.post('/login', function (req, res, next) {
-
-        // tapping into Knex query builder to modify query being run
         var user_login = req.body;
         var username = user_login.username;
         var password = user_login.password;
-        // console.log('req.body: ', req.body);
-        console.log(`Request values: ${username}, ${password}`);
-        // res.send(`user_values: ${username} ${password}`);
-        return Models.user
-        .where(function(){ this.where('username',username).orWhere('email',username) })
-        .where('password',password)
-        .where('active',true)
-        .fetch().then(function (result) {
-             if (result !== null){
 
-                // var userid = result.id;
+        console.log(`Request values`, user_login);
 
-                // var claims = {
-                //     iss: "https://somosportpocdev.herokuapp.com/",  // The URL of your service
-                //     sub: `users/${userid}`,    // The UID of the user in your system
-                //     scope: "admins" //Provided by the DB
-                // }
+        return Models.user.query((qb) => {
+            qb.where('username', username)
+            // qb.orWhere('email', username)
+            qb.where('password', password)
+            qb.where('active', true)
+        })
+        .fetch().then((result) => {
+            if (result !== null){
+                var userId = result.id
 
-                // var usr = new Models.user;
-                //  usr = result;
-                // console.log('usr: ', usr.id);
-                console.log('Result:', result.id );
-                // console.log('UserId: '+ result.id);
-                // var userid = result[0].id;
+                var claims = {
+                    // iss: "https://ss-core-dev.herokuapp.com/",  // The URL of your service
+                    // sub: `users/${userid}`,    // The UID of the user in your system
+                    // scope: "admins", //Provided by the DB
+                    user: userId,
+                    roles: ['admin'],
+                    permissions: ['list-all'],
+                    lang: 'en'
+                }
 
+                // console.log('claims:', claims)
+                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+                var jwt = nJwt.create(claims, signingKey)
 
-                // console.log('claims:', claims);
-                // var jwt = nJwt.create(claims,signingKey)
-                // console.log('Token:', jwt);
-                // console.log('Token Compact:', jwt.compact());
-                Message(res,'Success', '0', result);
-                // res.json(result);
-            } else {
-                Message(res,'Wrong user/password combination', '404', result);
-            //     console.log('user not found');
+                //TODO: does not expire, for now
+                jwt.setExpiration()
 
-            //     // res.json({'error':'wrong user/password combination'});
-             }
-        }).catch(function(err){
-            console.log(`Error: ${err}`);
-            Message(res,err.detail, err.code, null);
-            // res.json({'error':err});
+                result.attributes['Authorization-Token'] = jwt.compact()
+                delete result.attributes.password
+
+                //TODO: test only!
+                result.attributes.roles = ['admin', 'player']
+                result.attributes.permissions = ['list', 'create', 'update', 'delete']
+
+                Message(res,'Success', '0', result)
+            }
+            else{
+
+                console.log('Wrong user/pass combo!')
+
+                Message(res,'Wrong user/password combination', 404, result);
+            }
+    })
+    .catch((error) => {
+            console.log(`Error`, error)
+            console.log(error.stack)
+            Message(res,error.detail, error.code, null);
         });
     });
 
-    //TODO: Add translation to errors!
     router.post('/register', function(req, res, next){
-
         var new_user = req.body;
         var username = new_user.username;
         var password = new_user.password;
@@ -161,12 +163,18 @@ define(['express',
     //Add update Profile
 
     router.get('/', function(req, res){
-        return Models.user.where({active:true}).fetchAll()
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
+
+        console.log('currentApiUser >>', req._currentUser )
+
+        return Models.user
+            .where({active:true})
+            .fetchAll()
+            .then(function (result) {
+                // Message(res,'Success', '0', result);
+                res.status(200).json({ message: 'test', code: '0', data: result});
+            }).catch(function(error){
+                Message(res,error.details, error.code, []);
+            });
     })
 
     return router;

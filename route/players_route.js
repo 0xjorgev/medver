@@ -6,6 +6,14 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	var router = express.Router();
 
+	router.get('/', (req, res) => {
+		return Models.player
+		.fetchAll()
+		.then( (result) => {
+			Message(res,'Success', '0', result);
+		})
+	})
+
 	//List of Events
 	//Event by Subdiscipline_id -> Returns array
 	//

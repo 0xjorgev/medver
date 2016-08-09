@@ -3,11 +3,18 @@ if(process.env.NODE_ENV == 'production'){
   require('newrelic');
 }
 
-  var express = require('express');
-  var app = express();
-  var bodyParser = require('body-parser');
-  var morgan = require('morgan');
-  var my_knex = require('./model/util')
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var morgan = require('morgan'); //node js logger
+var nJwt = require('njwt') //jwt token generator
+var Message = require('./util/request_message_util') //in-house message handler
+var compression = require('compression');
+
+//logging lib, reaaaaally useful
+var inspect = require('util').inspect
+//log helper function
+var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
 //==========================================================================
 // swagger stuff
@@ -17,7 +24,7 @@ if(process.env.NODE_ENV == 'production'){
   var swagger = require("swagger-node-express");
 
   var subpath = express();
-
+  app.use(compression());
   app.use(bodyParser());
   app.use("/v1", subpath);
 
@@ -26,8 +33,8 @@ if(process.env.NODE_ENV == 'production'){
   app.use(express.static('docs'));
 
   swagger.setApiInfo({
-    title: "example API",
-    description: "API to do something, manage something...",
+    title: "SomoSport API",
+    description: "SomoSport API",
     termsOfServiceUrl: "",
     contact: "yourname@something.com",
     license: "",
@@ -39,14 +46,14 @@ if(process.env.NODE_ENV == 'production'){
   });
 
   // Set api-doc path
-  swagger.configureSwaggerPaths('', 'api-docs', '');
+  swagger.configureSwaggerPaths('', 'api-docs', 'docs');
 
   // // Configure the API domain
-  // var domain = 'localhost';
-  // if(argv.domain !== undefined)
-  //     domain = argv.domain;
-  // else
-  //     console.log('No --domain=xxx specified, taking default hostname "localhost".')
+  var domain = 'localhost';
+  if(argv.domain !== undefined)
+      domain = argv.domain;
+  else
+      console.log('No --domain=xxx specified, taking default hostname "localhost".')
 
   // // Configure the API port
   // var port = 8080;
@@ -55,10 +62,9 @@ if(process.env.NODE_ENV == 'production'){
   // else
   //     console.log('No --port=xxx specified, taking default port ' + port + '.')
 
-  // // Set and display the application URL
-  // var applicationUrl = 'http://' + domain + ':' + port;
-  // console.log('snapJob API running on ' + applicationUrl);
-
+  // Set and display the application URL
+  var applicationUrl = 'http://' + domain + ':' + port;
+  console.log('snapJob API running on ' + applicationUrl);
 
   // swagger.configure(applicationUrl, '1.0.0');
 
@@ -135,13 +141,14 @@ if(process.env.NODE_ENV == 'production'){
     res.header('origins','*');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization-Token');
   	next();
   };
 
-  app.use(morgan('combined'));
+  app.use(allowCrossDomain);
 
-	app.use(allowCrossDomain);
+  app.use(morgan('dev'));
+
 	// parse application/json
 	app.use(bodyParser.json());
 
@@ -151,10 +158,43 @@ if(process.env.NODE_ENV == 'production'){
 	//app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-  //Non Token Route
-  app.use(api_prefix+'user', user_ws);
+  var validateToken = function (req, res, next) {
 
-  //Token Route
+    var token = req.headers['Authorization-Token']
+
+    if(token === undefined || token === null){
+      if(!process.env.NODE_ENV  || process.env.NODE_ENV != 'production'){
+        console.log('No token received. Continuing as anonymous user')
+      }
+      next()
+    }
+    else{
+      try{
+        var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
+        var verifiedJwt = nJwt.verify(token, secretKey)
+
+        //si se entrega un token válido, se inyectan los datos del usuario al request
+        //estos valores se obtienen al hacer login
+        req._currentUser = {
+          id: verifiedJwt.body.user,
+          roles: verifiedJwt.body.roles,
+          permissions: verifiedJwt.body.permissions,
+          lang: verifiedJwt.body.lang
+        }
+
+        next()
+      }
+      catch(error){
+        console.log('invalid token received')
+        _log(error)
+        Message(res, error.userMessage, 403, null)
+      }
+    }
+  }
+
+  app.use(validateToken)
+
+  app.use(api_prefix+'user', user_ws);
   app.use(`${api_prefix}${routes.discipline}`, discipline_ws);
   app.use(`${api_prefix}${routes.competition}`, competition_ws);
   app.use(`${api_prefix}${routes.season}`, season_ws);

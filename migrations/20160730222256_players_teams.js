@@ -12,6 +12,7 @@ exports.up = function(knex, Promise) {
 			//Relationships
 			table.integer('player_id').references('players.id').index();
 			table.integer('team_id').references('teams.id').index();
+			table.integer('position_id').references('positions.id').index();
 			//Audit Log
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());

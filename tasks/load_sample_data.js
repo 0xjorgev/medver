@@ -27,7 +27,9 @@ var teams = data.map( (item, i) => {
 	return {
 		name: item.name,
 		short_name: 'T' + getRandomNumber(1,99),
-		logo_url: `https://s3.amazonaws.com/codefuel/media/${tmp}.png`
+		logo_url: `https://s3.amazonaws.com/codefuel/media/${tmp}.png`,
+		subdiscipline_id: 2,
+		gender_id: 3
 	}
 } )
 
@@ -84,18 +86,32 @@ knex.transaction((tr) => {
 
 		return knex('players').insert(p, 'id').transacting(tr).then((result) => {
 			thisTeam = teamList.filter((pt) => pt.name == player.team)
+			var pos
+			if(player.position == 'P')
+				pos = 6
+			if(player.position == 'D')
+				pos = 7
+			if(player.position == 'M')
+				pos = 8
+			if(player.position == 'Del')
+				pos = 9
+			else
+				pos = 10
+			
 			// _log(result)
 			playerTeam.push({
 				team_id: thisTeam[0].id,
 				player_id: result[0],
 				number: player.number,
-				position: player.position
+				position: player.position,
+				position_id: pos
 			})
 		})
 	}))
 })
 .then( (result, tr) => {
 	console.log('saved players')
+
 	//player_team
 	return Promise.all(playerTeam.map( (t) => knex('players_teams').insert(t, ['id']).transacting(tr) ))
 })

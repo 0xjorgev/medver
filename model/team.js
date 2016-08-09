@@ -16,7 +16,9 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './category_type', './organization', './player_team', './category_group_phase_team'], function (DB) {
+define(['./base_model', './category_type', './organization', './player_team', './category_group_phase_team', 
+    './subdiscipline', './gender'], function (DB) 
+{
 
     var Team = DB.Model.extend({
         tableName: 'teams',
@@ -25,6 +27,14 @@ define(['./base_model', './category_type', './organization', './player_team', '.
         // relations
         category_type: function(){
             return this.belongsTo('Category_type', 'category_type_id');
+        },
+        
+        subdiscipline: function(){
+            return this.belongsTo('Subdiscipline', 'subdiscipline_id');
+        },
+
+        gender: function(){
+            return this.belongsTo('Gender', 'gender_id');
         },
 
         organization: function(){

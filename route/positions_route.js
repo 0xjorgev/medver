@@ -9,6 +9,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
 
     var router = express.Router();
 
+    //Get all position from table
     router.get('/', function (req, res) {
         return Models.position
         .where({active:true})
@@ -20,6 +21,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         });
     });
 
+    //Get a position by id
     router.get('/:position_id', function (req, res) {
 
         var position_id = req.params.position_id;

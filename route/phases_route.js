@@ -26,8 +26,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //Teams by Phase
     router.get('/:phase_id/team', function (req, res) {
-
-        console.log("Teams by Phase");
         var phase_id = req.params.phase_id;
 
         return Models.category_group_phase_team
@@ -43,8 +41,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //Groups & teams by Phase
     router.get('/:phase_id/group_team', function (req, res) {
-
-        console.log("Groups and Teams by Phase");
         var phase_id = req.params.phase_id;
 
         return Models.group
@@ -66,7 +62,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //Phase, group, round team by Phase_id
     router.get('/:phase_id/group_round_match', function (req, res) {
 
-        console.log("Group_round_match");
         var phase_id = req.params.phase_id;
 
         return Models.group
@@ -86,8 +81,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 
     router.get('/', function (req, res) {
-        console.log('Phase List');
-
         return Models.phase
         .query(function(qb){
             // qb.limit(25);
@@ -104,8 +97,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
     //Phase by phase_id
     router.get('/:phase_id', function (req, res) {
-        console.log('phase_id List');
-         var phase_id = req.params.phase_id;
+        var phase_id = req.params.phase_id;
         return Models.phase
         .where({'id':phase_id})
         .where({active:true})

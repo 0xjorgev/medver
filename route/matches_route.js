@@ -124,13 +124,14 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         })
     });
 
-    //match create
-    router.post('/', function (req, res) {
+    var saveMatch = function(req, res){
+
+        //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
+        //https://github.com/hapijs/joi
+        //https://github.com/tgriesser/checkit
 
         var data = req.body;
         var Match = Models.match
-
-        console.log('POST /match', data)
 
         var matchData = {
             number: data.number,
@@ -162,6 +163,9 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             roundData.id = data.round_id
         }
 
+        //
+        if(!data.group_id)
+
         //para almacenar el match creado
         var _match = undefined
 
@@ -188,75 +192,22 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             Message(res, 'Match created', '0', _match)
         })
         .catch(function(error){
-            console.log(`{error:}`, error);
-            Message(res, error.detail, error.code, null);
+            console.log(`error:`, error)
+            console.log(error.stack)
+            Message(res, error.detail, error.code, null)
         })
+    }
+
+    //match create
+    router.post('/', function (req, res) {
+        console.log('POST /match', req.body)
+        saveMatch(req, res)
      })
 
     //match update
     router.put('/:match_id', function (req, res) {
-
-        var data = req.body;
-        data.id = req.params.match_id
-        var Match = Models.match
-
-        console.log('PUT /match', data)
-
-        var matchData = {}
-
-        if(data.id) matchData.id = data.id
-        if(data.number) matchData.number = data.number
-        if(data.location) matchData.location = data.location
-        if(data.home_team_id) matchData.home_team_id = data.home_team_id
-        if(data.visitor_team_id) matchData.visitor_team_id = data.visitor_team_id
-        if(data.home_team_score) matchData.home_team_score = data.home_team_score
-        if(data.visitor_team_score) matchData.visitor_team_score = data.visitor_team_score
-        if(data.round_id) matchData.round_id = data.round_id
-        if(data.date) matchData.date = data.date
-        if(data.played) matchData.played = data.played
-
-        var refereeData = {}
-        if(data.referee_id) refereeData.referee_id = data.referee_id
-
-        var roundData = {
-            group_id: data.group_id,
-            name: `Round of Group ${data.group_id}`
-        }
-
-        if(data.round_id){
-            roundData.id = data.round_id
-        }
-
-        //para almacenar el match creado
-        var _match = undefined
-
-        //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
-        //en caso de que la ronda exista, solo se hace update
-        new Models.round(roundData).save().then(function(round){
-            console.log('round saved', round.attributes)
-            matchData.round_id = round.attributes.id
-            return new Match(matchData).save()
-        })
-        .then(function(match){
-            console.log(`saved match`, match.attributes)
-            _match = match.attributes
-            return match
-        })
-        .then(function(result){
-            console.log('saving referee')
-            refereeData.match_id = _match.id
-            return new Models.match_referee(refereeData).save()
-        })
-        .then(function(result){
-            console.log(`saved referee`, result.attributes)
-            //finally
-            _match.referee_id = result.attributes.referee_id
-            Message(res, 'Match created', '0', _match)
-        })
-        .catch(function(error){
-            console.log(`{error:}`, error);
-            Message(res, error.detail, error.code, null);
-        })
+        console.log('PUT /match', req.body)
+        saveMatch(req, res)
     });
     return router;
 });

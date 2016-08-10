@@ -13,7 +13,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		return Models.team
 		.query(function(qb){})
 		.where({active:true})
-		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug:false})
+		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender'], debug:false})
 		//.fetchAll({withRelated: ['gender', 'season']})
 		.then(function (result) {
 			console.log('result: ' + result);
@@ -31,7 +31,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		return Models.player_team
 		.where({team_id:team_id})
 		.where({active:true})
-		.fetchAll({withRelated: ['player'], debug: false})
+		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){
@@ -48,7 +48,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		return Models.team
 		.where({id:team_id, active:true})
-		.fetch({withRelated: ['category_type', 'organization', 'player_team.player'], debug: false})
+		.fetch({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'player_team.position'], debug: false})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){
@@ -78,6 +78,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	router.post('/organization/:org_id/category/:cat_id', function (req, res) {
 
 		console.log('Team Create');
+
+		console.log('Team: ', req.body);
 		//Model Instance
 		var Team        = Models.team;
 		var team_post   = req.body;
@@ -86,6 +88,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var logo_url    =  req.params.logo_url;
 		var short_name  =  req.params.short_name;
 		var description =  req.params.description;
+		var subdiscipline_id =  req.params.subdiscipline_id;
+		var gender_id 	=  req.params.gender_id;
 		var name        = group_post.name;
 
 		new Team(
@@ -133,7 +137,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			name: data.name,
 			logo_url: data.logo_url,
 			category_type_id: data.category_type_id,
-			organization_id: data.organization_id
+			organization_id: data.organization_id,
+			subdiscipline_id: data.subdiscipline_id,
+			gender_id: data.gender_id
 		}
 
 		if(data.id){
@@ -252,9 +258,17 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	//==========================================================================
 
 	var savePlayerTeam = (playerTeamData, res) => {
+
+		console.log('Save Player Team: ', playerTeamData)
 		var playerData = playerTeamData.player
 		var teamData = playerTeamData.team_player
 
+		console.log('/////////////////////////// Save Player Team ///////////////////////////')
+		console.log('playerData: ', playerData)
+		console.log('////////////////////////////////////////////////////////////////////////')
+		console.log('teamData: ', teamData)
+		console.log('////////////////////////////////////////////////////////////////////////')
+		console.log('////////////////////////////////////////////////////////////////////////')
 		//TODO: check player existance
 
 		//version 1 -> insert into team roster without checking existance
@@ -262,10 +276,18 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var _playerResult = undefined
 
 		new Models.player(playerData).save().then((result) => {
-			console.log('player saved', result.attributes)
 			_playerResult = result
-			teamData.player_id = result.attributes.id
-			return new Models.player_team(teamData).save()
+			//teamData.player_id = result.attributes.id
+			var team_player = {
+				number	: teamData.number,
+				player_id : result.attributes.id,
+				position_id : teamData.position_id,
+				team_id : teamData.team_id
+			}
+			console.log('team_player', team_player)
+
+			console.log('////////////////////////////////////////////////////////////////////////')
+			return new Models.player_team(team_player).save()
 		}).then((result) => {
 			Message(res, 'Success', '0', {player: _playerResult, player_team: result})
 		}).catch(function(error){

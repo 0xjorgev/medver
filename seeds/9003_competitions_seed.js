@@ -17,7 +17,7 @@ exports.seed = function(knex, Promise) {
 
     */
 
-    knex('competitions').insert({is_published: true, name:'SomoSport Official Demo',discipline_id:1, subdiscipline_id:2, competition_type_id:2, description: 'Description of the SomoSport Official Competition Demo', img_url: 'http://ss-competition-portal-dev.herokuapp.com/img/somosport-logo-big.png', portrait_url: 'http://ss-competition-portal-dev.herokuapp.com/img/IMG_8616.jpeg'})
+    knex('competitions').insert({is_published: true, name:'SomoSport Official Demo',discipline_id:1, subdiscipline_id:2, competition_type_id:2, description: 'Description of the SomoSport Official Competition Demo', img_url: 'http://ss-competition-dev.herokuapp.com/img/somosport-logo-big.png', portrait_url: 'http://ss-competition-dev.herokuapp.com/img/IMG_8616.jpeg'})
     // knex('competitions').insert({name:'Copa Coca-Cola',discipline_id:1, subdiscipline_id:2, competition_type_id:2, description: 'Copa Coca-Cola', img_url: 'https://s3.amazonaws.com/codefuel/media/logo_torneo_cocacola.png', portrait_url: 'https://s3.amazonaws.com/codefuel/media/slide2.jpg'})
   )
 };

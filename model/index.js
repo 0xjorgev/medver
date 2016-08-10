@@ -36,7 +36,10 @@ define([
     './organization',
     './position'
 
-], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, Contact, Phase, Group, Round, Match, Team, Classification, Player_team, Event, Event_match_player, Match_referee, Category_type, Category_group_phase_team, Competition_user, Player, Rule, Match_team_player, Organization, Position) {
+], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, 
+    Contact, Phase, Group, Round, Match, Team, Classification, Player_team, Event, Event_match_player, Match_referee, 
+    Category_type, Category_group_phase_team, Competition_user, Player, Rule, Match_team_player, Organization, Position) 
+{
     return {
     	util : Util,
     	user: User,

@@ -9,7 +9,6 @@ exports.up = function(knex, Promise) {
 			table.string('name_es');
 			table.string('short_name_es');
 			table.boolean('active').notNullable().defaultTo(true);
-
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
 		})

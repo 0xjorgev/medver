@@ -15,6 +15,10 @@ define(['./base_model', './subdiscipline'], function (DB) {
         subdisciplines: function(){
             return this.belongsTo('Subdiscipline');
         },
+
+        player: function(){
+            return this.belongsTo('Player');
+        }
     });
 
     // uses Registry plugin

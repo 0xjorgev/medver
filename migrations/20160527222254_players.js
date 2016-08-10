@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
 			table.string('last_name');
 			table.string('img_url');
 			table.string('portrait_url');
+			table.string('document_number');
 			table.string('nickname');
 			table.date('birthday');
 			table.integer('status_id').notNullable().defaultTo(1);

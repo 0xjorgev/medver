@@ -16,7 +16,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './player', './team'], function (DB) {
+define(['./base_model', './player', './team', './position'], function (DB) {
 
     var Player_team = DB.Model.extend({
         tableName: 'players_teams',
@@ -29,7 +29,12 @@ define(['./base_model', './player', './team'], function (DB) {
 
         player: function(){
             return this.belongsTo('Player', 'player_id');
+        },
+
+        position: function(){
+            return this.belongsTo('Position', 'position_id');
         }
+        
     });
 
     // uses Registry plugin

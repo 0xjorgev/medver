@@ -10,6 +10,16 @@ define(['./base_model','./group', './match'], function (DB) {
     var Round = DB.Model.extend({
         tableName: 'rounds',
         hasTimestamps: true,
+        initialize: function() {
+            this.on('saving', this.validate, this);
+        },
+        validations: {
+            name: ['required', 'string'],
+            group_id: ['required', 'numeric','greaterThan:0']
+        },
+        validate: function(model, attrs, options) {
+            return DB.checkit(this.validations).run(this.toJSON());
+        },
 
         //relations
         group: function(){

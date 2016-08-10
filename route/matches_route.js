@@ -163,8 +163,8 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             roundData.id = data.round_id
         }
 
-        //
-        if(!data.group_id)
+        if(!data.group_id){
+        }
 
         //para almacenar el match creado
         var _match = undefined
@@ -192,9 +192,10 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             Message(res, 'Match created', '0', _match)
         })
         .catch(function(error){
-            console.log(`error:`, error)
+            console.log(error)
             console.log(error.stack)
-            Message(res, error.detail, error.code, null)
+
+            Message(res, "test!", 500, null, error)
         })
     }
 

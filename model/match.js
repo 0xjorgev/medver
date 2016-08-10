@@ -7,6 +7,19 @@ define(['./base_model', './round', './event_match_player'], function (DB) {
     var Match = DB.Model.extend({
         tableName: 'matches',
         hasTimestamps: true,
+        initialize: function() {
+            this.on('saving', this.validate, this);
+        },
+
+        validations: {
+            location: ['required', 'string'],
+            round_id: ['required', 'numeric','greaterThan:0'],
+            number: ['required', 'numeric','greaterThan:0']
+        },
+
+        validate: function(model, attrs, options) {
+            return DB.checkit(this.validations).run(this.toJSON());
+        },
 
         //relations
         round: function(){

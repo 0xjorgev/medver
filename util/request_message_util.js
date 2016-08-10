@@ -7,29 +7,33 @@ if (typeof define !== 'function') {
 
 define(['express'], function (express) {
 
-	var message =  function(res, mess, code, obj){
-		// var array = Array.isArray(obj)
-		// var isUndefined = (typeof obj != 'undefined')
-		// var isEmpty = (obj === null)
-		// // console.log(`isArray: ${array} isUndefined: ${isUndefined} isEmpty: ${isEmpty}`);
-		// if ( (array && obj.length > 0) || (isUndefined && !isEmpty)  ) {
-		// 	//200 Ok
-		// 	// console.log('Success Response');
-  		//res.json({message:mess, code: code, data:obj});
-		// } else {
-		// 	//empty array??
-		// 	// console.log('Failure');
-		// 	res.status(404);
-		// 	res.json({message:'Resource not found',code: 404, data:obj});
-		// }
+	// List of HTTP codes and their uses
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+	var message =  function(res, mess, code, obj, error){
 
-		// Lista de codigos HTTP y sus usos
-		// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 		code = code == '0' ? 200 : code
+
+		//checks if it's a validation failure message
+
+		console.log('message builder',error)
+
+		if(error) {
+			code =  400
+			mess = 'Business rules validation failure. Check data for details'
+			//overwriting obj, just in case
+            obj = error.keys().reduce((errors, field) => {
+                errors[field] = error.errors[field].errors
+                return errors
+            }, {})
+		}
 
 		switch(code){
 			case 200:
 				res.status(code).json({ message: mess, code: '0', data: obj});
+				break;
+			case 400:
+				//bad request: the server wont process the request due to something perceived as a client error
+				res.status(code).json({ message: 'Bad request: ' + mess, code: code, validation_errors: obj});
 				break;
 			case 403:
 				res.status(code).json({ message: 'Unauthorized: ' + mess, code: code});

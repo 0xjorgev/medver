@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['knex', 'bookshelf', '../knexfile'], function (Knex, Bookshelf, dbConfig) {
+define(['knex', 'bookshelf', '../knexfile', 'checkit'], function (Knex, Bookshelf, dbConfig, CheckIt) {
 
 	var bookshelf;
 
@@ -14,10 +14,16 @@ define(['knex', 'bookshelf', '../knexfile'], function (Knex, Bookshelf, dbConfig
 	} else {
 		bookshelf = new Bookshelf(new Knex(dbConfig.production));
 	}
-    // var bookshelf = new Bookshelf(new Knex(dbConfig.development));
+
     // enable Bookshelf plugins
     bookshelf.plugin('registry');
-    /*bookshelf.plugin('virtuals');
-    bookshelf.plugin('visibility');*/
+
+    /*
+    bookshelf.plugin('virtuals');
+    bookshelf.plugin('visibility');
+    */
+
+    bookshelf.checkit = CheckIt
+
     return bookshelf;
 });

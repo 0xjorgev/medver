@@ -8,7 +8,7 @@ var knex = new Knex(process.env.NODE_ENV ? Config[process.env.NODE_ENV] : Config
 
 var _log = (obj) => console.log(inspect(obj, { colors: true, depth: Infinity }))
 
-// _log(Config)
+console.log('----------------- cargando datos de prueba poncho -----------------')
 
 //read file
 const data = xlsx.parse(`${__dirname}/SabanaCompTestV1.xlsx`)
@@ -97,7 +97,7 @@ knex.transaction((tr) => {
 				pos = 9
 			else
 				pos = 10
-			
+
 			// _log(result)
 			playerTeam.push({
 				team_id: thisTeam[0].id,

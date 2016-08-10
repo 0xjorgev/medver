@@ -29,6 +29,8 @@ var filenames = teams.map((t) =>  {
 var teamsDone = []
 
 
+console.log('----------------- cargando datos cocacola SF 20160813 -----------------')
+
 filenames.forEach((file) => {
 
 	fs.readFile(file.filename , (err, data) => {

@@ -29,6 +29,7 @@ var teams = data.map( (item, i) => {
 		short_name: 'T' + getRandomNumber(1,99),
 		logo_url: `https://s3.amazonaws.com/codefuel/media/${tmp}.png`,
 		subdiscipline_id: 2,
+		category_type_id: 11,
 		gender_id: 3
 	}
 } )

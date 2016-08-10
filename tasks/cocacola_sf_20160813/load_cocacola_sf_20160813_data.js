@@ -24,10 +24,8 @@ var filenames = teams.map((t) =>  {
 	}
 })
 
-
 //quick&dirty way to end this process
 var teamsDone = []
-
 
 console.log('----------------- cargando datos cocacola SF 20160813 -----------------')
 
@@ -57,7 +55,10 @@ filenames.forEach((file) => {
 
 			var teamData = {
 				name: file.team,
-				short_name: 'T' + file.team.length
+				short_name: 'T' + file.team.length,
+				subdiscipline_id: 2, //soccer
+				category_type_id: 10, //sub-15,
+				gender_id: 2 //female
 			}
 
 			return knex('teams').insert(teamData, ['id', 'name']).transacting(tr)

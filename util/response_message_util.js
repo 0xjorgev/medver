@@ -32,11 +32,10 @@ define(['express', 'util'], function (express, util) {
 			}
 			else{
 				code = 500
+				//DB errors returns the message on error.message. There might be other keys in use, like error.detail
+				// mess = error.message ? error.message : error.detail
+				mess = `code: [${error.code}] - message: ${error.message}`
 			}
-
-			console.log('---------------------------------------------------------------')
-			// console.log(error.stack)
-			// console.log(error)
 			_log(error)
 		}
 
@@ -45,7 +44,6 @@ define(['express', 'util'], function (express, util) {
 				res.status(code).json({ message: 'Success', code: '0', data: result});
 				break;
 			case 400:
-				//bad request: the server wont process the request due to something perceived as a client error
 				res.status(code).json({ message: 'Validation failure', code: code, validation_errors: result});
 				break;
 			case 403:
@@ -55,11 +53,11 @@ define(['express', 'util'], function (express, util) {
 				res.status(code).json({ message: 'Resource not found', code: code, data: result});
 				break;
 			case 500:
-				res.status(code).json({ message: 'General error' + error.detail , code: code, data: result});
+				res.status(code).json({ message: 'General error: ' + mess , code: code});
 				break;
 			default:
 				console.log('code', code, 'message', mess)
-				res.status(code).json({ message: mess, code: code, data: obj});
+				res.status(500).json({ message: mess, code: 500, data: obj});
 		}
     }
 

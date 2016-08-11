@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+define(['express', '../model/index', '../util/request_message_util', '../util/knex_util', '../util/response_message_util'], function (express, Models, Message, Knex, Response) {
 
 	var router = express.Router();
 
@@ -33,9 +33,16 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.where({active:true})
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
+
+			// result.pupucito()
+
 			Message(res,'Success', '0', result);
 		}).catch(function(error){
-			Message(res,error.details, error.code, []);
+
+			// console.log("-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-",error.toString())
+
+			// Message(res,error.details, error.code, []);
+			Response(res, null, error)
 		});
 	});
 

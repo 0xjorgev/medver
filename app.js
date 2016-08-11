@@ -66,7 +66,7 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   var applicationUrl = 'http://' + domain + ':' + port;
   console.log('snapJob API running on ' + applicationUrl);
 
-  // swagger.configure(applicationUrl, '1.0.0');
+  swagger.configure(applicationUrl, '1.0.0');
 
 
 //==========================================================================

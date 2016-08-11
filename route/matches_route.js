@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util','../util/knex_util', 'util'], function (express, Models, Message, Knex, util) {
+define(['express', '../model/index', '../util/request_message_util','../util/knex_util', 'util', '../util/response_message_util'], function (express, Models, Message, Knex, util, Response) {
 
     var router = express.Router();
 
@@ -166,6 +166,8 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         if(!data.group_id){
         }
 
+        bla
+
         //para almacenar el match creado
         var _match = undefined
 
@@ -190,12 +192,10 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             //finally
             _match.referee_id = result.attributes.referee_id
             Message(res, 'Match created', '0', _match)
+            Response(res, result, error)
         })
         .catch(function(error){
-            console.log(error)
-            console.log(error.stack)
-
-            Message(res, "test!", 500, null, error)
+            Response(res, null, error)
         })
     }
 

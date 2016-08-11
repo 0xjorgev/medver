@@ -367,7 +367,7 @@ paths:
         - Player
       responses:
         200:
-          description: List of all players 
+          description: List of all players
   /player/{player_id}/category/{category_id}/events:
     get:
       summary: Gets all player's events in a specific category
@@ -404,6 +404,7 @@ paths:
       security: []
   /match:
     get:
+      summary: Gets all matches
       description: Gets all matches
       tags:
         - Match
@@ -415,6 +416,7 @@ paths:
           description: list of all matches
       security: []
     post:
+      summary: Creates a match
       description: Creates a match
       tags:
         - Match
@@ -433,6 +435,7 @@ paths:
       security: []
   /match/{match_id}:
     get:
+      summary: Gets one match
       description: Gets one match
       tags:
         - Match
@@ -450,6 +453,7 @@ paths:
           description: list of all matches
       security: []
     put:
+      summary: Updates a match
       description: Updates a match
       tags:
         - Match
@@ -520,7 +524,7 @@ paths:
           description: List of players assigned to this match & team
     put:
       summary: Toggles the participation of the given player in this match
-      description: Toggles the participation of the given player in this match
+      description: Toggles the participation of the given player in this match; necessary for updating the summoned player list for each match
       tags:
         - Match
         - Player
@@ -551,8 +555,8 @@ paths:
 
   /match/{match_id}/team:
     get:
-      summary: (???)
-      description: (???)
+      summary: (documentation pending)
+      description: (documentation pending)
       tags:
         - Match
         - Team
@@ -567,7 +571,7 @@ paths:
         format: integer
       responses:
         200:
-          description: (???)
+          description: (documentation pending)
 
   /competition/{competition_id}:
     put:

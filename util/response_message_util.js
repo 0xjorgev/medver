@@ -13,8 +13,8 @@ define(['express', 'util'], function (express, util) {
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 	var message =  function(res, result, error){
 
-		var code = 500
-		var mess = 'Response'
+		var code = 200
+		var mess = 'Undefined response message'
 
 		//checks if it's a validation failure message
 		console.log('message builder', 'result', result, 'error', error)
@@ -34,10 +34,11 @@ define(['express', 'util'], function (express, util) {
 				code = 500
 				//DB errors returns the message on error.message. There might be other keys in use, like error.detail
 				// mess = error.message ? error.message : error.detail
-				mess = `code: [${error.code}] - message: ${error.message}`
+				mess = `code: [${error.code}] - message: (${error.name}) ${error.message}`
 			}
 			_log(error)
 		}
+
 
 		switch(code){
 			case 200:

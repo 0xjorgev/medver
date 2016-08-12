@@ -33,14 +33,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.where({active:true})
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
-
-			// result.pupucito()
-
-			Message(res,'Success', '0', result);
+			// Message(res,'Success', '0', result);
+			Response(res, result)
 		}).catch(function(error){
-
-			// console.log("-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-",error.toString())
-
 			// Message(res,error.details, error.code, []);
 			Response(res, null, error)
 		});

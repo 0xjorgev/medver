@@ -23,7 +23,7 @@ produces:
 # /\__/ /  __/ |   \ V /| | (_|  __/\__ \
 # \____/ \___|_|    \_/ |_|\___\___||___/
 #
-# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NvbW9zcG9ydHBvY2Rldi5oZXJva3VhcHAuY29tLyIsInN1YiI6InVzZXJzLzEiLCJzY29wZSI6ImFkbWlucyIsImp0aSI6ImFkYzI5Y2FkLTdlMTItNGFhMS1iNGRhLWYzYzJjNTc0ZWI5NyIsImlhdCI6MTQ2OTcxNTMxOCwiZXhwIjoxNDY5NzE4OTE4fQ.h_Bo-R5NrlZG4oyFaTtkx7UDMrKzPM7cuTB4skbPt-I
+# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoyLCJyb2xlcyI6WyJhZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJsaXN0LWFsbCJdLCJsYW5nIjoiZW4iLCJqdGkiOiI1MzgzNGE5Zi1mMjdkLTRhN2UtYmRmNC0wMDA0NjA0YjJkMmQiLCJpYXQiOjE0NzEwMTkwMTR9.ha3UHU_oqwcaFh-fQYu91xMuBjRT-cPo7De20mNX8wg
 # e10adc3949ba59abbe56e057f20f883e
 ###################################################
 
@@ -35,7 +35,7 @@ paths:
       tags:
         - User
       parameters:
-        - name: token
+        - name: Authorization-Token
           in: header
           type: string
           required: true
@@ -633,7 +633,7 @@ paths:
       produces:
       - application/json
       parameters:
-        - name: token
+        - name: Authorization-Token
           in: header
           type: string
           required: true

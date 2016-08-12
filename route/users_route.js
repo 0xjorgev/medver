@@ -13,9 +13,10 @@ define(['express',
         '../util/knex_util',
         '../util/request_message_util',
         '../util/email_sender_util',
-        '../util/md5_gen_util' ],
-        function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
-            // function (express, Models, Pwd_gen, Knex_util, Message, Email, Md5) {
+        '../util/md5_gen_util',
+        '../util/response_message_util'
+         ],
+        function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5, Response) {
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -29,25 +30,21 @@ define(['express',
 
         return Models.user.query((qb) => {
             qb.where('username', username)
-            // qb.orWhere('email', username)
             qb.where('password', password)
             qb.where('active', true)
         })
-        .fetch().then((result) => {
+        .fetch()
+        .then((result) => {
             if (result !== null){
                 var userId = result.id
 
                 var claims = {
-                    // iss: "https://ss-core-dev.herokuapp.com/",  // The URL of your service
-                    // sub: `users/${userid}`,    // The UID of the user in your system
-                    // scope: "admins", //Provided by the DB
                     user: userId,
                     roles: ['admin'],
                     permissions: ['list-all'],
                     lang: 'en'
                 }
 
-                // console.log('claims:', claims)
                 var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
                 var jwt = nJwt.create(claims, signingKey)
 
@@ -61,19 +58,15 @@ define(['express',
                 result.attributes.roles = ['admin', 'player']
                 result.attributes.permissions = ['list', 'create', 'update', 'delete']
 
-                Message(res,'Success', '0', result)
+                // Message(res,'Success', '0', result)
             }
-            else{
 
-                console.log('Wrong user/pass combo!')
+            // console.log('---------------------------------', result)
 
-                Message(res,'Wrong user/password combination', 404, result);
-            }
-    })
-    .catch((error) => {
-            console.log(`Error`, error)
-            console.log(error.stack)
-            Message(res,error.detail, error.code, null);
+            Response(res, result)
+        })
+        .catch((error) => {
+            Response(res, null, error)
         });
     });
 
@@ -164,16 +157,19 @@ define(['express',
 
     router.get('/', function(req, res){
 
-        console.log('currentApiUser >>', req._currentUser )
-
         return Models.user
             .where({active:true})
             .fetchAll()
             .then(function (result) {
+
+                console.log(result)
+
                 // Message(res,'Success', '0', result);
-                res.status(200).json({ message: 'test', code: '0', data: result});
+                // res.status(200).json({ message: 'test', code: '0', data: result});
+                Response(res, result)
             }).catch(function(error){
-                Message(res,error.details, error.code, []);
+                //Message(res,error.details, error.code, []);
+                Response(res, null, error)
             });
     })
 

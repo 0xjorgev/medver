@@ -31,9 +31,11 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         .where({'id':match_id})
         .fetch({withRelated: ['home_team', 'visitor_team']})
         .then(function (result) {
-            Message(res,'Success', '0', result);
+            // Message(res,'Success', '0', result);
+            Response(res, result)
         }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            // Message(res,error.details, error.code, []);
+            Response(res, null, error)
         });
     });
 
@@ -166,8 +168,6 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         if(!data.group_id){
         }
 
-        bla
-
         //para almacenar el match creado
         var _match = undefined
 
@@ -179,19 +179,19 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             return new Match(matchData).save()
         })
         .then(function(match){
-            console.log(`saved match`, match)
+            // console.log(`saved match`, match)
             _match = match.attributes
             return match
         })
         .then(function(result){
-            console.log('saving referee')
+            // console.log('saving referee')
             refereeData.match_id = _match.id
             return new Models.match_referee(refereeData).save()
         })
         .then(function(result){
             //finally
             _match.referee_id = result.attributes.referee_id
-            Message(res, 'Match created', '0', _match)
+            // Message(res, 'Match created', '0', _match)
             Response(res, result, error)
         })
         .catch(function(error){

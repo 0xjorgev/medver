@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan'); //node js logger
 var nJwt = require('njwt') //jwt token generator
 var Message = require('./util/request_message_util') //in-house message handler
+var Response = require('./util/response_message_util') //in-house message handler
 var compression = require('compression');
 
 //logging lib, reaaaaally useful
@@ -160,10 +161,15 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
   var validateToken = function (req, res, next) {
 
-    var token = req.headers['Authorization-Token']
+    var token = req.headers['Authorization-Token'] || req.headers['authorization-token']
+
+    // console.log('=======================================================================')
+    // _log(req.headers)
+    // _log('token received: ' + token)
+    // console.log('=======================================================================')
 
     if(token === undefined || token === null){
-      if(!process.env.NODE_ENV  || process.env.NODE_ENV != 'production'){
+      if(!process.env.NODE_ENV || process.env.NODE_ENV != 'production'){
         console.log('No token received. Continuing as anonymous user')
       }
       next()
@@ -187,7 +193,8 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
       catch(error){
         console.log('invalid token received')
         _log(error)
-        Message(res, error.userMessage, 403, null)
+        // Message(res, error.userMessage, 403, null)
+        Response(res, null, error)
       }
     }
   }

@@ -78,6 +78,7 @@ define(['express', 'util'], function (express, util) {
 					//if we're not in production, show stack trace
 					msg.error_stack = error.stack
 				}
+				console.log(error.stack)
 				res.status(code).json(msg)
 				break
 			default:

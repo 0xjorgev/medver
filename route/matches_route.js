@@ -192,7 +192,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
             //finally
             _match.referee_id = result.attributes.referee_id
             // Message(res, 'Match created', '0', _match)
-            Response(res, result, error)
+            Response(res, result)
         })
         .catch(function(error){
             Response(res, null, error)

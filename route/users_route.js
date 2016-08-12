@@ -161,9 +161,6 @@ define(['express',
             .where({active:true})
             .fetchAll()
             .then(function (result) {
-
-                console.log(result)
-
                 // Message(res,'Success', '0', result);
                 // res.status(200).json({ message: 'test', code: '0', data: result});
                 Response(res, result)

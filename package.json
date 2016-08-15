@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-
   "dependencies": {
     "amdefine": "^1.0.0",
     "bcrypt": "0.8.5",
@@ -36,10 +35,11 @@
     "gulp-git": "^1.7.0",
     "gulp-jshint": "^2.0.0",
     "gulp-livereload": "^3.8.1",
+    "gulp-node-inspector": "^0.1.0",
     "gulp-prompt": "^0.1.2",
-    "jshint-stylish": "^2.1.0"
+    "jshint-stylish": "^2.1.0",
+    "node-inspector": "^0.12.8"
   },
-
   "author": "Jorge Mendoza",
   "license": "MIT"
 }

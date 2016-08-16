@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
-  title: Somosport Core API!
+  title: Somosport Core API
   description: Basic description of services provided by Somosport Core
   version: "1.0"
 # the domain of the service
-# host: somosportpocdev.herokuapp.com
+# host: ss-core-dev.herokuapp.com
 host: localhost:3000
 # array of all schemes that your API supports
 schemes:
@@ -23,8 +23,8 @@ produces:
 # /\__/ /  __/ |   \ V /| | (_|  __/\__ \
 # \____/ \___|_|    \_/ |_|\___\___||___/
 #
-# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoyLCJyb2xlcyI6WyJhZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJsaXN0LWFsbCJdLCJsYW5nIjoiZW4iLCJqdGkiOiI1MzgzNGE5Zi1mMjdkLTRhN2UtYmRmNC0wMDA0NjA0YjJkMmQiLCJpYXQiOjE0NzEwMTkwMTR9.ha3UHU_oqwcaFh-fQYu91xMuBjRT-cPo7De20mNX8wg
 # e10adc3949ba59abbe56e057f20f883e
+#
 ###################################################
 
 paths:
@@ -574,6 +574,22 @@ paths:
           description: (documentation pending)
 
   /competition/{competition_id}:
+    get:
+      summary: Gets a competition given an id
+      description: Full competition Object
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: competition_id
+        in: path
+        required: true
+        type: integer
+      responses:
+        200:
+          description:
+      security: []
     put:
       description: Competition Update
       produces:
@@ -670,18 +686,23 @@ paths:
         200:
           description:
       security: []
-  /competition/145:
-    get:
-      description: Full competition Object
-      tags:
-        - Competition
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description:
-      security: []
+  # /competition/{competition_id}:
+  #   get:
+  #     summary: Gets a competition given an id
+  #     description: Full competition Object
+  #     tags:
+  #       - Competition
+  #     produces:
+  #     - application/json
+  #     parameters:
+  #     - name: competition_id
+  #       in: path
+  #       required: true
+  #       type: integer
+  #     responses:
+  #       200:
+  #         description:
+  #     security: []
   /gender:
     get:
       description:
@@ -822,8 +843,12 @@ paths:
       security: []
   /competition/competition_type:
     get:
-      description: Full List of Competitions Type's
-      operationId: Get_Competition Type_
+      summary: Full List of competition types
+      description: Full List of competition types
+      operationId: Get_Competition_types
+      tags:
+        - Competition
+        - Competition Type
       produces:
       - application/json
       parameters: []
@@ -851,7 +876,9 @@ paths:
       security: []
   /discipline/:
     get:
-      description:
+      description: Lists all disciplines
+      tags:
+        - Discipline
       operationId: Get All Disciplines_
       produces:
       - application/json
@@ -868,8 +895,10 @@ paths:
       security: []
   /group/:
     get:
-      description:
+      description: lists all groups
       operationId: get Group_
+      tags:
+        - Group
       produces:
       - application/json
       parameters: []

@@ -1,7 +1,5 @@
-//skips newrelic if in localhost
-if(process.env.NODE_ENV == 'production'){
-  require('newrelic');
-}
+//skips newrelic if not in heroku
+if(process.env.NODE_ENV == 'production') require('newrelic')
 
 var express = require('express');
 var app = express();
@@ -17,57 +15,62 @@ var inspect = require('util').inspect
 //log helper function
 var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
+var argv = require('minimist')(process.argv.slice(2));
+var subpath = express();
+
+//node port
+var port = process.env.PORT;
+
+app.use(compression());
+
+app.use("/v1", subpath);
+
 //==========================================================================
 // swagger stuff
+// check hello world example: https://github.com/swagger-api/swagger-node/issues/189
 //==========================================================================
 
-  var argv = require('minimist')(process.argv.slice(2));
-  var swagger = require("swagger-node-express");
+// swagger.setAppHandler(subpath);
+var swagger_node_express = require("swagger-node-express");
+var swagger = swagger_node_express.createNew(app);
 
-  var subpath = express();
-  app.use(compression());
-  app.use(bodyParser());
-  app.use("/v1", subpath);
+app.use(express.static('docs'));
 
-  swagger.setAppHandler(subpath);
+swagger.setApiInfo({
+  title: "SomoSport API",
+  description: "SomoSport API",
+  termsOfServiceUrl: "",
+  contact: "ramsesl@codefuel.me",
+  license: "",
+  licenseUrl: ""
+});
 
-  app.use(express.static('docs'));
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/docs/index.html');
+});
 
-  swagger.setApiInfo({
-    title: "SomoSport API",
-    description: "SomoSport API",
-    termsOfServiceUrl: "",
-    contact: "yourname@something.com",
-    license: "",
-    licenseUrl: ""
-  });
+// Set api-doc path
+swagger.configureSwaggerPaths('', 'api-docs', 'docs');
 
-  app.get('/', function (req, res) {
-      res.sendFile(__dirname + '/docs/index.html');
-  });
+// // Configure the API domain
+var domain = 'localhost';
+if(argv.domain !== undefined)
+    domain = argv.domain;
+else
+    console.log('No --domain=xxx specified, taking default hostname "localhost".')
 
-  // Set api-doc path
-  swagger.configureSwaggerPaths('', 'api-docs', 'docs');
+// // Configure the API port
+// var port = 8080;
+// if(argv.port !== undefined)
+//     port = argv.port;
+// else
+//     console.log('No --port=xxx specified, taking default port ' + port + '.')
 
-  // // Configure the API domain
-  var domain = 'localhost';
-  if(argv.domain !== undefined)
-      domain = argv.domain;
-  else
-      console.log('No --domain=xxx specified, taking default hostname "localhost".')
+// Set and display the application URL
+var applicationUrl = 'http://' + domain + ':' + port;
+console.log('snapJob API running on ' + applicationUrl);
 
-  // // Configure the API port
-  // var port = 8080;
-  // if(argv.port !== undefined)
-  //     port = argv.port;
-  // else
-  //     console.log('No --port=xxx specified, taking default port ' + port + '.')
-
-  // Set and display the application URL
-  var applicationUrl = 'http://' + domain + ':' + port;
-  console.log('snapJob API running on ' + applicationUrl);
-
-  swagger.configure(applicationUrl, '1.0.0');
+swagger.configure(applicationUrl, '1.0.0');
 
 
 //==========================================================================
@@ -100,14 +103,6 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   var apiVersion = 'v1.0';
   var prefix = 'api';
   var api_prefix = `/${prefix}/${apiVersion}/`; //'template literal syntax' is only available in ES6 (use 'esversion: 6').
-
-  /*
-      app.use(api_prefix+'discipline', discipline_ws);
-      app.use(api_prefix+'competition', competition_ws);
-      app.use(api_prefix+'season', season_ws);
-      app.use(api_prefix+'category', category_ws);
-      app.use(api_prefix+'gender', gender_ws);
-  */
 
   //routes names
   var routes = {
@@ -280,7 +275,6 @@ var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
   // END OF TEST STUFF
   //==========================================================================
 
-  var port = process.env.PORT;
   app.listen(port, function(){
     console.log('Running ' + process.env.NODE_ENV +' on port ' + port);
   });

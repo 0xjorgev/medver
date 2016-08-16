@@ -44,8 +44,8 @@ paths:
           description: Active user list
   /user/login:
     post:
-      summary: Returns the list of active users
-      description: Returns the list of active users
+      summary: Returns info of an user, given it's username & password
+      description: Returns info of an user, given it's username & password
       tags:
         - User
       parameters:

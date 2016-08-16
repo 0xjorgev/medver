@@ -8,7 +8,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	//List of teams
 	router.get('/', function (req, res) {
-
 		console.log('Teams List');
 		return Models.team
 		.query(function(qb){})

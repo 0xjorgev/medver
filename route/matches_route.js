@@ -135,38 +135,34 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         var data = req.body;
         var Match = Models.match
 
-        var matchData = {
-            number: data.number,
-            location: data.location,
-            home_team_id: data.home_team_id,
-            visitor_team_id: data.visitor_team_id,
-            home_team_score: data.home_team_score,
-            visitor_team_score: data.visitor_team_score,
-            round_id: data.round_id,
-            date: data.date
+        var matchData = {}
+        if(data.id != undefined)                    matchData.id = data.id
+        if(data.number != undefined)                matchData.number = data.number
+        if(data.location != undefined)              matchData.location = data.location
+        if(data.home_team_id != undefined)          matchData.home_team_id = data.home_team_id
+        if(data.visitor_team_id != undefined)       matchData.visitor_team_id = data.visitor_team_id
+        if(data.home_team_score != undefined)       matchData.home_team_score = data.home_team_score
+        if(data.visitor_team_score != undefined)    matchData.visitor_team_score = data.visitor_team_score
+        if(data.round_id != undefined)              matchData.round_id =  data.round_id
+        if(data.date != undefined)                  matchData.date =  data.date
+
+        var categoryData = {}
+        if(data.category_id != undefined)   categoryData.category_id = data.category_id
+        if(data.phase_id != undefined)      categoryData.phase_id = data.phase_id
+        if(data.group_id != undefined)      categoryData.group_id = data.group_id
+
+        var refereeData = {}
+        if(data.referee_id != undefined) refereeData.referee_id = data.referee_id
+
+        var roundData = {}
+        if(data.group_id){
+            var roundData = {
+                group_id: data.group_id,
+                name: `Round of Group ${data.group_id}`
+            }
         }
 
-        var categoryData = {
-            category_id: data.category_id,
-            phase_id: data.phase_id,
-            group_id: data.group_id
-        }
-
-        var refereeData = {
-            referee_id: data.referee_id
-        }
-
-        var roundData = {
-            group_id: data.group_id,
-            name: `Round of Group ${data.group_id}`
-        }
-
-        if(data.round_id){
-            roundData.id = data.round_id
-        }
-
-        if(!data.group_id){
-        }
+        if(data.round_id) roundData.id = data.round_id
 
         //para almacenar el match creado
         var _match = undefined
@@ -174,24 +170,20 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
         //en caso de que la ronda exista, solo se hace update
         new Models.round(roundData).save().then(function(round){
-            console.log('round saved')
             matchData.round_id = round.attributes.id
             return new Match(matchData).save()
         })
         .then(function(match){
-            // console.log(`saved match`, match)
             _match = match.attributes
             return match
         })
         .then(function(result){
-            // console.log('saving referee')
             refereeData.match_id = _match.id
             return new Models.match_referee(refereeData).save()
         })
         .then(function(result){
             //finally
             _match.referee_id = result.attributes.referee_id
-            // Message(res, 'Match created', '0', _match)
             Response(res, result)
         })
         .catch(function(error){

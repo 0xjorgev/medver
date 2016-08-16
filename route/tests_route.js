@@ -16,7 +16,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           qb.orWhere({name: name2})
           qb.where({active:true})
         })
-        .fetchAll({debug: true})
+        .fetchAll({debug: false})
         .then(function(team){
              console.log(`Team: ${{ team }}`,team)
             return team

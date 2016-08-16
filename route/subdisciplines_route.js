@@ -18,7 +18,7 @@ define(['express', '../model/index', '../util/request_message_util'], function (
         return Models.event
         .where({subdiscipline_id:subdiscipline_id})
         .where({active:true})
-        .fetchAll({withRelated: [], debug: true})
+        .fetchAll({withRelated: [], debug: false})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){

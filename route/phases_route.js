@@ -86,8 +86,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 
     router.get('/', function (req, res) {
-        console.log('Phase List');
-
         return Models.phase
         .query(function(qb){
             // qb.limit(25);
@@ -116,7 +114,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res,error.details, error.code, []);
         });
     });
-    
+
     router.post('/', function (req, res) {
     	var Phase = Models.phase;
     	var phase_post = req.body;
@@ -178,7 +176,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           Message(res, err.detail, err.code, null);
         });
     });
-    
+
     return router;
     //teams by Phase_id
     // router.get('/:phase_id/team', function (req, res) {

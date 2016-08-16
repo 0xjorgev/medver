@@ -25,7 +25,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		return Models.player
 		.where({id:player_id})
 		.where({active:true})
-		.fetchAll({withRelated: ['player_team.team.organization', 'gender'], debug: true})
+		.fetchAll({withRelated: ['player_team.team.organization', 'gender'], debug: false})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){

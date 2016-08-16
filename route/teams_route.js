@@ -25,7 +25,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	});
 
 	router.get('/:team_id/player', function (req, res) {
-		console.log('Team Players by team_id');
 		var team_id = req.params.team_id;
 
 		return Models.player_team

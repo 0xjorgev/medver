@@ -108,7 +108,70 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             Message(res,error.details, error.code, []);
         });
     });
+    
+    router.post('/', function (req, res) {
+    	var Phase = Models.phase;
+    	var phase_post = req.body;
 
+
+    	console.log('Req Values:' , req.body);
+        var category_id = phase_post.category_id;
+    	var name = phase_post.name;
+    	var position = phase_post.position;
+
+        console.log('------------------------------');
+        console.log(`name:${name}`);
+        console.log(`position:${position}`);
+        console.log(`category:${phase_post.category_id}`);
+        console.log('------------------------------');
+
+        new Phase(phase_post
+        // {
+        //     name: name,
+        //     position: position,
+        //     category_id:category_id
+        // }
+        ).save().then(function(new_phase){
+            console.log(`{new_phase: ${new_phase}}`);
+            Message(res, 'Success', '0', new_phase);
+        }).catch(function(error){
+            console.log(`{error: ${error}}`);
+            Message(res, error.detail, error.code, null);
+        });
+
+    });
+
+
+    router.put('/:phase_id', function (req, res) {
+
+        console.log('update /:phase_id');
+        //Model Instance
+        var Phase = Models.phase;
+
+        var phase_id = req.params.phase_id;
+        var phase_upd = req.body;
+
+        // Knex(competition.tableName)
+        Knex('phases')
+        .where('id','=',phase_id)
+        .update(phase_upd, ['id'])
+        .then(function(result){
+            if (result.length != 0){
+                // console.log('result is not null');
+                // console.log(`result: ${result[0]}`);
+                Message(res, 'Success', '0', result);
+            } else {
+                // console.log(`{error: ${error}}`);
+                Message(res, 'Wrong phase_id', '404', result);
+            }
+        })
+        .catch(function(err){
+            console.log(`Catch Error: ${err}`);
+          Message(res, err.detail, err.code, null);
+        });
+    });
+    
+    return router;
     //teams by Phase_id
     // router.get('/:phase_id/team', function (req, res) {
     //     console.log('List teams by Phase Id');
@@ -216,67 +279,4 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     // });
 
 
-    router.post('/', function (req, res) {
-    	var Phase = Models.phase;
-    	var phase_post = req.body;
-
-
-    	console.log('Req Values:' , req.body);
-        var category_id = phase_post.category_id;
-    	var name = phase_post.name;
-    	var position = phase_post.position;
-
-        console.log('------------------------------');
-        console.log(`name:${name}`);
-        console.log(`position:${position}`);
-        console.log(`category:${phase_post.category_id}`);
-        console.log('------------------------------');
-
-        new Phase(phase_post
-        // {
-        //     name: name,
-        //     position: position,
-        //     category_id:category_id
-        // }
-        ).save().then(function(new_phase){
-            console.log(`{new_phase: ${new_phase}}`);
-            Message(res, 'Success', '0', new_phase);
-        }).catch(function(error){
-            console.log(`{error: ${error}}`);
-            Message(res, error.detail, error.code, null);
-        });
-
-    });
-
-
-    router.put('/:phase_id', function (req, res) {
-
-        console.log('update /:phase_id');
-        //Model Instance
-        var Phase = Models.phase;
-
-        var phase_id = req.params.phase_id;
-        var phase_upd = req.body;
-
-        // Knex(competition.tableName)
-        Knex('phases')
-        .where('id','=',phase_id)
-        .update(phase_upd, ['id'])
-        .then(function(result){
-            if (result.length != 0){
-                // console.log('result is not null');
-                // console.log(`result: ${result[0]}`);
-                Message(res, 'Success', '0', result);
-            } else {
-                // console.log(`{error: ${error}}`);
-                Message(res, 'Wrong phase_id', '404', result);
-            }
-        })
-        .catch(function(err){
-            console.log(`Catch Error: ${err}`);
-          Message(res, err.detail, err.code, null);
-        });
-    });
-
-    return router;
 });

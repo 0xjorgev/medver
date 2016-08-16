@@ -101,10 +101,13 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .where('active','=',1)
         .update(group_upd, ['id'])
         .then(function(result){
-            if (result.length != 0){
+            if (result.length != 0)
+            {
                 console.log('result is not null');
-                console.log(`result: ${result[0]}`);
-            Message(res, 'Success', '0', result);
+                console.log('result: ',result[0]);
+                //Message(res, 'Success', '0', result);
+                var data = req.body
+                updateFase(data, res, result)
             } else {
 
                 Message(res, 'group not found', '404', result);
@@ -126,6 +129,67 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         //todo: promisify this
         StandingTable.getStandingTableByMatches(matchSql, res)
     })
+
+    //FUNCION PARA ACTUALIZAR LOS VALORES DE LA TABLA FASE CUANDO SE CAMBIEN LOS VALORES DE UN GRUPO
+    var updateFase = (data, res, group_result) => {
+        console.log("-------Update Phase by group--------")
+        console.log("Data: ", data)
+        var phase_id = data.phase_id
+        console.log("phase_id: ", phase_id)
+
+        //Obtenemos todos los grupos de esa fase
+        Models.group
+        .where({phase_id:phase_id})
+        .where({active:true})
+        .fetchAll()
+        .then(function (result) 
+        {
+            var participant_teams = result.models.map((m) => m.attributes.participant_team)
+            var classified_teams = result.models.map((m) => m.attributes.classified_team)
+            console.log("participant_teams ", participant_teams)
+            console.log("classified_teams ", classified_teams)
+            var participant_team = participant_teams.reduce(function(pt, n) {
+                                    return pt + n; })
+
+            console.log("Phase participant_team ", participant_team)
+            var classified_team = classified_teams.reduce(function(ct, n) {
+                                    return ct + n; })
+            console.log("Phase classified_team ", classified_team)
+            console.log("phase_id: ", phase_id)
+
+            //Se guarda los campos en la fase
+            var phase_upd = {
+                id              : phase_id,
+                participant_team: participant_team,
+                classified_team : classified_team
+            };
+
+            var Phase = Models.phase;
+            Knex('phases')
+                .where('id','=', phase_id)
+                .update(phase_upd, ['id'])
+                .then(function(phases_result){
+                    if (result.length != 0){
+                        // console.log('result is not null');
+                        // console.log(`result: ${result[0]}`);
+                        Message(res, 'Success', '0', group_result);
+                    } else {
+                        // console.log(`{error: ${error}}`);
+                        Message(res, 'Wrong phase_id', '404', group_result);
+                    }
+                })
+                .catch(function(err){
+                    console.log(`Catch Error: ${err}`);
+                  Message(res, err.detail, err.code, null);
+                });
+
+        }).catch(function(error){
+            console.log('error', error)
+            console.log('error', error.stack)
+            res.status(500);
+            res.json({message: error.name, code: 500, data: error.detail});
+        })
+    }
 
     ///
 

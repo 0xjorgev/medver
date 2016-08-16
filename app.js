@@ -148,13 +148,12 @@ swagger.configure(applicationUrl, '1.0.0');
 
 	// parse application/json
 	app.use(bodyParser.json());
-
 	// parse application/vnd.api+json as json
 	app.use(bodyParser.json({type: 'application/vnd.api+json'}));
+  // support encoded bodies
+  app.use(bodyParser.urlencoded({ extended: true }));
 
-	//app.use(bodyParser.json()); // support json encoded bodies
-  app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-
+  //TODO: colocar en un helper
   var validateToken = function (req, res, next) {
 
     var token = req.headers['Authorization-Token'] || req.headers['authorization-token']

@@ -8,7 +8,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	//List of teams
 	router.get('/', function (req, res) {
-		console.log('Teams List');
+
 		return Models.team
 		.query(function(qb){})
 		.where({active:true})
@@ -24,7 +24,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	});
 
 	router.get('/:team_id/player', function (req, res) {
-		console.log('Team Players by team_id');
+
 		var team_id = req.params.team_id;
 
 		return Models.player_team
@@ -44,8 +44,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	router.get('/:team_id', function (req, res) {
 
 		var team_id = req.params.team_id;
-
-		console.log('GET Team', team_id);
 
 		return Models.team
 		.where({id:team_id, active:true})
@@ -77,8 +75,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	//TODO: Esto parece no estar en uso, deberia arrojar error al probar
 	router.post('/organization/:org_id/category/:cat_id', function (req, res) {
-
-		console.log('Team Create');
 
 		console.log('Team: ', req.body);
 		//Model Instance
@@ -264,12 +260,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var playerData = playerTeamData.player
 		var teamData = playerTeamData.team_player
 
-		console.log('/////////////////////////// Save Player Team ///////////////////////////')
-		console.log('playerData: ', playerData)
-		console.log('////////////////////////////////////////////////////////////////////////')
-		console.log('teamData: ', teamData)
-		console.log('////////////////////////////////////////////////////////////////////////')
-		console.log('////////////////////////////////////////////////////////////////////////')
 		//TODO: check player existance
 
 		//version 1 -> insert into team roster without checking existance
@@ -287,7 +277,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			}
 			console.log('team_player', team_player)
 
-			console.log('////////////////////////////////////////////////////////////////////////')
 			return new Models.player_team(team_player).save()
 		}).then((result) => {
 			Message(res, 'Success', '0', {player: _playerResult, player_team: result})

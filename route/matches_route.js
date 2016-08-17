@@ -131,8 +131,10 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
         //https://github.com/hapijs/joi
         //https://github.com/tgriesser/checkit
-
         var data = req.body;
+
+        console.log('saveMatch', data)
+
         var Match = Models.match
 
         var matchData = {}

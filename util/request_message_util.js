@@ -14,8 +14,7 @@ define(['express'], function (express) {
 		code = code == '0' ? 200 : code
 
 		//checks if it's a validation failure message
-
-		console.log('message builder',error)
+		// console.log('message builder',error)
 
 		if(error) {
 			code =  400

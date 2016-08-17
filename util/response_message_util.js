@@ -36,6 +36,10 @@ define(['express', 'util'], function (express, util) {
 						return errors
 					}, {})
 
+					if(!process.env.NODE_ENV || process.env.NODE_ENV != 'production'){
+						console.log('validation_errors',result)
+					}
+
 					break
 				default:
 					code = 500

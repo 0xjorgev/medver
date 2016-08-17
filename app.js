@@ -164,9 +164,9 @@ swagger.configure(applicationUrl, '1.0.0');
     // console.log('=======================================================================')
 
     if(token === undefined || token === null){
-      if(!process.env.NODE_ENV || process.env.NODE_ENV != 'production'){
-        console.log('No token received. Continuing as anonymous user')
-      }
+      // if(!process.env.NODE_ENV || process.env.NODE_ENV != 'production'){
+      //   console.log('No token received. Continuing as anonymous user')
+      // }
       next()
     }
     else{

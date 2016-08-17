@@ -151,7 +151,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 			name = category_upd.name
 
-			participant_minimum = category_upd.participant_minimum 
+			participant_minimum = category_upd.participant_minimum
 			participant_maximum = category_upd.participant_maximum
 			other_minimum_participant = category_upd.other_minimum_participant
 			other_maximum_participant = category_upd.other_maximum_participant
@@ -231,10 +231,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	router.get('/:category_id/standing_table', function(req, res){
 		var categoryId = req.params.category_id;
-		console.log('\n=======================================================\n')
-		console.log('standing_table of category', categoryId)
-
-		var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where categories.id = ' + categoryId
+		// console.log('standing_table of category', categoryId)
+		var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where matches.played = true and categories.id = ' + categoryId
 
 		//todo: promisify this
 		StandingTable.getStandingTableByMatches(matchSql, res)

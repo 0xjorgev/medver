@@ -7,7 +7,18 @@ if (typeof define !== 'function') {
 
 var _ = require('lodash')
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util', '../helpers/standing_table_helper'], function (express, Models, Message, Knex, StandingTable) {
+define(['express',
+		'../model/index',
+		'../util/request_message_util',
+		'../util/knex_util',
+		'../helpers/standing_table_helper',
+		'../util/response_message_util'],
+	function (express,
+		Models,
+		Message,
+		Knex,
+		StandingTable,
+		Response) {
 
 	var router = express.Router();
 
@@ -47,18 +58,19 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	//Teams by Category
 	router.get('/:category_id/team', function (req, res) {
 
-		console.log("Teams by Category");
 		var category_id = req.params.category_id;
 
 		return Models.category_group_phase_team
-		.where({category_id:category_id})
-		// .where({active:true})
-		.fetchAll({withRelated:['team']})
-		.then(function (result) {
-			Message(res,'Success', '0', result);
-		}).catch(function(error){
-			Message(res,error.details, error.code, []);
-		});
+			.where({category_id:category_id})
+			// .where({active:true})
+			.fetchAll({withRelated:['team']})
+			.then(function (result) {
+				// Message(res,'Success', '0', result);
+				Response(res, result)
+			}).catch(function(error){
+				// Message(res,error.details, error.code, []);
+				Response(res, null, error)
+			});
 	});
 
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result

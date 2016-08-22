@@ -858,9 +858,11 @@ paths:
       security: []
   /category/{category_id}/team:
     get:
-      description:
+      summary: Gets all teams invited to participate on a category
+      description: Gets all teams invited to participate on a category
       tags:
         - Category
+        - Team
       produces:
       - application/json
       parameters:

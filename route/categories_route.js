@@ -169,6 +169,8 @@ define(['express',
 			other_maximum_participant = category_upd.other_maximum_participant
 			player_minimum_participant = category_upd.player_minimum_participant
 			player_maximum_participant = category_upd.player_maximum_participant
+			player_minimum_summoned = category_upd.player_minimum_summoned
+			player_maximum_summoned = category_upd.player_maximum_summoned
 			coach_minimum_participant = category_upd.coach_minimum_participant
 			coach_maximum_participant = category_upd.coach_maximum_participant
 			team_quantity = category_upd.team_quantity
@@ -191,6 +193,8 @@ define(['express',
 			'other_maximum_participant' :  other_maximum_participant,
 			'player_minimum_participant' : player_minimum_participant,
 			'player_maximum_participant' : player_maximum_participant,
+			'player_minimum_summoned' : player_minimum_summoned,
+			'player_maximum_summoned' : player_maximum_summoned,
 			'coach_minimum_participant' : coach_minimum_participant,
 			'coach_maximum_participant' : coach_maximum_participant,
 			'team_quantity' : team_quantity,

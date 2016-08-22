@@ -169,6 +169,8 @@ define(['express',
 			other_maximum_participant = category_upd.other_maximum_participant
 			player_minimum_participant = category_upd.player_minimum_participant
 			player_maximum_participant = category_upd.player_maximum_participant
+			player_minimum_summoned = category_upd.player_minimum_summoned
+			player_maximum_summoned = category_upd.player_maximum_summoned
 			coach_minimum_participant = category_upd.coach_minimum_participant
 			coach_maximum_participant = category_upd.coach_maximum_participant
 			team_quantity = category_upd.team_quantity
@@ -179,6 +181,7 @@ define(['express',
 			inscription_init_at = category_upd.inscription_init_at
 			inscription_ends_at = category_upd.inscription_ends_at
 			image_url = category_upd.image_url
+			is_published = category_upd.is_published
 
 		Knex(category.tableName)
 		.where('id','=',category_id)
@@ -191,11 +194,14 @@ define(['express',
 			'other_maximum_participant' :  other_maximum_participant,
 			'player_minimum_participant' : player_minimum_participant,
 			'player_maximum_participant' : player_maximum_participant,
+			'player_minimum_summoned' : player_minimum_summoned,
+			'player_maximum_summoned' : player_maximum_summoned,
 			'coach_minimum_participant' : coach_minimum_participant,
 			'coach_maximum_participant' : coach_maximum_participant,
 			'team_quantity' : team_quantity,
 			'gender_id' : gender_id,
 			'season_id' : season_id,
+			'is_published' : is_published,
 			'category_type_id' : category_type_id,
 			'classification_type_id' : classification_type_id,
 			'inscription_init_at' : inscription_init_at,

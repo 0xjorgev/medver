@@ -12,6 +12,8 @@ exports.up = function(knex, Promise) {
 			//New Updates, Team participation req
 			table.integer('other_minimum_participant').defaultTo(0);
 			table.integer('other_maximum_participant').defaultTo(0);
+			table.integer('player_minimum_summoned').defaultTo(0);
+			table.integer('player_maximum_summoned').defaultTo(0);
 			table.integer('player_minimum_participant').defaultTo(0);
 			table.integer('player_maximum_participant').defaultTo(0);
 			table.integer('coach_minimum_participant').defaultTo(0);

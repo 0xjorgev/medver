@@ -63,7 +63,7 @@ define(['express',
 		return Models.category_group_phase_team
 			.where({category_id:category_id})
 			// .where({active:true})
-			.fetchAll({withRelated:['team']})
+			.fetchAll({withRelated:['team','category','group','phase']})
 			.then(function (result) {
 				// Message(res,'Success', '0', result);
 				Response(res, result)

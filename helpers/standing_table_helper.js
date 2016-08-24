@@ -4,7 +4,11 @@ if (typeof define !== 'function') {
 
 // var _ = require('lodash')
 
-define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/index', '../util/request_message_util'], function(Knex, _, Models, Message){
+define(['../util/knex_util',
+	'../node_modules/lodash/lodash.min',
+	'../model/index',
+	'../util/request_message_util'],
+	function(Knex, _, Models, Message){
 	var StandingTable = {}
 
 	//==========================================================================
@@ -152,7 +156,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 
 	StandingTable.getStandingTableByMatches = function(matchSql, res){
 
-		// var matchesByCategorySQL = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where categories.id = ' + category_id;
+		console.log(matchSql)
 
 		//TODO: encadenar promises
 		var matchesByCategory = Knex.raw(matchSql).then(function(result){

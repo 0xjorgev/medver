@@ -78,7 +78,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         // }
         ).save().then(function(new_group){
             console.log(`{new_group: ${new_group}}`);
-            Message(res, 'Success', '0', new_group);
+            var data = req.body
+            updateFase(data, res, new_group)
         }).catch(function(error){
             console.log(`{error: ${error}}`);
             Message(res, error.detail, error.code, null);

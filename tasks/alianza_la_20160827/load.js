@@ -23,7 +23,7 @@ var filenames = teams.map((t) =>  {
 	}
 })
 
-_log(filenames.map( (f) => f.filename ))
+// _log(filenames.map( (f) => f.filename ))
 
 //quick&dirty way to end this process
 var teamsDone = []
@@ -82,10 +82,10 @@ filenames.forEach((file) => {
 		}
 
 		return knex('teams').insert(teamData, ['id', 'name'])
-		.then((result, tr) => {
-			console.log('  saved teams')
+		.then((result) => {
+			// console.log('  saved teams')
 			var teamList = _.flatten(result)
-			_log(teamList)
+			// _log(teamList)
 
 			// save players
 			return Promise.all(players.map( (player) => {

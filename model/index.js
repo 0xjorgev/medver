@@ -34,11 +34,13 @@ define([
     './rule',
     './match_team_player',
     './organization',
-    './position'
+    './position',
+    './category_team_player'
 
 ], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type, 
     Contact, Phase, Group, Round, Match, Team, Classification, Player_team, Event, Event_match_player, Match_referee, 
-    Category_type, Category_group_phase_team, Competition_user, Player, Rule, Match_team_player, Organization, Position) 
+    Category_type, Category_group_phase_team, Competition_user, Player, Rule, Match_team_player, Organization, Position,
+    Category_team_player) 
 {
     return {
     	util : Util,
@@ -69,6 +71,7 @@ define([
         rule:Rule,
         match_team_player:Match_team_player,
         organization:Organization,
-        position:Position
+        position:Position,
+        category_team_player:Category_team_player
     };
 });

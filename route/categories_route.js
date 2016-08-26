@@ -5,20 +5,21 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-var _ = require('lodash')
+//var _ = require('lodash')
 
 define(['express',
 		'../model/index',
 		'../util/request_message_util',
 		'../util/knex_util',
 		'../helpers/standing_table_helper',
-		'../util/response_message_util'],
+		'../util/response_message_util',
+		'../node_modules/lodash/lodash.min'],
 	function (express,
 		Models,
 		Message,
 		Knex,
 		StandingTable,
-		Response) {
+		Response, _) {
 
 	var router = express.Router();
 
@@ -486,6 +487,27 @@ define(['express',
 		});
 	}
 
+	//==========================================================================
+	// Get all player of one category and one team
+	//==========================================================================
+	router.get('/:category_id/team/:team_id/player', function (req, res) {
+
+		var category_id = req.params.category_id;
+		var team_id = req.params.team_id;
+
+		return Models.category_team_player
+			.where({category_id:category_id})
+			.where({team_id:team_id})
+			.where({active:true})
+			.fetchAll({withRelated:['player']})
+			.then(function (result) {
+				console.log("Resultado: ",result)
+				Message(res,'Success', '0', result);
+			}).catch(function(error){
+				// Message(res,error.details, error.code, []);
+				Response(res, null, error)
+			});
+	});
 
 	return router;
 

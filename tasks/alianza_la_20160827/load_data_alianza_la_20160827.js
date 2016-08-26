@@ -13,7 +13,7 @@ var getRandomNumber = (min, max) => {
 	return tmp < 10 ? '0'+tmp : tmp
 }
 
-const teams = ['Allumbra United','Baldwin Park United', 'FC Premier', 'Norwalk FC', 'Strikers Olimpus FC', 'WCS Academy Madrid']
+const teams = ['Alhambra United','Baldwin Park United', 'FC Premier', 'Norwalk FC', 'Strikers Olimpus FC', 'WCS Academy Madrid']
 
 //process file
 var filenames = teams.map((t) =>  {

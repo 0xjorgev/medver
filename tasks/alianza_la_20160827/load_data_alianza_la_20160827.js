@@ -23,68 +23,78 @@ var filenames = teams.map((t) =>  {
 	}
 })
 
-_log(filenames)
-
-process.exit(0)
+_log(filenames.map( (f) => f.filename ))
 
 //quick&dirty way to end this process
 var teamsDone = []
 
 console.log('----------------- cargando datos alianza LA 20160827 -----------------')
-//console.log('equipo, nombre, date of birth, number')
 
+//builds a player given the csv
+var getPlayer = (player) => {
+	// 0 team
+	// 1 name
+	// 2 DoB
+	// 3 Number
+	var name = player[1].split(' ')
+	var fn = name[0]
+
+	var bd = player[2] && player[2] != '' ? player[2].split('/') : undefined
+	bd = bd ? new Date('20' + bd[2], bd[0] - 1, bd[1]) : undefined
+
+	return {
+		team: player[0].trim(),
+		number: player[3],
+		first_name: name[0],
+		last_name: name[1],
+		birthday: bd,
+		gender_id: 2
+	}
+}
 
 filenames.forEach((file) => {
 
-	fs.readFile(file.filename , (err, data) => {
-		var players = _.chunk(data.toString().split('\n'), 5)
-			.map((player) => {
-				var bd = player[4].split('/')
-				return {
-					//datos de team
-					team: file.team,
-					//datos de player_team
-					number: player[2],
-					//datos de la tabla player
-					first_name: player[1].trim(),
-					last_name: player[0].trim(),
-					birthday: new Date('20' + bd[2], bd[0] - 1, bd[1]),
-					gender_id: player[3] == 'M' ? 1 : 2
-				}
-			}
-		)
+	fs.readFile(file.filename, (err, data) => {
+
+		console.log('  processing', file.filename)
+
+		if(err){
+			_log(err)
+			process.exit(1)
+		}
+
+		var players = data
+			.toString()
+			.trim()
+			.split('\n')
+			.map( (row) => row.split('\n'))
+			.map( (row) => row[0].split(','))
+			.map(getPlayer)
 
 		var playerTeam = []
 
-		knex.transaction((tr) => {
+		var teamData = {
+			name: file.team,
+			short_name: 'T' + file.team.length,
+			subdiscipline_id: 2, //soccer
+			category_type_id: 10, //sub-15,
+			gender_id: 2 //female
+		}
 
-			var teamData = {
-				name: file.team,
-				short_name: 'T' + file.team.length,
-				subdiscipline_id: 2, //soccer
-				category_type_id: 10, //sub-15,
-				gender_id: 2 //female
-			}
-
-			return knex('teams').insert(teamData, ['id', 'name']).transacting(tr)
-		})
+		return knex('teams').insert(teamData, ['id', 'name'])
 		.then((result, tr) => {
-			// console.log('saved teams')
+			console.log('  saved teams')
 			var teamList = _.flatten(result)
-			// _log(teamList)
+			_log(teamList)
 
 			// save players
 			return Promise.all(players.map( (player) => {
-
 				var p = _.clone(player)
 				delete p.number
 				delete p.team
 
-				return knex('players').insert(p, 'id').transacting(tr).then((result) => {
-
-					// console.log(result)
-					// console.log(player)
-
+				return knex('players').insert(p, 'id')
+				.then((result) => {
 					thisTeam = teamList.filter((pt) => pt.name == player.team)
 					// _log(result)
 					playerTeam.push({
@@ -95,25 +105,23 @@ filenames.forEach((file) => {
 				})
 			}))
 		})
-		.then( (result, tr) => {
+		.then( (result) => {
 			// console.log('saved players')
 			//player_team
-			return Promise.all(playerTeam.map( (t) => knex('players_teams').insert(t, ['id']).transacting(tr) ))
+			return Promise.all(playerTeam.map( (t) => knex('players_teams').insert(t, ['id']) ))
 		})
 		.then((result) => {
 			// console.log('saved players_teams')
 			// _log(result)
-
-			console.log('done w/ team')
+			// console.log('done w/ team')
 			teamsDone.push(true)
 
 			if(teamsDone.length == teams.length){
-				_log('end - done 👏')
+				_log('end - done 👽 ')
 				process.exit(0)
 			}
-
 		})
-		.catch((error, tr) => {
+		.catch((error) => {
 			console.log(error.stack)
 			process.exit(1)
 		})

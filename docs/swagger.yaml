@@ -108,6 +108,7 @@ paths:
           required: true
           type: integer
           format: integer
+
   /category/{category_id}:
     get:
       summary: Gets a category given an id
@@ -140,6 +141,26 @@ paths:
           type: integer
           format: integer
 
+  /category/{category_id}/team/{team_id}/player/:
+    get:
+      summary: Gets all the players that participate on a team in a category
+      description: Get players by category_id and team_id
+      operationId: Get players by category_id and team_id
+      produces:
+      - application/json
+      parameters: 
+        - name: category_id
+          in: path
+          required: true
+          type: integer
+        - name: team_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Player
+        - Category
+        - team
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id

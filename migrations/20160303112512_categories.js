@@ -28,8 +28,8 @@ exports.up = function(knex, Promise) {
 			table.integer('category_type_id').references('categories_types.id').index();
 			table.integer('classification_type_id').references('classifications_types.id').index();
 
-			table.boolean('is_published').notNullable().defaultTo(false);
-
+			// table.boolean('is_published').notNullable().defaultTo(false);
+			table.boolean('is_published').defaultTo(false);
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
 		})

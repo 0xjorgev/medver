@@ -18,7 +18,7 @@ define(['sendgrid'], function (Email) {
                 text:     `${content}`
             }, function(err, json) {
                 if (err) { return console.error(err); }
-                    console.log(`Success! json:${json}`);
+                console.log(`Email sent:`, json);
             });
 		}
     }

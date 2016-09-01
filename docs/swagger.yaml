@@ -44,8 +44,8 @@ paths:
           description: Active user list
   /user/login:
     post:
-      summary: Returns info of an user, given it's username & password
-      description: Returns info of an user, given it's username & password
+      summary: Authenticates an user, given its username & password
+      description: Authenticates an user, given its username & password
       tags:
         - User
       parameters:
@@ -55,6 +55,88 @@ paths:
           x-is-map: false
           schema:
             $ref: '#/definitions/UserLogin'
+      responses:
+        200:
+          description: Active user list
+  /user/register:
+    post:
+      summary: Registers a user in Somosport DB
+      description: Registers a user in Somosport DB
+      tags:
+        - User
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: User Creation Request
+            type: object
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+            required:
+            - player_id
+      responses:
+        200:
+          description: Active user list
+  /user/forgot:
+    post:
+      summary: Forgotten password recovery service
+      description: If username/email is found, a new password is generated & sent to the registered email
+      tags:
+        - User
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: password recover request
+            type: object
+            properties:
+              username:
+                type: string
+                description: Username or email
+            required:
+            - username
+      responses:
+        200:
+          description: Successful password recovery
+        404:
+          description: No user was found with the given username/email
+  /user/change_password:
+    post:
+      summary: Change password
+      description: If username/email is found, then password is changed
+      tags:
+        - User
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: password change request
+            type: object
+            properties:
+              username:
+                type: string
+                description: Username or email
+              old_password:
+                type: string
+                description: Current password
+              new_password:
+                type: string
+                description: New password
+            required:
+            - username
+            - old_password
+            - new_password
       responses:
         200:
           description: Active user list
@@ -148,7 +230,7 @@ paths:
       operationId: Get players by category_id and team_id
       produces:
       - application/json
-      parameters: 
+      parameters:
         - name: category_id
           in: path
           required: true

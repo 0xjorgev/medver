@@ -57,8 +57,6 @@ define(['express',
                 //TODO: test only!
                 result.attributes.roles = ['admin', 'player']
                 result.attributes.permissions = ['list', 'create', 'update', 'delete']
-
-                // Message(res,'Success', '0', result)
             }
 
             // console.log('---------------------------------', result)
@@ -81,14 +79,18 @@ define(['express',
             username: username,
             email:email,
             password:password
-        }).save().then(function(newUser){
+        })
+        .save().then(function(newUser){
             console.log(`{new_user: ${email}}`);
             console.log(`{user_email: ${email}}`);
             send_email_from(email,'Welcome to Somosport', 'Welcome to Somosport!')
-            // email_sender();
-            Message(res, 'Success', '0', newUser);
-        }).catch(function(error){
-            Message(res, error.detail, error.code, null);
+
+            // Message(res, 'Success', '0', newUser);
+            Response(res, newUser)
+        })
+        .catch(function(error){
+            // Message(res, error.detail, error.code, null);
+            Response(res, null, error)
         });
     });
 
@@ -103,69 +105,78 @@ define(['express',
 
         Knex_util(user.tableName)
         .where(function(){
-            this.where('username',username).orWhere('email',username)
+            this.where('username',username)
+                .orWhere('email',username)
         })
         .where('active','=',1)
-        .update({password:md5_pwd}, ['id','email'])
+        .then((result) => {
+
+            if(result.length == 0){
+                //no user/email was found
+                Response(res, result)
+                return
+            }
+
+            return Knex_util(user.tableName)
+                .where({id: result[0].id})
+                .update({password: md5_pwd}
+                , ['id','email'])
+        })
+
         .then(function(result){
             if (result.length != 0){
                 console.log('result is not null');
                 var email = result[0].email;
-            //Non Ethical!
-            // console.log('Result: '+ email);
-            // console.log(`new pwd: ${generated_password}, ${md5_pwd}`);
-            // console.log(`Your new somosport Password is: ${generated_password}`);
-            send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
-            Message(res, 'Success', '0', result);
-            } else {
-                Message(res, 'Username or email not found', '404', result);
+                send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
+                // Message(res, 'Success', '0', result);
+                Response(res, result)
             }
         })
         .catch(function(err){
-          Message(res, err.detail, err.code, null);
+            Response(res, null, error)
         });
     });
 
     router.post('/change_password', function(req, res, next){
         var user = new Models.user;
         var user_pwd_change = req.body;
-        var user_id = user_pwd_change.id;
+        var username = user_pwd_change.username;
         var user_new_password = user_pwd_change.new_password;
         var user_old_password = user_pwd_change.old_password;
 
+
+        console.log(user_pwd_change)
+
         Knex_util(user.tableName)
-        .where('id','=',user_id)
-        .where('active','=',1)
-        .where('password','=',user_old_password)
-        .update({password:user_new_password}, ['id','email'])
+        .where((qb) => {
+            qb.where('username',username)
+                .orWhere('email',username)
+        })
+        .where({active: 1, password: user_old_password})
+        .update({password: user_new_password}, ['id','email'])
         .then(function(result){
             if (result.length != 0){
                 var email = result[0].email;
                 send_email_from(email, 'Your new Somosport Password!', 'Your somosport Password had been changed!' );
-                Message(res, 'Success', '0', result);
-            } else {
-                Message(res, 'invalid input data', '404', result);
+                // Message(res, 'Success', '0', result);
             }
+            //if result is empty, a 404 will be thrown
+            Response(res, result)
         })
         .catch(function(err){
-          Message(res, err.detail, err.code, null);
+            Response(res, null, err)
+          // Message(res, err.detail, err.code, null);
         });
     });
 
-    //TODO:
-    //Add update Profile
-
+    //TODO: Add profile update
     router.get('/', function(req, res){
-
         return Models.user
             .where({active:true})
             .fetchAll()
             .then(function (result) {
-                // Message(res,'Success', '0', result);
-                // res.status(200).json({ message: 'test', code: '0', data: result});
                 Response(res, result)
             }).catch(function(error){
-                //Message(res,error.details, error.code, []);
                 Response(res, null, error)
             });
     })

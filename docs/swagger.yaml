@@ -489,22 +489,6 @@ paths:
       responses:
         200:
           description: List of events
-  /discipline/{discipline_id}/subdiscipline:
-    get:
-      description:
-      produces:
-      - application/json
-      tags:
-        - Discipline
-      parameters:
-        - name: discipline_id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description:
-      security: []
   /match:
     get:
       summary: Gets all matches
@@ -914,10 +898,23 @@ paths:
         200:
           description:
       security: []
+  /discipline/:
+    get:
+      summary: Lists all disciplines
+      description: Lists all disciplines & associated subdisciplines
+      tags:
+        - Discipline
+      operationId: Get All Disciplines
+      produces:
+      - application/json
+      responses:
+        200:
+          description: list of all disciplines
   /discipline/{discipline_id}:
     get:
-      description: Contains related sub disciplines
-      operationId: Get_Discipline By ID_
+      summary: Gets info from a discipline given its ID
+      description: Gets info from a discipline given its ID
+      operationId: Get_Discipline By ID
       produces:
       - application/json
       tags:
@@ -929,12 +926,47 @@ paths:
           type: integer
       responses:
         200:
-          description:
+          description: info from a discipline
+      security: []
+  /discipline/{discipline_id}/subdiscipline:
+    get:
+      summary: Gets the subdisciplines of a discipline given its id
+      description: Gets the subdisciplines of a discipline given its id
+      produces:
+      - application/json
+      tags:
+        - Discipline
+      parameters:
+        - name: discipline_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Returns a list of subdisciplines given a discipline id
+      security: []
+  /discipline/subdiscipline/{subdiscipline_id}/event:
+    get:
+      summary: '?'
+      description: '?'
+      produces:
+      - application/json
+      tags:
+        - Discipline
+      parameters:
+        - name: subdiscipline_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: '?'
       security: []
   /round:
     get:
-      description:
-      operationId: get round_
+      summary: List all rounds
+      description: List all rounds
+      operationId: get round
       produces:
       - application/json
       tags:
@@ -942,7 +974,7 @@ paths:
       parameters: []
       responses:
         200:
-          description:
+          description: list of rounds
       security: []
   /competition/competition_type:
     get:
@@ -975,25 +1007,6 @@ paths:
           required: true
           type: integer
           format: integer
-      responses:
-        200:
-          description:
-      security: []
-  /discipline/:
-    get:
-      description: Lists all disciplines
-      tags:
-        - Discipline
-      operationId: Get All Disciplines_
-      produces:
-      - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/GetAllDisciplinesRequest'
       responses:
         200:
           description:

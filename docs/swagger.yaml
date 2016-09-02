@@ -242,7 +242,7 @@ paths:
       tags:
         - Player
         - Category
-        - team
+        - Team
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id

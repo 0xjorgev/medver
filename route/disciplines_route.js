@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/response_message_util'], function (express, Models, Message, Response) {
+define(['express', '../model/index', '../util/response_message_util'], function (express, Models, Response) {
 
     var router = express.Router();
 

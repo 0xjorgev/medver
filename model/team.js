@@ -51,6 +51,10 @@ define(['./base_model', './category_type', './organization', './player_team', '.
 
         match_player_team: function(){
             return this.hasMany('Match_team_player', 'team_id');
+        },
+
+        summoned: function(){
+            return this.hasMany('Category_team_player', 'team_id');
         }
 
         // player: function(){

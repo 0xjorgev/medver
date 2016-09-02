@@ -61,7 +61,12 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         // tapping into Knex query builder to modify query being run
         return Models.match
         .where({'id':match_id})
-        .fetch({withRelated: ['home_team.match_player_team.player.gender', 'visitor_team.match_player_team.player.gender', 'round.group.phase.category.category', 'round.group.phase.category.season.competition'], debug: false})
+        .fetch({withRelated: ['home_team.match_player_team.player.gender', 
+                                'visitor_team.match_player_team.player.gender', 
+                                'round.group.phase.category.category', 
+                                'round.group.phase.category.season.competition',
+                                'home_team.summoned.player',
+                                'visitor_team.summoned.player'], debug: false})
         .then(function (result) {
 
             // console.log(result.attributes)
@@ -204,5 +209,6 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         console.log('PUT /match', req.body)
         saveMatch(req, res)
     });
+
     return router;
 });

@@ -8,10 +8,11 @@ if (typeof define !== 'function') {
 define(['express',
         '../model/index',
         '../util/request_message_util',
+        '../util/response_message_util',
         '../util/knex_util',
         '../util/email_sender_util',
         '../helpers/auth_helper'],
-        function (express, Models, Message, Knex, Email, auth) {
+        function (express, Models, Message, Response, Knex, Email, auth) {
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -50,10 +51,12 @@ define(['express',
     //List of competitions
     router.get('/', function (req, res) {
 
-        var chk = auth.checkPermissions(req._currentUser, ['admin', 'admin-competition'])
+        //req._currentUser is the user recovered from token
+        //to get competitions the user should have these permissions
+        var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
 
         if (chk.code != 0){
-            Message(res, chk.message, chk.code, null)
+            Response(res, null, chk)
             return
         }
 
@@ -63,15 +66,10 @@ define(['express',
                 // qb.where(req._currentUser.id)
             })
             .fetchAll({ withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']} )
-            .then((result) => {
-                // console.log('result :', result);
-                Message(res,'Success', '0', result);
-            })
+            .then((result) => Response(res, result) )
             .catch((error) => {
-                console.log(error)
-                console.log(error.stack)
-                Message(res,error.details, error.code, []);
-            });
+                Response(res, null, error)
+            })
     });
 
     //Competitions Types List -> Array of results [Competition_type]

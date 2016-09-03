@@ -67,52 +67,37 @@ define(['express',
             })
             .fetchAll({ withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']} )
             .then((result) => Response(res, result) )
-            .catch((error) => {
-                Response(res, null, error)
-            })
+            .catch((error) => Response(res, null, error) )
     });
 
     //Competitions Types List -> Array of results [Competition_type]
     router.get('/competition_type', function(req, res){
-        console.log('types');
         return Models.competition_type
-        .fetchAll()
-        .then(function (result) {
-            console.log('Result:'+result);
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            console.log('Result:'+error);
-             Message(res,error.details, error.code, []);
-        });
+            .fetchAll()
+            .then((result) => Response(res, result) )
+            .catch((error) => Response(res, null, error) );
     });
 
     //Competition by Id
     router.get('/:competition_id', function (req, res) {
-        console.log('competition_id List');
         var comp_id = req.params.competition_id;
         return Models.competition
-        .where({'id':comp_id})
-        .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']} )
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
+            .where({'id': comp_id })
+            .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']} )
+            .then((result) => Response(res, result) )
+            .catch((error) => Response(res, null, error) )
     });
 
     //Seasons by Competition_Id -> Returns array of result
     router.get('/:competition_id/season/', function (req, res) {
-        console.log('/competition_id/season/');
         var competition_id = req.params.competition_id;
         return Models.season
-        .where({competition_id:competition_id})
-        .fetchAll()
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
+            .where({competition_id:competition_id})
+            .fetchAll()
+            .then((result) => Response(res, result))
+            .catch((error) => Response(res, null, error));
     });
+
 //Move to an independent Router
 
 //--------------------------

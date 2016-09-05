@@ -8,10 +8,11 @@ if (typeof define !== 'function') {
 define(['express',
         '../model/index',
         '../util/request_message_util',
+        '../util/response_message_util',
         '../util/knex_util',
         '../util/email_sender_util',
         '../helpers/auth_helper'],
-        function (express, Models, Message, Knex, Email, auth) {
+        function (express, Models, Message, Response, Knex, Email, auth) {
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -50,10 +51,12 @@ define(['express',
     //List of competitions
     router.get('/', function (req, res) {
 
-        var chk = auth.checkPermissions(req._currentUser, ['admin', 'admin-competition'])
+        //req._currentUser is the user recovered from token
+        //to get competitions the user should have these permissions
+        var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
 
         if (chk.code != 0){
-            Message(res, chk.message, chk.code, null)
+            Response(res, null, chk)
             return
         }
 
@@ -63,69 +66,49 @@ define(['express',
                 // qb.where(req._currentUser.id)
             })
             .fetchAll({ withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']} )
-            .then((result) => {
-                // console.log('result :', result);
-                Message(res,'Success', '0', result);
-            })
-            .catch((error) => {
-                console.log(error)
-                console.log(error.stack)
-                Message(res,error.details, error.code, []);
-            });
+            .then((result) => Response(res, result) )
+            .catch((error) => Response(res, null, error) )
     });
 
     //Competitions Types List -> Array of results [Competition_type]
     router.get('/competition_type', function(req, res){
-        console.log('types');
         return Models.competition_type
-        .fetchAll()
-        .then(function (result) {
-            console.log('Result:'+result);
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            console.log('Result:'+error);
-             Message(res,error.details, error.code, []);
-        });
+            .fetchAll()
+            .then((result) => Response(res, result) )
+            .catch((error) => Response(res, null, error) );
     });
 
     //Competition by Id
     router.get('/:competition_id', function (req, res) {
-        console.log('competition_id List');
         var comp_id = req.params.competition_id;
         return Models.competition
-        .where({'id':comp_id})
-        .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']} )
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
+            .where({'id': comp_id })
+            .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']} )
+            .then((result) => Response(res, result) )
+            .catch((error) => Response(res, null, error) )
     });
 
     //Seasons by Competition_Id -> Returns array of result
     router.get('/:competition_id/season/', function (req, res) {
-        console.log('/competition_id/season/');
         var competition_id = req.params.competition_id;
         return Models.season
-        .where({competition_id:competition_id})
-        .fetchAll()
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
+            .where({competition_id:competition_id})
+            .fetchAll()
+            .then((result) => Response(res, result))
+            .catch((error) => Response(res, null, error));
     });
+
 //Move to an independent Router
 
 //--------------------------
     router.post('/:competition_id/contact/', function (req, res) {
-        console.log('/:competition_id/contact/create');
+        // console.log('/:competition_id/contact/create');
 
         var Contact = Models.contact;
         var contact_post = req.body;
         var competition_id = req.params.competition_id;
 
-        console.log('Req Values:' + req.body);
+        console.log('Req values', req.body);
 
         var country = contact_post.country;
         var state = contact_post.state;
@@ -135,18 +118,16 @@ define(['express',
         var email = contact_post.email;
         var website_url = contact_post.website_url;
 
-        console.log('------------------------------');
-
-        console.log('country: ', contact_post.country);
-        console.log('state: ', contact_post.state);
-        console.log('city: ', contact_post.city);
-        console.log('zip_code: ', contact_post.zip_code);
-        console.log('phone: ', contact_post.phone);
-        console.log('email: ', contact_post.email);
-        console.log('website_url: ', contact_post.website_url);
-        console.log('competition_id: ', competition_id);
-
-        console.log('------------------------------');
+        // console.log('------------------------------');
+        // console.log('country: ', contact_post.country);
+        // console.log('state: ', contact_post.state);
+        // console.log('city: ', contact_post.city);
+        // console.log('zip_code: ', contact_post.zip_code);
+        // console.log('phone: ', contact_post.phone);
+        // console.log('email: ', contact_post.email);
+        // console.log('website_url: ', contact_post.website_url);
+        // console.log('competition_id: ', competition_id);
+        // console.log('------------------------------');
 
         new Contact({
             // country: contact_post.country,
@@ -158,95 +139,93 @@ define(['express',
             // website_url:contact_post.website_url,
             // competition_id: competition_id
             contact_post
-        }).save().then(function(new_contact){
-            console.log(`{new_contact: ${new_contact}}`);
-            Message(res, 'Success', '0', new_contact);
-        }).catch(function(error){
-            console.log(`{error: ${error}}`);
-            Message(res, error.detail, error.code, null);
+        })
+        .save()
+        .then(function(new_contact){
+            console.log(`new_contact:`, new_contact);
+            // Message(res, 'Success', '0', new_contact);
+            Response(res, new_contact)
+        })
+        .catch(function(error){
+            // Message(res, error.detail, error.code, null);
+            Response(res, null, error)
         });
-
     });
 
     //Competition Contact by competition_id
     router.get('/:competition_id/contact/', function (req, res) {
-        console.log('/:competition_id/contact/:contact_id');
-
         var competition_id = req.params.competition_id;
         return Models.contact
         .where('competition_id','=',competition_id)
         .fetchAll()
         .then(function (result) {
-            Message(res,'Success', '0', result);
+            // Message(res,'Success', '0', result);
+            Response(res, result)
         }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            Response(res, null, error)
+            // Message(res,error.details, error.code, []);
         });
     });
 
     //Competition Contact by contact_id
     router.get('/:competition_id/contact/:contact_id', function (req, res) {
-        console.log('/:competition_id/contact/:contact_id');
 
         var competition_id = req.params.competition_id;
         var contact_id = req.params.contact_id;
 
-        console.log('Req Values:' + req.body);
+        console.log('Req values:', req.body);
 
         return Models.contact
         .where({competition_id:competition_id, id:contact_id})
         .fetchAll()
         .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            // Message(res,'Success', '0', result);
+            Response(res, result)
+        })
+        .catch(function(error){
+            Response(res, null, error)
+            // Message(res,error.details, error.code, []);
         });
     });
 
     //Competition Contact Update
     router.put('/:competition_id/contact/:contact_id', function(req, res){
-        console.log('/:competition_id/contact/:contact_id/update');
-        //Model Instance
-        var Contact = Models.contact;
 
+        var Contact = Models.contact;
         var competition_id = req.params.competition_id;
         var contact_id = req.params.contact_id;
         var contact_upd = req.body;
 
-        // Knex(competition.tableName)
         Knex('contacts')
         .where('id','=',contact_id)
         .where('competition_id','=',competition_id)
         .update(contact_upd, ['id'])
         .then(function(result){
             if (result.length != 0){
-                console.log('result is not null');
-                console.log(`result: ${result[0]}`);
-                Message(res, 'Success', '0', result);
+                console.log(`result`, result);
+                Response(res, result)
             } else {
-                console.log(`{error: ${error}}`);
+                //TODO: cuando cae en esta condicion? probar
                 Message(res, 'Wrong Competition_id or contact_id', '404', result);
+                // Response(res, null, error)
             }
         })
         .catch(function(err){
-            console.log(`Catch Error: ${err}`);
-          Message(res, err.detail, err.code, null);
+            Response(res, null, error)
         });
     });
+
 //--------------------------
-
-
 
     //Create Competition
     router.post('/', function (req, res) {
 
-
         //ADD URL
         //Model Instance
-        console.log('Create Competition');
         var Competition = Models.competition;
         var competition_post = req.body;
 
-        //console.log('Req Values:' + req.body);
+        console.log('Req Values:', req.body);
 
         var name = competition_post.name;
         var discipline_id = competition_post.discipline_id;
@@ -256,79 +235,38 @@ define(['express',
         var img_url = competition_post.img_url;
         var is_published = competition_post.is_published;
 
-        console.log('------------------------------');
+        // console.log('------------------------------');
 
-        console.log('name: ', competition_post.name);
-        console.log('discipline_id: ', competition_post.discipline_id);
-        console.log('subdiscipline_id: ', competition_post.subdiscipline_id);
-        console.log('competition_type_id: ', competition_post.competition_type_id);
-        console.log('description: ', competition_post.description);
-        console.log('competition_post: ', competition_post);
+        // console.log('name: ', competition_post.name);
+        // console.log('discipline_id: ', competition_post.discipline_id);
+        // console.log('subdiscipline_id: ', competition_post.subdiscipline_id);
+        // console.log('competition_type_id: ', competition_post.competition_type_id);
+        // console.log('description: ', competition_post.description);
+        // console.log('competition_post: ', competition_post);
 
-        console.log('------------------------------');
+        // console.log('------------------------------');
 
-         new Competition( competition_post
-            //{
-        //     competition_post
-            // name: name,
-            // description: description,
-            // discipline_id:discipline_id,
-            // subdiscipline_id:subdiscipline_id,
-            // competition_type_id:competition_type_id,
-            // img_url: img_url,
-            // is_published: is_published
+        //{
+        // competition_post
+        // name: name,
+        // description: description,
+        // discipline_id:discipline_id,
+        // subdiscipline_id:subdiscipline_id,
+        // competition_type_id:competition_type_id,
+        // img_url: img_url,
+        // is_published: is_published
         // }
-        ).save().then(function(new_competition){
-            console.log(`{new_competition: ${new_competition}}`);
-            Message(res, 'Success', '0', new_competition);
-        }).catch(function(error){
-            console.log(`{error: ${error}}`);
-            Message(res, error.detail, error.code, null);
-        });
+        new Competition( competition_post )
+        .save()
+        .then(function(new_competition){
+            Response(res, result)
+        })
+        .catch(function(error){
+            Response(res, null, error)
+        })
     });
 
-    // //Competition Update
-    // router.put('/:competition_id/', function(req, res){
-
-    //     console.log('Competition Update');
-
-    //     //Model Instance
-    //     var competition = Models.competition;
-    //     var competition_id = req.params.competition_id;
-    //     var competition_upd = req.body;
-    //     console.log('------------------------------');
-    //     console.log('Competition Update');
-    //     console.log('name: ', competition_upd.name);
-    //     console.log('description: ', competition_upd.description);
-    //     console.log('discipline_id: ', competition_upd.discipline_id);
-    //     console.log('subdiscipline_id: ', competition_upd.subdiscipline_id);
-    //     console.log('competition_type_id: ', competition_upd.competition_type_id);
-    //     console.log('is_published: ', competition_upd.is_published);
-    //     console.log('------------------------------');
-
-    //     // Knex(competition.tableName)
-    //     Knex('competitions')
-    //     .where('id','=',competition_id)
-    //     .where('active','=',1)
-    //     .update(competition_upd, ['id'])
-    //     .then(function(result){
-    //         if (result.length != 0){
-    //             console.log('result is not null');
-    //             console.log(`result: ${result[0]}`);
-    //             Message(res, 'Success', '0', result);
-    //         } else {
-    //             console.log(`{error: ${error}}`);
-    //             Message(res, 'Username or email not found', '404', result);
-    //         }
-    //     })
-    //     .catch(function(err){
-    //         console.log(`error: ${err}`);
-    //       Message(res, err.detail, err.code, null);
-    //     });
-    // });
-
     router.post('/:comp_id/admin_user/', function(req, res, next){
-
         console.log('Create Competitions Admins');
         var Competition_user = Models.competition_user
         var comp_user = req.body;
@@ -371,7 +309,6 @@ define(['express',
         var comp_id = req.params.competition_id;
         return Models.competition
         .where({'id':comp_id})
-        // .fetch( {withRelated: ['discipline.subdisciplines', 'competition_type', 'seasons','seasons.categories.classification', 'seasons.categories.phases', 'seasons.categories.phases.groups','seasons.categories.category_group_phase_team.group.rounds.matches.home_team', 'seasons.categories.category_group_phase_team.group.rounds.matches.visitor_team']} )
         .fetch( {withRelated: ['discipline.subdisciplines',
             'competition_type',
             'seasons',
@@ -387,10 +324,8 @@ define(['express',
     //---------------------------------------------------------------
 
     //Competition Update
-    router.put('/:competition_id/', function(req, res)
-    {
+    router.put('/:competition_id/', function(req, res) {
         console.log('Competition Publish')
-
         //Model Instance
         var competition = Models.competition
         var competition_id = req.params.competition_id
@@ -429,39 +364,42 @@ define(['express',
                         console.log('Envio de email de actualizacion de la competition ' + fullUrl)
 
                         Models.user
-                        .where('active',true)
-                        .fetchAll().then(function (result) {
+                        .where('active', true)
+                        .fetchAll()
+                        .then(function (result) {
                             //console.log('Result:', result)
+                            //TODO: send mail only to comp admins
                             var us = result.map(userMap)
                             // console.log('Users email:', us.reduce(userReduce))
                             for (var i = us.length - 1; i >= 0; i--) {
-                                send_email_from(us[i], 'Your competition has been published!',
+                                send_email_from(us[i],
+                                    'Your competition has been published!',
                                     'Your new competition portal is now live!\n' +
-                                        'Check it out at ' + fullUrl)
+                                    'Check it out at ' + fullUrl)
                             }
-
-                        }).catch(function(err){
-                            console.log(`Error: ${err}`);
+                        })
+                        .catch(function(err){
+                            //TODO: handle this error
+                            console.log(`Error`, err);
                         });
                     }
-                    Message(res, 'Success', '0', result)
+                    // Message(res, 'Success', '0', result)
+                    Response(res, result)
                 } else {
                     console.log(`{error: ${error}}`)
                     Message(res, 'Username or email not found', '404', result)
                 }
             })
             .catch(function(err){
-                console.log(`error: ${err}`)
-              Message(res, err.detail, err.code, null);
+              // Message(res, err.detail, err.code, null);
+              Response(res, null, error)
             });
         })
     });
 
     //Publish a competition
-    router.put('/:competition_id/season/:season_id/category/:category_id/publish', function(req, res)
-    {
+    router.put('/:competition_id/season/:season_id/category/:category_id/publish', function(req, res) {
         console.log('Competition Publish')
-
         //Model Instance
         var competition_id = req.params.competition_id
         var season_id = req.params.season_id

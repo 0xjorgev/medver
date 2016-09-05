@@ -159,30 +159,28 @@ define(['express',
 		var category_id = req.params.category_id;
 		var category_upd = req.body;
 
-		console.log('--------------------');
-		console.log("season_id: " + category_upd.season_id);
+		console.log('Req body', category_upd);
 
-			name = category_upd.name
-
-			participant_minimum = category_upd.participant_minimum
-			participant_maximum = category_upd.participant_maximum
-			other_minimum_participant = category_upd.other_minimum_participant
-			other_maximum_participant = category_upd.other_maximum_participant
-			player_minimum_participant = category_upd.player_minimum_participant
-			player_maximum_participant = category_upd.player_maximum_participant
-			player_minimum_summoned = category_upd.player_minimum_summoned
-			player_maximum_summoned = category_upd.player_maximum_summoned
-			coach_minimum_participant = category_upd.coach_minimum_participant
-			coach_maximum_participant = category_upd.coach_maximum_participant
-			team_quantity = category_upd.team_quantity
-			gender_id = category_upd.gender_id
-			season_id = category_upd.season_id
-			category_type_id = category_upd.category_type_id
-			classification_type_id = category_upd.classification_type_id
-			inscription_init_at = category_upd.inscription_init_at
-			inscription_ends_at = category_upd.inscription_ends_at
-			image_url = category_upd.image_url
-			is_published = category_upd.is_published
+		name = category_upd.name
+		participant_minimum = category_upd.participant_minimum
+		participant_maximum = category_upd.participant_maximum
+		other_minimum_participant = category_upd.other_minimum_participant
+		other_maximum_participant = category_upd.other_maximum_participant
+		player_minimum_participant = category_upd.player_minimum_participant
+		player_maximum_participant = category_upd.player_maximum_participant
+		player_minimum_summoned = category_upd.player_minimum_summoned
+		player_maximum_summoned = category_upd.player_maximum_summoned
+		coach_minimum_participant = category_upd.coach_minimum_participant
+		coach_maximum_participant = category_upd.coach_maximum_participant
+		team_quantity = category_upd.team_quantity
+		gender_id = category_upd.gender_id
+		season_id = category_upd.season_id
+		category_type_id = category_upd.category_type_id
+		classification_type_id = category_upd.classification_type_id
+		inscription_init_at = category_upd.inscription_init_at
+		inscription_ends_at = category_upd.inscription_ends_at
+		image_url = category_upd.image_url
+		is_published = category_upd.is_published
 
 		Knex(category.tableName)
 		.where('id','=',category_id)
@@ -210,17 +208,16 @@ define(['express',
 			'image_url' : image_url }, ['id'])
 		.then(function(result){
 			if (result.length != 0){
-				console.log('result is not null');
-				console.log(`result: ${result[0]}`);
-				console.log(`result: ${result}`);
-				Message(res, 'Success', '0', result);
+				console.log(`result:`, result);
+				// Message(res, 'Success', '0', result);
+				Response(res, result)
 			} else {
+				//TODO: Reemplazar por mensaje de response
 				Message(res, 'Category not found', '404', result);
 			}
 		})
 		.catch(function(err){
-			console.log(`error: ${err}`);
-		  Message(res, err.detail, err.code, null);
+			Response(res, null, err)
 		});
 	});
 

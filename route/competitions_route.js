@@ -219,7 +219,6 @@ define(['express',
 
     //Create Competition
     router.post('/', function (req, res) {
-
         //ADD URL
         //Model Instance
         var Competition = Models.competition;
@@ -259,7 +258,7 @@ define(['express',
         new Competition( competition_post )
         .save()
         .then(function(new_competition){
-            Response(res, result)
+            Response(res, new_competition)
         })
         .catch(function(error){
             Response(res, null, error)

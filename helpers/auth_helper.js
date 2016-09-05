@@ -10,24 +10,24 @@ define(['../node_modules/lodash/lodash.min', '../util/request_message_util'], fu
 
 		// permissions = (typeof permissions == Array) ? permissions : [permissions]
 
-		console.log('user.roles > ', user.roles[0], 'permissions required >', permissions)
+		// console.log('user.roles > ', user.roles[0], 'permissions required >', permissions)
 
-		console.log(_.includes(permissions, user.roles ))
+		if(user){
+			var hasPermission = user.roles.reduce((flag, p) => {
+				return flag || _.includes(permissions, p)
+			}, false)
 
-		var hasPermission = user.roles.reduce((flag, p) => {
-			return flag || _.includes(permissions, p)
-		}, false)
-
-		console.log('has permissions', hasPermission)
-
-		if(user && hasPermission ){
-			return {code: 0,  message: 'OK'}
+			if(hasPermission){
+				return {code: 0,  message: 'OK'}
+			}
 		}
-		else {
-			return {code: 403,
-				name: 'InsufficientPermissionsError',
-				message: 'Insufficient permissions to access this resource'}
-		}
+
+		//if no user was found or the user doesn't have permissions
+		return {code: 403,
+			name: 'InsufficientPermissionsError',
+			message: 'Insufficient permissions to access this resource'}
+
+
 	}
 
 	return authHelper

@@ -224,36 +224,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		saveTeam(data, res)
 	});
 
-
-	//==========================================================================
-	// players_teams relations ... AKA team roster
-	//
-	// {
-	//     "team_id":"1",
-	//     "team_player":{
-	//         "id":1,
-	//         "active":true,
-	//         "number":1,
-	//         "position":"P",
-	//         "player_id":1,
-	//         "team_id":1
-	//     },
-	//     "player":
-	//         {
-	//         "id":1,
-	//         "first_name":"José Pablo",
-	//         "last_name":"Pérez Fernández",
-	//         "img_url":null,
-	//         "portrait_url":null,
-	//         "nickname":"PEPE",
-	//         "birthday":"2007-05-28T04:00:00.000Z",
-	//         "email":"PErezFernandez@somos.com",
-	//         "gender_id":1
-	//     }
-	// }
-	//
-	//==========================================================================
-
 	var savePlayerTeam = (playerTeamData, res) => {
 
 		console.log('Save Player Team: ', playerTeamData)

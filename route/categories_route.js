@@ -490,7 +490,7 @@ define(['express',
 	//==========================================================================
 	// Get all player of one category and one team
 	//==========================================================================
-	router.get('/:category_id/team/:team_id/player', function (req, res) {
+	router.get('/:category_id/team/:team_id/players', function (req, res) {
 
 		var category_id = req.params.category_id;
 		var team_id = req.params.team_id;
@@ -508,6 +508,84 @@ define(['express',
 				Response(res, null, error)
 			});
 	});
+
+	//==========================================================================
+	// Get all players of one category
+	//==========================================================================
+	router.get('/:category_id/players', function (req, res) {
+
+		var category_id = req.params.category_id;
+		var team_id = req.params.team_id;
+
+		return Models.category_team_player
+			.where({category_id:category_id})
+			.where({active:true})
+			.fetchAll({withRelated:['player']})
+			.then(function (result) {
+				console.log("Resultado: ",result)
+				Message(res,'Success', '0', result);
+			}).catch(function(error){
+				// Message(res,error.details, error.code, []);
+				Response(res, null, error)
+			});
+	});
+
+	//==========================================================================
+	// Create a category team player
+	//==========================================================================
+	router.post('/:category_id/team/:team_id/player/:player_id', function(req, res){
+		console.log('params: ', req.params)
+		var data = {
+			params: req.params,
+			body: req.body
+		}
+		console.log('POST', data)
+		saveCategory_team_player(data, res)
+	})
+
+	//==========================================================================
+	// Update a category team player
+	//==========================================================================
+	router.put('/:category_id/team/:team_id/player/:player_id', function(req, res){
+		var data = {
+			params: req.params,
+			body: req.body
+		}
+		console.log('PUT', data)
+		saveCategory_team_player(data, res)
+	})
+
+	//==========================================================================
+	// Save Category Group Phase Team
+	//==========================================================================
+	var saveCategory_team_player = function(data, res){
+
+		console.log('params: ', data.params)
+		var summonedData = {
+			category_id: data.params.category_id,
+			team_id: data.params.team_id,
+			player_id: data.params.player_id,
+			active: data.body.active = data.body.active !== false,
+			number: data.body.number = (data.body.number == undefined) ? 0 : data.body.number,
+			position: data.body.position = (data.body.position == undefined) ? "" : data.body.position
+		}
+		if(data.body.id){
+			console.log("data id: ", data.body.id)
+			summonedData.id = data.body.id
+		}
+
+		console.log('Summoned: ', summonedData);
+
+		return new Models.category_team_player(summonedData).save().then(function(summoned)
+		{
+			console.log('Summoned response: ', summoned);
+			Message(res, 'Success', '0', summoned);
+		}).catch(function(error){
+			console.log(`{error: ${error}`);
+			console.log(` ------ error: ${error.detail}`);
+			Message(res, error.detail, error.code, null);
+		});
+	}
 
 	return router;
 

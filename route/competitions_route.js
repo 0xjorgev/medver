@@ -17,18 +17,6 @@ define(['express',
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
 
-    var userMap = function(user){
-        //console.log('Inner User :', user)
-        return user.attributes.email
-    }
-
-    var userReduce = function(acum, email)
-    {
-        console.log("Email: ", email)
-        console.log("Acum: ", acum)
-        return acum += ", " + email
-    }
-
     router.get('/:comp_id/admin_user/', function(req, res, next){
 
         console.log('Competitions Admins');
@@ -62,11 +50,32 @@ define(['express',
 
         return Models.competition
             .query(function(qb){
-                //TODO: necesitamos asociar la competicion al usuario
-                // qb.where(req._currentUser.id)
+                qb.distinct() //TODO: el query está devolviendo una competicion por usuario
+                qb.innerJoin('competitions_users', 'competitions_users.competition_id', 'competitions.id')
+                qb.where({'competitions_users.user_id': req._currentUser.id})
             })
-            .fetchAll({ withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'seasons.categories']} )
-            .then((result) => Response(res, result) )
+            .fetchAll({
+                withRelated: [
+                    'discipline',
+                    'subdiscipline',
+                    'competition_type',
+                    'seasons',
+                    'seasons.categories',
+                    'competition_user.users']
+                    // esto no funciono, pero debe haber alguna forma de hacerlo funcionar
+                    // , columns: ['competition_user.users.username','competition_user.users.email']
+            })
+            .then((result) => {
+                //se elimina el password de los users
+                result = result.map((comp) => {
+                    comp.relations.competition_user.map((user) => {
+                        delete user.relations.users.attributes.password
+                        return user
+                    })
+                    return comp
+                })
+                Response(res, result)}
+            )
             .catch((error) => Response(res, null, error) )
     });
 
@@ -83,8 +92,19 @@ define(['express',
         var comp_id = req.params.competition_id;
         return Models.competition
             .where({'id': comp_id })
-            .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons']} )
-            .then((result) => Response(res, result) )
+            .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'competition_user.users']} )
+            .then((result) => {
+                //se elimina el password de los users
+
+                result.relations.competition_user.map((user) => {
+                    delete user.relations.users.attributes.password
+                    return user
+                })
+
+                Response(res, result)}
+                // return result
+            )
+            // .then((result) => Response(res, result) )
             .catch((error) => Response(res, null, error) )
     });
 
@@ -327,8 +347,7 @@ define(['express',
 
     //Competition Update
     router.put('/:competition_id/', function(req, res) {
-        console.log('Competition Publish')
-        //Model Instance
+
         var competition = Models.competition
         var competition_id = req.params.competition_id
         // var competition_upd = req.body
@@ -357,58 +376,77 @@ define(['express',
 
         // Obtengo los datos de la competition antes de actualizar
         Models.competition
-        .where( {'id': competition_id})
+        .where( {'id': competition_id, 'active': true})
         .fetch()
-        .then(function (result){
-            var new_is_published = competition_upd.is_published
-            var old_is_published = result.attributes.is_published
-
-            // Se hace el update de la competition
-            Knex('competitions')
-            .where('id','=',competition_id)
-            .where('active','=',1)
-            .update(competition_upd, ['id'])
-            .then(function(result){
-                if (result.length != 0)
-                {
-                    // Se verifica si se modifico el estado de la competition como publicada
-                    if(new_is_published != old_is_published)
-                    {
-                        var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id
-                        console.log('Envio de email de actualizacion de la competition ' + fullUrl)
-
-                        Models.user
-                        .where('active', true)
-                        .fetchAll()
-                        .then(function (result) {
-                            //console.log('Result:', result)
-                            //TODO: send mail only to comp admins
-                            var us = result.map(userMap)
-                            // console.log('Users email:', us.reduce(userReduce))
-                            for (var i = us.length - 1; i >= 0; i--) {
-                                send_email_from(us[i],
-                                    'Your competition has been published!',
-                                    'Your new competition portal is now live!\n' +
-                                    'Check it out at ' + fullUrl)
-                            }
-                        })
-                        .catch(function(err){
-                            //TODO: handle this error
-                            console.log(`Error`, err);
-                        });
-                    }
-                    // Message(res, 'Success', '0', result)
-                    Response(res, result)
-                } else {
-                    console.log(`{error: ${error}}`)
-                    Message(res, 'Username or email not found', '404', result)
-                }
-            })
-            .catch(function(err){
-              // Message(res, err.detail, err.code, null);
-              Response(res, null, err)
-            });
+        .then((result) => {
+            console.log('result de fetch', result.attributes)
+            return Knex('competitions')
+                .where({id: result.attributes.id})
+                .update(competition_upd, ['id'])
         })
+        .then((result) => {
+            var adminData = {
+                competition_id: competition_id,
+                user_id: req.body.created_by.id,
+                active: true }
+            return new Models.competition_user(adminData).save()
+        })
+        .then((result) => {
+            console.log('result de competition users save', result)
+            Response(res, result)
+        })
+
+            // var new_is_published = competition_upd.is_published
+            // var old_is_published = result.attributes.is_published
+
+            // // Se hace el update de la competition
+            // Knex('competitions')
+            // .where('id','=',competition_id)
+            // .where('active','=',1)
+            // .update(competition_upd, ['id'])
+            // .then(function(result){
+                // if (result.length != 0)
+                // {
+                //     // Se verifica si se modifico el estado de la competition como publicada
+                //     if(new_is_published != old_is_published)
+                //     {
+                //         var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id
+                //         console.log('Envio de email de actualizacion de la competition ' + fullUrl)
+
+                //         Models.user
+                //         .where('active', true)
+                //         .fetchAll()
+                //         .then(function (result) {
+                //             //console.log('Result:', result)
+                //             //TODO: send mail only to comp admins
+                //             var us = result.map(userMap)
+                //             // console.log('Users email:', us.reduce(userReduce))
+                //             for (var i = us.length - 1; i >= 0; i--) {
+                //                 send_email_from(us[i],
+                //                     'Your competition has been published!',
+                //                     'Your new competition portal is now live!\n' +
+                //                     'Check it out at ' + fullUrl)
+                //             }
+                //         })
+                //         .catch(function(err){
+                //             //TODO: handle this error
+                //             console.log(`Error`, err);
+                //         });
+                //     }
+                    // Message(res, 'Success', '0', result)
+                // }
+                // else {
+                //     console.log(`{error: ${error}}`)
+                //     Message(res, 'Username or email not found', '404', result)
+                // }
+            // .then((result) => {
+            //     Response(res, result)
+            // })
+            // .catch(function(err){
+            //   // Message(res, err.detail, err.code, null);
+            //   Response(res, null, err)
+            // });
+        // })
     });
 
     //Publish a competition

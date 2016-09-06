@@ -850,7 +850,8 @@ paths:
       security: []
   /competition:
     get:
-      description: Full List of Competitions
+      summary: List of competitions managed by the user_id received in auth-token
+      description: List of competitions managed by the user_id received in auth-token
       tags:
         - Competition
       produces:
@@ -863,8 +864,11 @@ paths:
       responses:
         200:
           description: List of competition managed by token user
+        404:
+          description: User doesn't manage any competitions
       security: []
     post:
+      summary: Creates a competition
       description: Competition Creation
       tags:
         - Competition
@@ -881,24 +885,6 @@ paths:
         200:
           description:
       security: []
-
-  # /competition/{competition_id}:
-  #   get:
-  #     summary: Gets a competition given an id
-  #     description: Full competition Object
-  #     tags:
-  #       - Competition
-  #     produces:
-  #     - application/json
-  #     parameters:
-  #     - name: competition_id
-  #       in: path
-  #       required: true
-  #       type: integer
-  #     responses:
-  #       200:
-  #         description:
-  #     security: []
   /gender:
     get:
       description:
@@ -992,6 +978,7 @@ paths:
       security: []
   /competition/{competition_id}/season/:
     get:
+      summary: List of seasons for each competition
       description: List of seasons for each competition
       tags:
         - Competition
@@ -1023,7 +1010,7 @@ paths:
     get:
       summary: Gets info from a discipline given its ID
       description: Gets info from a discipline given its ID
-      operationId: Get_Discipline By ID
+      operationId: get_discipline_by_id
       produces:
       - application/json
       tags:

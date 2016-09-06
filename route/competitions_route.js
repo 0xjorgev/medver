@@ -222,29 +222,28 @@ define(['express',
         //ADD URL
         //Model Instance
         var Competition = Models.competition;
-        var competition_post = req.body;
+        // var competition_post = req.body;
 
         console.log('Req Values:', req.body);
 
-        var name = competition_post.name;
-        var discipline_id = competition_post.discipline_id;
-        var subdiscipline_id = competition_post.subdiscipline_id;
-        var competition_type_id = competition_post.competition_type_id;
-        var description = competition_post.description;
-        var img_url = competition_post.img_url;
-        var is_published = competition_post.is_published;
+        var competition_post = {
+            name: req.body.name,
+            discipline_id: req.body.discipline_id,
+            subdiscipline_id: req.body.subdiscipline_id,
+            competition_type_id: req.body.competition_type_id,
+            description: req.body.description,
+            img_url: req.body.img_url,
+            is_published: req.body.is_published
+        }
 
         // console.log('------------------------------');
-
         // console.log('name: ', competition_post.name);
         // console.log('discipline_id: ', competition_post.discipline_id);
         // console.log('subdiscipline_id: ', competition_post.subdiscipline_id);
         // console.log('competition_type_id: ', competition_post.competition_type_id);
         // console.log('description: ', competition_post.description);
         // console.log('competition_post: ', competition_post);
-
         // console.log('------------------------------');
-
         //{
         // competition_post
         // name: name,
@@ -255,6 +254,7 @@ define(['express',
         // img_url: img_url,
         // is_published: is_published
         // }
+
         new Competition( competition_post )
         .save()
         .then(function(new_competition){
@@ -315,9 +315,12 @@ define(['express',
             'seasons.categories.phases',
             'seasons.categories.phases.groups']} )
         .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            // Message(res,'Success', '0', result);
+            Response(res, result)
+        })
+        .catch(function(error){
+            // Message(res,error.details, error.code, []);
+            Response(res, null, error)
         });
     });
     //---------------------------------------------------------------
@@ -328,23 +331,35 @@ define(['express',
         //Model Instance
         var competition = Models.competition
         var competition_id = req.params.competition_id
-        var competition_upd = req.body
+        // var competition_upd = req.body
         var upd_published = false
-        console.log('------------------------------')
-        console.log('Competition Update')
-        console.log('name: ', competition_upd.name)
-        console.log('description: ', competition_upd.description)
-        console.log('discipline_id: ', competition_upd.discipline_id)
-        console.log('subdiscipline_id: ', competition_upd.subdiscipline_id)
-        console.log('competition_type_id: ', competition_upd.competition_type_id)
-        console.log('is_published: ', competition_upd.is_published)
-        console.log('------------------------------')
+
+        // console.log('------------------------------')
+        // console.log('Competition Update')
+        // console.log('name: ', competition_upd.name)
+        // console.log('description: ', competition_upd.description)
+        // console.log('discipline_id: ', competition_upd.discipline_id)
+        // console.log('subdiscipline_id: ', competition_upd.subdiscipline_id)
+        // console.log('competition_type_id: ', competition_upd.competition_type_id)
+        // console.log('is_published: ', competition_upd.is_published)
+        // console.log('------------------------------')
+
+        console.log('Request body', req.body)
+
+        var competition_upd = {
+            name: req.body.name,
+            description: req.body.description,
+            discipline_id: req.body.discipline_id,
+            subdiscipline_id: req.body.subdiscipline_id,
+            competition_type_id: req.body.competition_type_id,
+            is_published: req.body.is_published
+        }
+
         // Obtengo los datos de la competition antes de actualizar
         Models.competition
-        .where({'id':competition_id})
+        .where( {'id': competition_id})
         .fetch()
-        .then(function (result)
-        {
+        .then(function (result){
             var new_is_published = competition_upd.is_published
             var old_is_published = result.attributes.is_published
 
@@ -391,7 +406,7 @@ define(['express',
             })
             .catch(function(err){
               // Message(res, err.detail, err.code, null);
-              Response(res, null, error)
+              Response(res, null, err)
             });
         })
     });
@@ -452,8 +467,8 @@ define(['express',
                 Message(res, 'Success', '0', result)
 
             }).catch(function(err){
-                    console.log(`error: ${err}`)
-                  Message(res, err.detail, err.code, null);
+                console.log(`error: ${err}`)
+                Message(res, err.detail, err.code, null);
             });
 
         }).catch(function(err){

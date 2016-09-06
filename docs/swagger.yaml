@@ -690,6 +690,39 @@ paths:
         200:
           description: List of phases
       security: []
+    post:
+      summary: Creates a phase
+      description: Creates a phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: Phase Creation Request
+            type: object
+            properties:
+              name:
+                type: string
+              position:
+                type: integer
+              category_id:
+                type: integer
+              participant_team:
+                type: integer
+              classified_team:
+                type: integer
+            required:
+            - category_id
+            - name
+      responses:
+        200:
+          description: Newly created phase
+      security: []
   /phase/{phase_id}:
     get:
       summary: Gets a phase given its ID
@@ -709,6 +742,41 @@ paths:
         200:
           description: Detail of a phase
       security: []
+
+    put:
+      summary: Updates a phase given its ID
+      description: Updates a phase given its ID
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: Phase Creation Request
+            type: object
+            properties:
+              name:
+                type: string
+              position:
+                type: integer
+              category_id:
+                type: integer
+              participant_team:
+                type: integer
+              classified_team:
+                type: integer
+              active:
+                type: boolean
   /phase/{phase_id}/team:
     get:
       summary: Returns the teams participating in a phase

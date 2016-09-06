@@ -115,164 +115,47 @@ define(['express',
     	var name = phase_post.name;
     	var position = phase_post.position;
 
-        console.log('------------------------------');
-        console.log(`name:${name}`);
-        console.log(`position:${position}`);
-        console.log(`category:${phase_post.category_id}`);
-        console.log('------------------------------');
+        // console.log('------------------------------');
+        // console.log(`name:${name}`);
+        // console.log(`position:${position}`);
+        // console.log(`category:${phase_post.category_id}`);
+        // console.log('------------------------------');
 
-        new Phase(phase_post
-        // {
-        //     name: name,
-        //     position: position,
-        //     category_id:category_id
-        // }
-        ).save().then(function(new_phase){
-            console.log(`{new_phase: ${new_phase}}`);
-            Message(res, 'Success', '0', new_phase);
-        }).catch(function(error){
-            console.log(`{error: ${error}}`);
-            Message(res, error.detail, error.code, null);
+        new Phase(phase_post)
+        .save()
+        .then(function(new_phase){
+            Response(res, new_phase)
+        })
+        .catch(function(error){
+            Response(res, null, error)
         });
-
     });
-
 
     router.put('/:phase_id', function (req, res) {
 
-        console.log('update /:phase_id');
         //Model Instance
         var Phase = Models.phase;
-
         var phase_id = req.params.phase_id;
         var phase_upd = req.body;
 
-        // Knex(competition.tableName)
+        console.log('Req body', phase_upd)
+
         Knex('phases')
         .where('id','=',phase_id)
         .update(phase_upd, ['id'])
         .then(function(result){
             if (result.length != 0){
-                // console.log('result is not null');
-                // console.log(`result: ${result[0]}`);
-                Message(res, 'Success', '0', result);
+                Response(res, result)
             } else {
-                // console.log(`{error: ${error}}`);
+                //TODO: fix this
                 Message(res, 'Wrong phase_id', '404', result);
             }
         })
         .catch(function(err){
-            console.log(`Catch Error: ${err}`);
-          Message(res, err.detail, err.code, null);
+            Response(res, null, err)
         });
     });
 
     return router;
-    //teams by Phase_id
-    // router.get('/:phase_id/team', function (req, res) {
-    //     console.log('List teams by Phase Id');
-    //     var phase_id = req.params.phase_id;
-    //     return Models.group
-    //     .where({'id':phase_id})
-    //     .fetch({withRelated: ['rounds']})
-    //     .then(function (round) {
-    //           var round_id = round.id;
-    //         return Models.match
-    //         .where({'round_id':round_id})
-    //         .fetchAll({withRelated: ['home_team', 'visitor_team']})
-    //         .then(function (result) {
-    //             var zip = result.map(teamMap);
-    //             var flat = flatArray(zip);
-    //             Message(res,'Success', '0', flat);
-    //         }).catch(function(error){
-    //             Message(res,error.details, error.code, []);
-    //         });
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
-
-    // //teams by Phase_id
-    // router.get('/:phase_id/group', function (req, res) {
-    //     console.log('List groups by Phase Id');
-    //     var phase_id = req.params.phase_id;
-    //     return Models.group
-    //     .where({'id':phase_id})
-    //     .fetch({withRelated: ['rounds']})
-    //     .then(function (round) {
-    //         var round_id = round.id;
-    //         return Models.match
-    //         .where({'round_id':round_id})
-    //         .fetchAll({withRelated: ['home_team', 'visitor_team']})
-    //         .then(function (result) {
-    //             var zip = result.map(teamMap);
-    //             var flat = flatArray(zip);
-    //             Message(res,'Success', '0', flat);
-    //         }).catch(function(error){
-    //             Message(res,error.details, error.code, []);
-    //         });
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
-
-
-
-    // this.getGroup(group_id) {
-    //     return Models.round
-    //     .where({'group_id':group_id})
-    //     .fetch({withRelated: ['rounds']})
-    //     .then(function (result) {
-    //        return result;
-    //     }).catch(function(error){
-    //         return error;
-    //     });
-    // }
-
-    // function getMatch(round_id) {
-    //     console.log("Round function!", round_id);
-    //     return Models.match
-    //     .where({'round_id':round_id})
-    //     .fetchAll({withRelated: ['home_team', 'visitor_team']})
-    //     .then(function (result) {
-    //        return result;
-    //     }).catch(function(error){
-    //         return error;
-    //     });
-    // };
-
-
-    // //Groups by Phase_id
-    // router.get('/:phase_id/group/', function (req, res) {
-
-    //     console.log('Group by phase_id');
-
-    //     var phase_id = req.params.phase_id;
-
-    //     return Models.group
-    //     .where({phase_id:phase_id})
-    //     .where({active:true})
-    //     .fetch({withRelated: ['phase']})
-    //     .then(function (result) {
-    //         Message(res,'Success', '0', result);
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
-
-    // //Phases by category_id -> Returns array of result
-    // router.get('/category/:category_id', function (req, res) {
-    //     console.log('/category/:category_id/');
-    //     var category_id = req.params.category_id;
-    //     return Models.phase
-    //     .where({category_id:category_id})
-    //     .fetchAll()
-    //     .then(function (result) {
-    //         Message(res,'Success', '0', result);
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
-
 
 });

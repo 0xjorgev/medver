@@ -140,23 +140,6 @@ paths:
       responses:
         200:
           description: Active user list
-  /phase/{phase_id}/group_round_match:
-    get:
-      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
-      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
-      tags:
-        - Phase
-      responses:
-        200:
-          description: Match event stream
-      parameters:
-        - name: phase_id
-          in: path
-          description: Phase ID
-          required: true
-          type: integer
-          format: integer
-
   /event/{match_id}:
     get:
       summary: Gets the events of a match, given its category_id
@@ -694,8 +677,77 @@ paths:
         200:
           description:
       security: []
+  /phase:
+    get:
+      summary: Complete list of phases
+      description: Complete list of phases
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: List of phases
+      security: []
+  /phase/{phase_id}:
+    get:
+      summary: Gets a phase given its ID
+      description: Gets a phase given its ID
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: Detail of a phase
+      security: []
+  /phase/{phase_id}/team:
+    get:
+      summary: Returns the teams participating in a phase
+      description: Returns the teams participating in a phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of teams in a phase
+      security: []
+  /phase/{phase_id}/group_round_match:
+    get:
+      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
+      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
+      tags:
+        - Phase
+      responses:
+        200:
+          description: Match event stream
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+
   /phase/{phase_id}/group_team:
     get:
+      summary: returns groups & teams associated to this phase
       description: returns groups & teams associated to this phase
       tags:
         - Phase
@@ -761,18 +813,7 @@ paths:
         200:
           description:
       security: []
-  /phase:
-    get:
-      description:
-      tags:
-        - Phase
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description:
-      security: []
+
   # /competition/{competition_id}:
   #   get:
   #     summary: Gets a competition given an id

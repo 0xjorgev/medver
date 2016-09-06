@@ -1,11 +1,17 @@
-/**
- * Created by george on 25/04/16.
- */
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
+define(['express',
+        '../model/index',
+        '../util/request_message_util',
+        '../util/response_message_util',
+        '../util/knex_util'],
+    function (express,
+        Models,
+        Message,
+        Response,
+        Knex) {
 
     var router = express.Router();
 
@@ -29,13 +35,13 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         var phase_id = req.params.phase_id;
 
         return Models.category_group_phase_team
-        .where({phase_id:phase_id})
-        .where({active:true})
+        .where({phase_id:phase_id,active:true})
         .fetchAll({withRelated:['team']})
         .then(function (result) {
-            Message(res,'Success', '0', result.models.map(teamMap));
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            Response(res, result.models.map(teamMap))
+        })
+        .catch(function(error){
+            Response(res, null, error)
         });
     });
 
@@ -45,40 +51,31 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         return Models.group
         .query(function(qb){})
-        .where({'phase_id':phase_id})
-        .where({active:true})
+        .where({'phase_id':phase_id, active:true})
         .fetchAll({withRelated: ['category_group_phase_team.team']})
-        .then(function (result) {
-            // console.log("Res :", result);
-            //console.log("Res Map:", result.models.map(groupMap));
-            Message(res,'Success', '0', result.models.map(groupMap));
+        .then(function(result) {
+            Response(res, result.models.map(groupMap))
         }).catch(function(error){
-            console.log("Error :", error);
-            Message(res,error.details, error.code, []);
+            Response(res, null, error)
         });
     });
 
 
     //Phase, group, round team by Phase_id
     router.get('/:phase_id/group_round_match', function (req, res) {
-
         var phase_id = req.params.phase_id;
 
         return Models.group
         .query(function(qb){})
-        .where({'phase_id':phase_id})
-        .where({active:true})
+        .where({'phase_id':phase_id, active:true})
         .fetchAll({withRelated: ['rounds.matches.home_team', 'rounds.matches.visitor_team']})
         .then(function (result) {
-            // console.log("Res :", result);
-            //console.log("Res Map:", result.models.map(groupMap));
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            console.log("Error :", error);
-            Message(res,error.details, error.code, []);
+            Response(res, result)
+        })
+        .catch(function(error){
+            Response(res, null, error)
         });
     });
-
 
     router.get('/', function (req, res) {
         return Models.phase
@@ -88,10 +85,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .where({active:true})
         .fetchAll({withRelated: ['category' , { groups: function(qb) { qb.where('active', true) }}], debug: false})
         .then(function (result) {
-            // console.log('result :', result);
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            Response(res, result)
+        })
+        .catch(function(error){
+            Response(res, null, error)
         });
     });
 
@@ -99,20 +96,19 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     router.get('/:phase_id', function (req, res) {
         var phase_id = req.params.phase_id;
         return Models.phase
-        .where({'id':phase_id})
-        .where({active:true})
+        .where({'id':phase_id, active:true})
         .fetch({withRelated: ['groups']})
         .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            Response(res, result)
+        })
+        .catch(function(error){
+            Response(res, null, error)
         });
     });
 
     router.post('/', function (req, res) {
     	var Phase = Models.phase;
     	var phase_post = req.body;
-
 
     	console.log('Req Values:' , req.body);
         var category_id = phase_post.category_id;

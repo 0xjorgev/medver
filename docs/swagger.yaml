@@ -252,10 +252,6 @@ paths:
       responses:
         200:
           description: List of teams
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
         default:
           description: Unexpected error
           schema:
@@ -884,6 +880,57 @@ paths:
       responses:
         200:
           description:
+      security: []
+  /competition/{competition_id}/season/{season_id}/category/{category_id}/publish:
+    put:
+      summary: Sets a category and a competition as published.
+      description: Sets a category and a competition as published. Sends emails to all admins
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      # - name: competition_id
+      #     in: path
+      #     description: Competition ID
+      #     required: true
+      #     type: integer
+      #     format: integer
+      # - name: season_id
+      #     in: path
+      #     description: season ID
+      #     required: true
+      #     type: integer
+      #     format: integer
+      # - name: category_id
+      #     in: path
+      #     description: category ID
+      #     required: true
+      #     type: integer
+      #     format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          title: Competition & category publish Request
+          type: object
+          properties:
+            name:
+              type: string
+            position:
+              type: integer
+            category_id:
+              type: integer
+            participant_team:
+              type: integer
+            classified_team:
+              type: integer
+            active:
+              type: boolean
+      responses:
+        200:
+          description: Competition update
       security: []
   /gender:
     get:

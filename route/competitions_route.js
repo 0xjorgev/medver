@@ -1,6 +1,3 @@
-/**
- * Created by george on 08/03/16.
- */
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
@@ -320,33 +317,13 @@ define(['express',
 
         new Competition_user( comp_user
         ).save().then(function(new_admin_user){
-            console.log(`{new_admin_user: ${new_admin_user}}`);
+            console.log(`{new_admin_user:}`, new_admin_user);
             Message(res, 'Success', '0', new_admin_user);
         }).catch(function(error){
             console.log(`{error: ${error}}`);
             Message(res, error.detail, error.code, null);
         });
     });
-
-    // router.put('/:comp_id/admin_user/', function(req, res, next){
-
-    //     console.log('Update Competitions Admins');
-    //     var Competition_user = Models.competition_user
-    //     var comp_user = req.body;
-    //     var id = req.body.id;
-
-    //     Knex('competitions_users')
-    //     .where({active:true})
-    //     .where({id:id})
-    //     .update(comp_user, ['id'])
-    //     .then(function(result){
-    //         console.log(`{admin_user: ${result}}`);
-    //         Message(res, 'Success', '0', result);
-    //     }).catch(function(error){
-    //         console.log(`{error: ${error}}`);
-    //         Message(res, error.detail, error.code, null);
-    //     });
-    // });
 
     //---------------------------------------------------------------
     //                    Testing Stuff
@@ -375,67 +352,54 @@ define(['express',
 
     //Publish a competition
     router.put('/:competition_id/season/:season_id/category/:category_id/publish', function(req, res) {
-        console.log('Competition Publish')
-        //Model Instance
+
         var competition_id = req.params.competition_id
         var season_id = req.params.season_id
         var category_id = req.params.category_id
-        var competition_upd = {
-            "is_published":req.body.is_published
-        }
-        var category_upd = {
-            "is_published":req.body.is_published
-        }
-        console.log('------------------------------')
-        console.log('Publish a category of a competition')
-        console.log('competition_id: ', competition_id)
-        console.log('season_id: ', season_id)
-        console.log('category_id: ', category_id)
-        console.log('Competition is_published: ', competition_upd.is_published)
-        console.log('Category is_published: ', category_upd.is_published)
 
-        console.log('------------------------------')
-        // Obtengo los datos de la competition antes de actualizar
-        Knex('competitions')
-        .where({'id':competition_id})
-        .update(competition_upd, ['id'])
-        .then(function(result)
-        {
-            Knex('categories')
+        var thisCompetition = undefined
+
+        console.log('Req body', req.body)
+
+        Models.competition
+        .where( {'id': competition_id, 'active': true})
+        .fetch({withRelated: ['competition_user.users']})
+        .then((result) => {
+            thisCompetition = result
+            return Knex('competitions')
+                .where({'id': competition_id})
+                .update({ is_published: req.body.is_published }, ['id'])
+        })
+        .then((result) => {
+            return Knex('categories')
             .where({'id':category_id})
-            .update(category_upd, ['id'])
-            .then(function(result)
-            {
-                if (result.length != 0)
-                {
-                    var fullUrl = process.env.COMPETITION_PORTAL_URL + '/' + competition_id + '/season/' + season_id +
-                                    '/category/' + category_id  + '/home'
-                    console.log('Envio de email de actualizacion de la competition ' + fullUrl)
-                    Models.user
-                    .where('active',true)
-                    .fetchAll().then(function (result) {
-                        //console.log('Result:', result)
-                        var us = result.map(userMap)
-                        // console.log('Users email:', us.reduce(userReduce))
-                        for (var i = us.length - 1; i >= 0; i--) {
-                            send_email_from(us[i], 'Your competition has been published!',
-                                'Your new competition portal is now live!\n' +
-                                    'Check it out at ' + fullUrl)
-                        }
+            .update({ is_published: req.body.is_published }, ['id'])
+        })
+        // .then((result) => {
+        //     return Models.user
+        //         .where('active', true)
+        //         .fetchAll()
+        // })
+        .then( (result) => {
+            var fullUrl =  `${process.env.COMPETITION_PORTAL_URL}/${competition_id}/season/${season_id}/category/${category_id}/home`
 
+            console.log('Envio de email de actualizacion de la competition ' + fullUrl)
 
-                    })
-                }
-                Message(res, 'Success', '0', result)
+            thisCompetition.relations.competition_user.map((u) => {
+                console.log(`Sending mails to ${u.relations.users.attributes.email}`)
+                send_email_from(u.relations.users.attributes.email,
+                    'Your competition has been published!',
+                    'Your new competition portal is now live!\n' +
+                    'Check it out at ' + fullUrl)
+            })
 
-            }).catch(function(err){
-                console.log(`error: ${err}`)
-                Message(res, err.detail, err.code, null);
-            });
-
-        }).catch(function(err){
-            console.log(`error: ${err}`)
-            Message(res, err.detail, err.code, null);
+            return result
+        })
+        .then((result) => {
+            Response(res, result)
+        })
+        .catch((err) => {
+            Response(res, null, err)
         });
     });
 

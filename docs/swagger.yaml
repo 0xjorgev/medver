@@ -890,24 +890,24 @@ paths:
       produces:
       - application/json
       parameters:
-      # - name: competition_id
-      #     in: path
-      #     description: Competition ID
-      #     required: true
-      #     type: integer
-      #     format: integer
-      # - name: season_id
-      #     in: path
-      #     description: season ID
-      #     required: true
-      #     type: integer
-      #     format: integer
-      # - name: category_id
-      #     in: path
-      #     description: category ID
-      #     required: true
-      #     type: integer
-      #     format: integer
+      - name: competition_id
+        in: path
+        description: Competition ID
+        required: true
+        type: integer
+        format: integer
+      - name: season_id
+        in: path
+        description: season ID
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        description: category ID
+        required: true
+        type: integer
+        format: integer
       - name: Body
         in: body
         required: true
@@ -916,17 +916,7 @@ paths:
           title: Competition & category publish Request
           type: object
           properties:
-            name:
-              type: string
-            position:
-              type: integer
-            category_id:
-              type: integer
-            participant_team:
-              type: integer
-            classified_team:
-              type: integer
-            active:
+            is_published:
               type: boolean
       responses:
         200:

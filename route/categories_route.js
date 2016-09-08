@@ -490,7 +490,7 @@ define(['express',
 	//==========================================================================
 	// Get all player of one category and one team
 	//==========================================================================
-	router.get('/:category_id/team/:team_id/players', function (req, res) {
+	router.get('/:category_id/team/:team_id/player', function (req, res) {
 
 		var category_id = req.params.category_id;
 		var team_id = req.params.team_id;
@@ -512,7 +512,7 @@ define(['express',
 	//==========================================================================
 	// Get all players of one category
 	//==========================================================================
-	router.get('/:category_id/players', function (req, res) {
+	router.get('/:category_id/player', function (req, res) {
 
 		var category_id = req.params.category_id;
 		var team_id = req.params.team_id;

@@ -176,7 +176,8 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
 
         //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
         //en caso de que la ronda exista, solo se hace update
-        new Models.round(roundData).save().then(function(round){
+        new Models.round(roundData).save()
+        .then(function(round){
             matchData.round_id = round.attributes.id
             return new Match(matchData).save()
         })

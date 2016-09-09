@@ -8,10 +8,9 @@ if (typeof define !== 'function') {
 define(['sendgrid'], function (Email) {
     var sendgrid = Email(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 	var email_sender = function(sender){
-        // console.log(`sender: ${sender}`);
 		return function(email, subject, content){
-            console.log(`email: ${email}, subject:${subject}, content:${content}`);
-			sendgrid.send({
+            // console.log('Email sent', `email: ${email}, subject:${subject}, content:${content}`);
+            sendgrid.send({
                 to:       `${email}`,
                 from:     sender,
                 subject:  `${subject}`,

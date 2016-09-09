@@ -140,23 +140,6 @@ paths:
       responses:
         200:
           description: Active user list
-  /phase/{phase_id}/group_round_match:
-    get:
-      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
-      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
-      tags:
-        - Phase
-      responses:
-        200:
-          description: Match event stream
-      parameters:
-        - name: phase_id
-          in: path
-          description: Phase ID
-          required: true
-          type: integer
-          format: integer
-
   /event/{match_id}:
     get:
       summary: Gets the events of a match, given its category_id
@@ -242,7 +225,7 @@ paths:
       tags:
         - Player
         - Category
-        - team
+        - Team
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -269,10 +252,6 @@ paths:
       responses:
         200:
           description: List of teams
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
         default:
           description: Unexpected error
           schema:
@@ -489,22 +468,6 @@ paths:
       responses:
         200:
           description: List of events
-  /discipline/{discipline_id}/subdiscipline:
-    get:
-      description:
-      produces:
-      - application/json
-      tags:
-        - Discipline
-      parameters:
-        - name: discipline_id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description:
-      security: []
   /match:
     get:
       summary: Gets all matches
@@ -710,8 +673,145 @@ paths:
         200:
           description:
       security: []
+  /phase:
+    get:
+      summary: Complete list of phases
+      description: Complete list of phases
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: List of phases
+      security: []
+    post:
+      summary: Creates a phase
+      description: Creates a phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: Phase Creation Request
+            type: object
+            properties:
+              name:
+                type: string
+              position:
+                type: integer
+              category_id:
+                type: integer
+              participant_team:
+                type: integer
+              classified_team:
+                type: integer
+            required:
+            - category_id
+            - name
+      responses:
+        200:
+          description: Newly created phase
+      security: []
+  /phase/{phase_id}:
+    get:
+      summary: Gets a phase given its ID
+      description: Gets a phase given its ID
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: Detail of a phase
+      security: []
+
+    put:
+      summary: Updates a phase given its ID
+      description: Updates a phase given its ID
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: Phase Creation Request
+            type: object
+            properties:
+              name:
+                type: string
+              position:
+                type: integer
+              category_id:
+                type: integer
+              participant_team:
+                type: integer
+              classified_team:
+                type: integer
+              active:
+                type: boolean
+  /phase/{phase_id}/team:
+    get:
+      summary: Returns the teams participating in a phase
+      description: Returns the teams participating in a phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of teams in a phase
+      security: []
+  /phase/{phase_id}/group_round_match:
+    get:
+      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
+      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
+      tags:
+        - Phase
+      responses:
+        200:
+          description: Match event stream
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+
   /phase/{phase_id}/group_team:
     get:
+      summary: returns groups & teams associated to this phase
       description: returns groups & teams associated to this phase
       tags:
         - Phase
@@ -746,7 +846,8 @@ paths:
       security: []
   /competition:
     get:
-      description: Full List of Competitions
+      summary: List of competitions managed by the user_id received in auth-token
+      description: List of competitions managed by the user_id received in auth-token
       tags:
         - Competition
       produces:
@@ -759,8 +860,11 @@ paths:
       responses:
         200:
           description: List of competition managed by token user
+        404:
+          description: User doesn't manage any competitions
       security: []
     post:
+      summary: Creates a competition
       description: Competition Creation
       tags:
         - Competition
@@ -777,35 +881,47 @@ paths:
         200:
           description:
       security: []
-  /phase:
-    get:
-      description:
+  /competition/{competition_id}/season/{season_id}/category/{category_id}/publish:
+    put:
+      summary: Sets a category and a competition as published.
+      description: Sets a category and a competition as published. Sends emails to all admins
       tags:
-        - Phase
+        - Competition
       produces:
       - application/json
-      parameters: []
+      parameters:
+      - name: competition_id
+        in: path
+        description: Competition ID
+        required: true
+        type: integer
+        format: integer
+      - name: season_id
+        in: path
+        description: season ID
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        description: category ID
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          title: Competition & category publish Request
+          type: object
+          properties:
+            is_published:
+              type: boolean
       responses:
         200:
-          description:
+          description: Competition update
       security: []
-  # /competition/{competition_id}:
-  #   get:
-  #     summary: Gets a competition given an id
-  #     description: Full competition Object
-  #     tags:
-  #       - Competition
-  #     produces:
-  #     - application/json
-  #     parameters:
-  #     - name: competition_id
-  #       in: path
-  #       required: true
-  #       type: integer
-  #     responses:
-  #       200:
-  #         description:
-  #     security: []
   /gender:
     get:
       description:
@@ -899,6 +1015,7 @@ paths:
       security: []
   /competition/{competition_id}/season/:
     get:
+      summary: List of seasons for each competition
       description: List of seasons for each competition
       tags:
         - Competition
@@ -914,10 +1031,23 @@ paths:
         200:
           description:
       security: []
+  /discipline/:
+    get:
+      summary: Lists all disciplines
+      description: Lists all disciplines & associated subdisciplines
+      tags:
+        - Discipline
+      operationId: Get All Disciplines
+      produces:
+      - application/json
+      responses:
+        200:
+          description: list of all disciplines
   /discipline/{discipline_id}:
     get:
-      description: Contains related sub disciplines
-      operationId: Get_Discipline By ID_
+      summary: Gets info from a discipline given its ID
+      description: Gets info from a discipline given its ID
+      operationId: get_discipline_by_id
       produces:
       - application/json
       tags:
@@ -929,12 +1059,47 @@ paths:
           type: integer
       responses:
         200:
-          description:
+          description: info from a discipline
+      security: []
+  /discipline/{discipline_id}/subdiscipline:
+    get:
+      summary: Gets the subdisciplines of a discipline given its id
+      description: Gets the subdisciplines of a discipline given its id
+      produces:
+      - application/json
+      tags:
+        - Discipline
+      parameters:
+        - name: discipline_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Returns a list of subdisciplines given a discipline id
+      security: []
+  /discipline/subdiscipline/{subdiscipline_id}/event:
+    get:
+      summary: '?'
+      description: '?'
+      produces:
+      - application/json
+      tags:
+        - Discipline
+      parameters:
+        - name: subdiscipline_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: '?'
       security: []
   /round:
     get:
-      description:
-      operationId: get round_
+      summary: List all rounds
+      description: List all rounds
+      operationId: get round
       produces:
       - application/json
       tags:
@@ -942,7 +1107,7 @@ paths:
       parameters: []
       responses:
         200:
-          description:
+          description: list of rounds
       security: []
   /competition/competition_type:
     get:
@@ -975,25 +1140,6 @@ paths:
           required: true
           type: integer
           format: integer
-      responses:
-        200:
-          description:
-      security: []
-  /discipline/:
-    get:
-      description: Lists all disciplines
-      tags:
-        - Discipline
-      operationId: Get All Disciplines_
-      produces:
-      - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/GetAllDisciplinesRequest'
       responses:
         200:
           description:

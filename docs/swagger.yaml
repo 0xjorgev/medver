@@ -289,11 +289,7 @@ paths:
         - Team
       responses:
         200:
-          description: An array of products
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
+          description: An array of teams
         default:
           description: Unexpected error
           schema:
@@ -1550,7 +1546,7 @@ definitions:
 
 
   CreateTeamRequest:
-    title: Team Creation Request
+    title: Team Creation/Update Request
     type: object
     properties:
       name:
@@ -1563,24 +1559,21 @@ definitions:
         type: string
       category_type_id:
         type: integer
+        description: If not provided, a new 'club' organization will be created under the same name as the team
+      gender_id:
+        type: integer
+        description: Gender associated to this team
       organization_id:
         type: integer
-        description: If not sent, a new 'club' organization will be created under the same name as the team
-      category_id:
-          type: integer
-          description: send if assigned to a category
-      phase_id:
-          type: integer
-          description: send if assigned to a phase
-      group_id:
-          type: integer
-          description: send if assigned to a group
-      category_group_phase_team_id:
-          type: integer
-          description: sent on update only, it's the id of the 'category_group_phase_team' table
+        description: If not provided, a new 'club' organization will be created under the same name as the team
+      subdiscipline_id:
+        type: integer
+        description: Sport associated with this team
     required:
       - name
       - category_type_id
+      - gender_id
+      - subdiscipline_id
 
   UserLogin:
     title: User login info

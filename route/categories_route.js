@@ -456,6 +456,7 @@ define(['express',
 		console.log('PUT', data)
 		saveCategory_group_phase_team(data, res)
 	})
+
 	//==========================================================================
 	// Save Category Group Phase Team
 	//==========================================================================
@@ -468,19 +469,18 @@ define(['express',
 			group_id: data.group_id,
 			active: data.active
 		}
+
 		if(data.id){
 			console.log("data id: ", data.id)
 			spiderData.id = data.id
 		}
 
-		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation)
-		{
-			console.log(`{new_invitation: ${new_invitation}}`);
-			Message(res, 'Success', '0', new_invitation);
-		}).catch(function(error){
-			console.log(`{error: ${error}`);
-			console.log(` ------ error: ${error.detail}`);
-			Message(res, error.detail, error.code, null);
+		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
+			console.log(`new_invitation:`, new_invitation);
+			Response(res, new_invitation);
+		})
+		.catch(function(error){
+			Response(res, null, error);
 		});
 	}
 

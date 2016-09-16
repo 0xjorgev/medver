@@ -271,7 +271,8 @@ define(['express',
             discipline_id: req.body.discipline_id,
             subdiscipline_id: req.body.subdiscipline_id,
             competition_type_id: req.body.competition_type_id,
-            is_published: req.body.is_published
+            is_published: req.body.is_published,
+            img_url: req.body.img_url
         }
 
         var thisCompetition = undefined

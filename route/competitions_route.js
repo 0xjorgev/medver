@@ -110,15 +110,13 @@ define(['express',
             .where({'id': comp_id })
             .fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'competition_user.users']} )
             .then((result) => {
-                //se elimina el password de los users
+                //se elimina el password de los users para no retornarlo en el request
                 result.relations.competition_user.map((user) => {
                     delete user.relations.users.attributes.password
                     return user
                 })
-
                 Response(res, result)}
             )
-            // .then((result) => Response(res, result) )
             .catch((error) => Response(res, null, error) )
     });
 
@@ -234,7 +232,8 @@ define(['express',
             description: req.body.description,
             img_url: req.body.img_url,
             is_published: req.body.is_published,
-            created_by_id: req.body.created_by_id
+            created_by_id: req.body.created_by_id,
+            meta: req.body.meta
         }
 
         var newCompetition = undefined
@@ -272,7 +271,8 @@ define(['express',
             subdiscipline_id: req.body.subdiscipline_id,
             competition_type_id: req.body.competition_type_id,
             is_published: req.body.is_published,
-            img_url: req.body.img_url
+            img_url: req.body.img_url,
+            meta: req.body.meta
         }
 
         var thisCompetition = undefined
@@ -282,7 +282,6 @@ define(['express',
         .where( {'id': competition_id, 'active': true})
         .fetch({withRelated: ['competition_user.users']})
         .then((result) => {
-            // console.log('result de fetch', result.attributes)
             thisCompetition = result
             return Knex('competitions')
                 .where({id: result.attributes.id})
@@ -303,7 +302,6 @@ define(['express',
                         'Check it out at ' + fullUrl)
                 })
             }
-
             return result
         })
         .then((result) => Response(res, result) )
@@ -326,38 +324,31 @@ define(['express',
         });
     });
 
-    //---------------------------------------------------------------
-    //                    Testing Stuff
-    //---------------------------------------------------------------
     router.get('/rcompetition/:competition_id', function (req, res) {
         console.log('competition_id List');
         var comp_id = req.params.competition_id;
         return Models.competition
         .where({'id':comp_id})
         .fetch( {withRelated: ['discipline.subdisciplines',
+			'competition_user.users',
             'competition_type',
             'seasons',
             'seasons.categories.classification',
             'seasons.categories.phases',
             'seasons.categories.phases.groups']} )
         .then(function (result) {
-            // Message(res,'Success', '0', result);
             Response(res, result)
         })
         .catch(function(error){
-            // Message(res,error.details, error.code, []);
             Response(res, null, error)
         });
     });
-    //---------------------------------------------------------------
 
     //Publish a competition
     router.put('/:competition_id/season/:season_id/category/:category_id/publish', function(req, res) {
-
         var competition_id = req.params.competition_id
         var season_id = req.params.season_id
         var category_id = req.params.category_id
-
         var thisCompetition = undefined
 
         console.log('Req body', req.body)
@@ -376,16 +367,9 @@ define(['express',
             .where({'id':category_id})
             .update({ is_published: req.body.is_published }, ['id'])
         })
-        // .then((result) => {
-        //     return Models.user
-        //         .where('active', true)
-        //         .fetchAll()
-        // })
         .then( (result) => {
             var fullUrl =  `${process.env.COMPETITION_PORTAL_URL}/${competition_id}/season/${season_id}/category/${category_id}/home`
-
             console.log('Envio de email de actualizacion de la competition ' + fullUrl)
-
             thisCompetition.relations.competition_user.map((u) => {
                 console.log(`Sending mails to ${u.relations.users.attributes.email}`)
                 send_email_from(u.relations.users.attributes.email,
@@ -393,7 +377,6 @@ define(['express',
                     'Your new competition portal is now live!\n' +
                     'Check it out at ' + fullUrl)
             })
-
             return result
         })
         .then((result) => {

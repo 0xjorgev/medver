@@ -5,7 +5,15 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util'], function (express, Models, Message, Knex) {
+define(['express',
+	'../model/index',
+	'../util/request_message_util',
+	'../util/response_message_util',
+	'../util/knex_util'], function (express,
+		Models,
+		Message,
+		Response,
+		Knex) {
 
     var router = express.Router();
 
@@ -17,9 +25,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .where({active:true})
         .fetchAll({debug:true, withRelated: ['categories']})
         .then(function (result) {
-            Message(res,'Success', '0', result);
+            Response(res, result)
         }).catch(function(error){
-            Message(res,error.details, error.code, []);
+			Response(res, null, error)
         });
     });
 
@@ -31,9 +39,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .where({id:season_id})
         .fetch({withRelated: ['categories']})
         .then(function (result) {
-            Message(res,'Success', '0', result);
+			Response(res, result)
         }).catch(function(error){
-            Message(res,error.details, error.code, []);
+			Response(res, null, error)
         });
     });
 
@@ -51,45 +59,29 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         console.log('req.body: ', req.body);
 
-        new Season(season_post
-        // {
-        //     name: name,
-        //     description:description,
-        //     game_title:game_title,
-        //     init_at:init_at,
-        //     ends_at:ends_at,
-        //     competition_id: competition_id
-        // }
-        ).save().then(function(new_season){
-            console.log(`{new_season: ${new_season}}`);
-            Message(res, 'Success', '0', new_season);
-        }).catch(function(error){
-            console.log(`{error: ${error}}`);
-            Message(res, error.detail, error.code, null);
+        new Season(season_post)
+		.save()
+		.then(function(new_season){
+            Response(res, new_season)
+        })
+		.catch(function(error){
+			Response(res, null, error)
         });
     });
 
 
     router.put('/:season_id', function(req, res, next){
-        console.log('Season PUT');
+        console.log('Season PUT', req.body);
         //Model Instance
         var season = new Models.season;
 
         //URL Request, Season Id
         var season_id = req.params.season_id;
         var season_upd = req.body;
-
         var competition_id = season_upd.competition_id;
         var name = season_upd.name;
         var description = season_upd.description;
         var game_title = season_upd.game_title;
-
-        console.log('--------------------');
-        console.log("competition_id: " + competition_id);
-        console.log("name: " + name);
-        console.log("description: " + description);
-        console.log("game_title: " + game_title);
-        console.log('--------------------');
 
         Knex(season.tableName)
         .where('id','=',season_id)
@@ -97,20 +89,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         .update(season_upd, ['id'])
         .then(function(result){
             if (result.length != 0){
-                console.log('result is not null');
-                console.log(`result: ${result[0]}`);
-                // var email = result[0].email;
-            // send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
-            Message(res, 'Success', '0', result);
+            	Response(res, result)
             } else {
                 Message(res, 'Username or email not found', '404', result);
             }
         })
         .catch(function(err){
-          Message(res, err.detail, err.code, null);
+			Response(res, null, err)
         });
     });
-
 
     //Add to new schemma
     //Category Season Methods
@@ -120,55 +107,32 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         return Models.category
         .where({season_id:season_id})
         //.fetchAll({withRelated: ['phases'], debug:true})
-        .fetchAll({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug:true})
+        .fetchAll({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug: false})
         .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            Response(res, result)
+        })
+		.catch(function(error){
+            Response(res, null, error)
         });
     });
 
 
     router.get('/:season_id/category/:cat_id', function (req, res) {
-        console.log('Category by ID');
         var season_id = req.params.season_id;
         var cat_id = req.params.cat_id;
 
         return Models.category
         .where({season_id:season_id})
         .where({id:cat_id})
-        //.fetchAll({withRelated: ['phases'], debug:true})
-        .fetch({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug:true})
+        .fetch({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug: false})
         .then(function (result) {
-            Message(res,'Success', '0', result);
+            Response(res, result)
         }).catch(function(error){
-            Message(res,error.details, error.code, []);
+			Response(res, null, error)
         });
     });
 
-
-    // // ---------------------------------------------------
-    //     //Category Season Methods
-    // router.get('/test/test', function (req, res) {
-    //     console.log('TEST Season_category');
-    //     // var season_id = req.params.season_id;
-    //     return Models.category_season
-    //     .query(function(qb){})
-    //     // .where({season_id:season_id})
-    //     //.fetchAll({withRelated: ['phases'], debug:true})
-    //     .fetchAll({withRelated: ['category_season'], debug:true})
-    //     .then(function (result) {
-    //         Message(res,'Success', '0', result);
-    //     }).catch(function(error){
-    //         Message(res,error.details, error.code, []);
-    //     });
-    // });
-
-    // // ---------------------------------------------------
-
-
     router.post('/:season_id/category', function (req, res) {
-        console.log('category Create');
         var season_id = req.params.season_id;
         //Model Instance
         var Category = Models.category;
@@ -189,15 +153,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
             init_at:init_at,
             ends_at:ends_at,
             competition_id: competition_id
-        }).save().then(function(new_category){
-            console.log(`{new_season: ${new_category}}`);
-            Message(res, 'Success', '0', new_category);
-        }).catch(function(error){
-            console.log(`{error: ${error}}`);
-            Message(res, error.detail, error.code, null);
+        })
+		.save()
+		.then(function(new_category){
+            Response(res, new_category)
+        })
+		.catch(function(error){
+			Response(res, null, error)
         });
     });
 
-    //,'gender'
     return router;
 });

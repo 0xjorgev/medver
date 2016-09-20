@@ -24,43 +24,41 @@ define(['express',
 	var router = express.Router();
 
 	var mapper = function(phase) {
-	  // console.log('Phase:', phase.attributes);
-	  phase.relations.groups.models.map(groupMapper);
-	  phaseDelete(phase.attributes.id);
+		// console.log('Phase:', phase.attributes);
+		phase.relations.groups.models.map(groupMapper);
+		phaseDelete(phase.attributes.id);
 	}
 
 	var groupMapper = function(group){
-	  groupDelete(group);
+		groupDelete(group);
 	}
 
 	var groupDelete = function(group){
-	  console.log('Group Delete');
-	  Knex(group.tableName)
-	  .where({id:group.id})
-	  .del().then(function(del_group){
+		console.log('Group Delete');
+		Knex(group.tableName)
+		.where({id:group.id})
+		.del().then(function(del_group){
 		console.log('del_group', del_group);
-	  }).catch(function(error){
+		}).catch(function(error){
 		console.log('del_group error:', error);
-	  })
+		})
 	}
 
 	var phaseDelete = function(phase){
-	  console.log('Phase Delete');
-	  //console.log('Phase id:', phase.attributes);
-	  Knex('phases')
-	  .where({id:phase}, ['id'])
-	  .del().then(function(del_phase){
+		console.log('Phase Delete');
+		//console.log('Phase id:', phase.attributes);
+		Knex('phases')
+		.where({id:phase}, ['id'])
+		.del().then(function(del_phase){
 		console.log('del_phase', del_phase);
-	  }).catch(function(error){
+		}).catch(function(error){
 		console.log('del_phase error:', error);
-	  })
+		})
 	}
 
 	//Teams by Category
 	router.get('/:category_id/team', function (req, res) {
-
 		var category_id = req.params.category_id;
-
 		return Models.category_group_phase_team
 			.where({category_id:category_id})
 			.where({active:true})
@@ -79,11 +77,9 @@ define(['express',
 		.where({active:true})
 		.fetchAll({withRelated: ['gender', 'phases', 'classification']})
 		.then(function (result) {
-			 // console.log('result: ' + result);
-			Message(res,'Success', '0', result);
+			Response(res, result)
 		}).catch(function(error){
-			// console.log('Error: ' + error);
-			Message(res,error.details, error.code, []);
+			Response(res, null, error)
 		});
 	});
 
@@ -95,9 +91,9 @@ define(['express',
 			.where({active:true})
 			.fetch({withRelated: ['gender','phases', 'classification']})
 			.then(function (result) {
-				Message(res,'Success', '0', result);
+				Response(res, result)
 			}).catch(function(error){
-				Message(res,error.details, error.code, []);
+				Response(res, null, error)
 			});
 	});
 
@@ -105,49 +101,16 @@ define(['express',
 		//Model Instance
 		var Category = Models.category;
 		var category_post = req.body;
-		// var gender_id = category_post.gender_id;
-		// var season_id = category_post.season_id;
-		// var name = category_post.name;
-		// var description = category_post.description;
-		// var image_url = category_post.image_url;
-		// var inscription_init_at = category_post.inscription_init_at;
-		// var inscription_ends_at = category_post.inscription_ends_at;
-		// //V 1.1
-		// var minimum_value = category_post.minimum_value;
-		// var maximum_value = category_post.maximum_value;
 
-		// console.log('--------------------');
-		// console.log("season_id: " + competition_id);
-		// console.log("name: " + name);
-		// console.log("gender_id: " + gender_id);
-		// console.log("inscription_init_at: " + inscription_init_at);
-		// console.log("inscription_ends_at: " + inscription_ends_at);
-		// console.log("minimum_value: " + minimum_value);
-		// console.log("maximum_value: " + maximum_value);
-		// console.log("image_url: " + image_url);
-		// console.log('--------------------');
-
-		new Category(category_post
-		// {
-		//     name: name,
-		//     description:description,
-		//     image_url:image_url,
-		//     inscription_init_at:inscription_init_at,
-		//     inscription_ends_at:inscription_ends_at,
-		//     gender_id: gender_id,
-		//     season_id: season_id,
-		//     minimun_value: minimum_value,
-		//     maximun_value: maximum_value
-		// }
-		).save().then(function(new_category){
-			console.log('new_category: ',new_category);
-			Message(res, 'Success', '0', new_category);
-		}).catch(function(error){
-			console.log(`{error: ${error}`);
-			Message(res, error.detail, error.code, null);
+		new Category(category_post)
+		.save()
+		.then(function(new_category){
+			Response(res, category_post)
+		})
+		.catch(function(error){
+			Response(res, null, error)
 		});
 	});
-
 
 	router.put('/:category_id', function(req, res, next){
 		//Model Instance
@@ -159,26 +122,27 @@ define(['express',
 
 		console.log('Req body', category_upd);
 
-		name = category_upd.name
-		participant_minimum = category_upd.participant_minimum
-		participant_maximum = category_upd.participant_maximum
-		other_minimum_participant = category_upd.other_minimum_participant
-		other_maximum_participant = category_upd.other_maximum_participant
-		player_minimum_participant = category_upd.player_minimum_participant
-		player_maximum_participant = category_upd.player_maximum_participant
-		player_minimum_summoned = category_upd.player_minimum_summoned
-		player_maximum_summoned = category_upd.player_maximum_summoned
-		coach_minimum_participant = category_upd.coach_minimum_participant
-		coach_maximum_participant = category_upd.coach_maximum_participant
-		team_quantity = category_upd.team_quantity
-		gender_id = category_upd.gender_id
-		season_id = category_upd.season_id
-		category_type_id = category_upd.category_type_id
-		classification_type_id = category_upd.classification_type_id
-		inscription_init_at = category_upd.inscription_init_at
-		inscription_ends_at = category_upd.inscription_ends_at
-		image_url = category_upd.image_url
-		is_published = category_upd.is_published
+		var name = category_upd.name
+		var participant_minimum = category_upd.participant_minimum
+		var participant_maximum = category_upd.participant_maximum
+		var other_minimum_participant = category_upd.other_minimum_participant
+		var other_maximum_participant = category_upd.other_maximum_participant
+		var player_minimum_participant = category_upd.player_minimum_participant
+		var player_maximum_participant = category_upd.player_maximum_participant
+		var player_minimum_summoned = category_upd.player_minimum_summoned
+		var player_maximum_summoned = category_upd.player_maximum_summoned
+		var coach_minimum_participant = category_upd.coach_minimum_participant
+		var coach_maximum_participant = category_upd.coach_maximum_participant
+		var team_quantity = category_upd.team_quantity
+		var gender_id = category_upd.gender_id
+		var season_id = category_upd.season_id
+		var category_type_id = category_upd.category_type_id
+		var classification_type_id = category_upd.classification_type_id
+		var inscription_init_at = category_upd.inscription_init_at
+		var inscription_ends_at = category_upd.inscription_ends_at
+		var image_url = category_upd.image_url
+		var is_published = category_upd.is_published
+		var meta = category_upd.meta
 
 		Knex(category.tableName)
 		.where('id','=',category_id)
@@ -203,11 +167,10 @@ define(['express',
 			'classification_type_id' : classification_type_id,
 			'inscription_init_at' : inscription_init_at,
 			'inscription_ends_at' : inscription_ends_at,
+			'meta': meta,
 			'image_url' : image_url }, ['id'])
 		.then(function(result){
 			if (result.length != 0){
-				console.log(`result:`, result);
-				// Message(res, 'Success', '0', result);
 				Response(res, result)
 			} else {
 				//TODO: Reemplazar por mensaje de response
@@ -223,23 +186,17 @@ define(['express',
 	router.delete('/:category_id', function(req, res, next){
 		var category_id = req.params.category_id;
 
-		console.log('--------------------');
-		console.log(`-----Category / Phase / ${category_id} Delete-----`);
-		console.log('--------------------');
-
 		return Models.phase
 		.query(function(qb){})
 		.where('category_id','=',category_id)
 		.where({active:true})
 		.fetchAll({withRelated:['groups']})
 		.then(function(result){
-		  console.log('result: delete cascade');
-		  result.map(mapper);
-		  //this.phaseDelete(result.attributes.id);
-		  Message(res, 'Delete successful', 0, {});
-		}).catch(function(err){
-			console.log(`error: ${err}`);
-			Message(res, err.detail, err.code, null);
+			result.map(mapper);
+			Response(res, result)
+		})
+		.catch(function(err){
+			Response(res, null, err)
 		});
 	});
 
@@ -250,7 +207,6 @@ define(['express',
 
 		//todo: promisify this
 		StandingTable.getStandingTableByMatches(matchSql, res)
-
 	});
 
 
@@ -430,10 +386,10 @@ define(['express',
 				'home_team',
 				'visitor_team']})
 			.then(function(result){
-				Message(res, 'Success', 0, result)
-			}).catch(function(err){
-				console.log(`error: ${err}`);
-				Message(res, err.detail, err.code, null)
+				Response(res, result)
+			})
+			.catch(function(err){
+				Response(res, null, err)
 			})
 	})
 
@@ -496,8 +452,7 @@ define(['express',
 			.where({active:true})
 			.fetchAll({withRelated:['player']})
 			.then(function (result) {
-				console.log("Resultado: ",result)
-				Message(res,'Success', '0', result);
+				Response(res, result)
 			}).catch(function(error){
 				// Message(res,error.details, error.code, []);
 				Response(res, null, error)
@@ -517,10 +472,9 @@ define(['express',
 			.where({active:true})
 			.fetchAll({withRelated:['player']})
 			.then(function (result) {
-				console.log("Resultado: ",result)
-				Message(res,'Success', '0', result);
-			}).catch(function(error){
-				// Message(res,error.details, error.code, []);
+				Response(res, result)
+			})
+			.catch(function(error){
 				Response(res, null, error)
 			});
 	});
@@ -571,14 +525,14 @@ define(['express',
 
 		console.log('Summoned: ', summonedData);
 
-		return new Models.category_team_player(summonedData).save().then(function(summoned)
-		{
+		return new Models.category_team_player(summonedData)
+		.save()
+		.then(function(summoned) {
 			console.log('Summoned response: ', summoned);
-			Message(res, 'Success', '0', summoned);
-		}).catch(function(error){
-			console.log(`{error: ${error}`);
-			console.log(` ------ error: ${error.detail}`);
-			Message(res, error.detail, error.code, null);
+			Response(res, summoned)
+		})
+		.catch(function(error){
+			Response(res, null, error)
 		});
 	}
 

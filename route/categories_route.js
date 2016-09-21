@@ -102,10 +102,11 @@ define(['express',
 		var Category = Models.category;
 		var category_post = req.body;
 
+		console.log('category_post', category_post);
 		new Category(category_post)
 		.save()
 		.then(function(new_category){
-			Response(res, category_post)
+			Response(res, new_category)
 		})
 		.catch(function(error){
 			Response(res, null, error)

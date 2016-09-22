@@ -141,7 +141,6 @@ define(['../util/knex_util',
 			else
 				result = matchResult.visitor_team_goals > matchResult.home_team_goals ? 1 : -1
 		}
-
 		return result
 	}
 
@@ -196,7 +195,7 @@ define(['../util/knex_util',
 				.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug: false})
 		})
 		.then((result) => {
-			teams = result.models.map((m) => m.attributes)
+			var teams = result.models.map((m) => m.attributes)
 			//se sumarizan los resultados normalizados de los partidos
 			var standingTable = teams
 				.map(normalizeTeamResults(matchesWithResults))

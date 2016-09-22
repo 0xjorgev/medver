@@ -7,8 +7,14 @@ if (typeof define !== 'function') {
 define(['../util/knex_util',
 	'../node_modules/lodash/lodash.min',
 	'../model/index',
-	'../util/request_message_util'],
-	function(Knex, _, Models, Message){
+	'../util/request_message_util',
+	'../util/response_message_util'
+	],
+	function(Knex, _,
+		Models,
+		Message,
+		Response){
+
 	var StandingTable = {}
 
 	//==========================================================================
@@ -156,12 +162,9 @@ define(['../util/knex_util',
 
 	StandingTable.getStandingTableByMatches = function(matchSql, res){
 
-		console.log(matchSql)
-
-		//TODO: encadenar promises
-		var matchesByCategory = Knex.raw(matchSql).then(function(result){
+		var matchesByCategory = Knex.raw(matchSql)
+		.then((result) => {
 			var matches = result.rows
-
 			if(!matches || matches.length == 0){
 				Message(res, 'No matches found', 404, '')
 				return
@@ -169,11 +172,10 @@ define(['../util/knex_util',
 
 			var matchIds = matches.map((e) => e.match_id).join(',')
 			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id = 1 and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`
-			var standing_table = Knex.raw(goalsByMatchSQL).then(function(result){
+			var standing_table = Knex.raw(goalsByMatchSQL).then((result) => {
 				goals = result.rows
 				goals.map((g) => g.goals = parseInt(g.goals))
 
-				// console.log('goals', goals)
 				var matchesWithResults = matches
 					.map(prepMatch)
 					.map(assignGoalsToTeams(goals))
@@ -183,30 +185,21 @@ define(['../util/knex_util',
 				var teams = matchesWithResults.map((m) => [m.home_team_id, m.visitor_team_id])
 				teams = _(teams).flatten().uniq().value()
 
-				Models.team
+				return Models.team
 					.where({active: true})
 					.where('id', 'in', teams)
 					.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug: false})
-					.then(function (result) {
-						teams = result.models.map((m) => m.attributes)
-
-						//se sumarizan los resultados normalizados de los partidos
-						var standingTable = teams
-							.map(normalizeTeamResults(matchesWithResults))
-							.map(calculateStandingTable)
-
-						// console.log('------------------------------- resolcing promises')
-
-						// var a = Promise.resolve(standingTable)
-
-						// console.log(a)
-						Message(res, 'Success', '0', standingTable);
-
-					})
-					.catch(function(error){
-						console.log(error)
-						// return Promise.reject(error)
-					})
+			})
+			.then((result) => {
+				teams = result.models.map((m) => m.attributes)
+				//se sumarizan los resultados normalizados de los partidos
+				var standingTable = teams
+					.map(normalizeTeamResults(matchesWithResults))
+					.map(calculateStandingTable)
+				Response(res, standingTable)
+			})
+			.catch((error) => {
+				Response(res, null, error)
 			})
 		})
 	}

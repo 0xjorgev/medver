@@ -5,7 +5,11 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-//var _ = require('lodash')
+//logging lib, reaaaaally useful
+var inspect = require('util').inspect
+//log helper function
+var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
+
 
 define(['express',
 		'../model/index',
@@ -536,6 +540,30 @@ define(['express',
 			Response(res, null, error)
 		});
 	}
+
+	//==========================================================================
+	// Get all Phases with the teams of one category
+	//==========================================================================
+	router.get('/:category_id/phase/team', function (req, res) {
+
+		var category_id = req.params.category_id;
+		var phase_id = req.params.phase_id;
+		var group_id = req.params.group_id;
+
+		var category_id = req.params.category_id;
+		return Models.category_group_phase_team
+			.where({category_id:category_id})
+			.where({active:true})
+			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team']})
+			.then(function (result) {
+
+				var x = result.toJSON().category.phases
+
+				Response(res, x)
+			}).catch(function(error){
+				Response(res, null, error)
+			});
+	});
 
 	return router;
 

@@ -202,13 +202,8 @@ define(['express',
 
 	router.get('/:category_id/standing_table', function(req, res){
 		var categoryId = req.params.category_id;
-		// console.log('standing_table of category', categoryId)
-		var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where matches.played = true and categories.id = ' + categoryId
-
-		//todo: promisify this
-		StandingTable.getStandingTableByMatches(matchSql, res)
+		StandingTable.getStandingTableByCategory(categoryId, res)
 	});
-
 
     //==========================================================================
     // Competition by Simple Elimination

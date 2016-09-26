@@ -2,16 +2,8 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['../util/knex_util',
-	'../node_modules/lodash/lodash.min',
-	'../model/index',
-	'../util/request_message_util',
-	'../util/response_message_util'
-	],
-	(Knex, _,
-	Models,
-	Message,
-	Response) => {
+define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/index', '../util/request_message_util', '../util/response_message_util'],
+	(Knex, _, Models, Message, Response) => {
 
 	var StandingTable = {}
 
@@ -28,7 +20,6 @@ define(['../util/knex_util',
 					match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
 				}
 			})
-
 			match.total_goals = match.home_team_goals + match.visitor_team_goals
 			return match
 		}
@@ -68,7 +59,11 @@ define(['../util/knex_util',
 	}
 
 	var setTeamResults = (team, match) => {
-		var result = {team_id: team.id, data: team, points: 0,
+		var result = {
+		category_id: match.category_id,
+		phase_id: match.phase_id,
+		group_id: match.group_id,
+		team_id: team.id, data: team, points: 0,
 		goals_in_favor: 0, goals_against: 0,
 		matches_won: 0, matches_lost: 0,
 		matches: 0, matches_draw: 0}
@@ -98,7 +93,6 @@ define(['../util/knex_util',
 				result.matches_lost = getTeamResult(team, match) == -1 ? 1 : 0
 			}
 		}
-
 		return result
 	}
 
@@ -112,7 +106,14 @@ define(['../util/knex_util',
 	}
 
 	var calculateStandingTable = (results) => {
+
+		// console.log(results);
+		// debugger
+
 		return results.reduce((total, result) => {
+			total.category_id = result.category_id,
+			total.phase_id = result.phase_id,
+			total.group_id = result.group_id,
 			total.team_id = result.team_id
 			total.points += result.points
 			total.goals_in_favor += result.goals_in_favor
@@ -149,8 +150,7 @@ define(['../util/knex_util',
 	//==========================================================================
 
 	//given a set of matches (could be a entire category, or a group), returns the current standing table
-
-	StandingTable.getStandingTableByMatches = (matchSql, res) => {
+	var getStandingTableByMatches = (matchSql, res) => {
 		var matchesWithResults = undefined
 		var matches = undefined
 
@@ -178,7 +178,7 @@ define(['../util/knex_util',
 		.then((result) => {
 			var goals = result.rows
 			goals.map((g) => g.goals = parseInt(g.goals))
-
+			// console.log(matches);
 			//estos son los matches con los puntos ya determinados
 			matchesWithResults = matches
 				.map(prepMatch)
@@ -189,22 +189,70 @@ define(['../util/knex_util',
 			var teams = matchesWithResults.map((m) => [m.home_team_id, m.visitor_team_id])
 			teams = _(teams).flatten().uniq().value()
 
+			//se busca la info de cada team mencionado en la standing
 			return Models.team
 				.where({active: true})
 				.where('id', 'in', teams)
-				.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player'], debug: false})
+				.fetchAll({debug: false})
 		})
 		.then((result) => {
 			var teams = result.models.map((m) => m.attributes)
 			//se sumarizan los resultados normalizados de los partidos
-			var standingTable = teams
+			standingTable = teams
 				.map(normalizeTeamResults(matchesWithResults))
 				.map(calculateStandingTable)
+
+			return standingTable
+		})
+		.then((standingTable) => {
+			//bloque para almacenar la standingTable en base de datos
+			//esto no está promifisified, asi que no estará disponible al instante que el servicio retorna
+			//TODO: promisify???
+			standingTable.forEach((standingResult) => {
+				var tmp = {
+						category_id: standingResult.category_id,
+						phase_id: standingResult.phase_id,
+						group_id: standingResult.group_id,
+						team_id: standingResult.team_id,
+						points: standingResult.points,
+						goals_in_favor: standingResult.goals_in_favor,
+						goals_against:  standingResult.goals_against,
+						matches_count:  standingResult.matches,
+						matches_won:  standingResult.matches_won,
+						matches_lost:  standingResult.matches_lost,
+						matches_draw: standingResult.matches_draw }
+				//TODO: cambiar por un bulk insert
+				new Models.standing_table(tmp)
+				.save()
+				.then((result) => {
+					//all ok
+					console.log('standingResult saved')
+				})
+				.catch((error) => {
+					//do something
+					console.log(error);
+				})
+			})
+
+			//respuesta al usuario
+			console.log('bye!');
 			Response(res, standingTable)
 		})
 		.catch((error) => {
 			Response(res, null, error)
 		})
+	}
+
+	StandingTable.getStandingTableByCategory = (categoryId, res) => {
+		var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where matches.played = true and categories.id = ' + categoryId
+
+		getStandingTableByMatches(matchSql, res)
+	}
+
+	StandingTable.getStandingTableByGroup = (groupId, res) => {
+		var matchSql = 'select groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id where matches.played = true and groups.id = ' + groupId
+
+		getStandingTableByMatches(matchSql, res)
 	}
 
 	return StandingTable

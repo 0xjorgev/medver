@@ -140,9 +140,10 @@ swagger.configure(applicationUrl, '1.0.0');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization-Token');
+	res.header( 'X-Powered-By', 'SomoSport' )
   	next();
   };
-
+  
   app.use(allowCrossDomain);
 
   app.use(morgan('dev'));
@@ -195,7 +196,6 @@ swagger.configure(applicationUrl, '1.0.0');
   }
 
   app.use(validateToken)
-
   app.use(api_prefix+'core', core_ws);
   app.use(api_prefix+'user', user_ws);
   app.use(`${api_prefix}${routes.discipline}`, discipline_ws);

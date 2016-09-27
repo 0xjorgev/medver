@@ -5,6 +5,10 @@ if (typeof define !== 'function') {
 define(['./base_model'], (DB) => {
 	var StandingTable = DB.Model.extend({
 		tableName: 'standing_tables',
-		hasTimestamps: true })
+		hasTimestamps: true,
+		team: function () {
+			return this.belongsTo('Team', 'team_id');
+		}
+	})
 	return DB.model('StandingTable', StandingTable)
 });

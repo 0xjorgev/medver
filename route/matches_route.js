@@ -198,10 +198,11 @@ define(['express',
         })
         .then((result) => {
             _match.referee_id = result.attributes.referee_id
+
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true)
 				StandingTable.calculateByGroup(data.group_id)
-				
+
             Response(res, _match)
         })
         .catch((error) => {

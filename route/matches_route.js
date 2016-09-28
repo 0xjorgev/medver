@@ -2,39 +2,48 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util','../util/knex_util', 'util', '../util/response_message_util'], function (express, Models, Message, Knex, util, Response) {
+define(['express',
+	'../model/index',
+	'../util/request_message_util',
+	'../util/knex_util',
+	'util',
+	'../util/response_message_util',
+	'../helpers/standing_table_helper'],
+	(express,
+		Models,
+		Message,
+		Knex,
+		util,
+		Response,
+		StandingTable) => {
 
     var router = express.Router();
 
     inspect = util.inspect
 
     //matches index
-    router.get('/', function (req, res) {
-
-        // tapping into Knex query builder to modify query being run
+    router.get('/', (req, res) => {
         return Models.match
-        .query(function(qb){})
+        .query((qb) => {})
         .fetchAll({withRelated: ['home_team', 'visitor_team']} )
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+        .then((result) => {
+            Response(res, result)
+        })
+		.catch((error) => {
+            Response(res, null, error)
         });
     });
 
     //matches show
-    router.get('/:match_id', function (req, res) {
-
+    router.get('/:match_id', (req, res) => {
         var match_id = req.params.match_id;
-        // tapping into Knex query builder to modify query being run
         return Models.match
         .where({'id':match_id})
-        .fetch({withRelated: ['home_team', 'visitor_team']})
-        .then(function (result) {
-            // Message(res,'Success', '0', result);
+        .fetch({withRelated: ['home_team', 'visitor_team', 'round.group']})
+        .then( (result) => {
             Response(res, result)
-        }).catch(function(error){
-            // Message(res,error.details, error.code, []);
+        })
+		.catch((error) => {
             Response(res, null, error)
         });
     });
@@ -42,42 +51,36 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     //=========================================================================
     // Returns the player list for a given match
     //=========================================================================
-    router.get('/:match_id/player', function (req, res) {
+    router.get('/:match_id/player', (req, res) => {
         var match_id = req.params.match_id;
-        // tapping into Knex query builder to modify query being run
         return Models.match
         .where({'id': match_id})
         .fetch({withRelated: ['home_team.match_player_team.player', 'visitor_team.match_player_team.player']})
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+        .then((result) => {
+            Response(res, result);
+        })
+		.catch((error) => {
+            Response(res, null, error);
         });
     });
 
-    router.get('/:match_id/team', function (req, res) {
+    router.get('/:match_id/team', (req, res) => {
 
         var match_id = req.params.match_id;
-        // tapping into Knex query builder to modify query being run
         return Models.match
         .where({'id':match_id})
-        .fetch({withRelated: ['home_team.match_player_team.player.gender', 
-                                'visitor_team.match_player_team.player.gender', 
-                                'round.group.phase.category.category', 
+        .fetch({withRelated: ['home_team.match_player_team.player.gender',
+                                'visitor_team.match_player_team.player.gender',
+                                'round.group.phase.category.category',
                                 'round.group.phase.category.season.competition',
                                 'home_team.summoned.player',
                                 'visitor_team.summoned.player'], debug: false})
-        .then(function (result) {
-
-            // console.log(result.attributes)
-
-            // console.log(result)
+        .then( (result) => {
             // console.log(inspect(result, { colors: true, depth: Infinity }))
-
-            Message(res,'Success', '0', result);
-
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
+            Response(res, result)
+        })
+		.catch( (error) => {
+            Response(res, null, error)
         });
     });
 
@@ -85,8 +88,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     //==========================================================================
     // gets the player list for a given match & team
     //==========================================================================
-
-    router.get('/:match_id/team/:team_id/player', function (req, res) {
+    router.get('/:match_id/team/:team_id/player', (req, res) => {
 
         var data = {
             match_id: req.params.match_id,
@@ -99,10 +101,11 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         return Models.match_team_player
             .where({match_id: data.match_id, team_id: data.team_id})
             .fetchAll()
-            .then(function (result) {
-                Message(res,'Success', '0', result);
-            }).catch(function(error){
-                Message(res,error.details, error.code, [])
+            .then((result) => {
+                Response(res, result)
+            })
+			.catch((error) => {
+                Response(res, null, error)
         })
     });
 
@@ -110,7 +113,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
     // updates the player list for a given match & team
     //==========================================================================
 
-    router.put('/:match_id/team/:team_id/player', function (req, res) {
+    router.put('/:match_id/team/:team_id/player', (req, res) => {
 
         var data = {}
         if(req.body.id != undefined) data.id = req.body.id
@@ -124,14 +127,15 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         console.log('PUT /:match_id/team/:team_id/player/', data)
 
         return new Models.match_team_player(data).save()
-            .then(function (result) {
-                Message(res,'Success', '0', result);
-            }).catch(function(error){
-                Message(res,error.details, error.code, [])
-        })
+            .then( (result) => {
+                Response(res, result)
+            })
+			.catch( (error) => {
+				Response(res, null, error)
+        	})
     });
 
-    var saveMatch = function(req, res){
+    var saveMatch = (req, res) => {
 
         //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
         //https://github.com/hapijs/joi
@@ -152,6 +156,7 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         if(data.visitor_team_score != undefined)    matchData.visitor_team_score = data.visitor_team_score
         if(data.round_id != undefined)              matchData.round_id =  data.round_id
         if(data.date != undefined)                  matchData.date =  data.date
+        if(data.played != undefined)                matchData.played =  data.played
 
         var categoryData = {}
         if(data.category_id != undefined)   categoryData.category_id = data.category_id
@@ -170,44 +175,52 @@ define(['express', '../model/index', '../util/request_message_util','../util/kne
         }
 
         if(data.round_id) roundData.id = data.round_id
-
         //para almacenar el match creado
         var _match = undefined
-
         //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
         //en caso de que la ronda exista, solo se hace update
-        new Models.round(roundData).save()
-        .then(function(round){
+        new Models.round(roundData)
+		.save()
+        .then((round) => {
+			//se salvan los datos del match
             matchData.round_id = round.attributes.id
             return new Match(matchData).save()
         })
-        .then(function(match){
+        .then((match) => {
+			//se guardan los datos del match para retornarse al final de la cadena
             _match = match.attributes
             return match
         })
-        .then(function(result){
+        .then((result) => {
             refereeData.match_id = _match.id
+			//TODO: se está duplicando el referi cuando se actaliza el registro; para evitar eso es necesario devolver el id de la tabla referee_match
             return new Models.match_referee(refereeData).save()
         })
-        .then(function(result){
-            //finally
+        .then((result) => {
             _match.referee_id = result.attributes.referee_id
-            Response(res, result)
+			//se actualiza el standing_table del grupo del match
+			if(data.played && data.played === true)
+				StandingTable.calculateByGroup(data.group_id)
+				
+            Response(res, _match)
         })
-        .catch(function(error){
+        .catch((error) => {
+			//TODO: log the error
+			console.log(error);
             Response(res, null, error)
         })
     }
 
     //match create
-    router.post('/', function (req, res) {
+    router.post('/', (req, res) => {
         console.log('POST /match', req.body)
         saveMatch(req, res)
      })
 
     //match update
-    router.put('/:match_id', function (req, res) {
+    router.put('/:match_id', (req, res) => {
         console.log('PUT /match', req.body)
+		req.body.id = req.params.match_id
         saveMatch(req, res)
     });
 

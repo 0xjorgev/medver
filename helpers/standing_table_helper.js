@@ -149,7 +149,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 	//==========================================================================
 
 	//given a set of matches (could be a entire category, or a group), returns the current standing table
-	var calculateStandingTableByMatches = (matchSql, res) => {
+	var calculateStandingTableByMatches = (matchSql) => {
 		var matchesWithResults = undefined
 		var matches = undefined
 
@@ -204,7 +204,6 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		})
 		.then((standingTable) => {
 			//bloque para almacenar la standingTable en base de datos
-			//TODO: promisify???
 			standingTable.forEach((standingResult) => {
 				Knex('standing_tables')
 				.where({group_id: standingResult.group_id})
@@ -231,26 +230,19 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 					//all ok
 					console.log('standingResult saved')
 				})
-				.catch((error) => {
-					//do something
-					console.log(error);
-				})
 			})
-
-			//respuesta al usuario
-			console.log('bye!');
-			Response(res, standingTable)
 		})
 		.catch((error) => {
-			Response(res, null, error)
+			console.log(error);
 		})
 	}
 
-	//TODO: los metodos GET de standing table deberian simplemente consultar la
-	//nueva tabla standing_tables. El GET de standing x categoria debe sumarizar los
-	//resultados existentes en la tabla.
-	//la tabla standing va a almacenar el 'grano' mas pequeño que permita calcular
-	//los niveles superiores
+	/*
+	* Sumariza la standing table según un grupo
+	*
+	* la tabla standing almacena el 'grano' mas pequeño que permita calcular
+	* los niveles superiores. En este caso, grupo > fase > categoria
+\	*/
 
 	StandingTable.getStandingTableByCategory = (categoryId, res) => {
 		Models.standing_table
@@ -275,8 +267,10 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		})
 	}
 
+	/*
+	* Sumariza la standing table según un grupo
+	*/
 	StandingTable.getStandingTableByGroup = (groupId, res) => {
-
 		Models.standing_table
 		.query((qb) => {
 			qb.where({category_id: groupId})
@@ -309,11 +303,10 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		' inner join groups on groups.id = rounds.group_id ' +
 		' inner join phases on phases.id = groups.phase_id ' +
 		' inner join categories on categories.id = phases.category_id ' +
-		' where matches.played = true and groups.id = ' + groupId
+		' where matches.played = true and groups.id = ' + group_id
 
-		calculateStandingTableByMatches(matchSql, res)
+		calculateStandingTableByMatches(matchSql)
 	}
-
 
 	return StandingTable
 });

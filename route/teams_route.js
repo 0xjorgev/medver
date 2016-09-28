@@ -245,6 +245,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 				position_id : teamData.position_id,
 				team_id : teamData.team_id
 			}
+			if(playerTeamData.team_player.id)
+				team_player.id = playerTeamData.team_player.id
+			
 			console.log('team_player', team_player)
 
 			return new Models.player_team(team_player).save()

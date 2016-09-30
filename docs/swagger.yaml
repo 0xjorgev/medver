@@ -243,6 +243,22 @@ paths:
           required: true
           type: integer
           format: integer
+    post:
+      summary: calculates & then gets the current standing table for a given group_id
+      description: calculates & then gets the current standing table for a given group_id
+      tags:
+        - Standing table
+        - Group
+      responses:
+        200:
+          description: the current standing_table of the group
+      parameters:
+        - name: group_id
+          in: path
+          description: group ID
+          required: true
+          type: integer
+          format: integer
   /team:
     get:
       summary: Gets the info of all teams
@@ -734,7 +750,6 @@ paths:
         200:
           description: Detail of a phase
       security: []
-
     put:
       summary: Updates a phase given its ID
       description: Updates a phase given its ID
@@ -769,6 +784,26 @@ paths:
                 type: integer
               active:
                 type: boolean
+  /category/{category_id}/team_placeholders:
+    get:
+      summary: Returns team placeholders for future matches
+      description: Returns team placeholders for future matches.
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of placeholders
+      security: []
+
   /phase/{phase_id}/team:
     get:
       summary: Returns the teams participating in a phase

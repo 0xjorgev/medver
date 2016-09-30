@@ -105,6 +105,12 @@ define(['express',
 		StandingTable.getStandingTableByGroup(group_id, res)
 	})
 
+	router.post('/:group_id/standing_table', function(req, res){
+		var group_id = req.params.group_id
+		StandingTable.calculateByGroup(group_id)
+		StandingTable.getStandingTableByGroup(group_id, res)
+	})
+
 	//FUNCION PARA ACTUALIZAR LOS VALORES DE LA TABLA FASE CUANDO SE CAMBIEN LOS VALORES DE UN GRUPO
 	var updateFase = (data, res, group_result) => {
 		console.log("-------Update Phase by group--------")

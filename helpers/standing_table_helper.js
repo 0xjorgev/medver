@@ -162,8 +162,8 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 
 			//si la estructura no tiene matches, se retorna 404
 			if(!matches || matches.length == 0){
-				Response(res, matches) // matches está vacio y causa un 404
-				return
+				//Response(res, matches) // matches está vacio y causa un 404
+				throw new Error("Matches not found")
 			}
 
 			//separo los IDs de los matches
@@ -234,6 +234,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		})
 		.catch((error) => {
 			console.log(error);
+			console.log(error.stack);
 		})
 	}
 

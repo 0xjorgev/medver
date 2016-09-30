@@ -1,6 +1,3 @@
-/**
- * Created by george on 08/03/16.
- */
 if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
@@ -559,6 +556,61 @@ define(['express',
 				Response(res, null, error)
 			});
 	});
+
+
+	var sortBy = (key) => {
+		return (a, b) => {
+			if (a['position'] > b['position']) {
+				return 1;
+			}
+			if (a['position'] < b['position']) {
+				return -1;
+			}
+			return 0;
+		}
+	}
+
+	// dada una fase, retorna los placeholders de posiciones en referencia a la fase anterior
+	// es decir, ganador grupo 1, posicion 2 grupo 3, etc
+	router.get('/:category_id/team_placeholders', (req, res) => {
+		//paso 0: si esta fase es la primera, devolver vacío, o simplemente el listado de equipos
+		// obtener la fase, revisar el campo position
+		Models.category
+		.where({id: req.params.category_id})
+		.fetch({withRelated: ['phases.groups']})
+		.then((result) => {
+			var category = result.toJSON()
+
+			if(category.phases.length < 2){
+				//no devuelvo nada si la cat no tiene mas de 1 fase
+				Response(res, [])
+			}
+
+			var tags = {}
+			tags.category_id = req.params.category_id
+			tags.phases = []
+			//paso 1: obtener los grupos de la fase anterior, para obtener el # de equipos que participan en cada fase
+			_.sortBy(category.phases,'position').map((phase) => {
+				var p = {phase_id: phase.id}
+				p.groups = []
+				//paso 2: por cada grupo, generar un array con el nombre del grupo y la posicion dentro del mismo
+				phase.groups.forEach((group) => {
+					var g = {group_id: group.id}
+					g.positions = []
+					for (var i = 1; i <= group.classified_team; i++) {
+						g.positions.push(i)
+					}
+					p.groups.push(g)
+				})
+				tags.phases.push(p)
+			})
+			//y para obtener el numero de equipos clasificados
+			Response(res, tags)
+		})
+		.catch((error) => {
+			Response(res, null, error)
+		})
+	})
 
 	return router;
 

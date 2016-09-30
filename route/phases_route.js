@@ -115,12 +115,6 @@ define(['express',
     	var name = phase_post.name;
     	var position = phase_post.position;
 
-        // console.log('------------------------------');
-        // console.log(`name:${name}`);
-        // console.log(`position:${position}`);
-        // console.log(`category:${phase_post.category_id}`);
-        // console.log('------------------------------');
-
         new Phase(phase_post)
         .save()
         .then(function(new_phase){
@@ -144,12 +138,7 @@ define(['express',
         .where('id','=',phase_id)
         .update(phase_upd, ['id'])
         .then(function(result){
-            if (result.length != 0){
-                Response(res, result)
-            } else {
-                //TODO: fix this
-                Message(res, 'Wrong phase_id', '404', result);
-            }
+			Response(res, result)
         })
         .catch(function(err){
             Response(res, null, err)

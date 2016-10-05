@@ -14,13 +14,16 @@ define(['express',
 		'../util/knex_util',
 		'../helpers/standing_table_helper',
 		'../util/response_message_util',
-		'../node_modules/lodash/lodash.min'],
+		'../node_modules/lodash/lodash.min',
+		'bluebird'],
 	function (express,
 		Models,
 		Message,
 		Knex,
 		StandingTable,
-		Response, _) {
+		Response,
+		_,
+		Promise) {
 
 	var router = express.Router();
 
@@ -575,37 +578,67 @@ define(['express',
 	router.get('/:category_id/team_placeholders', (req, res) => {
 		//paso 0: si esta fase es la primera, devolver vacío, o simplemente el listado de equipos
 		// obtener la fase, revisar el campo position
+
+			// 	Promise.filter(category.phases, (ph) => ph.position == (phase.position + 1) )
+
 		Models.category
 		.where({id: req.params.category_id})
 		.fetch({withRelated: ['phases.groups']})
 		.then((result) => {
 			var category = result.toJSON()
+			//no devuelvo nada si la cat no tiene mas de 1 fase
+			if(category.phases.length < 2) Response(res, [])
 
-			if(category.phases.length < 2){
-				//no devuelvo nada si la cat no tiene mas de 1 fase
-				Response(res, [])
-			}
+			return category.phases.map((phase) => {
+				//se retorna un promise por cada una de las fases
+				var ph = {
+					phase_id: phase.id,
+					name: phase.name,
+					position: phase.position,
+					groups: []
+				}
 
-			var tags = {}
-			tags.category_id = req.params.category_id
-			tags.phases = []
-			//paso 1: obtener los grupos de la fase anterior, para obtener el # de equipos que participan en cada fase
-			_.sortBy(category.phases,'position').map((phase) => {
-				var p = {phase_id: phase.id}
-				p.groups = []
-				//paso 2: por cada grupo, generar un array con el nombre del grupo y la posicion dentro del mismo
-				phase.groups.forEach((group) => {
-					var g = {group_id: group.id}
-					g.positions = []
-					for (var i = 1; i <= group.classified_team; i++) {
-						g.positions.push(i)
+				phase.groups.map((group) => {
+					var last = {
+						group_id: group.id,
+						name: group.name,
+						classifying_teams: group.classified_team,
+						positions: []
 					}
-					p.groups.push(g)
+
+					for (var i = 1; i <= group.classified_team; i++) {
+						last.positions.push({
+							position: i,
+							description: `Position ${i}/${group.classified_team} of '${group.name}' on '${phase.name}'`
+						})
+					}
+					ph.groups.push(last)
 				})
-				tags.phases.push(p)
+
+				return ph
 			})
-			//y para obtener el numero de equipos clasificados
-			Response(res, tags)
+		})
+		.then((result) => {
+			return _(result).flatten().sortBy('position')
+		})
+		.then((result) => {
+			var tmp = undefined
+			return result.map((phase) => {
+				if(phase.position == 1)
+					tmp = phase.groups
+				else {
+					var tmp2 = phase.groups
+					phase.groups = tmp
+					tmp = tmp2
+				}
+				return phase
+			})
+		})
+		.then((result) => {
+			return result.slice(1)
+		})
+		.then((result) => {
+			Response(res, result)
 		})
 		.catch((error) => {
 			Response(res, null, error)

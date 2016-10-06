@@ -354,12 +354,29 @@ paths:
           required: true
           type: integer
           format: integer
-        - name: player and team data
+        - name: PlayerTeamCreateData
           in: body
           required: true
           x-is-map: false
           schema:
-            $ref: '#/definitions/PlayerTeamRequest'
+            title: PlayerTeamCreateRequest
+            type: object
+            properties:
+              player:
+                type: object
+                schema:
+                  name:
+                    type: string
+                  position:
+                    type: integer
+                  category_id:
+                    type: integer
+                  participant_team:
+                    type: integer
+                  classified_team:
+                    type: integer
+            required:
+            - player
       tags:
         - Team
         - Player

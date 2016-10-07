@@ -158,6 +158,26 @@ define(['express',
         if(data.date != undefined)                  matchData.date =  data.date
         if(data.played != undefined)                matchData.played =  data.played
 
+		//datos para los placeholders
+		//si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
+		if(data.home_team_id == undefined || data.home_team_id == null){
+			if(data.placeholder_home_team_group != undefined)	matchData.placeholder_home_team_group = data.placeholder_home_team_group
+			if(data.placeholder_home_team_position != undefined)	matchData.placeholder_home_team_position = data.placeholder_home_team_position
+		}
+		else {
+			matchData.placeholder_home_team_group = null
+			matchData.placeholder_home_team_position = null
+		}
+
+		if(data.visitor_team_id == undefined || data.visitor_team_id == null){
+			if(data.placeholder_visitor_team_group != undefined)	matchData.placeholder_visitor_team_group = data.placeholder_visitor_team_group
+			if(data.placeholder_visitor_team_position != undefined)	matchData.placeholder_visitor_team_position = data.placeholder_visitor_team_position
+		}
+		else {
+			matchData.placeholder_visitor_team_group = null
+			matchData.placeholder_visitor_team_position = null
+		}
+
         var categoryData = {}
         if(data.category_id != undefined)   categoryData.category_id = data.category_id
         if(data.phase_id != undefined)      categoryData.phase_id = data.phase_id
@@ -175,6 +195,8 @@ define(['express',
         }
 
         if(data.round_id) roundData.id = data.round_id
+		roundData.name = 'Round'
+
         //para almacenar el match creado
         var _match = undefined
         //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
@@ -186,7 +208,7 @@ define(['express',
             matchData.round_id = round.attributes.id
             return new Match(matchData).save()
         })
-        .then((match) => {
+		.then((match) => {
 			//se guardan los datos del match para retornarse al final de la cadena
             _match = match.attributes
             return match
@@ -198,16 +220,12 @@ define(['express',
         })
         .then((result) => {
             _match.referee_id = result.attributes.referee_id
-
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true)
 				StandingTable.calculateByGroup(data.group_id)
-
             Response(res, _match)
         })
         .catch((error) => {
-			//TODO: log the error
-			console.log(error);
             Response(res, null, error)
         })
     }

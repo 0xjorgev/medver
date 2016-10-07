@@ -17,9 +17,7 @@ define(['express',
 
     var router = express.Router();
 
-    //List of seasons (don't seem to be needed) -> Returns Array of result
     router.get('/', function (req, res) {
-        console.log('Get all Seasons');
         return Models.season
         .query(function(qb){})
         .where({active:true})
@@ -33,7 +31,6 @@ define(['express',
 
     //Seasons by Id -> Returns 1 result
     router.get('/:season_id', function (req, res) {
-        console.log('Get Season by ID');
         var season_id = req.params.season_id;
         return Models.season
         .where({id:season_id})
@@ -46,7 +43,6 @@ define(['express',
     });
 
     router.post('/', function (req, res) {
-
         //Model Instance
         var Season = Models.season;
         var season_post = req.body;
@@ -102,7 +98,6 @@ define(['express',
     //Add to new schemma
     //Category Season Methods
     router.get('/:season_id/category', function (req, res) {
-        console.log('category');
         var season_id = req.params.season_id;
         return Models.category
         .where({season_id:season_id})

@@ -312,6 +312,7 @@ define(['express',
                         console.log(`group_id:   ${round_post.group_id}`);
                         console.log(`------------------------------`);
 
+						//TODO: eliminar los rounds
                         new Round(round_post).save().then(function(new_round)
                         {
                             console.log(`Create round successful ${new_round.id}`);

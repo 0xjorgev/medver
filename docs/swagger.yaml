@@ -1561,6 +1561,18 @@ definitions:
         type: integer
       referee_id:
         type: integer
+      placeholder_home_team_group:
+          type: integer
+          description: group_id for the home_team placeholder
+      placeholder_home_team_position:
+          type: integer
+          description: position of the placeholder team according to the group's standing table
+      placeholder_visitor_team_group:
+          type: integer
+          description: group_id for the visitor_team placeholder
+      placeholder_visitor_team_position:
+          type: integer
+          description: position of the placeholder team according to the group's standing table
     required:
     - home_team_id
     - visitor_team_id

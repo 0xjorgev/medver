@@ -894,6 +894,27 @@ paths:
         200:
           description:
       security: []
+
+  /competition/query/by_city:
+    get:
+      summary: List of competitions managed by the user_id received in auth-token & filtered by city
+      description: List of competitions managed by the user_id received in auth-token & filtered by city
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+      responses:
+        200:
+          description: List of competition managed by token user
+        404:
+          description: User doesn't manage any competitions
+      security: []
+
   /competition/{competition_id}/season/{season_id}/category/{category_id}/publish:
     put:
       summary: Sets a category and a competition as published.

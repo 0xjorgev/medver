@@ -81,9 +81,28 @@ define(['express',
             password:password
         })
         .save().then(function(newUser){
-            console.log(`{new_user: ${email}}`);
-            console.log(`{user_email: ${email}}`);
             send_email_from(email,'Welcome to Somosport', 'Welcome to Somosport!')
+
+
+                var claims = {
+                    user: newUser.id,
+                    roles: ['admin'],
+                    permissions: ['list-all'],
+                    lang: 'en'
+                }
+
+                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+                var jwt = nJwt.create(claims, signingKey)
+
+                //TODO: does not expire, for now
+                jwt.setExpiration()
+
+                newUser.attributes['Authorization-Token'] = jwt.compact()
+                delete newUser.attributes.password
+
+                //TODO: test only!
+                newUser.attributes.roles = ['admin', 'player']
+                newUser.attributes.permissions = ['list', 'create', 'update', 'delete']
 
             // Message(res, 'Success', '0', newUser);
             Response(res, newUser)
@@ -137,6 +156,54 @@ define(['express',
         });
     });
 
+    router.post('/recover_password', function(req, res, next){
+
+        var user = new Models.user;
+        var user_fgt = req.body;
+        var username = user_fgt.username_email;
+
+        var generated_password = Pwd_gen
+        console.log('generated_password',generated_password)
+        var md5_pwd = Md5(generated_password)
+
+        Knex_util(user.tableName)
+        .where(function(){
+            this.where('username',username)
+                .orWhere('email',username)
+        })
+        .then((result) => {
+
+            if(result.length == 0){
+                //no user/email was found
+                Response(res, result)
+                return
+            }
+            return Knex_util(user.tableName)
+                .where({id: result[0].id})
+                .update({password: md5_pwd}
+                , ['id','email'])
+        })
+
+        .then(function(result){
+            if (result.length != 0){
+                console.log('result is not null'); 
+                console.log('result',result)      
+                var email = result[0].email
+                var myTemplateFunction = define('text!template/email/header.html')
+                console.log('result',result)      
+                console.log('myTemplateFunction',myTemplateFunction)
+
+                // var content =  myTemplateFunction + 
+                // email_sender_html(email, 'Your new Somosport Password!', `<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">  <div style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">       <table cellpadding="0" cellspacing="0" border="0">          <tr>                <td class="action-content">                 <h1>${result[0].email},</h1>                    <p><strong>Your new password is:</strong> ${generated_password}</p>                 <p>You can change your password at any time by logging into <a href="${req.headers.origin}">your account</a>.</p>                </td>           </tr>       </table>    </div></body>` );
+                // Message(res, 'Success', '0', result);
+                Response(res, result)
+            }
+        })
+        .catch(function(err){
+            Response(res, null, err)
+        });
+    });
+
     router.post('/change_password', function(req, res, next){
         var user = new Models.user;
         var user_pwd_change = req.body;
@@ -160,6 +227,27 @@ define(['express',
                 send_email_from(email, 'Your new Somosport Password!', 'Your somosport Password had been changed!' );
                 // Message(res, 'Success', '0', result);
             }
+
+            //Manage Token
+            var claims = {
+                user: userId,
+                roles: ['admin'],
+                permissions: ['list-all'],
+                lang: 'en'
+            }
+            var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+            var jwt = nJwt.create(claims, signingKey)
+
+            //TODO: does not expire, for now
+            jwt.setExpiration()
+
+            result.attributes['Authorization-Token'] = jwt.compact()
+            delete result.attributes.password
+
+            //TODO: test only!
+            result.attributes.roles = ['admin', 'player']
+            result.attributes.permissions = ['list', 'create', 'update', 'delete']
+
             //if result is empty, a 404 will be thrown
             Response(res, result)
         })

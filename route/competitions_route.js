@@ -9,8 +9,9 @@ define(['express',
         '../util/response_message_util',
         '../util/knex_util',
         '../util/email_sender_util',
-        '../helpers/auth_helper'],
-        function (express, util, Models, Message, Response, Knex, Email, auth) {
+        '../helpers/auth_helper',
+		'../node_modules/lodash/lodash.min'],
+        function (express, util, Models, Message, Response, Knex, Email, auth, lodash) {
 
     var _log = (obj) => console.log(util.inspect(obj, {colors: true, depth: Infinity }))
     var router = express.Router();
@@ -129,7 +130,6 @@ define(['express',
             .then((result) => Response(res, result))
             .catch((error) => Response(res, null, error));
     });
-
 
     router.post('/:competition_id/contact/', function (req, res) {
 
@@ -386,6 +386,52 @@ define(['express',
             Response(res, null, err)
         });
     });
+
+	router.get('/query/by_city', (req, res) => {
+		//req._currentUser is the user recovered from token
+        //to get competitions the user should have these permissions
+        var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
+
+        if (chk.code != 0){
+            Response(res, null, chk)
+            return
+        }
+
+		return Models.season
+            .query(function(qb){
+                // qb.distinct() //TODO: el query está devolviendo una competicion por usuario
+				qb.innerJoin('competitions', 'competitions.id', 'seasons.competition_id')
+                qb.innerJoin('competitions_users', 'competitions_users.competition_id', 'competitions.id')
+                qb.where({'competitions_users.user_id': req._currentUser.id})
+				qb.orWhere({'competitions.created_by_id': req._currentUser.id})
+				qb.whereNotNull('seasons.meta')
+            })
+            .fetchAll({
+                withRelated: [
+                    'competition'
+                    ,'competition.discipline'
+                    ,'competition.subdiscipline'
+                    ,'competition.competition_type'
+                    ,'categories']
+            })
+			.then((result) => {
+				var seasons = result.toJSON()
+				return seasons.map((season) => {
+					var meta = JSON.parse(season.meta)
+					if(meta != null && meta.ciudad){
+						season.city = meta.ciudad
+					}
+					return season
+				})
+			})
+			.then((result) => {
+				return lodash(result).groupBy('city')
+			})
+			.then((result) => {
+				Response(res, result)
+			})
+
+	})
 
     return router;
 });

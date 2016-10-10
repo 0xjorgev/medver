@@ -159,10 +159,10 @@ define(['express',
         if(data.played != undefined)                matchData.played =  data.played
 
 		//datos para los placeholders
-		//si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
+		// si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
 		if(data.home_team_id == undefined || data.home_team_id == null){
-			if(data.placeholder_home_team_group != undefined)	matchData.placeholder_home_team_group = data.placeholder_home_team_group
-			if(data.placeholder_home_team_position != undefined)	matchData.placeholder_home_team_position = data.placeholder_home_team_position
+			if(data.placeholder_home.group_id != undefined)	matchData.placeholder_home_team_group = data.placeholder_home.group_id
+			if(data.placeholder_home.position != undefined)	matchData.placeholder_home_team_position = data.placeholder_home.position
 		}
 		else {
 			matchData.placeholder_home_team_group = null
@@ -170,8 +170,8 @@ define(['express',
 		}
 
 		if(data.visitor_team_id == undefined || data.visitor_team_id == null){
-			if(data.placeholder_visitor_team_group != undefined)	matchData.placeholder_visitor_team_group = data.placeholder_visitor_team_group
-			if(data.placeholder_visitor_team_position != undefined)	matchData.placeholder_visitor_team_position = data.placeholder_visitor_team_position
+			if(data.placeholder_visitor.group_id != undefined)	matchData.placeholder_visitor_team_group = data.placeholder_visitor.group_id
+			if(data.placeholder_visitor.position != undefined)	matchData.placeholder_visitor_team_position = data.placeholder_visitor.position
 		}
 		else {
 			matchData.placeholder_visitor_team_group = null
@@ -206,6 +206,9 @@ define(['express',
         .then((round) => {
 			//se salvan los datos del match
             matchData.round_id = round.attributes.id
+
+			console.log(matchData)
+
             return new Match(matchData).save()
         })
 		.then((match) => {

@@ -21,19 +21,23 @@ define(['sendgrid'], function (Email) {
             });
 		}
     }
-    var email_sender_html = function(sender){
-        return function(email, subject, content){
-            // console.log('Email sent', `email: ${email}, subject:${subject}, content:${content}`);
-            sendgrid.send({
-                to:       `${email}`,
-                from:     sender,
-                subject:  `${subject}`,
-                html:     `${content}`
-            }, function(err, json) {
-                if (err) { return console.error(err); }
-                console.log(`Email sent:`, json);
-            });
-        }
-    }
-    return email_sender;
+
+        return email_sender;
+    // var email_sender_html = function(sender){
+    //     return function(email, subject, content){
+    //         // console.log('Email sent', `email: ${email}, subject:${subject}, content:${content}`);
+    //         sendgrid.send({
+    //             to:       `${email}`,
+    //             from:     sender,
+    //             subject:  `${subject}`,
+    //             html:     `${content}`
+    //         }, function(err, json) {
+    //             if (err) { return console.error(err); }
+    //             console.log(`Email sent:`, json);
+    //         });
+    //     }
+    //     return email_sender_html;
+    // }
+    
+
 });

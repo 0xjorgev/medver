@@ -4,7 +4,7 @@
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-
+var fs = require('fs')
 define(['express',
         'uuid',
         'njwt',
@@ -73,6 +73,9 @@ define(['express',
         var username = new_user.username;
         var password = new_user.password;
         var email    = new_user.email;
+        var origin = req.headers.origin
+        console.log('origin', origin)
+
         var User = Models.user;
 
         new User({
@@ -81,28 +84,29 @@ define(['express',
             password:password
         })
         .save().then(function(newUser){
-            send_email_from(email,'Welcome to Somosport', 'Welcome to Somosport!')
+            //content is from template/email/registerUser.html
+            var content =  `<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">    <!-- header -->    <table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table">        <tr style="background-color: #00796b; text-align: center;">            <td>                <h5 style="line-height: 5px;text-align: center; font-size: 14px;">                    <img alt="SomoSport Logo"  href="${origin}" src="http://ss-management-dev.herokuapp.com/img/somosport-brand-small.png">                </h5>            </td>        </tr>        <!-- Content -->        </tr style="text-align: center; font-size: 12px;">            <td style="padding-left: 21%">                <h1>Welcome ${username}</h1>                <p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p>                <p class="highlighted-text">                    Use the following values when prompted to log in:<br/>                    <strong>Username or Email</strong>: ${username} or ${email} <br/>                </p>            </td>        </tr>        <!-- End Content -->        <tr style="background-color: #00796b;">            <td class="col-md-12">                <h5 class="closing-text" style="color: #f6f6f6; line-height: 5px;text-align: center; font-size: 14px;">Thank you, Somosport!</h5>            </td>        </tr>             </table>    <!-- End wrapper table --></body>`    
+            send_email_from(email,'Welcome to Somosport', content)
 
+            var claims = {
+                user: newUser.id,
+                roles: ['admin'],
+                permissions: ['list-all'],
+                lang: 'en'
+            }
 
-                var claims = {
-                    user: newUser.id,
-                    roles: ['admin'],
-                    permissions: ['list-all'],
-                    lang: 'en'
-                }
+            var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+            var jwt = nJwt.create(claims, signingKey)
 
-                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
-                var jwt = nJwt.create(claims, signingKey)
+            //TODO: does not expire, for now
+            jwt.setExpiration()
 
-                //TODO: does not expire, for now
-                jwt.setExpiration()
+            newUser.attributes['Authorization-Token'] = jwt.compact()
+            delete newUser.attributes.password
 
-                newUser.attributes['Authorization-Token'] = jwt.compact()
-                delete newUser.attributes.password
-
-                //TODO: test only!
-                newUser.attributes.roles = ['admin', 'player']
-                newUser.attributes.permissions = ['list', 'create', 'update', 'delete']
+            //TODO: test only!
+            newUser.attributes.roles = ['admin', 'player']
+            newUser.attributes.permissions = ['list', 'create', 'update', 'delete']
 
             // Message(res, 'Success', '0', newUser);
             Response(res, newUser)
@@ -155,7 +159,7 @@ define(['express',
             Response(res, null, error)
         });
     });
-
+    
     router.post('/recover_password', function(req, res, next){
 
         var user = new Models.user;
@@ -181,7 +185,7 @@ define(['express',
             return Knex_util(user.tableName)
                 .where({id: result[0].id})
                 .update({password: md5_pwd}
-                , ['id','email'])
+                , ['id','email','username'])
         })
 
         .then(function(result){
@@ -189,15 +193,12 @@ define(['express',
                 console.log('result is not null'); 
                 console.log('result',result)      
                 var email = result[0].email
-                var myTemplateFunction = define('text!template/email/header.html')
-                console.log('result',result)      
-                console.log('myTemplateFunction',myTemplateFunction)
-
-                // var content =  myTemplateFunction + 
-                // email_sender_html(email, 'Your new Somosport Password!', `<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">  <div style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">       <table cellpadding="0" cellspacing="0" border="0">          <tr>                <td class="action-content">                 <h1>${result[0].email},</h1>                    <p><strong>Your new password is:</strong> ${generated_password}</p>                 <p>You can change your password at any time by logging into <a href="${req.headers.origin}">your account</a>.</p>                </td>           </tr>       </table>    </div></body>` );
-                // Message(res, 'Success', '0', result);
-                Response(res, result)
+                 //content is from template/email/recover_password.html
+                var content =  `<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;"><!-- header --><table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table">    <tr style="background-color: #00796b; text-align: center;">        <td>            <h5 style="line-height: 5px;text-align: center; font-size: 14px;">                <img alt="SomoSport Logo"  href="${req.headers.origin}" src="http://ss-management-dev.herokuapp.com/img/somosport-brand-small.png">            </h5>        </td>    </tr>    <!-- Content -->    <tr style="text-align: center;">        <td valign="top" class="top-content action-content">           <!-- Begin Content -->            <h1>${result[0].username},</h1>           <p>Your new password is:<strong> ${generated_password}</strong></p>         <p>You can change your password at any time by logging into <a href="${req.headers.origin}">your account</a>.</p>        </td>   </tr>               <!-- End Content -->    <tr style="background-color: #00796b;">        <td>            <h5 class="closing-text" style="color: #f6f6f6; line-height: 5px;text-align: center; font-size: 14px;">Thank you, Somosport!</h5>        </td>    </tr>         </table><!-- End wrapper table --></body>`
+                console.log('content', content)
+                send_email_from(email, 'Your new Somosport Password!', content )
             }
+            Response(res, result)
         })
         .catch(function(err){
             Response(res, null, err)

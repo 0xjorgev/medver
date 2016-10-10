@@ -105,6 +105,19 @@ define(['express',
 		StandingTable.getStandingTableByGroup(group_id, res)
 	})
 
+	router.get('/:group_id/team', function(req, res){
+		var group_id = req.params.group_id;
+
+		return Models.category_group_phase_team
+			.where({group_id:group_id, active:true})
+			.fetchAll({withRelated:['team','category','group','phase']})
+			.then(function (result) {
+				Response(res, result)
+			}).catch(function(error){
+				Response(res, null, error)
+			});
+	})
+
 	router.post('/:group_id/standing_table', function(req, res){
 		var group_id = req.params.group_id
 		StandingTable.calculateByGroup(group_id)
@@ -113,7 +126,6 @@ define(['express',
 
 	//FUNCION PARA ACTUALIZAR LOS VALORES DE LA TABLA FASE CUANDO SE CAMBIEN LOS VALORES DE UN GRUPO
 	var updateFase = (data, res, group_result) => {
-		console.log("-------Update Phase by group--------")
 		console.log("Data: ", data)
 		var phase_id = data.phase_id
 		console.log("phase_id: ", phase_id)
@@ -145,19 +157,18 @@ define(['express',
 
 			var Phase = Models.phase;
 			Knex('phases')
-				.where('id','=', phase_id)
-				.update(phase_upd, ['id'])
-				.then((phases_result) => {
-					if (result.length != 0){
-						Response(res, group_result)
-					} else {
-						// Message(res, 'Wrong phase_id', '404', group_result);
-						Response(res, [])
-					}
-				})
-				.catch((err) => {
-					Response(res, null, err)
-				});
+			.where('id','=', phase_id)
+			.update(phase_upd, ['id'])
+			.then((phases_result) => {
+				if (result.length != 0){
+					Response(res, group_result)
+				} else {
+					Response(res, [])
+				}
+			})
+			.catch((err) => {
+				Response(res, null, err)
+			})
 		})
 		.catch((error) => {
 			Response(res, null, error)

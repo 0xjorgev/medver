@@ -1242,6 +1242,25 @@ paths:
       responses:
         200:
           description: list of all matches
+  /group/{group_id}/team:
+    get:
+      description: get teams invited to play on this group
+      tags:
+        - Group
+        - Team
+      produces:
+      - application/json
+      parameters:
+        - name: group_id
+          in: path
+          description: Group ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: list of teams currently on this group 
+      security: []
   /category/{category_id}/se:
     post:
       summary: Category Create SE

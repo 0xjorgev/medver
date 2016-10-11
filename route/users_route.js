@@ -85,7 +85,7 @@ define(['express',
         })
         .save().then(function(newUser){
             //content is from template/email/registerUser.html
-            var content =  `<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">    <!-- header -->    <table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table">        <tr style="background-color: #00796b; text-align: center;">            <td>                <h5 style="line-height: 5px;text-align: center; font-size: 14px;">                    <img alt="SomoSport Logo"  href="${origin}" src="http://ss-management-dev.herokuapp.com/img/somosport-brand-small.png">                </h5>            </td>        </tr>        <!-- Content -->        </tr style="text-align: center; font-size: 12px;">            <td style="padding-left: 21%">                <h1>Welcome ${username}</h1>                <p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p>                <p class="highlighted-text">                    Use the following values when prompted to log in:<br/>                    <strong>Username or Email</strong>: ${username} or ${email} <br/>                </p>            </td>        </tr>        <!-- End Content -->        <tr style="background-color: #00796b;">            <td class="col-md-12">                <h5 class="closing-text" style="color: #f6f6f6; line-height: 5px;text-align: center; font-size: 14px;">Thank you, Somosport!</h5>            </td>        </tr>             </table>    <!-- End wrapper table --></body>`    
+            var content =  `<td style="padding-left: 21%"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`    
             send_email_from(email,'Welcome to Somosport', content)
 
             var claims = {
@@ -113,49 +113,6 @@ define(['express',
         })
         .catch(function(error){
             // Message(res, error.detail, error.code, null);
-            Response(res, null, error)
-        });
-    });
-
-    router.post('/forgot', function(req, res, next){
-
-        var user = new Models.user;
-        var user_fgt = req.body;
-        var username = user_fgt.username || user_fgt.email;
-
-        var generated_password = Pwd_gen;
-        var md5_pwd = Md5(generated_password);
-
-        Knex_util(user.tableName)
-        .where(function(){
-            this.where('username',username)
-                .orWhere('email',username)
-        })
-        .where('active','=',1)
-        .then((result) => {
-
-            if(result.length == 0){
-                //no user/email was found
-                Response(res, result)
-                return
-            }
-
-            return Knex_util(user.tableName)
-                .where({id: result[0].id})
-                .update({password: md5_pwd}
-                , ['id','email'])
-        })
-
-        .then(function(result){
-            if (result.length != 0){
-                console.log('result is not null');
-                var email = result[0].email;
-                send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
-                // Message(res, 'Success', '0', result);
-                Response(res, result)
-            }
-        })
-        .catch(function(err){
             Response(res, null, error)
         });
     });
@@ -193,8 +150,7 @@ define(['express',
                 console.log('result is not null'); 
                 console.log('result',result)      
                 var email = result[0].email
-                 //content is from template/email/recover_password.html
-                var content =  `<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;"><!-- header --><table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table">    <tr style="background-color: #00796b; text-align: center;">        <td>            <h5 style="line-height: 5px;text-align: center; font-size: 14px;">                <img alt="SomoSport Logo"  href="${req.headers.origin}" src="http://ss-management-dev.herokuapp.com/img/somosport-brand-small.png">            </h5>        </td>    </tr>    <!-- Content -->    <tr style="text-align: center;">        <td valign="top" class="top-content action-content">           <!-- Begin Content -->            <h1>${result[0].username},</h1>           <p>Your new password is:<strong> ${generated_password}</strong></p>         <p>You can change your password at any time by logging into <a href="${req.headers.origin}">your account</a>.</p>        </td>   </tr>               <!-- End Content -->    <tr style="background-color: #00796b;">        <td>            <h5 class="closing-text" style="color: #f6f6f6; line-height: 5px;text-align: center; font-size: 14px;">Thank you, Somosport!</h5>        </td>    </tr>         </table><!-- End wrapper table --></body>`
+                var content =  `<td valign="top" class="top-content action-content" style="padding-left: 21%"><!-- Begin Content --><h1>${result[0].username},</h1><p>Your new password is:<strong> ${generated_password}</strong></p><p>You can change your password at any time by logging into <a href="${req.header.origin}">your account</a>.</p></td>`
                 console.log('content', content)
                 send_email_from(email, 'Your new Somosport Password!', content )
             }
@@ -225,7 +181,8 @@ define(['express',
         .then(function(result){
             if (result.length != 0){
                 var email = result[0].email;
-                send_email_from(email, 'Your new Somosport Password!', 'Your somosport Password had been changed!' );
+                var content = `<table style="width:100%;border-collapse:collapse">  <tbody>     <tr>            <td class="m_4445496107839198780user-action" colspan="2" style="font:14px/1.4285714 Arial,sans-serif;padding:0;line-height:1">              <span>Important information from <strong>Somosport</strong></span>          </td>       </tr>       <tr>            <td class="m_4445496107839198780spacer" style="font:14px/1.4285714 Arial,sans-serif;padding:10px 0 0"></td>     </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">             <p style="margin-bottom:0;margin-top:0">The password for <strong>${username}</strong> was changed. If you did not make this change, please email <a href="mailto:support@somosport.com" target="_blank">support@somosport.com</a>.              </p>            </td>       </tr>       <tr>            <td class="m_4445496107839198780spacer" style="font:14px/1.4285714 Arial,sans-serif;padding:10px 0 0"></td>     </tr>       <tr>            <td class="m_4445496107839198780spacer" style="font:14px/1.4285714 Arial,sans-serif;padding:10px 0 0"></td>     </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">     </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">             <span>Thanks,</span>            </td>       </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">             <span>The Somosport Team</span>         </td>       </tr>   </tbody></table>`
+                send_email_from(email, 'Password changed!', content );
                 // Message(res, 'Success', '0', result);
             }
 

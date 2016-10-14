@@ -417,15 +417,27 @@ define(['express',
 			.then((result) => {
 				var seasons = result.toJSON()
 				return seasons.map((season) => {
-					var meta = JSON.parse(season.meta)
-					if(meta != null && meta.ciudad){
-						season.city = meta.ciudad
+					try {
+						var meta = JSON.parse(season.meta)
+						if(meta != null && meta.ciudad) season.city = meta.ciudad
 					}
+					catch (e) {
+						//no metadata received
+					}
+
 					return season
 				})
 			})
 			.then((result) => {
 				return lodash(result).groupBy('city')
+			})
+			.then((result) => {
+				var cities = result.toJSON()
+				return Object.keys(cities).map((city) => {
+					var tmp = {}
+					tmp[city] = cities[city]
+					return tmp
+				})
 			})
 			.then((result) => {
 				Response(res, result)

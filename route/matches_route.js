@@ -136,7 +136,6 @@ define(['express',
     });
 
     var saveMatch = (req, res) => {
-
         //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
         //https://github.com/hapijs/joi
         //https://github.com/tgriesser/checkit
@@ -222,20 +221,42 @@ define(['express',
         })
         .then((result) => {
             refereeData.match_id = _match.id
-			//TODO: se está duplicando el referi cuando se actaliza el registro; para evitar eso es necesario devolver el id de la tabla referee_match
+			//TODO: se está duplicando el referi cuando se actaliza el registro;
+			//para evitar eso es necesario devolver el id de la tabla referee_match
             return new Models.match_referee(refereeData).save()
         })
         .then((result) => {
+			//se obtiene el ID del referee para devolverlo en la respuesta del servicio
             _match.referee_id = result.attributes.referee_id
+
 			//se actualiza el standing_table del grupo del match
-			if(data.played && data.played === true)
+			if(data.played && data.played === true){
 				StandingTable.calculateByGroup(data.group_id)
-            Response(res, _match)
+				//revisar matches para actualizar placeholders
+				//esto debe ocurrir inmediatamente despues de calcular el standing
+				this.checkMatchPlaceholders(data.group_id)
+			}
+            return result
         })
+		.then((result) => {
+			Response(res, _match)
+		})
         .catch((error) => {
             Response(res, null, error)
         })
     }
+
+	//revisa los matches que tienen algun placeholder de equipo, para reemplazar
+	//el placeholder por el ID del equipo
+	var checkMatchPlaceholders = (groupId) => {
+		//se obtienen los matches dado el grupo
+
+		//si el match tiene placeholders, y no tiene teams asignados, procedo a
+		//buscar los teams correspondientes
+
+		//debo buscar en la tabla standing de acuerdo a los placeholders
+			//es bueno agregar una columna position a la tabla standing
+	}
 
     //match create
     router.post('/', (req, res) => {

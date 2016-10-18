@@ -5,7 +5,11 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+define(['express',
+	'../model/index',
+	'../util/request_message_util',
+	'../util/knex_util',
+	], function (express, Models, Message, Knex) {
 
     var router = express.Router();
 
@@ -212,6 +216,66 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
           //   res.json({message:error.detail, code: error.code, data: {} });
           // });
       });
+
+	router.get('/:group_id/ph', (req, res) => {
+		var _matches = undefined
+		//se obtienen los matches dado el grupo
+		return Models.match
+		.query((qb) => {
+			qb.where({group_id: req.params.group_id})
+			qb.where(Knex.raw('(placeholder_home_team_group is not null or placeholder_visitor_team_group is not null)'))
+			qb.where(Knex.raw('(home_team_id is null or visitor_team_id is not null)'))
+		})
+		.fetchAll()
+		.then((result) => {
+			var _matches = result.toJSON()
+			// console.log(_matches);
+			var ids = _matches.reduce((acum, m) => {
+				console.log(acum);
+				// console.log(m.placeholder_home_team_group);
+				// console.log(m.placeholder_visitor_team_group);
+				if(m.placeholder_home_team_group != null)
+					acum.push(m.placeholder_home_team_group)
+				if(m.placeholder_visitor_team_group != null)
+					acum.push(m.placeholder_visitor_team_group)
+			}, [])
+
+
+			return Models.standing_table
+				.query((qb) => {
+					qb.where({group_id: m.placeholder_home_team_group})
+					qb.orWhere({group_id: m.placeholder_visitor_team_group})
+					qb.orderBy('points','desc')
+				})
+				.fetchAll()
+
+			// return matches.map((m) => {
+			// 	Models.standing_table
+			// 	.query((qb) => {
+			// 		qb.where({group_id: m.placeholder_home_team_group})
+			// 		qb.orWhere({group_id: m.placeholder_visitor_team_group})
+			// 		qb.orderBy('points','desc')
+			// 	})
+			// 	.fetchAll()
+			// 	.then((standing) => {
+			// 		console.log('>', standing.toJSON())
+			// 	})
+			// 	return m
+			// })
+		})
+		.then((result) => {
+			console.log(result);
+			Message(res, 'Success', '0', result);
+		})
+
+		//si el match tiene placeholders, y no tiene teams asignados, procedo a
+		//buscar los teams correspondientes
+
+		//debo buscar en la tabla standing de acuerdo a los placeholders
+			//es bueno agregar una columna position a la tabla standing
+
+
+	})
 
     return router;
 });

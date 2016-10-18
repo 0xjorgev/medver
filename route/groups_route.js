@@ -126,7 +126,7 @@ define(['express',
 
 	//FUNCION PARA ACTUALIZAR LOS VALORES DE LA TABLA FASE CUANDO SE CAMBIEN LOS VALORES DE UN GRUPO
 	var updateFase = (data, res, group_result) => {
-		console.log("Data: ", data)
+		console.log("data: ", data)
 		var phase_id = data.phase_id
 		console.log("phase_id: ", phase_id)
 

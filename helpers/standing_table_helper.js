@@ -159,12 +159,9 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		.then((result) => {
 			//Se extraen los matches de la estructura y se almacenan en matches para uso posterior
 			matches = result.rows
-
 			//si la estructura no tiene matches, se retorna 404
-			if(!matches || matches.length == 0){
-				//Response(res, matches) // matches está vacio y causa un 404
+			if(!matches || matches.length == 0)
 				throw new Error("Matches not found")
-			}
 
 			//separo los IDs de los matches
 			var matchIds = matches.map((e) => e.match_id).join(',')
@@ -251,6 +248,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 			qb.where({category_id: categoryId})
 			.groupBy(['team_id', 'category_id'])
 			.select(['team_id', 'category_id'])
+			.orderBy('points')
 			.sum('points as points')
 			.sum('goals_in_favor as goals_in_favor')
 			.sum('goals_against as goals_against')
@@ -277,6 +275,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 			qb.where({category_id: groupId})
 			.groupBy(['team_id', 'category_id', 'phase_id', 'group_id'])
 			.select(['team_id', 'category_id', 'phase_id', 'group_id'])
+			.orderBy('points')
 			.sum('points as points')
 			.sum('goals_in_favor as goals_in_favor')
 			.sum('goals_against as goals_against')

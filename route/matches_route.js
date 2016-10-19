@@ -233,12 +233,12 @@ define(['express',
             _match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
-			// if(data.played && data.played === true){
+			if(data.played && data.played === true){
 				StandingTable.calculateByGroup(data.group_id)
 				//revisar matches para actualizar placeholders
 				//esto debe ocurrir inmediatamente despues de calcular el standing
 				PlaceholdersHelper.replacePlaceholders(data.group_id)
-			// }
+			}
             return result
         })
 		.then((result) => {

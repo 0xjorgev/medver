@@ -7,15 +7,18 @@ define(['express',
 	'../util/request_message_util',
 	'../util/knex_util',
 	'util',
-	'../util/response_message_util',
-	'../helpers/standing_table_helper'],
-	(express,
-		Models,
-		Message,
-		Knex,
-		util,
-		Response,
-		StandingTable) => {
+	'../util/response_message_util'
+	,'../helpers/standing_table_helper'
+	,'../helpers/team_placeholders_helper'
+	],
+	(express
+	,Models
+	,Message
+	,Knex
+	,util
+	,Response
+	,StandingTable
+	,PlaceholdersHelper) => {
 
     var router = express.Router();
 
@@ -230,12 +233,12 @@ define(['express',
             _match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
-			if(data.played && data.played === true){
+			// if(data.played && data.played === true){
 				StandingTable.calculateByGroup(data.group_id)
 				//revisar matches para actualizar placeholders
 				//esto debe ocurrir inmediatamente despues de calcular el standing
-				this.checkMatchPlaceholders(data.group_id)
-			}
+				PlaceholdersHelper.replacePlaceholders(data.group_id)
+			// }
             return result
         })
 		.then((result) => {
@@ -245,18 +248,6 @@ define(['express',
             Response(res, null, error)
         })
     }
-
-	//revisa los matches que tienen algun placeholder de equipo, para reemplazar
-	//el placeholder por el ID del equipo
-	var checkMatchPlaceholders = (groupId) => {
-		//se obtienen los matches dado el grupo
-
-		//si el match tiene placeholders, y no tiene teams asignados, procedo a
-		//buscar los teams correspondientes
-
-		//debo buscar en la tabla standing de acuerdo a los placeholders
-			//es bueno agregar una columna position a la tabla standing
-	}
 
     //match create
     router.post('/', (req, res) => {

@@ -2,12 +2,12 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express',
-	'../model/index',
-	'../util/request_message_util',
-	'../util/knex_util',
-	'util',
-	'../util/response_message_util'
+define(['express'
+	,'../model/index'
+	,'../util/request_message_util'
+	,'../util/knex_util'
+	,'util'
+	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
 	,'../helpers/team_placeholders_helper'
 	],
@@ -233,12 +233,13 @@ define(['express',
             _match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
-			if(data.played && data.played === true){
+			// if(data.played && data.played === true){
 				StandingTable.calculateByGroup(data.group_id)
 				//revisar matches para actualizar placeholders
-				//esto debe ocurrir inmediatamente despues de calcular el standing
+				//esto debe ocurrir inmediatamente despues de
+				//calcular el standing
 				PlaceholdersHelper.replacePlaceholders(data.group_id)
-			}
+			// }
             return result
         })
 		.then((result) => {

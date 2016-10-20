@@ -226,6 +226,166 @@ paths:
         - Player
         - Category
         - Team
+    
+  /category/{category_id}/team/{team_id}/player/{player_id}:
+    get:
+      summary: Gets the players that participate on a team in a category
+      description: Get players by category_id and team_id
+      operationId: Get players by category_id and team_id
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          type: integer
+        - name: team_id
+          in: path
+          required: true
+          type: integer
+        - name: player_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Player
+        - Category
+        - Team
+    post:
+      summary: Create info of the summoned player of one team on one category
+      description: 
+      # operationId: Update_http://localhost:3000/api/v1.0/category/5/team/37/player/467_
+      tags:
+        - Player
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: player_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: false
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateCategyTeamPlayer'
+      responses:
+        200:
+          description: Create info of the summoned player of one team on one category successful
+      security: []
+      x-unitTests:
+      - request:
+          method: PUT
+          uri: /category/5/team/37/player/467
+          headers:
+            Content-Type: application/json
+          body: >-
+            {
+                "active": false,
+                "number": 0,
+                "position": ""
+            }
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: http://localhost:3000/api/v1.0/category/5/team/37/player/467
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+
+    put:
+      summary: Update info of the summoned player of one team on one category
+      description: 
+      # operationId: Update_http://localhost:3000/api/v1.0/category/5/team/37/player/467_
+      tags:
+        - Player
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: player_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/UpdateCategyTeamPlayer'
+      responses:
+        200:
+          description: Update info of the summoned player of one team on one category successful
+      security: []
+      x-unitTests:
+      - request:
+          method: PUT
+          uri: /category/5/team/37/player/467
+          headers:
+            Content-Type: application/json
+          body: >-
+            {
+                "id":47,
+                "category_id": "5",
+                "team_id": "37",
+                "player_id": "467",
+                "active": false,
+                "number": 0,
+                "position": ""
+            }
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: http://localhost:3000/api/v1.0/category/5/team/37/player/467
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+   
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -1233,6 +1393,7 @@ paths:
         200:
           description:
       security: []
+
   /competition/rcompetition/{competition_id}:
     get:
       summary: Get Complete Competition
@@ -1292,6 +1453,96 @@ paths:
       responses:
         200:
           description: Active subdiscipline Available Events
+
+  /category/{category_id}/team/{team_id}/invite:
+    post:
+      summary: Create Category Team Invite
+      operationId: Create Category Team Invite
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: 
+      security: []
+  /category/{category_id}/team/{team_id}/invite/{id}:
+    put:
+      summary: update Category Team Invite
+      operationId: Update Category Team Invite
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/UpdateCategoryTeamInviteRequest'
+      responses:
+        200:
+          description: 
+      security: []
+    delete:
+      summary: Delete logical Category Team Invite
+      operationId: Delete logical Category Team Invite
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: false
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/DeleteCategoryTeamInviteRequest'
+      responses:
+        200:
+          description: 
+      security: []
+  
 
 #######################################################################
 #      _       __ _       _ _   _
@@ -1568,7 +1819,6 @@ definitions:
     required:
     - name
     - phase_id
-
   MatchPlayerTeamRequest:
     title: Match Creation Request
     type: object
@@ -1581,8 +1831,6 @@ definitions:
         type: integer
     required:
     - player_id
-
-
   CreateTeamRequest:
     title: Team Creation/Update Request
     type: object
@@ -1612,7 +1860,6 @@ definitions:
       - category_type_id
       - gender_id
       - subdiscipline_id
-
   UserLogin:
     title: User login info
     type: object
@@ -1622,12 +1869,76 @@ definitions:
       password:
         type: string
 
-    #TODO: cargar este ejemplo
-    PlayerTeamRequest:
-      title: PlayerTeam Request
-      type: object
-      properties:
-        player:
-          $ref: '#/definitions/CreateTeamRequest'
-        team:
-          $ref: '#/definitions/CreateGroupRequest'
+  #TODO: cargar este ejemplo
+  PlayerTeamRequest:
+    title: PlayerTeam Request
+    type: object
+    properties:
+      player:
+        $ref: '#/definitions/CreateTeamRequest'
+      team:
+        $ref: '#/definitions/CreateGroupRequest'
+
+  UpdateCategoryTeamInviteRequest:
+    title: Create Category Team InviteRequest
+    type: object
+    properties:
+      category_id:
+        type: integer
+        format: int32
+      team_id:
+        type: integer
+        format: int32
+      phase_id:
+        type: integer
+        format: int32
+      group_id:
+        type: integer
+        format: int32
+      active:
+        type: boolean
+  
+  UpdateCategyTeamPlayer:
+    title: UpdateCategyTeamPlayer
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+      active:
+        type: boolean
+      number:
+        type: integer
+        format: int32
+      position:
+        type: string
+    required:
+    - id
+
+  CreateCategyTeamPlayer:
+    title: CreateCategyTeamPlayer
+    type: object
+    properties:
+      category_id:
+        type: string
+      team_id:
+        type: string
+      player_id:
+        type: string
+      active:
+        type: boolean
+      number:
+        type: integer
+        format: int32
+      position:
+        type: string
+    required:
+    - category_id
+    - team_id
+    - player_id
+    - active
+    - number
+    - position
+
+
+

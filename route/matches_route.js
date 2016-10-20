@@ -156,6 +156,7 @@ define(['express'
         if(data.visitor_team_id != undefined)       matchData.visitor_team_id = data.visitor_team_id
         if(data.home_team_score != undefined)       matchData.home_team_score = data.home_team_score
         if(data.visitor_team_score != undefined)    matchData.visitor_team_score = data.visitor_team_score
+        if(data.group_id != undefined)              matchData.group_id =  data.group_id
         if(data.round_id != undefined)              matchData.round_id =  data.round_id
         if(data.date != undefined)                  matchData.date =  data.date
         if(data.played != undefined)                matchData.played =  data.played
@@ -230,7 +231,7 @@ define(['express'
         })
         .then((result) => {
 			//se obtiene el ID del referee para devolverlo en la respuesta del servicio
-            _match.referee_id = result.attributes.referee_id
+			_match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
 			// if(data.played && data.played === true){
@@ -240,8 +241,8 @@ define(['express'
 				//calcular el standing
 				PlaceholdersHelper.replacePlaceholders(data.group_id)
 			// }
-            return result
-        })
+			return result
+		})
 		.then((result) => {
 			Response(res, _match)
 		})

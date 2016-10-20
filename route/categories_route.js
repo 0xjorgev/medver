@@ -1,6 +1,3 @@
-/**
- * Created by george on 08/03/16.
- */
 if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
@@ -17,13 +14,16 @@ define(['express',
 		'../util/knex_util',
 		'../helpers/standing_table_helper',
 		'../util/response_message_util',
-		'../node_modules/lodash/lodash.min'],
+		'../node_modules/lodash/lodash.min',
+		'bluebird'],
 	function (express,
 		Models,
 		Message,
 		Knex,
 		StandingTable,
-		Response, _) {
+		Response,
+		_,
+		Promise) {
 
 	var router = express.Router();
 
@@ -312,6 +312,7 @@ define(['express',
                         console.log(`group_id:   ${round_post.group_id}`);
                         console.log(`------------------------------`);
 
+						//TODO: eliminar los rounds
                         new Round(round_post).save().then(function(new_round)
                         {
                             console.log(`Create round successful ${new_round.id}`);
@@ -605,6 +606,91 @@ define(['express',
 				Response(res, null, error)
 			});
 	});
+
+
+	var sortBy = (key) => {
+		return (a, b) => {
+			if (a['position'] > b['position']) {
+				return 1;
+			}
+			if (a['position'] < b['position']) {
+				return -1;
+			}
+			return 0;
+		}
+	}
+
+	// dada una fase, retorna los placeholders de posiciones en referencia a la fase anterior
+	// es decir, ganador grupo 1, posicion 2 grupo 3, etc
+	router.get('/:category_id/team_placeholders', (req, res) => {
+		//paso 0: si esta fase es la primera, devolver vacío, o simplemente el listado de equipos
+		// obtener la fase, revisar el campo position
+
+			// 	Promise.filter(category.phases, (ph) => ph.position == (phase.position + 1) )
+
+		Models.category
+		.where({id: req.params.category_id})
+		.fetch({withRelated: ['phases.groups']})
+		.then((result) => {
+			var category = result.toJSON()
+			//no devuelvo nada si la cat no tiene mas de 1 fase
+			if(category.phases.length < 2) Response(res, [])
+
+			return category.phases.map((phase) => {
+				//se retorna un promise por cada una de las fases
+				var ph = {
+					phase_id: phase.id,
+					name: phase.name,
+					position: phase.position,
+					groups: []
+				}
+
+				phase.groups.map((group) => {
+					var last = {
+						group_id: group.id,
+						name: group.name,
+						classifying_teams: group.classified_team,
+						positions: []
+					}
+
+					for (var i = 1; i <= group.classified_team; i++) {
+						last.positions.push({
+							position: i,
+							description: `Position ${i}/${group.classified_team} of '${group.name}' on '${phase.name}'`
+						})
+					}
+					ph.groups.push(last)
+				})
+
+				return ph
+			})
+		})
+		.then((result) => {
+			return _(result).flatten().sortBy('position')
+		})
+		.then((result) => {
+			var tmp = undefined
+			return result.map((phase) => {
+				if(phase.position == 1)
+					tmp = phase.groups
+				else {
+					var tmp2 = phase.groups
+					phase.groups = tmp
+					tmp = tmp2
+				}
+				return phase
+			})
+		})
+		.then((result) => {
+			return result.slice(1)
+		})
+		.then((result) => {
+			Response(res, result)
+		})
+		.catch((error) => {
+			Response(res, null, error)
+		})
+	})
 
 	return router;
 

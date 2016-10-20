@@ -403,6 +403,22 @@ paths:
           required: true
           type: integer
           format: integer
+    post:
+      summary: calculates & then gets the current standing table for a given group_id
+      description: calculates & then gets the current standing table for a given group_id
+      tags:
+        - Standing table
+        - Group
+      responses:
+        200:
+          description: the current standing_table of the group
+      parameters:
+        - name: group_id
+          in: path
+          description: group ID
+          required: true
+          type: integer
+          format: integer
   /team:
     get:
       summary: Gets the info of all teams
@@ -911,7 +927,6 @@ paths:
         200:
           description: Detail of a phase
       security: []
-
     put:
       summary: Updates a phase given its ID
       description: Updates a phase given its ID
@@ -946,6 +961,26 @@ paths:
                 type: integer
               active:
                 type: boolean
+  /category/{category_id}/team_placeholders:
+    get:
+      summary: Returns team placeholders for future matches
+      description: Returns team placeholders for future matches.
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of placeholders
+      security: []
+
   /phase/{phase_id}/team:
     get:
       summary: Returns the teams participating in a phase
@@ -1367,6 +1402,25 @@ paths:
       responses:
         200:
           description: list of all matches
+  /group/{group_id}/team:
+    get:
+      description: get teams invited to play on this group
+      tags:
+        - Group
+        - Team
+      produces:
+      - application/json
+      parameters:
+        - name: group_id
+          in: path
+          description: Group ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: list of teams currently on this group 
+      security: []
   /category/{category_id}/se:
     post:
       summary: Category Create SE
@@ -1798,6 +1852,18 @@ definitions:
         type: integer
       referee_id:
         type: integer
+      placeholder_home_team_group:
+          type: integer
+          description: group_id for the home_team placeholder
+      placeholder_home_team_position:
+          type: integer
+          description: position of the placeholder team according to the group's standing table
+      placeholder_visitor_team_group:
+          type: integer
+          description: group_id for the visitor_team placeholder
+      placeholder_visitor_team_position:
+          type: integer
+          description: position of the placeholder team according to the group's standing table
     required:
     - home_team_id
     - visitor_team_id

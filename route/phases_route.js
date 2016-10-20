@@ -6,12 +6,14 @@ define(['express',
         '../model/index',
         '../util/request_message_util',
         '../util/response_message_util',
-        '../util/knex_util'],
+        '../util/knex_util',
+		'../helpers/app_helper.js'],
     function (express,
         Models,
         Message,
         Response,
-        Knex) {
+        Knex,
+		Util) {
 
     var router = express.Router();
 

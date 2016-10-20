@@ -291,7 +291,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		PlayerTeam.where({team_id: teamId, player_id: playerId}).fetch().then((result) => {
 			console.log('player found', result.attributes)
-			return new Models.player_team({id: result.attributes.id}).save()
+			return new Models.player_team({id: result.attributes.id, active: false}).save()
 		})
 		.then((result) => {
 			console.log('player updated', result.attributes)

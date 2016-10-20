@@ -7,3 +7,4 @@ docker-compose.yml
 **/.~lock.*
 newrelic_agent.log
 latest.dump
+npm-debug.log

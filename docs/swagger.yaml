@@ -84,9 +84,9 @@ paths:
       responses:
         200:
           description: Active user list
-  /user/forgot:
+  /user/recover_password:
     post:
-      summary: Forgotten password recovery service
+      summary: Recover password service
       description: If username/email is found, a new password is generated & sent to the registered email
       tags:
         - User

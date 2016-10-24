@@ -182,10 +182,6 @@ define(['express',
         console.log('username: ',user_fgt.username)
 
         var User = new Models.user;
-        // var user = {}
-        // user.id = verifiedJwt.body.user
-        // user.username = user_fgt.username
-        // user.password = user_fgt.password
 
         Knex_util(User.tableName)
         .where('id','=',verifiedJwt.body.user)

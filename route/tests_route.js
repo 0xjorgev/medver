@@ -5,7 +5,11 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+define(['express',
+	'../model/index',
+	'../util/request_message_util',
+	'../util/knex_util',
+	], function (express, Models, Message, Knex) {
 
     var router = express.Router();
 

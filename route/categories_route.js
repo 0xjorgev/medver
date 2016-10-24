@@ -1,11 +1,12 @@
-/**
- * Created by george on 08/03/16.
- */
 if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-//var _ = require('lodash')
+//logging lib, reaaaaally useful
+var inspect = require('util').inspect
+//log helper function
+var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
+
 
 define(['express',
 		'../model/index',
@@ -13,63 +14,62 @@ define(['express',
 		'../util/knex_util',
 		'../helpers/standing_table_helper',
 		'../util/response_message_util',
-		'../node_modules/lodash/lodash.min'],
+		'../node_modules/lodash/lodash.min',
+		'bluebird'],
 	function (express,
 		Models,
 		Message,
 		Knex,
 		StandingTable,
-		Response, _) {
+		Response,
+		_,
+		Promise) {
 
 	var router = express.Router();
 
 	var mapper = function(phase) {
-	  // console.log('Phase:', phase.attributes);
-	  phase.relations.groups.models.map(groupMapper);
-	  phaseDelete(phase.attributes.id);
+		// console.log('Phase:', phase.attributes);
+		phase.relations.groups.models.map(groupMapper);
+		phaseDelete(phase.attributes.id);
 	}
 
 	var groupMapper = function(group){
-	  groupDelete(group);
+		groupDelete(group);
 	}
 
 	var groupDelete = function(group){
-	  console.log('Group Delete');
-	  Knex(group.tableName)
-	  .where({id:group.id})
-	  .del().then(function(del_group){
+		console.log('Group Delete');
+		Knex(group.tableName)
+		.where({id:group.id})
+		.del().then(function(del_group){
 		console.log('del_group', del_group);
-	  }).catch(function(error){
+		}).catch(function(error){
 		console.log('del_group error:', error);
-	  })
+		})
 	}
 
 	var phaseDelete = function(phase){
-	  console.log('Phase Delete');
-	  //console.log('Phase id:', phase.attributes);
-	  Knex('phases')
-	  .where({id:phase}, ['id'])
-	  .del().then(function(del_phase){
+		console.log('Phase Delete');
+		//console.log('Phase id:', phase.attributes);
+		Knex('phases')
+		.where({id:phase}, ['id'])
+		.del().then(function(del_phase){
 		console.log('del_phase', del_phase);
-	  }).catch(function(error){
+		}).catch(function(error){
 		console.log('del_phase error:', error);
-	  })
+		})
 	}
 
 	//Teams by Category
 	router.get('/:category_id/team', function (req, res) {
-
 		var category_id = req.params.category_id;
-
 		return Models.category_group_phase_team
 			.where({category_id:category_id})
-			// .where({active:true})
+			.where({active:true})
 			.fetchAll({withRelated:['team','category','group','phase']})
 			.then(function (result) {
-				// Message(res,'Success', '0', result);
 				Response(res, result)
 			}).catch(function(error){
-				// Message(res,error.details, error.code, []);
 				Response(res, null, error)
 			});
 	});
@@ -81,11 +81,9 @@ define(['express',
 		.where({active:true})
 		.fetchAll({withRelated: ['gender', 'phases', 'classification']})
 		.then(function (result) {
-			 // console.log('result: ' + result);
-			Message(res,'Success', '0', result);
+			Response(res, result)
 		}).catch(function(error){
-			// console.log('Error: ' + error);
-			Message(res,error.details, error.code, []);
+			Response(res, null, error)
 		});
 	});
 
@@ -97,9 +95,9 @@ define(['express',
 			.where({active:true})
 			.fetch({withRelated: ['gender','phases', 'classification']})
 			.then(function (result) {
-				Message(res,'Success', '0', result);
+				Response(res, result)
 			}).catch(function(error){
-				Message(res,error.details, error.code, []);
+				Response(res, null, error)
 			});
 	});
 
@@ -107,49 +105,17 @@ define(['express',
 		//Model Instance
 		var Category = Models.category;
 		var category_post = req.body;
-		// var gender_id = category_post.gender_id;
-		// var season_id = category_post.season_id;
-		// var name = category_post.name;
-		// var description = category_post.description;
-		// var image_url = category_post.image_url;
-		// var inscription_init_at = category_post.inscription_init_at;
-		// var inscription_ends_at = category_post.inscription_ends_at;
-		// //V 1.1
-		// var minimum_value = category_post.minimum_value;
-		// var maximum_value = category_post.maximum_value;
 
-		// console.log('--------------------');
-		// console.log("season_id: " + competition_id);
-		// console.log("name: " + name);
-		// console.log("gender_id: " + gender_id);
-		// console.log("inscription_init_at: " + inscription_init_at);
-		// console.log("inscription_ends_at: " + inscription_ends_at);
-		// console.log("minimum_value: " + minimum_value);
-		// console.log("maximum_value: " + maximum_value);
-		// console.log("image_url: " + image_url);
-		// console.log('--------------------');
-
-		new Category(category_post
-		// {
-		//     name: name,
-		//     description:description,
-		//     image_url:image_url,
-		//     inscription_init_at:inscription_init_at,
-		//     inscription_ends_at:inscription_ends_at,
-		//     gender_id: gender_id,
-		//     season_id: season_id,
-		//     minimun_value: minimum_value,
-		//     maximun_value: maximum_value
-		// }
-		).save().then(function(new_category){
-			console.log('new_category: ',new_category);
-			Message(res, 'Success', '0', new_category);
-		}).catch(function(error){
-			console.log(`{error: ${error}`);
-			Message(res, error.detail, error.code, null);
+		console.log('category_post', category_post);
+		new Category(category_post)
+		.save()
+		.then(function(new_category){
+			Response(res, new_category)
+		})
+		.catch(function(error){
+			Response(res, null, error)
 		});
 	});
-
 
 	router.put('/:category_id', function(req, res, next){
 		//Model Instance
@@ -159,30 +125,29 @@ define(['express',
 		var category_id = req.params.category_id;
 		var category_upd = req.body;
 
-		console.log('--------------------');
-		console.log("season_id: " + category_upd.season_id);
+		console.log('Req body', category_upd);
 
-			name = category_upd.name
-
-			participant_minimum = category_upd.participant_minimum
-			participant_maximum = category_upd.participant_maximum
-			other_minimum_participant = category_upd.other_minimum_participant
-			other_maximum_participant = category_upd.other_maximum_participant
-			player_minimum_participant = category_upd.player_minimum_participant
-			player_maximum_participant = category_upd.player_maximum_participant
-			player_minimum_summoned = category_upd.player_minimum_summoned
-			player_maximum_summoned = category_upd.player_maximum_summoned
-			coach_minimum_participant = category_upd.coach_minimum_participant
-			coach_maximum_participant = category_upd.coach_maximum_participant
-			team_quantity = category_upd.team_quantity
-			gender_id = category_upd.gender_id
-			season_id = category_upd.season_id
-			category_type_id = category_upd.category_type_id
-			classification_type_id = category_upd.classification_type_id
-			inscription_init_at = category_upd.inscription_init_at
-			inscription_ends_at = category_upd.inscription_ends_at
-			image_url = category_upd.image_url
-			is_published = category_upd.is_published
+		var name = category_upd.name
+		var participant_minimum = category_upd.participant_minimum
+		var participant_maximum = category_upd.participant_maximum
+		var other_minimum_participant = category_upd.other_minimum_participant
+		var other_maximum_participant = category_upd.other_maximum_participant
+		var player_minimum_participant = category_upd.player_minimum_participant
+		var player_maximum_participant = category_upd.player_maximum_participant
+		var player_minimum_summoned = category_upd.player_minimum_summoned
+		var player_maximum_summoned = category_upd.player_maximum_summoned
+		var coach_minimum_participant = category_upd.coach_minimum_participant
+		var coach_maximum_participant = category_upd.coach_maximum_participant
+		var team_quantity = category_upd.team_quantity
+		var gender_id = category_upd.gender_id
+		var season_id = category_upd.season_id
+		var category_type_id = category_upd.category_type_id
+		var classification_type_id = category_upd.classification_type_id
+		var inscription_init_at = category_upd.inscription_init_at
+		var inscription_ends_at = category_upd.inscription_ends_at
+		var image_url = category_upd.image_url
+		var is_published = category_upd.is_published
+		var meta = category_upd.meta
 
 		Knex(category.tableName)
 		.where('id','=',category_id)
@@ -207,20 +172,18 @@ define(['express',
 			'classification_type_id' : classification_type_id,
 			'inscription_init_at' : inscription_init_at,
 			'inscription_ends_at' : inscription_ends_at,
+			'meta': meta,
 			'image_url' : image_url }, ['id'])
 		.then(function(result){
 			if (result.length != 0){
-				console.log('result is not null');
-				console.log(`result: ${result[0]}`);
-				console.log(`result: ${result}`);
-				Message(res, 'Success', '0', result);
+				Response(res, result)
 			} else {
+				//TODO: Reemplazar por mensaje de response
 				Message(res, 'Category not found', '404', result);
 			}
 		})
 		.catch(function(err){
-			console.log(`error: ${err}`);
-		  Message(res, err.detail, err.code, null);
+			Response(res, null, err)
 		});
 	});
 
@@ -228,36 +191,24 @@ define(['express',
 	router.delete('/:category_id', function(req, res, next){
 		var category_id = req.params.category_id;
 
-		console.log('--------------------');
-		console.log(`-----Category / Phase / ${category_id} Delete-----`);
-		console.log('--------------------');
-
 		return Models.phase
 		.query(function(qb){})
 		.where('category_id','=',category_id)
 		.where({active:true})
 		.fetchAll({withRelated:['groups']})
 		.then(function(result){
-		  console.log('result: delete cascade');
-		  result.map(mapper);
-		  //this.phaseDelete(result.attributes.id);
-		  Message(res, 'Delete successful', 0, {});
-		}).catch(function(err){
-			console.log(`error: ${err}`);
-			Message(res, err.detail, err.code, null);
+			result.map(mapper);
+			Response(res, result)
+		})
+		.catch(function(err){
+			Response(res, null, err)
 		});
 	});
 
 	router.get('/:category_id/standing_table', function(req, res){
 		var categoryId = req.params.category_id;
-		// console.log('standing_table of category', categoryId)
-		var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where matches.played = true and categories.id = ' + categoryId
-
-		//todo: promisify this
-		StandingTable.getStandingTableByMatches(matchSql, res)
-
+		StandingTable.getStandingTableByCategory(categoryId, res)
 	});
-
 
     //==========================================================================
     // Competition by Simple Elimination
@@ -361,6 +312,7 @@ define(['express',
                         console.log(`group_id:   ${round_post.group_id}`);
                         console.log(`------------------------------`);
 
+						//TODO: eliminar los rounds
                         new Round(round_post).save().then(function(new_round)
                         {
                             console.log(`Create round successful ${new_round.id}`);
@@ -435,10 +387,10 @@ define(['express',
 				'home_team',
 				'visitor_team']})
 			.then(function(result){
-				Message(res, 'Success', 0, result)
-			}).catch(function(err){
-				console.log(`error: ${err}`);
-				Message(res, err.detail, err.code, null)
+				Response(res, result)
+			})
+			.catch(function(err){
+				Response(res, null, err)
 			})
 	})
 
@@ -459,6 +411,7 @@ define(['express',
 		console.log('PUT', data)
 		saveCategory_group_phase_team(data, res)
 	})
+
 	//==========================================================================
 	// Save Category Group Phase Team
 	//==========================================================================
@@ -471,19 +424,18 @@ define(['express',
 			group_id: data.group_id,
 			active: data.active
 		}
+
 		if(data.id){
 			console.log("data id: ", data.id)
 			spiderData.id = data.id
 		}
 
-		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation)
-		{
-			console.log(`{new_invitation: ${new_invitation}}`);
-			Message(res, 'Success', '0', new_invitation);
-		}).catch(function(error){
-			console.log(`{error: ${error}`);
-			console.log(` ------ error: ${error.detail}`);
-			Message(res, error.detail, error.code, null);
+		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
+			console.log(`new_invitation:`, new_invitation);
+			Response(res, new_invitation);
+		})
+		.catch(function(error){
+			Response(res, null, error);
 		});
 	}
 
@@ -501,13 +453,198 @@ define(['express',
 			.where({active:true})
 			.fetchAll({withRelated:['player']})
 			.then(function (result) {
-				console.log("Resultado: ",result)
-				Message(res,'Success', '0', result);
+				Response(res, result)
 			}).catch(function(error){
 				// Message(res,error.details, error.code, []);
 				Response(res, null, error)
 			});
 	});
+
+	//==========================================================================
+	// Get all players of one category
+	//==========================================================================
+	router.get('/:category_id/player', function (req, res) {
+
+		var category_id = req.params.category_id;
+		var team_id = req.params.team_id;
+
+		return Models.category_team_player
+			.where({category_id:category_id})
+			.where({active:true})
+			.fetchAll({withRelated:['player']})
+			.then(function (result) {
+				Response(res, result)
+			})
+			.catch(function(error){
+				Response(res, null, error)
+			});
+	});
+
+	//==========================================================================
+	// Create a category team player
+	//==========================================================================
+	router.post('/:category_id/team/:team_id/player/:player_id', function(req, res){
+		console.log('params: ', req.params)
+		var data = {
+			params: req.params,
+			body: req.body
+		}
+		console.log('POST', data)
+		saveCategory_team_player(data, res)
+	})
+
+	//==========================================================================
+	// Update a category team player
+	//==========================================================================
+	router.put('/:category_id/team/:team_id/player/:player_id', function(req, res){
+		var data = {
+			params: req.params,
+			body: req.body
+		}
+		console.log('PUT', data)
+		saveCategory_team_player(data, res)
+	})
+
+	//==========================================================================
+	// Save Category Group Phase Team
+	//==========================================================================
+	var saveCategory_team_player = function(data, res){
+
+		console.log('params: ', data.params)
+		var summonedData = {
+			category_id: data.params.category_id,
+			team_id: data.params.team_id,
+			player_id: data.params.player_id,
+			active: data.body.active = data.body.active !== false,
+			number: data.body.number = (data.body.number == undefined) ? 0 : data.body.number,
+			position: data.body.position = (data.body.position == undefined) ? "" : data.body.position
+		}
+		if(data.body.id){
+			console.log("data id: ", data.body.id)
+			summonedData.id = data.body.id
+		}
+
+		console.log('Summoned: ', summonedData);
+
+		return new Models.category_team_player(summonedData)
+		.save()
+		.then(function(summoned) {
+			console.log('Summoned response: ', summoned);
+			Response(res, summoned)
+		})
+		.catch(function(error){
+			Response(res, null, error)
+		});
+	}
+
+	//==========================================================================
+	// Get all Phases with the teams of one category
+	//==========================================================================
+	router.get('/:category_id/phase/team', function (req, res) {
+
+		var category_id = req.params.category_id;
+		var phase_id = req.params.phase_id;
+		var group_id = req.params.group_id;
+
+		var category_id = req.params.category_id;
+		return Models.category_group_phase_team
+			.where({category_id:category_id})
+			.where({active:true})
+			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team']})
+			.then(function (result) {
+
+				var x = result.toJSON().category.phases
+
+				Response(res, x)
+			}).catch(function(error){
+				Response(res, null, error)
+			});
+	});
+
+
+	var sortBy = (key) => {
+		return (a, b) => {
+			if (a['position'] > b['position']) {
+				return 1;
+			}
+			if (a['position'] < b['position']) {
+				return -1;
+			}
+			return 0;
+		}
+	}
+
+	// dada una fase, retorna los placeholders de posiciones en referencia a la fase anterior
+	// es decir, ganador grupo 1, posicion 2 grupo 3, etc
+	router.get('/:category_id/team_placeholders', (req, res) => {
+		//paso 0: si esta fase es la primera, devolver vacío, o simplemente el listado de equipos
+		// obtener la fase, revisar el campo position
+
+			// 	Promise.filter(category.phases, (ph) => ph.position == (phase.position + 1) )
+
+		Models.category
+		.where({id: req.params.category_id})
+		.fetch({withRelated: ['phases.groups']})
+		.then((result) => {
+			var category = result.toJSON()
+			//no devuelvo nada si la cat no tiene mas de 1 fase
+			if(category.phases.length < 2) Response(res, [])
+
+			return category.phases.map((phase) => {
+				//se retorna un promise por cada una de las fases
+				var ph = {
+					phase_id: phase.id,
+					name: phase.name,
+					position: phase.position,
+					groups: []
+				}
+
+				phase.groups.map((group) => {
+					var last = {
+						group_id: group.id,
+						name: group.name,
+						classifying_teams: group.classified_team,
+						positions: []
+					}
+
+					for (var i = 1; i <= group.classified_team; i++) {
+						last.positions.push({
+							position: i,
+							description: `Position ${i}/${group.classified_team} of '${group.name}' on '${phase.name}'`
+						})
+					}
+					ph.groups.push(last)
+				})
+
+				return ph
+			})
+		})
+		.then((result) => {
+			return _(result).flatten().sortBy('position')
+		})
+		.then((result) => {
+			var tmp = undefined
+			return result.map((phase) => {
+				if(phase.position == 1)
+					tmp = phase.groups
+				else {
+					var tmp2 = phase.groups
+					phase.groups = tmp
+					tmp = tmp2
+				}
+				return phase
+			})
+		})
+		.then((result) => {
+			return result.slice(1)
+		})
+		.then((result) => {
+			Response(res, result)
+		})
+		.catch((error) => {
+			Response(res, null, error)
+		})
+	})
 
 	return router;
 

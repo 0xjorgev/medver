@@ -4,7 +4,7 @@ if(process.env.NODE_ENV == 'production') require('newrelic')
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var morgan = require('morgan'); //node js logger
+var morgan = require('morgan'); //nodejs logger
 var nJwt = require('njwt') //jwt token generator
 var Message = require('./util/request_message_util') //in-house message handler
 var Response = require('./util/response_message_util') //in-house message handler
@@ -45,7 +45,7 @@ swagger.setApiInfo({
   licenseUrl: ""
 });
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
     res.sendFile(__dirname + '/docs/index.html');
 });
 
@@ -78,8 +78,6 @@ swagger.configure(applicationUrl, '1.0.0');
 // end swagger stuff
 //==========================================================================
 
-  // var uuid = require('uuid');
-  // var nJwt = require('nJwt');
   var discipline_ws = require('./route/disciplines_route');
   var user_ws = require('./route/users_route');
   var competition_ws = require('./route/competitions_route');
@@ -100,6 +98,9 @@ swagger.configure(applicationUrl, '1.0.0');
   var subdiscipline_ws = require('./route/subdisciplines_route');
   var test_ws =  require('./route/tests_route');
   var position_ws =  require('./route/positions_route');
+
+  //put here all non business-related services
+  var core_ws =  require('./route/core_route');
 
   var apiVersion = 'v1.0';
   var prefix = 'api';
@@ -139,9 +140,10 @@ swagger.configure(applicationUrl, '1.0.0');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization-Token');
+	res.header( 'X-Powered-By', 'SomoSport' )
   	next();
   };
-
+  
   app.use(allowCrossDomain);
 
   app.use(morgan('dev'));
@@ -188,14 +190,13 @@ swagger.configure(applicationUrl, '1.0.0');
       catch(error){
         console.log('invalid token received')
         _log(error)
-        // Message(res, error.userMessage, 403, null)
         Response(res, null, error)
       }
     }
   }
 
   app.use(validateToken)
-
+  app.use(api_prefix+'core', core_ws);
   app.use(api_prefix+'user', user_ws);
   app.use(`${api_prefix}${routes.discipline}`, discipline_ws);
   app.use(`${api_prefix}${routes.competition}`, competition_ws);

@@ -22,6 +22,8 @@ define(['express', 'util'], function (express, util) {
 			error.name = (error.name == 'Error' && error.message && error.message.includes('invalid values')) ? 'ValidationError' : error.name
 
 			switch(error.name){
+				case 'InsufficientPermissionsError':
+					//thrown by auth_helper.js, when user doesnt have the required permissions to access a resource
 				case 'JwtParseError':
 					code = 403
 					mess = error.userMessage
@@ -51,16 +53,15 @@ define(['express', 'util'], function (express, util) {
 			}
 		}
 		else{
-			// console.log('--------------------------------------------------------')
-			// console.log('typeof', typeof result)
-			// console.log('is object?', typeof result == Object)
-			// if(result && result.length) console.log('length', result.length)
+			//checks if the result is a valid response
+			var isCode200 = result && ((result.length && result.length > 0) || result.attributes || Object.keys(result).length > 0)
+
 			// _log(result)
-			// console.log('--------------------------------------------------------')
+			// console.log('404?', !isCode200 )
 
 			//if it's not an error, but the response is empty, then it's a 404 error
 			//if the response is an array, checks it's size. If it's greater than 0, then is a valid response
-			code = (result && ((result && result.length && result.length > 0) || result.attributes )) ? 200 : 404
+			code = (isCode200) ? 200 : 404
 		}
 
 		switch(code){

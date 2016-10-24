@@ -224,36 +224,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		saveTeam(data, res)
 	});
 
-
-	//==========================================================================
-	// players_teams relations ... AKA team roster
-	//
-	// {
-	//     "team_id":"1",
-	//     "team_player":{
-	//         "id":1,
-	//         "active":true,
-	//         "number":1,
-	//         "position":"P",
-	//         "player_id":1,
-	//         "team_id":1
-	//     },
-	//     "player":
-	//         {
-	//         "id":1,
-	//         "first_name":"José Pablo",
-	//         "last_name":"Pérez Fernández",
-	//         "img_url":null,
-	//         "portrait_url":null,
-	//         "nickname":"PEPE",
-	//         "birthday":"2007-05-28T04:00:00.000Z",
-	//         "email":"PErezFernandez@somos.com",
-	//         "gender_id":1
-	//     }
-	// }
-	//
-	//==========================================================================
-
 	var savePlayerTeam = (playerTeamData, res) => {
 
 		console.log('Save Player Team: ', playerTeamData)
@@ -275,6 +245,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 				position_id : teamData.position_id,
 				team_id : teamData.team_id
 			}
+			if(playerTeamData.team_player.id)
+				team_player.id = playerTeamData.team_player.id
+			
 			console.log('team_player', team_player)
 
 			return new Models.player_team(team_player).save()
@@ -318,7 +291,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		PlayerTeam.where({team_id: teamId, player_id: playerId}).fetch().then((result) => {
 			console.log('player found', result.attributes)
-			return new Models.player_team({id: result.attributes.id}).save()
+			return new Models.player_team({id: result.attributes.id, active: false}).save()
 		})
 		.then((result) => {
 			console.log('player updated', result.attributes)

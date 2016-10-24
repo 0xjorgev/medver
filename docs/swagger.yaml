@@ -246,6 +246,9 @@ paths:
         - Player
         - Category
         - Team
+      responses:
+        200:
+          description: all the players that participate on a team in a category
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -821,6 +824,9 @@ paths:
                 type: integer
               active:
                 type: boolean
+      responses:
+        200:
+          description: Resource updated
   /category/{category_id}/team_placeholders:
     get:
       summary: Returns team placeholders for future matches
@@ -1612,7 +1618,7 @@ definitions:
       round_id:
         type: integer
       date:
-        type: date
+        type: string
       category_id:
         type: integer
       phase_id:
@@ -1707,7 +1713,6 @@ definitions:
         type: string
       password:
         type: string
-
   #TODO: cargar este ejemplo
   PlayerTeamRequest:
     title: PlayerTeam Request

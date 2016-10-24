@@ -116,8 +116,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	var saveTeam = function(data, res){
 
 		var orgData = {}
-		data.name = data.name.trim()
 
+		if (data.name != undefined) {
+			teamData.name = data.name.trim()
+		}
 		if(data.organization_id){
 			orgData.id = data.organization_id
 		}
@@ -130,20 +132,33 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			}
 		}
 
-		var teamData = {
-			name: data.name,
-			logo_url: data.logo_url,
-			category_type_id: data.category_type_id,
-			organization_id: data.organization_id,
-			subdiscipline_id: data.subdiscipline_id,
-			gender_id: data.gender_id
-		}
+		var teamData = {}
+
+		if (data.name != undefined) teamData.name = data.name.trim()
+		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
+		if (data.category_type_id != undefined) teamData.category_type_id = data.category_type_id
+		if (data.organization_id != undefined) teamData.organization_id = data.organization_id
+		if (data.subdiscipline_id != undefined) teamData.subdiscipline_id = data.subdiscipline_id
+		if (data.gender_id != undefined) teamData.gender_id = data.gender_id
+		if (data.meta != undefined) teamData.meta = data.meta
+		if (data.short_name != undefined) teamData.short_name = data.short_name
+		if (data.description != undefined) teamData.description = data.description
+
+
+		// 	name: data.name,
+		// 	logo_url: data.logo_url,
+		// 	category_type_id: data.category_type_id,
+		// 	organization_id: data.organization_id,
+		// 	subdiscipline_id: data.subdiscipline_id,
+		// 	gender_id: data.gender_id,
+		// 	meta: data.meta
+		// }
 
 		if(data.id){
 			teamData.id = data.id
 		}
-		teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
-		teamData.description = data.description ? data.description : data.name
+	//	teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
+	//	teamData.description = data.description ? data.description : data.name
 
 		// spider is the 'category_group_phase_team' table
 		// var spiderData = {
@@ -247,7 +262,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			}
 			if(playerTeamData.team_player.id)
 				team_player.id = playerTeamData.team_player.id
-			
+
 			console.log('team_player', team_player)
 
 			return new Models.player_team(team_player).save()

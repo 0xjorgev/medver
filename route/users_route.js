@@ -78,6 +78,7 @@ define(['express',
 
         var User = Models.user;
 
+        console.log('Username: ',username)
         new User({
             username: username,
             email:email,
@@ -117,101 +118,88 @@ define(['express',
         });
     });
     
-    router.post('/recover_password', function(req, res, next){
+    router.post('/reset_password_request', function(req, res, next){
 
         var user = new Models.user;
         var user_fgt = req.body;
-        var username = user_fgt.username_email;
-
-        var generated_password = Pwd_gen
-        console.log('generated_password',generated_password)
-        var md5_pwd = Md5(generated_password)
-
+        var username_email = user_fgt.username_email;
+        //console.log('req: ',req )
+        var origin = req.headers.origin
+        console.log('origin: ',origin )
+        //Obtengo los datos del usuario
         Knex_util(user.tableName)
         .where(function(){
-            this.where('username',username)
-                .orWhere('email',username)
+            this.where('username',username_email)
+                .orWhere('email',username_email)
         })
         .then((result) => {
-
             if(result.length == 0){
                 //no user/email was found
                 Response(res, result)
                 return
             }
-            return Knex_util(user.tableName)
-                .where({id: result[0].id})
-                .update({password: md5_pwd}
-                , ['id','email','username'])
-        })
-
-        .then(function(result){
-            if (result.length != 0){
-                console.log('result is not null'); 
+            else
+            {
                 console.log('result',result)      
-                var email = result[0].email
-                var content =  `<td valign="top" class="top-content action-content" style="padding-left: 21%"><!-- Begin Content --><h1>${result[0].username},</h1><p>Your new password is:<strong> ${generated_password}</strong></p><p>You can change your password at any time by logging into <a href="${req.header.origin}">your account</a>.</p></td>`
+                var email = result[0].email     
+                var username = result[0].username
+                //Se crea el token
+                var claims = {
+                    user: result[0].id,
+                    roles: ['admin'],
+                    permissions: ['list-all'],
+                    lang: 'en'
+                }
+                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+                var jwt = nJwt.create(claims, signingKey)
+                //TODO: does not expire, for now
+                jwt.setExpiration()
+
+                var urlresetPassword = origin+'/reset_password/username/'+ username + '/rq_token/' + jwt.compact()
+                console.log('urlresetPassword', urlresetPassword)
+                var content =  `<td valign="top" class="top-content action-content" style="padding-left: 21%"><h1>${username},</h1><p>There was recently a request to change the password for your account.</p><p>You can change your password at any time by logging into <a href="${origin}">your account</a>.</p><p>If you requested this password change, click here to reset your password:</p><table cellspacing="0" cellpadding="0" class="action-button"><tr><td><a href="${urlresetPassword}"><span>Reset Password</span></a></td></tr></table><p>If you did not make this request, you can ignore this message and your password will remain the same.</p></td>`
                 console.log('content', content)
-                send_email_from(email, 'Your new Somosport Password!', content )
+                send_email_from(email, 'Reset Password Request', content )
+                Response(res, result)
             }
-            Response(res, result)
         })
         .catch(function(err){
             Response(res, null, err)
         });
     });
 
-    router.post('/change_password', function(req, res, next){
-        var user = new Models.user;
-        var user_pwd_change = req.body;
-        var username = user_pwd_change.username;
-        var user_new_password = user_pwd_change.new_password;
-        var user_old_password = user_pwd_change.old_password;
+    router.put('/reset_password', function(req, res, next){
+        var origin = req.headers.origin
+        var user_fgt = req.body;
+        var username = user_fgt.username
+        //Manage token
+        var token = user_fgt.token;
+        var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
+        var verifiedJwt = nJwt.verify(token, secretKey)
 
+        console.log('user Id: ',verifiedJwt.body.user)
+        console.log('new password: ',user_fgt.password)
+        console.log('username: ',user_fgt.username)
 
-        console.log(user_pwd_change)
+        var User = new Models.user;
+        // var user = {}
+        // user.id = verifiedJwt.body.user
+        // user.username = user_fgt.username
+        // user.password = user_fgt.password
 
-        Knex_util(user.tableName)
-        .where((qb) => {
-            qb.where('username',username)
-                .orWhere('email',username)
-        })
-        .where({active: 1, password: user_old_password})
-        .update({password: user_new_password}, ['id','email'])
+        Knex_util(User.tableName)
+        .where('id','=',verifiedJwt.body.user)
+        .where('active','=',1)
+        .update({
+            'password' : user_fgt.password 
+        }, ['id'])
         .then(function(result){
-            if (result.length != 0){
-                var email = result[0].email;
-                var content = `<table style="width:100%;border-collapse:collapse">  <tbody>     <tr>            <td class="m_4445496107839198780user-action" colspan="2" style="font:14px/1.4285714 Arial,sans-serif;padding:0;line-height:1">              <span>Important information from <strong>Somosport</strong></span>          </td>       </tr>       <tr>            <td class="m_4445496107839198780spacer" style="font:14px/1.4285714 Arial,sans-serif;padding:10px 0 0"></td>     </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">             <p style="margin-bottom:0;margin-top:0">The password for <strong>${username}</strong> was changed. If you did not make this change, please email <a href="mailto:support@somosport.com" target="_blank">support@somosport.com</a>.              </p>            </td>       </tr>       <tr>            <td class="m_4445496107839198780spacer" style="font:14px/1.4285714 Arial,sans-serif;padding:10px 0 0"></td>     </tr>       <tr>            <td class="m_4445496107839198780spacer" style="font:14px/1.4285714 Arial,sans-serif;padding:10px 0 0"></td>     </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">     </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">             <span>Thanks,</span>            </td>       </tr>       <tr>            <td style="font:14px/1.4285714 Arial,sans-serif;padding:0">             <span>The Somosport Team</span>         </td>       </tr>   </tbody></table>`
-                send_email_from(email, 'Password changed!', content );
-                // Message(res, 'Success', '0', result);
-            }
-
-            //Manage Token
-            var claims = {
-                user: userId,
-                roles: ['admin'],
-                permissions: ['list-all'],
-                lang: 'en'
-            }
-            var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
-            var jwt = nJwt.create(claims, signingKey)
-
-            //TODO: does not expire, for now
-            jwt.setExpiration()
-
-            result.attributes['Authorization-Token'] = jwt.compact()
-            delete result.attributes.password
-
-            //TODO: test only!
-            result.attributes.roles = ['admin', 'player']
-            result.attributes.permissions = ['list', 'create', 'update', 'delete']
-
-            //if result is empty, a 404 will be thrown
+            console.log('result of reset password)', result)
             Response(res, result)
         })
-        .catch(function(err){
-            Response(res, null, err)
-          // Message(res, err.detail, err.code, null);
+        .catch(function(error){
+            // Message(res, error.detail, error.code, null);
+            Response(res, null, error)
         });
     });
 
@@ -226,6 +214,5 @@ define(['express',
                 Response(res, null, error)
             });
     })
-
     return router;
 });

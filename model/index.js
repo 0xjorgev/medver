@@ -6,37 +6,38 @@ if (typeof define !== 'function') {
 }
 
 define([
-	'./util',
-    './discipline',
-    './subdiscipline',
-    './user',
-    './competition',
-    './season',
-    './category',
-    './gender',
-    './competition_type',
-    // './country',
-    './contact',
-    './phase',
-    './group',
-    './round',
-    './match',
-    './team',
-    './classification',
-    './player_team',
-    './event',
-    './event_match_player',
-    './match_referee',
-    './category_type',
-    './category_group_phase_team', //<- esta es la famosa spider table
-    './competition_user',
-    './player',
-    './rule',
-    './match_team_player',
-    './organization',
-    './position',
-    './category_team_player',
-    './standing_table'
+	'./util'
+    ,'./discipline'
+    ,'./subdiscipline'
+    ,'./user'
+    ,'./competition'
+    ,'./season'
+    ,'./category'
+    ,'./gender'
+    ,'./competition_type'
+    ,'./contact'
+    ,'./phase'
+    ,'./group'
+    ,'./round'
+    ,'./match'
+    ,'./team'
+    ,'./classification'
+    ,'./player_team'
+    ,'./event'
+    ,'./event_match_player'
+    ,'./match_referee'
+    ,'./category_type'
+    ,'./category_group_phase_team' //<- esta es la famosa spider table
+    ,'./competition_user'
+    ,'./player'
+    ,'./rule'
+    ,'./match_team_player'
+    ,'./organization'
+    ,'./position'
+    ,'./category_team_player'
+    ,'./standing_table'
+    // ,'./contact_type'
+    // ,'./entity_type'
 ], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type,
     Contact, Phase, Group, Round, Match, Team, Classification, Player_team, Event, Event_match_player, Match_referee,
     Category_type, Category_group_phase_team, Competition_user, Player, Rule, Match_team_player, Organization, Position,
@@ -52,7 +53,6 @@ define([
         category: Category,
         gender: Gender,
         competition_type: Competition_type,
-        //country:Country
         contact:Contact,
         phase:Phase,
         group:Group,

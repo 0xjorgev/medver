@@ -398,7 +398,9 @@ define(['express',
 	// Create a category group phase team
 	//==========================================================================
 	router.post('/:category_id/team/:team_id/invite', function(req, res){
-		var data = req.body
+		var data = {}
+		data.category_id = req.params.category_id
+		data.team_id = req.params.team_id
 		console.log('POST', data)
 		saveCategory_group_phase_team(data, res)
 	})
@@ -407,8 +409,24 @@ define(['express',
 	// Update a category group phase team
 	//==========================================================================
 	router.put('/:category_id/team/:team_id/invite/:id', function(req, res){
-		var data = req.body
+		var data = {}
+		data.id = req.params.id
+		data.category_id = req.params.category_id
+		data.team_id = req.params.team_id
+		data.phase_id = req.body.phase_id
+		data.group_id = req.body.group_id
+		data.active = req.body.active
 		console.log('PUT', data)
+		saveCategory_group_phase_team(data, res)
+	})
+
+	router.delete('/:category_id/team/:team_id/invite/:id', function(req, res){
+		var data = {}
+		data.id = req.params.id
+		data.category_id = req.params.category_id
+		data.team_id = req.params.team_id
+		data.active = false
+		console.log('DELETE', data)
 		saveCategory_group_phase_team(data, res)
 	})
 
@@ -417,12 +435,17 @@ define(['express',
 	//==========================================================================
 	var saveCategory_group_phase_team = function(data, res){
 
-		var spiderData = {
-			category_id: data.category_id,
-			team_id: data.team_id,
-			phase_id: data.phase_id,
-			group_id: data.group_id,
-			active: data.active
+		var spiderData = {}
+		spiderData.category_id = data.category_id
+		spiderData.team_id = data.team_id
+		spiderData.active = (data.active == undefined) ? true : data.active
+		
+		if(data.phase_id){
+			spiderData.phase_id = data.phase_id
+		}
+
+		if(data.group_id){
+			spiderData.group_id = data.group_id
 		}
 
 		if(data.id){
@@ -481,6 +504,29 @@ define(['express',
 	});
 
 	//==========================================================================
+	// Get the player of one category and one team
+	//==========================================================================
+	router.get('/:category_id/team/:team_id/player/:player_id', function (req, res) {
+
+		var category_id = req.params.category_id;
+		var team_id = req.params.team_id;
+		var player_id = req.params.player_id;
+
+		return Models.category_team_player
+			.where({category_id:category_id})
+			.where({team_id:team_id})
+			.where({player_id:player_id})
+			.where({active:true})
+			.fetch({withRelated:['player']})
+			.then(function (result) {
+				Response(res, result)
+			}).catch(function(error){
+				// Message(res,error.details, error.code, []);
+				Response(res, null, error)
+			});
+	});
+
+	//==========================================================================
 	// Create a category team player
 	//==========================================================================
 	router.post('/:category_id/team/:team_id/player/:player_id', function(req, res){
@@ -515,7 +561,7 @@ define(['express',
 			category_id: data.params.category_id,
 			team_id: data.params.team_id,
 			player_id: data.params.player_id,
-			active: data.body.active = data.body.active !== false,
+			active: data.body.active = (data.body.active == undefined) ? true : data.body.active,
 			number: data.body.number = (data.body.number == undefined) ? 0 : data.body.number,
 			position: data.body.position = (data.body.position == undefined) ? "" : data.body.position
 		}

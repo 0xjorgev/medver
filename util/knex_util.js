@@ -9,8 +9,11 @@ define(['knex','../knexfile'], function (Knex, dbConfig) {
 
 	var knex_util;
 
+
+  console.log(dbConfig.development)
 	if (process.env.NODE_ENV === 'development'){
 		knex_util = new Knex(dbConfig.development);
+
 	} else {
 		knex_util = new Knex(dbConfig.production);
 	}

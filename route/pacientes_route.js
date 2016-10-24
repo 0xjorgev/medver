@@ -15,10 +15,15 @@ define(['express',
 
     	//List of seasons (don't seem to be needed) -> Returns Array of result
 	    router.get('/', function (req, res) {
-	        return Models.paciente
+
+          console.log('get all pacients')
+
+          return Models.paciente
 	        .query(function(qb){})
 	        .fetchAll()
 	        .then(function (result) {
+            console.log(result)
+
 	            Message(res,'Success', '0', result);
 	        }).catch(function(error){
 	            Message(res,error.details, error.code, []);

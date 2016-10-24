@@ -28,6 +28,6 @@ app.use('/paciente', pacientes_ws);
 app.use('/historia', historia_ws);
 app.use('/consulta', consulta_ws);
 
-app.listen(process.env.PORT, function(){
-	console.log('Running on port: '+ process.env.PORT);
+app.listen(3000, function(){
+	console.log('Running on port: '+ 3000);
 });

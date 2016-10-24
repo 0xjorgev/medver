@@ -47,7 +47,7 @@ paths:
           required: true
       responses:
         200:
-          description: A signed url for upload; a final URL to access the file    
+          description: A signed url for upload; a final URL to access the file
   /user:
     get:
       summary: Returns the list of active users
@@ -1708,12 +1708,12 @@ definitions:
       password:
         type: string
 
-    #TODO: cargar este ejemplo
-    PlayerTeamRequest:
-      title: PlayerTeam Request
-      type: object
-      properties:
-        player:
-          $ref: '#/definitions/CreateTeamRequest'
-        team:
-          $ref: '#/definitions/CreateGroupRequest'
+  #TODO: cargar este ejemplo
+  PlayerTeamRequest:
+    title: PlayerTeam Request
+    type: object
+    properties:
+      player:
+        $ref: '#/definitions/CreateTeamRequest'
+      team:
+        $ref: '#/definitions/CreateGroupRequest'

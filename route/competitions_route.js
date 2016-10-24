@@ -375,6 +375,8 @@ define(['express',
         .fetch( {withRelated: ['discipline.subdisciplines',
             'competition_type',
             'seasons',
+            'seasons.categories.category',
+            'seasons.categories.gender',
             'seasons.categories.classification',
             'seasons.categories.phases',
             'seasons.categories.phases.groups']} )

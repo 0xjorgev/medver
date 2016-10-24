@@ -329,12 +329,16 @@ define(['express',
         var comp_id = req.params.competition_id;
         return Models.competition
         .where({'id':comp_id})
+        // .fetch( {withRelated: ['discipline.subdisciplines', 'competition_type', 'seasons','seasons.categories.classification', 'seasons.categories.phases', 'seasons.categories.phases.groups','seasons.categories.category_group_phase_team.group.rounds.matches.home_team', 'seasons.categories.category_group_phase_team.group.rounds.matches.visitor_team']} )
+        //Testing new characteristics
         .fetch( {withRelated: ['discipline.subdisciplines',
 			'competition_user.users',
             'competition_type',
-            'seasons',
+            // 'seasons',
+            'seasons.categories.category',
+            'seasons.categories.gender',
             'seasons.categories.classification',
-            'seasons.categories.phases',
+            // 'seasons.categories.phases',
             'seasons.categories.phases.groups']} )
         .then(function (result) {
             Response(res, result)

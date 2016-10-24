@@ -28,6 +28,26 @@ produces:
 ###################################################
 
 paths:
+  /core/s3_signed_url:
+    get:
+      summary: Returns a signed URL to upload a file to SomoSport
+      description: Returns a signed URL to upload a file to SomoSport
+      tags:
+        - Core
+      parameters:
+        - name: file_name
+          description: The name under which the file will be saved
+          in: query
+          type: string
+          required: true
+        - name: file_type
+          description: MIME type of the file
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: A signed url for upload; a final URL to access the file
   /user:
     get:
       summary: Returns the list of active users
@@ -226,7 +246,7 @@ paths:
         - Player
         - Category
         - Team
-    
+
   /category/{category_id}/team/{team_id}/player/{player_id}:
     get:
       summary: Gets the players that participate on a team in a category
@@ -385,7 +405,10 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-   
+      responses:
+        200:
+          description: all the players that participate on a team in a category
+          
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -961,6 +984,9 @@ paths:
                 type: integer
               active:
                 type: boolean
+      responses:
+        200:
+          description: Resource updated
   /category/{category_id}/team_placeholders:
     get:
       summary: Returns team placeholders for future matches
@@ -1419,7 +1445,7 @@ paths:
           format: integer
       responses:
         200:
-          description: list of teams currently on this group 
+          description: list of teams currently on this group
       security: []
   /category/{category_id}/se:
     post:
@@ -1843,7 +1869,7 @@ definitions:
       round_id:
         type: integer
       date:
-        type: date
+        type: string
       category_id:
         type: integer
       phase_id:
@@ -1934,7 +1960,10 @@ definitions:
         type: string
       password:
         type: string
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8beb962f34991d9d76d44602842b5613dac31c2e
   #TODO: cargar este ejemplo
   PlayerTeamRequest:
     title: PlayerTeam Request
@@ -1944,6 +1973,7 @@ definitions:
         $ref: '#/definitions/CreateTeamRequest'
       team:
         $ref: '#/definitions/CreateGroupRequest'
+<<<<<<< HEAD
 
   UpdateCategoryTeamInviteRequest:
     title: Create Category Team InviteRequest
@@ -2008,3 +2038,5 @@ definitions:
 
 
 
+=======
+>>>>>>> 8beb962f34991d9d76d44602842b5613dac31c2e

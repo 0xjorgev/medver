@@ -28,6 +28,26 @@ produces:
 ###################################################
 
 paths:
+  /core/s3_signed_url:
+    get:
+      summary: Returns a signed URL to upload a file to SomoSport
+      description: Returns a signed URL to upload a file to SomoSport
+      tags:
+        - Core
+      parameters:
+        - name: file_name
+          description: The name under which the file will be saved
+          in: query
+          type: string
+          required: true
+        - name: file_type
+          description: MIME type of the file
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: A signed url for upload; a final URL to access the file    
   /user:
     get:
       summary: Returns the list of active users
@@ -1259,7 +1279,7 @@ paths:
           format: integer
       responses:
         200:
-          description: list of teams currently on this group 
+          description: list of teams currently on this group
       security: []
   /category/{category_id}/se:
     post:

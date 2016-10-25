@@ -22,7 +22,6 @@ define(['express'
 	});
 
 	router.get('/:team_id/player', function (req, res) {
-
 		var team_id = req.params.team_id;
 
 		return Models.player_team
@@ -36,20 +35,14 @@ define(['express'
 		});
 	});
 
-		//Team by Id -> Returns 1 result
+	//Team by Id -> Returns 1 result
 	router.get('/:team_id', function (req, res) {
-
 		var team_id = req.params.team_id;
-
 		return Models.team
 		.where({id:team_id, active:true})
 		.fetch({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'player_team.position']})
-		.then(function (result) {
-			Response(res, result)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
+		.then( (result) => Response(res, result))
+		.catch((error) => Response(res, null, error));
 
 	});
 
@@ -69,23 +62,9 @@ define(['express'
 		var gender_id 	=  req.params.gender_id;
 		var name        = group_post.name;
 
-		new Team(
-			team_post
-		// {
-		//     name: name,
-		//     organization_id: org_id,
-		//     category_id: cat_id,
-		//     logo_url: logo_url,
-		//     short_name: short_name,
-		//     description: description
-		// }
-		).save().then(function(new_team){
-			console.log(`{new_team: ${new_team}}`);
-			Message(res, 'Success', '0', new_team);
-		}).catch(function(error){
-			console.log(`{error: ${error}}`);
-			Message(res, error.detail, error.code, null);
-		});
+		new Team(team_post).save()
+		.then((new_team) => Response(res, new_team) )
+		.catch((error) => Response(res, null, error));
 	});
 
 	//==========================================================================
@@ -145,13 +124,10 @@ define(['express'
 		.then(function(found){
 			//if found, let's put its id on teamData
 			if(found){
-				console.log('org found!', found.attributes)
 				teamData.organization_id = found.attributes.id
 				return teamData
 			}
 			else{
-				//if not, let's create the organization
-				console.log('org not found, creating')
 				return new Models.organization(orgData).save().then(function(result){
 					teamData.organization_id = result.attributes.id
 					console.log('org created/updated', result.attributes)
@@ -161,7 +137,6 @@ define(['express'
 		})
 		.then(function(teamData){
 			//with the organization stuff all sorted out, let's create the team
-			console.log('before saving team', teamData)
 			return new Models.team(teamData).save()
 		})
 		.then((result) => {
@@ -202,15 +177,12 @@ define(['express'
 	});
 
 	var savePlayerTeam = (playerTeamData, res) => {
-
 		console.log('Save Player Team: ', playerTeamData)
 		var playerData = playerTeamData.player
 		var teamData = playerTeamData.team_player
 
 		//TODO: check player existance
-
 		//version 1 -> insert into team roster without checking existance
-
 		var _playerResult = undefined
 
 		new Models.player(playerData).save().then((result) => {
@@ -222,19 +194,15 @@ define(['express'
 				position_id : teamData.position_id,
 				team_id : teamData.team_id
 			}
-			if(playerTeamData.team_player.id)
-				team_player.id = playerTeamData.team_player.id
-
-			console.log('team_player', team_player)
+			if(playerTeamData.team_player.id) team_player.id = playerTeamData.team_player.id
 
 			return new Models.player_team(team_player).save()
-		}).then((result) => {
-			Message(res, 'Success', '0', {player: _playerResult, player_team: result})
-		}).catch(function(error){
-			console.log('error', error)
-			console.log('error', error.stack)
-			res.status(500);
-			res.json({message: error.name, code: 500, data: error.detail});
+		})
+		.then((result) => {
+			Response(res, {player: _playerResult, player_team: result})
+		})
+		.catch(function(error){
+			Response(res, null, error)
 		})
 	}
 
@@ -257,7 +225,6 @@ define(['express'
 
 	//inactivates the player from the roster
 	router.delete('/:team_id/player/:player_id', function(req, res){
-
 		var PlayerTeam = new Models.player_team()
 		var playerId = req.params.player_id
 		var teamId = req.params.team_id
@@ -267,18 +234,10 @@ define(['express'
 		var _found = undefined
 
 		PlayerTeam.where({team_id: teamId, player_id: playerId}).fetch().then((result) => {
-			console.log('player found', result.attributes)
 			return new Models.player_team({id: result.attributes.id, active: false}).save()
 		})
-		.then((result) => {
-			console.log('player updated', result.attributes)
-			Message(res, 'Success', '0', result)
-		})
-		.catch(function(error){
-			console.log('error', error);
-			console.log('error', error.stack);
-			Message(res, error.detail, error.code, error);
-		})
+		.then((result) => Response(res, result))
+		.catch((error) => Response(res, null, error))
 	})
 
 	return router;

@@ -2,25 +2,23 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util', '../util/response_message_util'], function (express, Models, Message, Knex, Response) {
+define(['express'
+	,'../model/index'
+	,'../util/request_message_util'
+	,'../util/knex_util'
+	,'../util/response_message_util'],
+	function (express, Models, Message, Knex, Response) {
 
 	var router = express.Router();
 
 	//List of teams
 	router.get('/', function (req, res) {
-
 		return Models.team
 		.query(function(qb){})
 		.where({active:true})
-		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender'], debug:false})
-		//.fetchAll({withRelated: ['gender', 'season']})
-		.then(function (result) {
-			console.log('result: ' + result);
-			Message(res,'Success', '0', result);
-		}).catch(function(error){
-			console.log('Error: ' + error);
-			Message(res,error.details, error.code, []);
-		});
+		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender']})
+		.then((result) => Response(res, result))
+		.catch((error) =>  Response(res, null, error))
 	});
 
 	router.get('/:team_id/player', function (req, res) {
@@ -32,10 +30,8 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.where({active:true})
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
-			// Message(res,'Success', '0', result);
 			Response(res, result)
 		}).catch(function(error){
-			// Message(res,error.details, error.code, []);
 			Response(res, null, error)
 		});
 	});
@@ -47,31 +43,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		return Models.team
 		.where({id:team_id, active:true})
-		.fetch({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'player_team.position'], debug: false})
+		.fetch({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'player_team.position']})
 		.then(function (result) {
-			Message(res,'Success', '0', result);
-		}).catch(function(error){
-			Message(res,error.details, error.code, []);
+			Response(res, result)
+		})
+		.catch(function(error){
+			Response(res, null, error)
 		});
 
 	});
-
-	// //'category', 'organization'
-	// router.get('/:org_id/organization/', function (req, res) {
-
-	//     console.log('Rounds by group_id');
-
-	//      var group_id = req.params.group_id;
-	//     return Models.round
-	//     .where({'group_id':group_id})
-	//     .fetch({withRelated: ['group']})
-	//     .then(function (result) {
-	//         Message(res,'Success', '0', result);
-	//     }).catch(function(error){
-	//         Message(res,error.details, error.code, []);
-	//     });
-	// });
-
 
 	//TODO: Esto parece no estar en uso, deberia arrojar error al probar
 	router.post('/organization/:org_id/category/:cat_id', function (req, res) {
@@ -140,9 +120,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		if (data.meta != undefined) teamData.meta = data.meta
 		if (data.short_name != undefined) teamData.short_name = data.short_name
 		if (data.description != undefined) teamData.description = data.description
-		if (data.id != undefined) teamData.id = data.id 
-	//	teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
-	//	teamData.description = data.description ? data.description : data.name
+		if (data.id != undefined) teamData.id = data.id
+		//	teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
+		//	teamData.description = data.description ? data.description : data.name
 
 		// spider is the 'category_group_phase_team' table
 		// var spiderData = {
@@ -182,8 +162,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.then(function(teamData){
 			//with the organization stuff all sorted out, let's create the team
 			console.log('before saving team', teamData)
-			new Models.team(teamData).save()
-			Message(res, 'Success', '0', teamData);
+			return new Models.team(teamData).save()
+		})
+		.then((result) => {
+			Response(res, result)
 		})
 		// .then(function(new_team){
 		// 	//now let's associate the newly created team with the category
@@ -201,11 +183,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		// 	Message(res, `Team ${_team.id} ${action}`, '0', _team)
 		// })
 		.catch(function(error){
-			// something has happened
-			console.log('error', error)
-
-			//TODO: no todo el tiempo se envia el detail... manejar el error en este tipo de casos
-			Message(res, `${error.error} - detail: ${error.detail}`, error.code, error)
+			Response(res, null, error)
 		})
 	}
 

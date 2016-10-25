@@ -117,9 +117,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		var orgData = {}
 
-		if (data.name != undefined) {
-			teamData.name = data.name.trim()
-		}
 		if(data.organization_id){
 			orgData.id = data.organization_id
 		}
@@ -143,20 +140,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		if (data.meta != undefined) teamData.meta = data.meta
 		if (data.short_name != undefined) teamData.short_name = data.short_name
 		if (data.description != undefined) teamData.description = data.description
-
-
-		// 	name: data.name,
-		// 	logo_url: data.logo_url,
-		// 	category_type_id: data.category_type_id,
-		// 	organization_id: data.organization_id,
-		// 	subdiscipline_id: data.subdiscipline_id,
-		// 	gender_id: data.gender_id,
-		// 	meta: data.meta
-		// }
-
-		if(data.id){
-			teamData.id = data.id
-		}
+		if (data.id != undefined) teamData.id = data.id 
 	//	teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
 	//	teamData.description = data.description ? data.description : data.name
 

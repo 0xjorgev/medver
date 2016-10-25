@@ -1960,10 +1960,7 @@ definitions:
         type: string
       password:
         type: string
-<<<<<<< HEAD
 
-=======
->>>>>>> 8beb962f34991d9d76d44602842b5613dac31c2e
   #TODO: cargar este ejemplo
   PlayerTeamRequest:
     title: PlayerTeam Request
@@ -1973,7 +1970,6 @@ definitions:
         $ref: '#/definitions/CreateTeamRequest'
       team:
         $ref: '#/definitions/CreateGroupRequest'
-<<<<<<< HEAD
 
   UpdateCategoryTeamInviteRequest:
     title: Create Category Team InviteRequest
@@ -2010,7 +2006,6 @@ definitions:
         type: string
     required:
     - id
-
   CreateCategyTeamPlayer:
     title: CreateCategyTeamPlayer
     type: object
@@ -2035,8 +2030,3 @@ definitions:
     - active
     - number
     - position
-
-
-
-=======
->>>>>>> 8beb962f34991d9d76d44602842b5613dac31c2e

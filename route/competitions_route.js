@@ -57,23 +57,32 @@ define(['express',
 		//req._currentUser is the user recovered from token
 		//to get competitions the user should have these permissions
 		var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
-		//falo en el chequeo de auth
-		if (chk.code != 0){
-			Response(res, null, chk)
-			return
-		}
+		//fallo en el chequeo de auth
+		// if (chk.code != 0){
+		// 	Response(res, null, chk)
+		// 	return
+		// }
 
 		return Models.competition
 			.query(function(qb){
 				qb.distinct() //TODO: el query está devolviendo una competicion por usuario
 				qb.innerJoin('competitions_users', 'competitions_users.competition_id', 'competitions.id')
-				qb.where({'competitions_users.user_id': req._currentUser.id})
-				//el creador de la competencia no necesariamente tiene permisos de edicion, pero deberia poder verla
-				qb.orWhere({'competitions.created_by_id': req._currentUser.id})
+
+				if (req._currentUser && req._currentUser.id){
+					qb.where({'competitions_users.user_id': req._currentUser.id})
+					//el creador de la competencia no necesariamente tiene permisos de edicion, pero deberia poder verla
+					qb.orWhere({'competitions.created_by_id': req._currentUser.id})
+				}
+
 				if(req._sortBy){
 					req._sortBy.map((sort) => {
 						qb.orderBy(sort[0], sort[1])
 					})
+				}
+
+				if(req._limit){
+					qb.limit(req._limit)
+					if(req._offset) qb.offset(req._offset)
 				}
 			})
 			.fetchAll({
@@ -340,7 +349,7 @@ define(['express',
 			'competition_user.users',
 			'competition_type',
 			// 'seasons',
-			'seasons.categories.category',
+			'seasons.categories.category_type',
 			'seasons.categories.gender',
 			'seasons.categories.classification',
 			// 'seasons.categories.phases',

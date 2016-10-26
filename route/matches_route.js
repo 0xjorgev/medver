@@ -74,7 +74,7 @@ define(['express'
         .where({'id':match_id})
         .fetch({withRelated: ['home_team.match_player_team.player.gender',
                                 'visitor_team.match_player_team.player.gender',
-                                'round.group.phase.category.category',
+                                'round.group.phase.category.category_type',
                                 'round.group.phase.category.season.competition',
                                 'home_team.summoned.player',
                                 'visitor_team.summoned.player'], debug: false})

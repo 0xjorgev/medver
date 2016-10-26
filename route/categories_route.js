@@ -439,7 +439,7 @@ define(['express',
 		spiderData.category_id = data.category_id
 		spiderData.team_id = data.team_id
 		spiderData.active = (data.active == undefined) ? true : data.active
-		
+
 		if(data.phase_id){
 			spiderData.phase_id = data.phase_id
 		}
@@ -478,7 +478,6 @@ define(['express',
 			.then(function (result) {
 				Response(res, result)
 			}).catch(function(error){
-				// Message(res,error.details, error.code, []);
 				Response(res, null, error)
 			});
 	});
@@ -598,7 +597,7 @@ define(['express',
 			.where({active:true})
 			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team']})
 			.then(function (result) {
-
+				console.log(result);
 				var x = result.toJSON().category.phases
 
 				Response(res, x)
@@ -610,13 +609,9 @@ define(['express',
 
 	var sortBy = (key) => {
 		return (a, b) => {
-			if (a['position'] > b['position']) {
-				return 1;
-			}
-			if (a['position'] < b['position']) {
-				return -1;
-			}
-			return 0;
+			if (a['position'] > b['position']) return 1
+			if (a['position'] < b['position']) return -1
+			return 0
 		}
 	}
 
@@ -625,9 +620,6 @@ define(['express',
 	router.get('/:category_id/team_placeholders', (req, res) => {
 		//paso 0: si esta fase es la primera, devolver vacío, o simplemente el listado de equipos
 		// obtener la fase, revisar el campo position
-
-			// 	Promise.filter(category.phases, (ph) => ph.position == (phase.position + 1) )
-
 		Models.category
 		.where({id: req.params.category_id})
 		.fetch({withRelated: ['phases.groups']})

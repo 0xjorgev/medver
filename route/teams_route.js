@@ -185,7 +185,8 @@ define(['express'
 		//version 1 -> insert into team roster without checking existance
 		var _playerResult = undefined
 
-		new Models.player(playerData).save().then((result) => {
+		new Models.player(playerData).save()
+		.then((result) => {
 			_playerResult = result
 			//teamData.player_id = result.attributes.id
 			var team_player = {
@@ -233,11 +234,23 @@ define(['express'
 
 		var _found = undefined
 
-		PlayerTeam.where({team_id: teamId, player_id: playerId}).fetch().then((result) => {
-			return new Models.player_team({id: result.attributes.id, active: false}).save()
+		PlayerTeam.where({team_id: teamId, player_id: playerId})
+		.fetch()
+		.then((result) => {
+			return new Models.player_team({id: result.attributes.id, active: false})
+				.save()
 		})
 		.then((result) => Response(res, result))
 		.catch((error) => Response(res, null, error))
+	})
+
+	router.get('/:team_id/competition', (res, req) => {
+		Model.category_group_phase_team
+		.query(qb => {})
+		.fetch()
+		.then(result => {
+			console.log(result)
+		})
 	})
 
 	return router;

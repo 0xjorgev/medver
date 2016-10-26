@@ -2,29 +2,26 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util', '../util/response_message_util'], function (express, Models, Message, Knex, Response) {
+define(['express'
+	,'../model/index'
+	,'../util/request_message_util'
+	,'../util/knex_util'
+	,'../util/response_message_util'],
+	function (express, Models, Message, Knex, Response) {
 
 	var router = express.Router();
 
 	//List of teams
 	router.get('/', function (req, res) {
-
 		return Models.team
 		.query(function(qb){})
 		.where({active:true})
-		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender'], debug:false})
-		//.fetchAll({withRelated: ['gender', 'season']})
-		.then(function (result) {
-			console.log('result: ' + result);
-			Message(res,'Success', '0', result);
-		}).catch(function(error){
-			console.log('Error: ' + error);
-			Message(res,error.details, error.code, []);
-		});
+		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender']})
+		.then((result) => Response(res, result))
+		.catch((error) =>  Response(res, null, error))
 	});
 
 	router.get('/:team_id/player', function (req, res) {
-
 		var team_id = req.params.team_id;
 
 		return Models.player_team
@@ -32,46 +29,22 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.where({active:true})
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
-			// Message(res,'Success', '0', result);
 			Response(res, result)
 		}).catch(function(error){
-			// Message(res,error.details, error.code, []);
 			Response(res, null, error)
 		});
 	});
 
-		//Team by Id -> Returns 1 result
+	//Team by Id -> Returns 1 result
 	router.get('/:team_id', function (req, res) {
-
 		var team_id = req.params.team_id;
-
 		return Models.team
 		.where({id:team_id, active:true})
-		.fetch({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'player_team.position'], debug: false})
-		.then(function (result) {
-			Message(res,'Success', '0', result);
-		}).catch(function(error){
-			Message(res,error.details, error.code, []);
-		});
+		.fetch({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'player_team.position']})
+		.then( (result) => Response(res, result))
+		.catch((error) => Response(res, null, error));
 
 	});
-
-	// //'category', 'organization'
-	// router.get('/:org_id/organization/', function (req, res) {
-
-	//     console.log('Rounds by group_id');
-
-	//      var group_id = req.params.group_id;
-	//     return Models.round
-	//     .where({'group_id':group_id})
-	//     .fetch({withRelated: ['group']})
-	//     .then(function (result) {
-	//         Message(res,'Success', '0', result);
-	//     }).catch(function(error){
-	//         Message(res,error.details, error.code, []);
-	//     });
-	// });
-
 
 	//TODO: Esto parece no estar en uso, deberia arrojar error al probar
 	router.post('/organization/:org_id/category/:cat_id', function (req, res) {
@@ -89,23 +62,9 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var gender_id 	=  req.params.gender_id;
 		var name        = group_post.name;
 
-		new Team(
-			team_post
-		// {
-		//     name: name,
-		//     organization_id: org_id,
-		//     category_id: cat_id,
-		//     logo_url: logo_url,
-		//     short_name: short_name,
-		//     description: description
-		// }
-		).save().then(function(new_team){
-			console.log(`{new_team: ${new_team}}`);
-			Message(res, 'Success', '0', new_team);
-		}).catch(function(error){
-			console.log(`{error: ${error}}`);
-			Message(res, error.detail, error.code, null);
-		});
+		new Team(team_post).save()
+		.then((new_team) => Response(res, new_team) )
+		.catch((error) => Response(res, null, error));
 	});
 
 	//==========================================================================
@@ -116,7 +75,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	var saveTeam = function(data, res){
 
 		var orgData = {}
-		data.name = data.name.trim()
 
 		if(data.organization_id){
 			orgData.id = data.organization_id
@@ -130,20 +88,20 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			}
 		}
 
-		var teamData = {
-			name: data.name,
-			logo_url: data.logo_url,
-			category_type_id: data.category_type_id,
-			organization_id: data.organization_id,
-			subdiscipline_id: data.subdiscipline_id,
-			gender_id: data.gender_id
-		}
+		var teamData = {}
 
-		if(data.id){
-			teamData.id = data.id
-		}
-		teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
-		teamData.description = data.description ? data.description : data.name
+		if (data.name != undefined) teamData.name = data.name.trim()
+		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
+		if (data.category_type_id != undefined) teamData.category_type_id = data.category_type_id
+		if (data.organization_id != undefined) teamData.organization_id = data.organization_id
+		if (data.subdiscipline_id != undefined) teamData.subdiscipline_id = data.subdiscipline_id
+		if (data.gender_id != undefined) teamData.gender_id = data.gender_id
+		if (data.meta != undefined) teamData.meta = data.meta
+		if (data.short_name != undefined) teamData.short_name = data.short_name
+		if (data.description != undefined) teamData.description = data.description
+		if (data.id != undefined) teamData.id = data.id
+		//	teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
+		//	teamData.description = data.description ? data.description : data.name
 
 		// spider is the 'category_group_phase_team' table
 		// var spiderData = {
@@ -166,13 +124,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		.then(function(found){
 			//if found, let's put its id on teamData
 			if(found){
-				console.log('org found!', found.attributes)
 				teamData.organization_id = found.attributes.id
 				return teamData
 			}
 			else{
-				//if not, let's create the organization
-				console.log('org not found, creating')
 				return new Models.organization(orgData).save().then(function(result){
 					teamData.organization_id = result.attributes.id
 					console.log('org created/updated', result.attributes)
@@ -182,9 +137,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		})
 		.then(function(teamData){
 			//with the organization stuff all sorted out, let's create the team
-			console.log('before saving team', teamData)
-			new Models.team(teamData).save()
-			Message(res, 'Success', '0', teamData);
+			return new Models.team(teamData).save()
+		})
+		.then((result) => {
+			Response(res, result)
 		})
 		// .then(function(new_team){
 		// 	//now let's associate the newly created team with the category
@@ -202,11 +158,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		// 	Message(res, `Team ${_team.id} ${action}`, '0', _team)
 		// })
 		.catch(function(error){
-			// something has happened
-			console.log('error', error)
-
-			//TODO: no todo el tiempo se envia el detail... manejar el error en este tipo de casos
-			Message(res, `${error.error} - detail: ${error.detail}`, error.code, error)
+			Response(res, null, error)
 		})
 	}
 
@@ -225,18 +177,16 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 	});
 
 	var savePlayerTeam = (playerTeamData, res) => {
-
 		console.log('Save Player Team: ', playerTeamData)
 		var playerData = playerTeamData.player
 		var teamData = playerTeamData.team_player
 
 		//TODO: check player existance
-
 		//version 1 -> insert into team roster without checking existance
-
 		var _playerResult = undefined
 
-		new Models.player(playerData).save().then((result) => {
+		new Models.player(playerData).save()
+		.then((result) => {
 			_playerResult = result
 			//teamData.player_id = result.attributes.id
 			var team_player = {
@@ -245,19 +195,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 				position_id : teamData.position_id,
 				team_id : teamData.team_id
 			}
-			if(playerTeamData.team_player.id)
-				team_player.id = playerTeamData.team_player.id
-			
-			console.log('team_player', team_player)
+			if(playerTeamData.team_player.id) team_player.id = playerTeamData.team_player.id
 
 			return new Models.player_team(team_player).save()
-		}).then((result) => {
-			Message(res, 'Success', '0', {player: _playerResult, player_team: result})
-		}).catch(function(error){
-			console.log('error', error)
-			console.log('error', error.stack)
-			res.status(500);
-			res.json({message: error.name, code: 500, data: error.detail});
+		})
+		.then((result) => {
+			Response(res, {player: _playerResult, player_team: result})
+		})
+		.catch(function(error){
+			Response(res, null, error)
 		})
 	}
 
@@ -280,7 +226,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	//inactivates the player from the roster
 	router.delete('/:team_id/player/:player_id', function(req, res){
-
 		var PlayerTeam = new Models.player_team()
 		var playerId = req.params.player_id
 		var teamId = req.params.team_id
@@ -289,19 +234,23 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 		var _found = undefined
 
-		PlayerTeam.where({team_id: teamId, player_id: playerId}).fetch().then((result) => {
-			console.log('player found', result.attributes)
-			return new Models.player_team({id: result.attributes.id, active: false}).save()
-		})
+		PlayerTeam.where({team_id: teamId, player_id: playerId})
+		.fetch()
 		.then((result) => {
-			console.log('player updated', result.attributes)
-			Message(res, 'Success', '0', result)
+			return new Models.player_team({id: result.attributes.id, active: false})
+				.save()
 		})
-		.catch(function(error){
-			console.log('error', error);
-			console.log('error', error.stack);
-			Message(res, error.detail, error.code, error);
-		})
+		.then((result) => Response(res, result))
+		.catch((error) => Response(res, null, error))
+	})
+
+	//TODO: es necesario filtrar las competiciones recibidas por organizacion
+	router.get('/:team_id/competition', (req, res) => {
+		Models.category_group_phase_team
+		.query(qb => qb.where({team_id: req.params.team_id}) )
+		.fetchAll({withRelated: ['team','category.season.competition']})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
 	})
 
 	return router;

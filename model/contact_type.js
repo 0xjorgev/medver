@@ -15,5 +15,5 @@ define(['./base_model', './Contact'], function (DB) {
     });
 
     // uses Registry plugin
-    return DB.model('Contacts_types', Contacts_types);
+    return DB.model('Contact_type', Contact_type);
 });

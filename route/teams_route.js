@@ -244,13 +244,14 @@ define(['express'
 		.catch((error) => Response(res, null, error))
 	})
 
-	router.get('/:team_id/competition', (res, req) => {
-		Model.category_group_phase_team
-		.query(qb => {})
-		.fetch()
-		.then(result => {
-			console.log(result)
+	router.get('/:team_id/competition', (req, res) => {
+		Models.category_group_phase_team
+		.query(qb => {
+			qb.where({team_id: req.params.team_id})
 		})
+		.fetchAll({withRelated: 'category.season.competition'})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
 	})
 
 	return router;

@@ -314,35 +314,6 @@ paths:
         200:
           description: Create info of the summoned player of one team on one category successful
       security: []
-      x-unitTests:
-      - request:
-          method: PUT
-          uri: /category/5/team/37/player/467
-          headers:
-            Content-Type: application/json
-          body: >-
-            {
-                "active": false,
-                "number": 0,
-                "position": ""
-            }
-        expectedResponse:
-          x-allowExtraHeaders: true
-          x-bodyMatchMode: NONE
-          x-arrayOrderedMatching: false
-          x-arrayCheckCount: false
-          x-matchResponseSchema: true
-          headers: {}
-        x-testShouldPass: true
-        x-testEnabled: true
-        x-testName: http://localhost:3000/api/v1.0/category/5/team/37/player/467
-        x-testDescription:
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
-
     put:
       summary: Update info of the summoned player of one team on one category
       description: Update info of the summoned player of one team on one category
@@ -501,6 +472,7 @@ paths:
           format: integer
       tags:
         - Team
+        - Competition
       responses:
         200:
           description: An array of competitions

@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Somosport Core API
-  description: Basic description of services provided by Somosport Core
+  description: Basic description of services provided by Somosport Core. Online editor & validator available at  http://editor.swagger.io/
   version: "1.0"
 # the domain of the service
 # host: ss-core-dev.herokuapp.com
@@ -246,6 +246,9 @@ paths:
         - Player
         - Category
         - Team
+      responses:
+        200:
+          description: pending
 
   /category/{category_id}/team/{team_id}/player/{player_id}:
     get:
@@ -272,9 +275,12 @@ paths:
         - Player
         - Category
         - Team
+      responses:
+        200:
+          description: pending
     post:
       summary: Create info of the summoned player of one team on one category
-      description: 
+      description: Create info of the summoned player of one team on one category
       # operationId: Update_http://localhost:3000/api/v1.0/category/5/team/37/player/467_
       tags:
         - Player
@@ -308,39 +314,9 @@ paths:
         200:
           description: Create info of the summoned player of one team on one category successful
       security: []
-      x-unitTests:
-      - request:
-          method: PUT
-          uri: /category/5/team/37/player/467
-          headers:
-            Content-Type: application/json
-          body: >-
-            {
-                "active": false,
-                "number": 0,
-                "position": ""
-            }
-        expectedResponse:
-          x-allowExtraHeaders: true
-          x-bodyMatchMode: NONE
-          x-arrayOrderedMatching: false
-          x-arrayCheckCount: false
-          x-matchResponseSchema: true
-          headers: {}
-        x-testShouldPass: true
-        x-testEnabled: true
-        x-testName: http://localhost:3000/api/v1.0/category/5/team/37/player/467
-        x-testDescription: 
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
-
     put:
       summary: Update info of the summoned player of one team on one category
-      description: 
-      # operationId: Update_http://localhost:3000/api/v1.0/category/5/team/37/player/467_
+      description: Update info of the summoned player of one team on one category
       tags:
         - Player
         - Category
@@ -373,42 +349,6 @@ paths:
         200:
           description: Update info of the summoned player of one team on one category successful
       security: []
-      x-unitTests:
-      - request:
-          method: PUT
-          uri: /category/5/team/37/player/467
-          headers:
-            Content-Type: application/json
-          body: >-
-            {
-                "id":47,
-                "category_id": "5",
-                "team_id": "37",
-                "player_id": "467",
-                "active": false,
-                "number": 0,
-                "position": ""
-            }
-        expectedResponse:
-          x-allowExtraHeaders: true
-          x-bodyMatchMode: NONE
-          x-arrayOrderedMatching: false
-          x-arrayCheckCount: false
-          x-matchResponseSchema: true
-          headers: {}
-        x-testShouldPass: true
-        x-testEnabled: true
-        x-testName: http://localhost:3000/api/v1.0/category/5/team/37/player/467
-        x-testDescription: 
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
-      responses:
-        200:
-          description: all the players that participate on a team in a category
-          
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -513,15 +453,34 @@ paths:
         - Team
       responses:
         200:
-          description: An array of products
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
+          description: Resource updated
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
+  /team/{team_id}/competition:
+    get:
+      summary: Returns the competitions where the given team is registered
+      description: Returns the competitions where the given team is registered
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Team
+        - Competition
+      responses:
+        200:
+          description: An array of competitions
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /team/{team_id}/player:
     get:
       summary: Gets the team's roster of players
@@ -581,7 +540,7 @@ paths:
         - Player
       responses:
         200:
-          description:
+          description: result
         default:
           description: Unexpected error
           schema:
@@ -608,7 +567,7 @@ paths:
         - Player
       responses:
         200:
-          description:
+          description: result
         default:
           description: Unexpected error
           schema:
@@ -632,7 +591,7 @@ paths:
         - Player
       responses:
         200:
-          description:
+          description: result
         default:
           description: Unexpected error
           schema:
@@ -866,7 +825,7 @@ paths:
         type: integer
       responses:
         200:
-          description:
+          description: result
       security: []
     put:
       description: Competition Update
@@ -883,7 +842,7 @@ paths:
           $ref: '#/definitions/UpdateCompetitionRequest'
       responses:
         200:
-          description:
+          description: result
       security: []
   /phase:
     get:
@@ -1058,7 +1017,7 @@ paths:
           type: integer
       responses:
         200:
-          description:
+          description: result
       security: []
   /season:
     get:
@@ -1076,7 +1035,7 @@ paths:
           $ref: '#/definitions/FullSeasonListRequest'
       responses:
         200:
-          description:
+          description: result
       security: []
   /competition:
     get:
@@ -1113,7 +1072,7 @@ paths:
           $ref: '#/definitions/CreateCompetitionRequest'
       responses:
         200:
-          description:
+          description: result
       security: []
 
   /competition/query/by_city:
@@ -1179,7 +1138,7 @@ paths:
       security: []
   /gender:
     get:
-      description:
+      description: get gender list
       operationId: Get_Gender List_
       produces:
       - application/json
@@ -1194,11 +1153,11 @@ paths:
           $ref: '#/definitions/GenderListRequest'
       responses:
         200:
-          description:
+          description: result
       security: []
   /season/{season_id}:
     get:
-      description:
+      description: get the detail of a season
       parameters:
         - name: season_id
           in: path
@@ -1210,7 +1169,7 @@ paths:
       - application/json
       responses:
         200:
-          description:
+          description: result
       security: []
     post:
       description: Creates a Season
@@ -1227,10 +1186,10 @@ paths:
           $ref: '#/definitions/SeasonCreationRequest'
       responses:
         200:
-          description:
+          description: results
       security: []
     put:
-      description:
+      description: season update
       operationId: Update_Season Update_
       produces:
       - application/json
@@ -1249,7 +1208,7 @@ paths:
             $ref: '#/definitions/SeasonUpdateRequest'
       responses:
         200:
-          description:
+          description: results
       security: []
   /gender/{gender_id}:
     get:
@@ -1266,7 +1225,7 @@ paths:
         - Gender
       responses:
         200:
-          description:
+          description: results
       security: []
   /competition/{competition_id}/season/:
     get:
@@ -1284,7 +1243,7 @@ paths:
           type: integer
       responses:
         200:
-          description:
+          description: results
       security: []
   /discipline/:
     get:
@@ -1377,7 +1336,7 @@ paths:
       parameters: []
       responses:
         200:
-          description:
+          description: results
       security: []
   /category/{category_id}/team:
     get:
@@ -1397,7 +1356,7 @@ paths:
           format: integer
       responses:
         200:
-          description:
+          description: results
       security: []
   /group/:
     get:
@@ -1410,7 +1369,7 @@ paths:
       parameters: []
       responses:
         200:
-          description:
+          description: list of groups
       security: []
     post:
       description: Creates a group
@@ -1471,7 +1430,7 @@ paths:
             $ref: '#/definitions/CategorySERequest'
       responses:
         200:
-          description:
+          description: OK response
       security: []
 
   /competition/rcompetition/{competition_id}:
@@ -1492,7 +1451,7 @@ paths:
           format: integer
       responses:
         200:
-          description:
+          description: Competition object
       security: []
 
   /category/{category_id}/teams/{team_id}/matches:
@@ -1556,7 +1515,7 @@ paths:
         format: integer
       responses:
         200:
-          description: 
+          description: Created Category Team Invite
       security: []
   /category/{category_id}/team/{team_id}/invite/{id}:
     put:
@@ -1586,7 +1545,7 @@ paths:
           $ref: '#/definitions/UpdateCategoryTeamInviteRequest'
       responses:
         200:
-          description: 
+          description: Resource updated
       security: []
     delete:
       summary: Delete logical Category Team Invite
@@ -1612,17 +1571,11 @@ paths:
         required: true
         type: integer
         format: integer
-      - name: Body
-        in: body
-        required: false
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/DeleteCategoryTeamInviteRequest'
       responses:
         200:
-          description: 
+          description: Deleted logical category team invite
       security: []
-  
+
 
 #######################################################################
 #      _       __ _       _ _   _
@@ -1960,10 +1913,6 @@ definitions:
         type: string
       password:
         type: string
-<<<<<<< HEAD
-
-=======
->>>>>>> 8beb962f34991d9d76d44602842b5613dac31c2e
   #TODO: cargar este ejemplo
   PlayerTeamRequest:
     title: PlayerTeam Request
@@ -1973,7 +1922,6 @@ definitions:
         $ref: '#/definitions/CreateTeamRequest'
       team:
         $ref: '#/definitions/CreateGroupRequest'
-<<<<<<< HEAD
 
   UpdateCategoryTeamInviteRequest:
     title: Create Category Team InviteRequest
@@ -1993,7 +1941,7 @@ definitions:
         format: int32
       active:
         type: boolean
-  
+
   UpdateCategyTeamPlayer:
     title: UpdateCategyTeamPlayer
     type: object
@@ -2035,8 +1983,9 @@ definitions:
     - active
     - number
     - position
-
-
-
-=======
->>>>>>> 8beb962f34991d9d76d44602842b5613dac31c2e
+  Error:
+    title: error
+    type: object
+    properties:
+      description:
+        type: string

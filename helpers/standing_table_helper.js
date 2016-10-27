@@ -230,8 +230,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 			})
 		})
 		.catch((error) => {
-			console.log(error);
-			console.log(error.stack);
+			throw error
 		})
 	}
 
@@ -243,27 +242,33 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 \	*/
 
 	StandingTable.getStandingTableByCategory = (categoryId, res) => {
-		Models.standing_table
-		.query((qb) => {
-			qb.where({category_id: categoryId})
-			.groupBy(['team_id', 'category_id'])
-			.select(['team_id', 'category_id'])
-			.orderBy('points')
-			.sum('points as points')
-			.sum('goals_in_favor as goals_in_favor')
-			.sum('goals_against as goals_against')
-			.sum('matches_count as matches')
-			.sum('matches_won as matches_won')
-			.sum('matches_lost as matches_lost')
-			.sum('matches_draw as matches_draw')
-		})
-		.fetchAll({withRelated:['team']})
-		.then((result) => {
-			Response(res, result)
-		})
-		.catch((error) => {
-			Response(res, null, error)
-		})
+		Models.category
+		.where({id: categoryId})
+		.fetchAll({withRelated: 'phases.groups.standing_table'})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
+
+		// Models.standing_table
+		// .query((qb) => {
+		// 	qb.where({category_id: categoryId})
+		// 	.groupBy(['team_id', 'category_id', 'phase_id', 'group_id'])
+		// 	.select(['team_id', 'category_id', 'phase_id', 'group_id'])
+		// 	.orderBy('points')
+		// 	.sum('points as points')
+		// 	.sum('goals_in_favor as goals_in_favor')
+		// 	.sum('goals_against as goals_against')
+		// 	.sum('matches_count as matches')
+		// 	.sum('matches_won as matches_won')
+		// 	.sum('matches_lost as matches_lost')
+		// 	.sum('matches_draw as matches_draw')
+		// })
+		// .fetchAll({withRelated:['team']})
+		// .then((result) => {
+		// 	Response(res, result)
+		// })
+		// .catch((error) => {
+		// 	Response(res, null, error)
+		// })
 	}
 
 	/*
@@ -284,7 +289,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 			.sum('matches_lost as matches_lost')
 			.sum('matches_draw as matches_draw')
 		})
-		.fetchAll({withRelated:['team']})
+		.fetchAll({withRelated:['team', 'group.phase']})
 		.then((result) => {
 			Response(res, result)
 		})

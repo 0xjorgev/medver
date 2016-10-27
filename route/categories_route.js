@@ -439,7 +439,7 @@ define(['express',
 		spiderData.category_id = data.category_id
 		spiderData.team_id = data.team_id
 		spiderData.active = (data.active == undefined) ? true : data.active
-		
+
 		if(data.phase_id){
 			spiderData.phase_id = data.phase_id
 		}

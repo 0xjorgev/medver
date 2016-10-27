@@ -179,8 +179,25 @@ paths:
 
   /category/{category_id}/standing_table:
     get:
-      summary: Gets the current standing table for a given category_id
-      description: Gets the current standing table for a given category_id
+      summary: Gets the current standing table for a given category_id, separated by phases & groups
+      description: Gets the current standing table for a given category_id, separated by phases & groups
+      tags:
+        - Standing table
+      responses:
+        200:
+          description: the current standing_table of the category
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+          
+  /category/{category_id}/summarized_standing_table:
+    get:
+      summary: Gets the current summarized standing table for a given category_id
+      description: Gets the current summarized standing table for a given category_id
       tags:
         - Standing table
       responses:
@@ -512,7 +529,7 @@ paths:
           required: true
           type: integer
           format: integer
-        - name: PlayerTeamCreateData
+        - name: player y team data
           in: body
           required: true
           x-is-map: false

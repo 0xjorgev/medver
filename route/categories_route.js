@@ -210,6 +210,11 @@ define(['express',
 		StandingTable.getStandingTableByCategory(categoryId, res)
 	});
 
+	router.get('/:category_id/summarized_standing_table', function(req, res){
+		var categoryId = req.params.category_id;
+		StandingTable.getSummarizedStandingTableByCategory(categoryId, res)
+	});
+
     //==========================================================================
     // Competition by Simple Elimination
     //==========================================================================

@@ -210,6 +210,11 @@ define(['express',
 		StandingTable.getStandingTableByCategory(categoryId, res)
 	});
 
+	router.get('/:category_id/summarized_standing_table', function(req, res){
+		var categoryId = req.params.category_id;
+		StandingTable.getSummarizedStandingTableByCategory(categoryId, res)
+	});
+
     //==========================================================================
     // Competition by Simple Elimination
     //==========================================================================
@@ -439,7 +444,7 @@ define(['express',
 		spiderData.category_id = data.category_id
 		spiderData.team_id = data.team_id
 		spiderData.active = (data.active == undefined) ? true : data.active
-		
+
 		if(data.phase_id){
 			spiderData.phase_id = data.phase_id
 		}

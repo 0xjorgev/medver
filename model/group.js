@@ -20,6 +20,9 @@ define(['./base_model','./phase','./round'], function (DB) {
         },
         category_group_phase_team: function(){
             return this.hasMany('Category_group_phase_team', 'group_id');
+        },
+        standing_table: function(){
+            return this.hasMany('StandingTable', 'group_id');
         }
     });
 

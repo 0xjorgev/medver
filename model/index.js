@@ -36,12 +36,13 @@ define([
     ,'./position'
     ,'./category_team_player'
     ,'./standing_table'
+    ,'./entity'
     // ,'./contact_type'
     // ,'./entity_type'
 ], function (Util, Discipline, Subdiscipline, User, Competition, Season, Category, Gender, Competition_type,
     Contact, Phase, Group, Round, Match, Team, Classification, Player_team, Event, Event_match_player, Match_referee,
     Category_type, Category_group_phase_team, Competition_user, Player, Rule, Match_team_player, Organization, Position,
-    Category_team_player, StandingTable)
+    Category_team_player, StandingTable, Entity)
 {
     return {
     	util : Util,
@@ -73,6 +74,7 @@ define([
         organization:Organization,
         position:Position,
         category_team_player:Category_team_player,
-		standing_table: StandingTable
+		    standing_table: StandingTable,
+        entity: Entity
     };
 });

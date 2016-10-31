@@ -8,10 +8,22 @@ if (typeof define !== 'function') {
 define(['express',
 	'../model/index',
 	'../util/request_message_util',
-	'../util/knex_util',
+	'../util/knex_util'
 	], function (express, Models, Message, Knex) {
 
     var router = express.Router();
+
+        router.get('/entities', (req, res) => {
+
+            Models.entity
+            .fetchAll({withRelated: 'entity_type'})
+            .then((result) => {
+                console.log(result.toJSON())
+            })
+
+            Message(res, 'Success', '0', 'mmmkay')
+        })
+
 
       var getTeamByName = function(name1, name2){
 
@@ -216,6 +228,5 @@ define(['express',
           //   res.json({message:error.detail, code: error.code, data: {} });
           // });
       });
-
     return router;
 });

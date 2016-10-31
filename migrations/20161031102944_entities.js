@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
     knex.schema.createTable('entities', function(table){
       table.increments('id').primary();
       table.integer('object_id');
+      table.integer('entity_type_id').references('entities_types.id');
       table.boolean('active').notNullable().defaultTo(true);
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());

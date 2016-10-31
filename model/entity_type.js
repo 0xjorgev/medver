@@ -24,7 +24,7 @@ define(['./base_model', './entity'], function (DB) {
         //     return this.hasMany('Phase');
         // },
 
-        categories:  function(){
+        entities:  function(){
             return this.hasMany('Entity');
         }
     });

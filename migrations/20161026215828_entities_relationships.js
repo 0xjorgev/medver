@@ -1,10 +1,10 @@
 
 exports.up = function(knex, Promise) {
 	return Promise.all([
-		knex.schema.createTable('entity_relationships', function(table){
+		knex.schema.createTable('entities_relationships', function(table){
 			table.increments('id').primary();
 			table.integer('ent_ref_from_id');
-			table.integer('relationship_type').references('relationship_types.id').index();
+			table.integer('relationship_type').references('relationships_types.id').index();
 			table.integer('ent_ref_to_id');
 			table.text('comment');
 			table.boolean('active').notNullable().defaultTo(true);
@@ -17,6 +17,6 @@ exports.up = function(knex, Promise) {
 
 exports.down = function(knex, Promise) {
 	return Promise.all([
-		knex.schema.dropTableIfExists('entity_relationships')
+		knex.schema.dropTableIfExists('entities_relationships')
 	])
 };

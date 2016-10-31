@@ -25,9 +25,9 @@ define(['./base_model', './organization', './entity'], function (DB) {
             return this.hasMany('Competition_user','user_id');
         },
 
-        entity: function(){
-          return this.morphMany(Entity, 'object_id');
-        }
+        // entity: function(){
+        //   return this.morphMany(Entity, 'object_id');
+        // }
     });
 
     // uses Registry plugin

@@ -5,7 +5,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model'], function (DB) {
+define(['./base_model', './entity'], function (DB) {
 
     var Entity_relationship = DB.Model.extend({
         tableName: 'entities_relationships',
@@ -18,12 +18,12 @@ define(['./base_model'], function (DB) {
         // }
 
         ent_ref_from_id: function(){
-          return this.belongsTo('Entity', 'id');
-        },
-
-        ent_ref_to_id: function(){
-          return this.belongsTo('Entity', 'id');
+          return this.belongsTo('Entity');
         }
+
+        // ent_ref_to_id: function(){
+        //   return this.belongsTo('Entity');
+        // }
     });
 
     // uses Registry plugin

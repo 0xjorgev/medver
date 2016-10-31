@@ -1,7 +1,7 @@
 
 exports.up = function(knex, Promise) {
   return Promise.all([
-    knex.schema.createTable('entities_type', function(table){
+    knex.schema.createTable('entities_types', function(table){
       table.increments('id').primary();
       table.boolean('active').notNullable().defaultTo(true);
       table.timestamp('created_at').defaultTo(knex.fn.now());
@@ -17,6 +17,6 @@ exports.up = function(knex, Promise) {
 
 exports.down = function(knex, Promise) {
   return Promise.all([
-		knex.schema.dropTableIfExists('entities_type')
+		knex.schema.dropTableIfExists('entities_types')
 	])
 };

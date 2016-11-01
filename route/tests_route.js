@@ -5,6 +5,8 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
+var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
+
 define(['express',
 	'../model/index',
 	'../util/request_message_util',
@@ -15,13 +17,46 @@ define(['express',
 
         router.get('/entities', (req, res) => {
 
-            Models.entity
-            .fetchAll({withRelated: 'entity_type'})
+            Models.user
+            .query((qb) => {
+                qb.where({id: 2})
+            })
+            .fetch({withRelated: [
+                 'entity.related_from.relationship_type'
+                ,'entity.related_from.to.entity_type'
+                // ,'entity.related_from.from.entity_type'
+            ]})
             .then((result) => {
-                console.log(result.toJSON())
+                var user = result.toJSON()
+                // _log(user)
+                //con esto se filtran las relaciones tipo 'coach'
+                return user.entity.related_from
+                .filter((rel) => rel.relationship_type.name == 'COACH')
+                //y con este map se extraen los ids de los teams
+                .map((teams) => teams.to.object_id)
+            })
+            .then((result) => {
+                _log(result)
+                return Models.team
+                .query((qb) => qb.whereIn('id', result))
+                .fetchAll()
+            })
+            .then((result) => {
+                Message(res, 'Success', '0', result)
             })
 
-            Message(res, 'Success', '0', 'mmmkay')
+            // Models.entity
+            // .query((qb) => {
+            //     //filtrar por tipo de entidad de usuario
+            //     qb.where({object_id: 2, entity_type_id: 1})
+            // })
+            // .fetchAll({withRelated: ['entity_type'
+            //     ,'related_to.relationship_type'
+            //     ,'related_from.relationship_type'
+            // ]})
+            // .then((result) => _log(result.toJSON()) )
+
+
         })
 
 

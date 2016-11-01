@@ -5,25 +5,11 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './entity'], function (DB) {
+define(['./base_model'], function (DB) {
 
     var Entity_type = DB.Model.extend({
         tableName: 'entities_types',
         hasTimestamps: true,
-
-        // //relations
-        // gender: function(){
-        //     return this.belongsTo('Gender', 'gender_id');
-        // },
-
-        // season: function(){
-        //     return this.belongsTo('Season', 'season_id');
-        // },
-
-        // phases: function(){
-        //     return this.hasMany('Phase');
-        // },
-
         entities:  function(){
             return this.hasMany('Entity');
         }

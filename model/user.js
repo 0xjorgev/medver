@@ -8,26 +8,17 @@ if (typeof define !== 'function') {
 define(['./base_model', './organization', './entity'], function (DB) {
 
     var User = DB.Model.extend({
-        tableName: 'users',
-        hasTimestamps: true,
-
-        //relations
-        // competition n:m
-        // organizations: function(){
-        //     return this.hasMany('Organization');
-        // }
-
-        referee: function(){
+        tableName: 'users'
+        ,hasTimestamps: true
+        ,entity: function(){
+            return this.hasOne('Entity', 'object_id')
+        }
+        ,referee: function(){
             return this.hasMany('Match_referee');
-        },
-
-        competition_user: function(){
+        }
+        ,competition_user: function(){
             return this.hasMany('Competition_user','user_id');
-        },
-
-        // entity: function(){
-        //   return this.morphMany(Entity, 'object_id');
-        // }
+        }
     });
 
     // uses Registry plugin

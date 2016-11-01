@@ -200,7 +200,6 @@ paths:
           required: true
           type: integer
           format: integer
-
   /category/{category_id}/summarized_standing_table:
     get:
       summary: Gets the current summarized standing table for a given category_id
@@ -217,7 +216,25 @@ paths:
           required: true
           type: integer
           format: integer
-
+  /category:
+    post:
+      summary: Creates a category
+      description: Creates a category
+      produces:
+      - application/json
+      tags:
+        - Category
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CategoryRequest'
+      responses:
+        200:
+          description: result
+      security: []
   /category/{category_id}:
     get:
       summary: Gets a category given an id
@@ -249,7 +266,30 @@ paths:
           required: true
           type: integer
           format: integer
-
+    put:
+      summary: Updates a category *BODY PARAMETER LIST NEEDS DOCUMENTATION*
+      description: Updates a category
+      produces:
+      - application/json
+      tags:
+        - Category
+      parameters:
+      - name: category_id
+        in: path
+        description: Category ID
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CategoryRequest'
+      responses:
+        200:
+          description: result
+      security: []
   /category/{category_id}/team/{team_id}/player/:
     get:
       summary: Gets all the players that participate on a team in a category
@@ -2007,6 +2047,18 @@ definitions:
     - active
     - number
     - position
+  CategoryRequest:
+    title: CategoryRequest
+    type: object
+    properties:
+      name:
+        type: string
+      is_published:
+        type: boolean
+      active:
+        type: boolean
+      number:
+        type: integer
   Error:
     title: error
     type: object

@@ -12,7 +12,7 @@ define(['./base_model', './round', './event_match_player'], function (DB) {
         },
 
         validations: {
-            round_id: ['required', 'numeric','greaterThan:0']
+            // round_id: ['required', 'numeric','greaterThan:0']
             // ,number: ['required', 'numeric','greaterThan:0']
         },
 

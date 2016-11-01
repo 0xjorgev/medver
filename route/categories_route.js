@@ -129,50 +129,27 @@ define(['express',
 
 		var data = {}
 
-		if(category_upd.name != undefined) data.name
-		if(category_upd.participant_minimum != undefined) data.participant_minimum
-		if(category_upd.participant_maximum != undefined) data.participant_maximum
-		if(category_upd.other_minimum_participant != undefined) data.other_minimum_participant
-		if(category_upd.other_maximum_participant != undefined) data.other_maximum_participant
-		if(category_upd.player_minimum_participant != undefined) data.player_minimum_participant
-		if(category_upd.player_maximum_participant != undefined) data.player_maximum_participant
-		if(category_upd.player_minimum_summoned != undefined) data.player_minimum_summoned
-		if(category_upd.player_maximum_summoned != undefined) data.player_maximum_summoned
-		if(category_upd.coach_minimum_participant != undefined) data.coach_minimum_participant
-		if(category_upd.coach_maximum_participant != undefined) data.coach_maximum_participant
-		if(category_upd.team_quantity != undefined) data.team_quantity
-		if(category_upd.gender_id != undefined) data.gender_id
-		if(category_upd.season_id != undefined) data.season_id
-		if(category_upd.category_type_id != undefined) data.category_type_id
-		if(category_upd.classification_type_id != undefined) data.classification_type_id
-		if(category_upd.inscription_init_at != undefined) data.inscription_init_at
-		if(category_upd.inscription_ends_at != undefined) data.inscription_ends_at
-		if(category_upd.image_url != undefined) data.image_url
-		if(category_upd.is_published != undefined) data.is_published
-		if(category_upd.meta != undefined) data.meta
-
-
-		// var name = category_upd.name
-		// var participant_minimum = category_upd.participant_minimum
-		// var participant_maximum = category_upd.participant_maximum
-		// var other_minimum_participant = category_upd.other_minimum_participant
-		// var other_maximum_participant = category_upd.other_maximum_participant
-		// var player_minimum_participant = category_upd.player_minimum_participant
-		// var player_maximum_participant = category_upd.player_maximum_participant
-		// var player_minimum_summoned = category_upd.player_minimum_summoned
-		// var player_maximum_summoned = category_upd.player_maximum_summoned
-		// var coach_minimum_participant = category_upd.coach_minimum_participant
-		// var coach_maximum_participant = category_upd.coach_maximum_participant
-		// var team_quantity = category_upd.team_quantity
-		// var gender_id = category_upd.gender_id
-		// var season_id = category_upd.season_id
-		// var category_type_id = category_upd.category_type_id
-		// var classification_type_id = category_upd.classification_type_id
-		// var inscription_init_at = category_upd.inscription_init_at
-		// var inscription_ends_at = category_upd.inscription_ends_at
-		// var image_url = category_upd.image_url
-		// var is_published = category_upd.is_published
-		// var meta = category_upd.meta
+		if(category_upd.name != undefined) data.name = category_upd.name
+		if(category_upd.participant_minimum != undefined) data.participant_minimum = category_upd.participant_minimum
+		if(category_upd.participant_maximum != undefined) data.participant_maximum = category_upd.participant_maximum
+		if(category_upd.other_minimum_participant != undefined) data.other_minimum_participant = category_upd.other_minimum_participant
+		if(category_upd.other_maximum_participant != undefined) data.other_maximum_participant = category_upd.other_maximum_participant
+		if(category_upd.player_minimum_participant != undefined) data.player_minimum_participant = category_upd.player_minimum_participant
+		if(category_upd.player_maximum_participant != undefined) data.player_maximum_participant = category_upd.player_maximum_participant
+		if(category_upd.player_minimum_summoned != undefined) data.player_minimum_summoned = category_upd.player_minimum_summoned
+		if(category_upd.player_maximum_summoned != undefined) data.player_maximum_summoned = category_upd.player_maximum_summoned
+		if(category_upd.coach_minimum_participant != undefined) data.coach_minimum_participant = category_upd.coach_minimum_participant
+		if(category_upd.coach_maximum_participant != undefined) data.coach_maximum_participant = category_upd.coach_maximum_participant
+		if(category_upd.team_quantity != undefined) data.team_quantity = category_upd.team_quantity
+		if(category_upd.gender_id != undefined) data.gender_id = category_upd.gender_id
+		if(category_upd.season_id != undefined) data.season_id = category_upd.season_id
+		if(category_upd.category_type_id != undefined) data.category_type_id = category_upd.category_type_id
+		if(category_upd.classification_type_id != undefined) data.classification_type_id = category_upd.classification_type_id
+		if(category_upd.inscription_init_at != undefined) data.inscription_init_at = category_upd.inscription_init_at
+		if(category_upd.inscription_ends_at != undefined) data.inscription_ends_at = category_upd.inscription_ends_at
+		if(category_upd.image_url != undefined) data.image_url = category_upd.image_url
+		if(category_upd.is_published != undefined) data.is_published = category_upd.is_published
+		if(category_upd.meta != undefined) data.meta = category_upd.meta
 
 		Knex(category.tableName)
 		.where('id','=',category_id)

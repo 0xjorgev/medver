@@ -252,10 +252,20 @@ define(['express'
 				//revisar matches para actualizar placeholders
 				//esto debe ocurrir inmediatamente despues de
 				//calcular el standing
-				PlaceholdersHelper.replacePlaceholders(_match.group_id)
+				// PlaceholdersHelper.replacePlaceholders(_match.group_id)
 			}
 			return result
 		})
+        .then((result) => {
+            if(data.played && data.played === true){
+                // StandingTable.calculateByGroup(_match.group_id)
+                //revisar matches para actualizar placeholders
+                //esto debe ocurrir inmediatamente despues de
+                //calcular el standing
+                PlaceholdersHelper.replacePlaceholders(_match.group_id)
+            }
+            return result
+        })
 		.then((result) => {
 			Response(res, _match)
 		})

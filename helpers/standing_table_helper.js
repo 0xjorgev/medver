@@ -15,36 +15,36 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 	var assignGoalsToTeams = (events) => {
 		return (match) => {
 
-			events.filter((event) => {
-				return event.match_id == match.match_id
-			})
-			.forEach((event) => {
-				console.log('event', event)
-				//goles
-				if(event.event_id == 1){
-					match.home_team_goals =
-						(event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
-					match.visitor_team_goals =
-						(event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
-				}
-				//autogoles
-				// else {
-				// 	match.home_team_goals =
-				// 		(event.team_id == match.home_team_id) ? event.goals : match.visitor_team_goals
-				// 	match.visitor_team_goals =
-				// 		(event.team_id == match.visitor_team_id) ? event.goals : match.home_team_goals
-				// }
-
-			})
-
-			// events.forEach((event) => {
-			// 	console.log('\tevent', event)
-
-			// 	if(event.match_id == match.match_id){
-			// 		match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
-			// 		match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
-			// 	}
+			// events.filter((event) => {
+			// 	return event.match_id == match.match_id
 			// })
+			// .forEach((event) => {
+			// 	console.log('event', event)
+			// 	//goles
+			// 	if(event.event_id == 1){
+			// 		match.home_team_goals =
+			// 			(event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
+			// 		match.visitor_team_goals =
+			// 			(event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+			// 	}
+			// 	//autogoles
+			// 	// else {
+			// 	// 	match.home_team_goals =
+			// 	// 		(event.team_id == match.home_team_id) ? event.goals : match.visitor_team_goals
+			// 	// 	match.visitor_team_goals =
+			// 	// 		(event.team_id == match.visitor_team_id) ? event.goals : match.home_team_goals
+			// 	// }
+
+			// })
+
+			events.forEach((event) => {
+				// console.log('\tevent', event)
+
+				if(event.match_id == match.match_id){
+					match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
+					match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+				}
+			})
 
 			match.total_goals = match.home_team_goals + match.visitor_team_goals
 			return match

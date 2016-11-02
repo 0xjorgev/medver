@@ -213,7 +213,6 @@ define(['express'
         .then((round) => {
 			//se salvan los datos del match
             matchData.round_id = round.attributes.id
-			console.log(matchData)
             return new Match(matchData).save()
         })
 		.then((match) => {
@@ -230,13 +229,13 @@ define(['express'
             .fetch()
         })
         .then((result) => {
-            var _log = (obj) => console.log(require('util').inspect(obj, {colors: true, depth: Infinity }))
-            _log(result)
+            // var _log = (obj) => console.log(require('util').inspect(obj, {colors: true, depth: Infinity }))
+            // _log(result)
             _match = result.attributes
 
             refereeData.match_id = _match.id
 
-            if(_match.matches_referee_id != null || _match.matches_referee_id != undefined)
+            if( _match.matches_referee_id != null || _match.matches_referee_id != undefined)
                 refereeData.id = _match.matches_referee_id
 
 			//TODO: se está duplicando el referi cuando se actaliza el registro;
@@ -248,13 +247,13 @@ define(['express'
 			_match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
-			// if(data.played && data.played === true){
+			if(data.played && data.played === true){
 				StandingTable.calculateByGroup(_match.group_id)
 				//revisar matches para actualizar placeholders
 				//esto debe ocurrir inmediatamente despues de
 				//calcular el standing
 				PlaceholdersHelper.replacePlaceholders(_match.group_id)
-			// }
+			}
 			return result
 		})
 		.then((result) => {

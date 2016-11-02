@@ -13,15 +13,10 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //Event by Subdiscipline_id -> Returns array
     //
     router.get('/:match_id', function (req, res) {
-
-        console.log('Match Player Events by match_id');
-
         var match_id = req.params.match_id;
-
         return Models.event_match_player
         .where({match_id:match_id, active: true})
-        // TODO: @Jorge revisa lo comentado, estaba haciendo que todo llegara vacío
-        .fetchAll({withRelated: ['match_id', 'event_id', 'player_in.player_team', 'player_out.player_team', 'team' /*, { player_in: function(qb) { qb.where('team_id', team.id) }}*/], debug: false})
+        .fetchAll({withRelated: ['match_id', 'event_id', 'player_in.player_team', 'player_out.player_team', 'team'], debug: false})
         .then(function (result) {
             Message(res,'Success', '0', result);
         }).catch(function(error){
@@ -30,20 +25,15 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     });
 
     router.post('/', function (req, res) {
-
-        console.log('Results Create');
         //Model Instance
         //{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
         var Event_match_player        = Models.event_match_player;
         var match_result  = req.body;
         var match_id = match_result.match_id;
-        console.log('Values: ', match_id)
-        console.log('log:',Event_match_player)
+
         new Event_match_player(match_result).save().then(function(new_team){
-            console.log(`{match_result: ${match_result}}`);
             Message(res, 'Success', '0', match_result);
         }).catch(function(error){
-            console.log(`{error: ${error}}`);
             Message(res, error.detail, error.code, null);
         });
     });

@@ -17,7 +17,7 @@ define(['../util/knex_util',
 		//se obtienen los matches dado el grupo
 		return Models.match
 		.query((qb) => {
-			qb.where({group_id: group_id})
+			// qb.where({group_id: group_id})
 			qb.where(Knex.raw('(placeholder_home_team_group is not null or placeholder_visitor_team_group is not null)'))
 			// qb.where(Knex.raw('(home_team_id is null or visitor_team_id is not null)'))
 		})
@@ -58,7 +58,7 @@ define(['../util/knex_util',
 
 				//al encontrar una coincidencia, se reemplaza y se elimina el
 				//placeholder
-				if(ph[0].team_id){
+				if(ph && ph[0] && ph[0].team_id){
 					m.home_team_id = ph[0].team_id
 					m.placeholder_home_team_group = null
 					m.placeholder_home_team_position = null
@@ -69,7 +69,7 @@ define(['../util/knex_util',
 				.filter((s) => s.group_id == m.placeholder_visitor_team_group)
 				.filter((s) => s.position == m.placeholder_visitor_team_position)
 
-				if(ph[0].team_id){
+				if(ph && ph[0] && ph[0].team_id){
 					m.visitor_team_id = ph[0].team_id
 					m.placeholder_visitor_team_group = null
 					m.placeholder_visitor_team_position = null

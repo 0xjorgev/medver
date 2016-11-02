@@ -153,6 +153,8 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		var matchesWithResults = undefined
 		var matches = undefined
 
+		console.log('matchSql', matchSql)
+
 		// se obtienen los matches que pertenecen a la categoria o grupo
 		// la diferencia viene del query 'matchSql'; es ahi donde se diferencia si buscamos los matches de una cat o group
 		Knex.raw(matchSql)
@@ -165,6 +167,8 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 
 			//separo los IDs de los matches
 			var matchIds = matches.map((e) => e.match_id).join(',')
+
+			console.log(matchIds)
 
 			//query para obtener el # de goles de los matches
 			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id = 1 and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`

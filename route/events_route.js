@@ -14,8 +14,6 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
     //
     router.get('/:subdiscipline_id/event', function (req, res) {
 
-        console.log('Events by Subdiscipline');
-
         var subdiscipline_id = req.params.subdiscipline_id;
 
         return Models.event

@@ -9,6 +9,10 @@ define(['./base_model', './round', './event_match_player'], function (DB) {
         hasTimestamps: true,
         initialize: function() {
             this.on('saving', this.validate, this);
+            //hay un problema para retornar distintas columnas al
+            //hacer update
+            //ver https://github.com/tgriesser/bookshelf/issues/507
+
         },
 
         validations: {

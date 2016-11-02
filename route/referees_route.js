@@ -17,7 +17,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
         return Models.match_referee
         .where({'match_id':match_id})
-        .fetchAll({withRelated: ['user'], debug:true} )
+        .fetchAll({withRelated: ['user'], debug:false} )
         .then(function (result) {
             console.log('result :', result);
             Message(res,'Success', '0', result);

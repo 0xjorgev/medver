@@ -2,8 +2,16 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/index', '../util/request_message_util', '../util/response_message_util'],
-	(Knex, _, Models, Message, Response) => {
+define(['../util/knex_util'
+	,'../node_modules/lodash/lodash.min'
+	,'../model/index'
+	,'../util/response_message_util',
+	'bluebird'],
+	(Knex
+	,_
+	,Models
+	,Response
+	,bluebird) => {
 
 	var StandingTable = {}
 
@@ -186,14 +194,15 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 	//==========================================================================
 
 	//given a set of matches (could be a entire category, or a group), returns the current standing table
-	var calculateStandingTableByMatches = (matchSql) => {
+	var calculateStandingTableByMatches = (matchSql, groupId) => {
 		var matchesWithResults = undefined
 		var matches = undefined
+		var standingTable = null
 
 		// se obtienen los matches que pertenecen a la categoria o grupo
 		// la diferencia viene del query 'matchSql'; es ahi donde se diferencia si buscamos los matches de una cat o group
 		Knex.raw(matchSql)
-		.then((result) => {
+		.then(result => {
 			//Se extraen los matches de la estructura y se almacenan en matches para uso posterior
 			matches = result.rows
 			//si la estructura no tiene matches, se retorna 404
@@ -209,7 +218,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 
 			return Knex.raw(goalsByMatchSQL)
 		})
-		.then((result) => {
+		.then(result => {
 			var goals = result.rows
 			goals.map((g) => g.goals = parseInt(g.goals))
 			// console.log(matches);
@@ -229,7 +238,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 				.where('id', 'in', teams)
 				.fetchAll({debug: false})
 		})
-		.then((result) => {
+		.then(result => {
 			var teams = result.models.map((m) => m.attributes)
 			//se sumarizan los resultados normalizados de los partidos
 			standingTable = teams
@@ -237,37 +246,42 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 				.map(calculateStandingTable)
 			return standingTable
 		})
-		.then((standingTable) => {
+		.then(result => {
 			//bloque para almacenar la standingTable en base de datos
-			standingTable.forEach((standingResult) => {
-				Knex('standing_tables')
-				.where({group_id: standingResult.group_id})
-				.del()
-				.then((result) => {
-					//standing table form this group was deleted
-					var tmp = {
-						category_id: standingResult.category_id,
-						phase_id: standingResult.phase_id,
-						group_id: standingResult.group_id,
-						team_id: standingResult.team_id,
-						points: standingResult.points,
-						goals_in_favor: standingResult.goals_in_favor,
-						goals_against:  standingResult.goals_against,
-						matches_count:  standingResult.matches,
-						matches_won:  standingResult.matches_won,
-						matches_lost:  standingResult.matches_lost,
-						matches_draw: standingResult.matches_draw }
+			standingTable = result
 
-					//TODO: cambiar por un bulk insert
-					return new Models.standing_table(tmp).save()
-				})
-				.then((result) => {
-					//all ok
-					console.log('standings calculated')
-				})
-			})
+			//se vacía la standing del grupo actual
+			return Knex('standing_tables')
+				.where({group_id: groupId})
+				.del()
 		})
-		.catch((error) => {
+		.then(result => {
+			return Promise.all(standingTable.map(row => {
+				//TODO: cambiar por un bulk insert
+				//se salva cada uno de los resultados calculados
+				return new Models.standing_table({
+					category_id: row.category_id,
+					phase_id: row.phase_id,
+					group_id: row.group_id,
+					team_id: row.team_id,
+					points: row.points,
+					goals_in_favor: row.goals_in_favor,
+					goals_against: row.goals_against,
+					matches_count: row.matches,
+					matches_won: row.matches_won,
+					matches_lost: row.matches_lost,
+					matches_draw: row.matches_draw
+				})
+				.save()
+			}))
+		})
+		.then(result => {
+			//se retornan los rows afectados
+			var t = result.map(r => r.toJSON())
+			console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', t)
+			return t
+		})
+		.catch(error => {
 			throw error
 		})
 	}
@@ -327,27 +341,35 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 			.sum('matches_draw as matches_draw')
 		})
 		.fetchAll({withRelated:['team', 'group.phase']})
-		.then((result) => {
-			Response(res, result)
-		})
-		.catch((error) => {
-			Response(res, null, error)
-		})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	}
 
 	StandingTable.calculateByGroup = (group_id) => {
-		// var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches inner join rounds on rounds.id = matches.round_id inner join groups on groups.id = rounds.group_id inner join phases on phases.id = groups.phase_id inner join categories on categories.id = phases.category_id where matches.played = true and categories.id = ' + categoryId
-		// getStandingTableByMatches(matchSql, res)
 
-		//query que obtiene los matches del grupo dado
-		var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches' +
-		' inner join rounds on rounds.id = matches.round_id' +
-		' inner join groups on groups.id = rounds.group_id ' +
-		' inner join phases on phases.id = groups.phase_id ' +
-		' inner join categories on categories.id = phases.category_id ' +
-		' where matches.played = true and groups.id = ' + group_id
+		console.log('>>>>>> StandingTable.calculateByGroup')
 
-		calculateStandingTableByMatches(matchSql)
+		return new Promise((resolve, reject) => {
+			try{
+
+				//query que obtiene los matches del grupo dado
+				var matchSql = 'select categories.id as category_id, phases.id as phase_id, rounds.id as round_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches' +
+				' inner join rounds on rounds.id = matches.round_id' +
+				' inner join groups on groups.id = rounds.group_id ' +
+				' inner join phases on phases.id = groups.phase_id ' +
+				' inner join categories on categories.id = phases.category_id ' +
+				' where matches.played = true and groups.id = ' + group_id
+
+
+
+				//TODO: el matchSQL podría moverse a esta función
+				resolve(calculateStandingTableByMatches(matchSql, group_id))
+			}
+			catch(error){
+				reject(error)
+			}
+		})
+		//
 	}
 
 	return StandingTable

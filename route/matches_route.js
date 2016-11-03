@@ -10,6 +10,7 @@ define(['express'
 	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
 	,'../helpers/team_placeholders_helper'
+    ,'bluebird'
 	],
 	(express
 	,Models
@@ -18,7 +19,8 @@ define(['express'
 	,util
 	,Response
 	,StandingTable
-	,PlaceholdersHelper) => {
+	,PlaceholdersHelper
+    ,bluebird) => {
 
     var router = express.Router();
 
@@ -248,30 +250,16 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-				StandingTable.calculateByGroup(_match.group_id)
-				//revisar matches para actualizar placeholders
-				//esto debe ocurrir inmediatamente despues de
-				//calcular el standing
-				// PlaceholdersHelper.replacePlaceholders(_match.group_id)
+                StandingTable.calculateByGroup(_match.group_id)
+                .then(r => {
+                    return PlaceholdersHelper
+                        .replacePlaceholders(_match.group_id)
+                })
 			}
 			return result
 		})
-        .then((result) => {
-            if(data.played && data.played === true){
-                // StandingTable.calculateByGroup(_match.group_id)
-                //revisar matches para actualizar placeholders
-                //esto debe ocurrir inmediatamente despues de
-                //calcular el standing
-                PlaceholdersHelper.replacePlaceholders(_match.group_id)
-            }
-            return result
-        })
-		.then((result) => {
-			Response(res, _match)
-		})
-        .catch((error) => {
-            Response(res, null, error)
-        })
+		.then(result => Response(res, _match))
+        .catch(error => Response(res, null, error))
     }
 
     //match create

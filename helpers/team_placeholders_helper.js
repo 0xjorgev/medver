@@ -1,17 +1,21 @@
 if (typeof define !== 'function')
 	var define = require('amdefine')(module);
 
-define(['../util/knex_util',
-	'../node_modules/lodash/lodash.min',
-	'../model/index',
-	'../util/response_message_util'],
-	(Knex, _, Models, Response) => {
+define(['../util/knex_util'
+	,'../node_modules/lodash/lodash.min'
+	,'../model/index'
+	,'../util/response_message_util'
+	],
+	(Knex
+	,_
+	,Models
+	,Response) => {
 
 	var MatchHelper = {}
 
 	MatchHelper.replacePlaceholders = (group_id) => {
 
-		console.log('setting placeholders 0', group_id)
+		console.log('>>>>>> MatchHelper.replacePlaceholders')
 
 		var _matches = undefined
 		//se obtienen los matches dado el grupo
@@ -23,7 +27,6 @@ define(['../util/knex_util',
 		})
 		.fetchAll()
 		.then((result) => {
-			console.log('setting placeholders 1', result)
 			_matches = result.toJSON()
 
 			var ids = _matches.reduce((blah, m) => {
@@ -42,7 +45,6 @@ define(['../util/knex_util',
 				.fetchAll()
 		})
 		.then((result) => {
-			console.log('setting placeholders 2', result)
 			//de acuerdo a los standings obtenidos, se reemplazan los
 			//placeholders con los team_id obtenidos
 			var standings = result.toJSON()
@@ -78,15 +80,10 @@ define(['../util/knex_util',
 			})
 		})
 		.then((result) => {
-			console.log('setting placeholders 3', result)
 			//array de matches modificados
 			//se salva en base de datos
-			return result.map((m) => {
-				new Models.match(m).save().then( (r) => {
-					console.log(r.toJSON());
-				})
-				return m
-			})
+			return Promise
+				.all(result.map(m => new Models.match(m).save()))
 		})
 		.catch((error) => {
 			console.log(error)

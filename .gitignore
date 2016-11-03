@@ -8,3 +8,4 @@ docker-compose.yml
 newrelic_agent.log
 latest.dump
 npm-debug.log
+.vscode

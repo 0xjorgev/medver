@@ -45,9 +45,7 @@ swagger.setApiInfo({
   licenseUrl: ""
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/docs/index.html');
-});
+app.get('/', (req, res) => res.sendFile(__dirname + '/docs/index.html') );
 
 // Set api-doc path
 swagger.configureSwaggerPaths('', 'api-docs', 'docs');
@@ -143,7 +141,7 @@ swagger.configure(applicationUrl, '1.0.0');
 	res.header( 'X-Powered-By', 'SomoSport' )
   	next();
   };
-  
+
   app.use(allowCrossDomain);
 
   app.use(morgan('dev'));
@@ -196,6 +194,48 @@ swagger.configure(applicationUrl, '1.0.0');
   }
 
   app.use(validateToken)
+
+  /******
+  * para procesamiento de query strings, como ordenamiento
+  * se espera recibir un parametro con la forma:
+  * <service_url>/<resource>?sort=-priority,created_at,+updated_at
+  * signo + asc, - desc
+  * si se envia el campo sin un signo + o - se asume +
+  * esta funcion coloca en el request un array con los campos del sort;
+  * sin embargo, es responsabilidad de la implementacion del servicio realizar
+  * los ajustes necesarios a la consulta
+  *******/
+  var processSortBy = (req, res, next) => {
+	if(!req.query['sort']){
+		next()
+		return
+	}
+
+	var sort = req.query['sort']
+	req._sortBy = sort.split(',').map((s) => {
+		return (s.indexOf('-') >= 0)
+			? [s.replace('-',''),'desc']
+			: [s.replace('+',''),'asc']
+	})
+	// console.log(req._sortBy);
+	next()
+  }
+  app.use(processSortBy)
+
+  var processLimit = (req, res, next) => {
+	  if(req.query.limit == undefined){
+  		next()
+  		return
+  	}
+  	req._limit = req.query['limit']
+
+	//offset no tiene sentido sin limit
+  	if(req.query.offset != undefined) req._offset = req.query['offset']
+  	next()
+  }
+
+
+
   app.use(api_prefix+'core', core_ws);
   app.use(api_prefix+'user', user_ws);
   app.use(`${api_prefix}${routes.discipline}`, discipline_ws);

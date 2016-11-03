@@ -392,13 +392,10 @@ define(['express',
 	router.put('/:category_id/team/:team_id/invite/:id', function(req, res){
 		var data = {}
 		data.id = req.params.id
-		data.category_id = req.params.category_id
-		data.team_id = req.params.team_id
-		data.phase_id = req.body.phase_id
-		data.group_id = req.body.group_id
-		data.active = req.body.active
-		console.log('PUT', data)
-		saveCategory_group_phase_team(data, res)
+		req.body.category_id = req.params.category_id
+		req.body.team_id = req.params.team_id
+		console.log('PUT', req.body)
+		saveCategory_group_phase_team(req.body, res)
 	})
 
 	router.delete('/:category_id/team/:team_id/invite/:id', function(req, res){
@@ -416,10 +413,14 @@ define(['express',
 	//==========================================================================
 	var saveCategory_group_phase_team = function(data, res){
 
+		console.log("data: ", data)
 		var spiderData = {}
 		spiderData.category_id = data.category_id
 		spiderData.team_id = data.team_id
 		spiderData.active = (data.active == undefined) ? true : data.active
+		spiderData.payment = (data.payment == undefined) ? false : data.payment
+		spiderData.document = (data.document == undefined) ? false : data.document
+		spiderData.roster = (data.roster == undefined) ? false : data.roster
 
 		if(data.phase_id){
 			spiderData.phase_id = data.phase_id
@@ -434,6 +435,7 @@ define(['express',
 			spiderData.id = data.id
 		}
 
+		console.log("spiderData: ", spiderData)
 		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
 			console.log(`new_invitation:`, new_invitation);
 			Response(res, new_invitation);
@@ -459,7 +461,6 @@ define(['express',
 			.then(function (result) {
 				Response(res, result)
 			}).catch(function(error){
-				// Message(res,error.details, error.code, []);
 				Response(res, null, error)
 			});
 	});
@@ -579,7 +580,7 @@ define(['express',
 			.where({active:true})
 			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team']})
 			.then(function (result) {
-
+				console.log(result);
 				var x = result.toJSON().category.phases
 
 				Response(res, x)
@@ -591,13 +592,9 @@ define(['express',
 
 	var sortBy = (key) => {
 		return (a, b) => {
-			if (a['position'] > b['position']) {
-				return 1;
-			}
-			if (a['position'] < b['position']) {
-				return -1;
-			}
-			return 0;
+			if (a['position'] > b['position']) return 1
+			if (a['position'] < b['position']) return -1
+			return 0
 		}
 	}
 
@@ -606,9 +603,6 @@ define(['express',
 	router.get('/:category_id/team_placeholders', (req, res) => {
 		//paso 0: si esta fase es la primera, devolver vacío, o simplemente el listado de equipos
 		// obtener la fase, revisar el campo position
-
-			// 	Promise.filter(category.phases, (ph) => ph.position == (phase.position + 1) )
-
 		Models.category
 		.where({id: req.params.category_id})
 		.fetch({withRelated: ['phases.groups']})

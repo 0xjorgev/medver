@@ -10,6 +10,7 @@ define(['express'
 	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
 	,'../helpers/team_placeholders_helper'
+    ,'bluebird'
 	],
 	(express
 	,Models
@@ -18,7 +19,8 @@ define(['express'
 	,util
 	,Response
 	,StandingTable
-	,PlaceholdersHelper) => {
+	,PlaceholdersHelper
+    ,bluebird) => {
 
     var router = express.Router();
 
@@ -71,20 +73,38 @@ define(['express'
 
         var match_id = req.params.match_id;
         return Models.match
-        .where({'id':match_id})
-        .fetch({withRelated: ['home_team.match_player_team.player.gender',
+        .where({'id': match_id})
+        .fetch({withRelated: [
+                                'home_team.match_player_team.player.gender',
                                 'visitor_team.match_player_team.player.gender',
-                                'round.group.phase.category.category',
+                                'round.group.phase.category.category_type',
                                 'round.group.phase.category.season.competition',
                                 'home_team.summoned.player',
-                                'visitor_team.summoned.player'], debug: false})
-        .then( (result) => {
-            // console.log(inspect(result, { colors: true, depth: Infinity }))
+                                { 'home_team.summoned': function(qb) {
+                                    qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.home_team_id')
+                                    qb.innerJoin('groups', 'matches.group_id', 'groups.id')
+                                    qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
+                                    qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+                                    qb.where('matches.id',  match_id)
+                                }},
+                                'visitor_team.summoned.player',
+                                { 'visitor_team.summoned': function(qb) {
+                                    qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.visitor_team_id')
+                                    qb.innerJoin('groups', 'matches.group_id', 'groups.id')
+                                    qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
+                                    qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+                                    qb.where('matches.id',  match_id)
+                                }},
+                                ], debug: false})
+        .then( result => {
+            var inspect = require('util').inspect
+            //log helper function
+            var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
+
+            _log(result.toJSON())
             Response(res, result)
         })
-		.catch( (error) => {
-            Response(res, null, error)
-        });
+		.catch( error => Response(res, null, error) );
     });
 
 
@@ -213,18 +233,31 @@ define(['express'
         .then((round) => {
 			//se salvan los datos del match
             matchData.round_id = round.attributes.id
-
-			console.log(matchData)
-
             return new Match(matchData).save()
         })
 		.then((match) => {
 			//se guardan los datos del match para retornarse al final de la cadena
-            _match = match.attributes
-            return match
+            // _match = match.attributes
+            // //TODO: asignacion temporal, mientras elimino round_id de esta tabla
+            // _match.group_id = match.round.group_id
+            return Models.match
+            .query((qb) => {
+                qb.select(Knex.raw('matches.*, matches_referees.id as matches_referee_id'))
+                qb.leftJoin('matches_referees', 'matches.id', 'matches_referees.match_id')
+                qb.where({'matches.id': match.attributes.id})
+            })
+            .fetch()
         })
         .then((result) => {
+            // var _log = (obj) => console.log(require('util').inspect(obj, {colors: true, depth: Infinity }))
+            // _log(result)
+            _match = result.attributes
+
             refereeData.match_id = _match.id
+
+            if( _match.matches_referee_id != null || _match.matches_referee_id != undefined)
+                refereeData.id = _match.matches_referee_id
+
 			//TODO: se está duplicando el referi cuando se actaliza el registro;
 			//para evitar eso es necesario devolver el id de la tabla referee_match
             return new Models.match_referee(refereeData).save()
@@ -234,21 +267,17 @@ define(['express'
 			_match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
-			// if(data.played && data.played === true){
-				StandingTable.calculateByGroup(data.group_id)
-				//revisar matches para actualizar placeholders
-				//esto debe ocurrir inmediatamente despues de
-				//calcular el standing
-				PlaceholdersHelper.replacePlaceholders(data.group_id)
-			// }
+			if(data.played && data.played === true){
+                StandingTable.calculateByGroup(_match.group_id)
+                .then(r => {
+                    return PlaceholdersHelper
+                        .replacePlaceholders(_match.group_id)
+                })
+			}
 			return result
 		})
-		.then((result) => {
-			Response(res, _match)
-		})
-        .catch((error) => {
-            Response(res, null, error)
-        })
+		.then(result => Response(res, _match))
+        .catch(error => Response(res, null, error))
     }
 
     //match create

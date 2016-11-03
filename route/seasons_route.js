@@ -30,16 +30,13 @@ define(['express',
     });
 
     //Seasons by Id -> Returns 1 result
-    router.get('/:season_id', function (req, res) {
+    router.get('/:season_id', (req, res) => {
         var season_id = req.params.season_id;
         return Models.season
-        .where({id:season_id})
-        .fetch({withRelated: ['categories']})
-        .then(function (result) {
-			Response(res, result)
-        }).catch(function(error){
-			Response(res, null, error)
-        });
+	        .where({id:season_id})
+	        .fetch({withRelated: ['categories', 'categories.gender', 'categories.category_type']})
+	        .then(result => Response(res, result))
+			.catch(error => Response(res, null, error))
     });
 
     router.post('/', function (req, res) {

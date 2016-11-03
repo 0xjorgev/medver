@@ -77,7 +77,7 @@ define(['express'
         .fetch({withRelated: [
                                 'home_team.match_player_team.player.gender',
                                 'visitor_team.match_player_team.player.gender',
-                                'round.group.phase.category.category',
+                                'round.group.phase.category.category_type',
                                 'round.group.phase.category.season.competition',
                                 'home_team.summoned.player',
                                 { 'home_team.summoned': function(qb) {

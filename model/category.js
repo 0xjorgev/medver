@@ -12,7 +12,7 @@ define(['./base_model','./gender','./season', './phase', './classification', './
         hasTimestamps: true,
 
         // //relations
-        category: function(){
+        category_type: function(){
             return this.belongsTo('Category_type', 'category_type_id');
         },
 

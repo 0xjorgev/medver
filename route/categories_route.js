@@ -127,60 +127,36 @@ define(['express',
 
 		console.log('Req body', category_upd);
 
-		var name = category_upd.name
-		var participant_minimum = category_upd.participant_minimum
-		var participant_maximum = category_upd.participant_maximum
-		var other_minimum_participant = category_upd.other_minimum_participant
-		var other_maximum_participant = category_upd.other_maximum_participant
-		var player_minimum_participant = category_upd.player_minimum_participant
-		var player_maximum_participant = category_upd.player_maximum_participant
-		var player_minimum_summoned = category_upd.player_minimum_summoned
-		var player_maximum_summoned = category_upd.player_maximum_summoned
-		var coach_minimum_participant = category_upd.coach_minimum_participant
-		var coach_maximum_participant = category_upd.coach_maximum_participant
-		var team_quantity = category_upd.team_quantity
-		var gender_id = category_upd.gender_id
-		var season_id = category_upd.season_id
-		var category_type_id = category_upd.category_type_id
-		var classification_type_id = category_upd.classification_type_id
-		var inscription_init_at = category_upd.inscription_init_at
-		var inscription_ends_at = category_upd.inscription_ends_at
-		var image_url = category_upd.image_url
-		var is_published = category_upd.is_published
-		var meta = category_upd.meta
+		var data = {}
+
+		if(category_upd.name != undefined) data.name = category_upd.name
+		if(category_upd.participant_minimum != undefined) data.participant_minimum = category_upd.participant_minimum
+		if(category_upd.participant_maximum != undefined) data.participant_maximum = category_upd.participant_maximum
+		if(category_upd.other_minimum_participant != undefined) data.other_minimum_participant = category_upd.other_minimum_participant
+		if(category_upd.other_maximum_participant != undefined) data.other_maximum_participant = category_upd.other_maximum_participant
+		if(category_upd.player_minimum_participant != undefined) data.player_minimum_participant = category_upd.player_minimum_participant
+		if(category_upd.player_maximum_participant != undefined) data.player_maximum_participant = category_upd.player_maximum_participant
+		if(category_upd.player_minimum_summoned != undefined) data.player_minimum_summoned = category_upd.player_minimum_summoned
+		if(category_upd.player_maximum_summoned != undefined) data.player_maximum_summoned = category_upd.player_maximum_summoned
+		if(category_upd.coach_minimum_participant != undefined) data.coach_minimum_participant = category_upd.coach_minimum_participant
+		if(category_upd.coach_maximum_participant != undefined) data.coach_maximum_participant = category_upd.coach_maximum_participant
+		if(category_upd.team_quantity != undefined) data.team_quantity = category_upd.team_quantity
+		if(category_upd.gender_id != undefined) data.gender_id = category_upd.gender_id
+		if(category_upd.season_id != undefined) data.season_id = category_upd.season_id
+		if(category_upd.category_type_id != undefined) data.category_type_id = category_upd.category_type_id
+		if(category_upd.classification_type_id != undefined) data.classification_type_id = category_upd.classification_type_id
+		if(category_upd.inscription_init_at != undefined) data.inscription_init_at = category_upd.inscription_init_at
+		if(category_upd.inscription_ends_at != undefined) data.inscription_ends_at = category_upd.inscription_ends_at
+		if(category_upd.image_url != undefined) data.image_url = category_upd.image_url
+		if(category_upd.is_published != undefined) data.is_published = category_upd.is_published
+		if(category_upd.meta != undefined) data.meta = category_upd.meta
 
 		Knex(category.tableName)
 		.where('id','=',category_id)
 		.where('active','=',1)
-		.update({
-			'name' : name,
-			'participant_minimum' : participant_minimum,
-			'participant_maximum' : participant_maximum,
-			'other_minimum_participant' :  other_minimum_participant,
-			'other_maximum_participant' :  other_maximum_participant,
-			'player_minimum_participant' : player_minimum_participant,
-			'player_maximum_participant' : player_maximum_participant,
-			'player_minimum_summoned' : player_minimum_summoned,
-			'player_maximum_summoned' : player_maximum_summoned,
-			'coach_minimum_participant' : coach_minimum_participant,
-			'coach_maximum_participant' : coach_maximum_participant,
-			'team_quantity' : team_quantity,
-			'gender_id' : gender_id,
-			'season_id' : season_id,
-			'is_published' : is_published,
-			'category_type_id' : category_type_id,
-			'classification_type_id' : classification_type_id,
-			'inscription_init_at' : inscription_init_at,
-			'inscription_ends_at' : inscription_ends_at,
-			'meta': meta,
-			'image_url' : image_url }, ['id'])
+		.update(data, ['id'])
 		.then(function(result){
-			if (result.length != 0){
-				Response(res, result)
-			} else {
-				//TODO: Reemplazar por mensaje de response
-				Message(res, 'Category not found', '404', result);
-			}
+			Response(res, result)
 		})
 		.catch(function(err){
 			Response(res, null, err)
@@ -416,13 +392,10 @@ define(['express',
 	router.put('/:category_id/team/:team_id/invite/:id', function(req, res){
 		var data = {}
 		data.id = req.params.id
-		data.category_id = req.params.category_id
-		data.team_id = req.params.team_id
-		data.phase_id = req.body.phase_id
-		data.group_id = req.body.group_id
-		data.active = req.body.active
-		console.log('PUT', data)
-		saveCategory_group_phase_team(data, res)
+		req.body.category_id = req.params.category_id
+		req.body.team_id = req.params.team_id
+		console.log('PUT', req.body)
+		saveCategory_group_phase_team(req.body, res)
 	})
 
 	router.delete('/:category_id/team/:team_id/invite/:id', function(req, res){
@@ -440,10 +413,14 @@ define(['express',
 	//==========================================================================
 	var saveCategory_group_phase_team = function(data, res){
 
+		console.log("data: ", data)
 		var spiderData = {}
 		spiderData.category_id = data.category_id
 		spiderData.team_id = data.team_id
 		spiderData.active = (data.active == undefined) ? true : data.active
+		spiderData.payment = (data.payment == undefined) ? false : data.payment
+		spiderData.document = (data.document == undefined) ? false : data.document
+		spiderData.roster = (data.roster == undefined) ? false : data.roster
 
 		if(data.phase_id){
 			spiderData.phase_id = data.phase_id
@@ -458,6 +435,7 @@ define(['express',
 			spiderData.id = data.id
 		}
 
+		console.log("spiderData: ", spiderData)
 		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
 			console.log(`new_invitation:`, new_invitation);
 			Response(res, new_invitation);

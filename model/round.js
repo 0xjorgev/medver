@@ -14,8 +14,8 @@ define(['./base_model','./group', './match'], function (DB) {
             this.on('saving', this.validate, this);
         },
         validations: {
-            name: ['required', 'string'],
-            group_id: ['required', 'numeric','greaterThan:0']
+            // name: ['required', 'string'],
+            // group_id: ['required', 'numeric','greaterThan:0']
         },
         validate: function(model, attrs, options) {
             return DB.checkit(this.validations).run(this.toJSON());

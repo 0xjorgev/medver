@@ -109,7 +109,7 @@ define(['express',
 		var group_id = req.params.group_id;
 
 		return Models.category_group_phase_team
-			.where({group_id:group_id, active:true})
+			.where({group_id:group_id, active: true})
 			.fetchAll({withRelated:['team','category','group','phase']})
 			.then(function (result) {
 				Response(res, result)

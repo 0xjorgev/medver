@@ -1,22 +1,29 @@
 if (typeof define !== 'function')
 	var define = require('amdefine')(module);
 
-define(['../util/knex_util',
-	'../node_modules/lodash/lodash.min',
-	'../model/index',
-	'../util/response_message_util'],
-	(Knex, _, Models, Response) => {
+define(['../util/knex_util'
+	,'../node_modules/lodash/lodash.min'
+	,'../model/index'
+	,'../util/response_message_util'
+	],
+	(Knex
+	,_
+	,Models
+	,Response) => {
 
 	var MatchHelper = {}
 
 	MatchHelper.replacePlaceholders = (group_id) => {
+
+		console.log('>>>>>> MatchHelper.replacePlaceholders')
+
 		var _matches = undefined
 		//se obtienen los matches dado el grupo
 		return Models.match
 		.query((qb) => {
-			qb.where({group_id: group_id})
+			// qb.where({group_id: group_id})
 			qb.where(Knex.raw('(placeholder_home_team_group is not null or placeholder_visitor_team_group is not null)'))
-			qb.where(Knex.raw('(home_team_id is null or visitor_team_id is not null)'))
+			// qb.where(Knex.raw('(home_team_id is null or visitor_team_id is not null)'))
 		})
 		.fetchAll()
 		.then((result) => {
@@ -53,7 +60,7 @@ define(['../util/knex_util',
 
 				//al encontrar una coincidencia, se reemplaza y se elimina el
 				//placeholder
-				if(ph[0].team_id){
+				if(ph && ph[0] && ph[0].team_id){
 					m.home_team_id = ph[0].team_id
 					m.placeholder_home_team_group = null
 					m.placeholder_home_team_position = null
@@ -64,7 +71,7 @@ define(['../util/knex_util',
 				.filter((s) => s.group_id == m.placeholder_visitor_team_group)
 				.filter((s) => s.position == m.placeholder_visitor_team_position)
 
-				if(ph[0].team_id){
+				if(ph && ph[0] && ph[0].team_id){
 					m.visitor_team_id = ph[0].team_id
 					m.placeholder_visitor_team_group = null
 					m.placeholder_visitor_team_position = null
@@ -75,14 +82,11 @@ define(['../util/knex_util',
 		.then((result) => {
 			//array de matches modificados
 			//se salva en base de datos
-			return result.map((m) => {
-				new Models.match(m).save().then( (r) => {
-					console.log(r.toJSON());
-				})
-				return m
-			})
+			return Promise
+				.all(result.map(m => new Models.match(m).save()))
 		})
 		.catch((error) => {
+			console.log(error)
 			throw error
 		})
 	}

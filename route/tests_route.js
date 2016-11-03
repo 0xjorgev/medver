@@ -22,7 +22,7 @@ define(['express',
         })
         .fetchAll({debug: false})
         .then(function(team){
-             console.log(`Team: ${{ team }}`,team)
+            console.log(`Team: ${{ team }}`,team)
             return team
         }).catch(function(error){
            console.log('Failed:',error)

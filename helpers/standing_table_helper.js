@@ -14,12 +14,38 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 	//dados los eventos de un match, se asignan los goles del evento al match por cada equipo, home o visitor
 	var assignGoalsToTeams = (events) => {
 		return (match) => {
+
+			// events.filter((event) => {
+			// 	return event.match_id == match.match_id
+			// })
+			// .forEach((event) => {
+			// 	console.log('event', event)
+			// 	//goles
+			// 	if(event.event_id == 1){
+			// 		match.home_team_goals =
+			// 			(event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
+			// 		match.visitor_team_goals =
+			// 			(event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+			// 	}
+			// 	//autogoles
+			// 	// else {
+			// 	// 	match.home_team_goals =
+			// 	// 		(event.team_id == match.home_team_id) ? event.goals : match.visitor_team_goals
+			// 	// 	match.visitor_team_goals =
+			// 	// 		(event.team_id == match.visitor_team_id) ? event.goals : match.home_team_goals
+			// 	// }
+
+			// })
+
 			events.forEach((event) => {
+				// console.log('\tevent', event)
+
 				if(event.match_id == match.match_id){
 					match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
 					match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
 				}
 			})
+
 			match.total_goals = match.home_team_goals + match.visitor_team_goals
 			return match
 		}
@@ -63,21 +89,25 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 		category_id: match.category_id,
 		phase_id: match.phase_id,
 		group_id: match.group_id,
-		team_id: team.id, data: team, points: 0,
-		goals_in_favor: 0, goals_against: 0,
-		matches_won: 0, matches_lost: 0,
-		matches: 0, matches_draw: 0}
+		team_id: team.id,
+		data: team, points: 0,
+		goals_in_favor: 0,
+		goals_against: 0,
+		matches_won: 0,
+		matches_lost: 0,
+		matches: 0,
+		matches_draw: 0}
 
 		//si el equipo participó en el match
 		if(match.home_team_id == team.id || match.visitor_team_id == team.id){
+			//el team es home
 			if(match.home_team_id == team.id){
-				//el team es home
 				result.points = match.home_team_points
 				result.goals_in_favor = match.home_team_goals
 				result.goals_against = match.visitor_team_goals
 			}
+			//team es visitor
 			else{
-				//team es visitor
 				result.points = match.visitor_team_points
 				result.goals_in_favor = match.visitor_team_goals
 				result.goals_against = match.home_team_goals
@@ -85,14 +115,19 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 
 			result.matches = 1
 
-			if(getTeamResult(team, match) === 0){
+			var teamResult = getTeamResult(team, match)
+
+			if(teamResult === 0){
 				result.matches_draw = 1
 			}
 			else{
-				result.matches_won = getTeamResult(team, match) == 1 ? 1 : 0
-				result.matches_lost = getTeamResult(team, match) == -1 ? 1 : 0
+				result.matches_won = teamResult == 1 ? 1 : 0
+				result.matches_lost = teamResult == -1 ? 1 : 0
 			}
 		}
+
+		// console.log('setTeamResults', result)
+
 		return result
 	}
 
@@ -106,7 +141,9 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 	}
 
 	var calculateStandingTable = (results) => {
-		// debugger
+
+		// console.log('antes de calcular standing', results)
+
 		var tmp = results.reduce((total, result) => {
 			total.category_id = results[0].category_id
 			total.phase_id = results[0].phase_id
@@ -167,7 +204,8 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 			var matchIds = matches.map((e) => e.match_id).join(',')
 
 			//query para obtener el # de goles de los matches
-			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id = 1 and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`
+			//event type 1 = gol, event type 4 autogol
+			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id in (1,4) and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`
 
 			return Knex.raw(goalsByMatchSQL)
 		})
@@ -225,7 +263,7 @@ define(['../util/knex_util', '../node_modules/lodash/lodash.min', '../model/inde
 				})
 				.then((result) => {
 					//all ok
-					console.log('standingResult saved')
+					console.log('standings calculated')
 				})
 			})
 		})

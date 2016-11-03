@@ -213,18 +213,31 @@ define(['express'
         .then((round) => {
 			//se salvan los datos del match
             matchData.round_id = round.attributes.id
-
-			console.log(matchData)
-
             return new Match(matchData).save()
         })
 		.then((match) => {
 			//se guardan los datos del match para retornarse al final de la cadena
-            _match = match.attributes
-            return match
+            // _match = match.attributes
+            // //TODO: asignacion temporal, mientras elimino round_id de esta tabla
+            // _match.group_id = match.round.group_id
+            return Models.match
+            .query((qb) => {
+                qb.select(Knex.raw('matches.*, matches_referees.id as matches_referee_id'))
+                qb.leftJoin('matches_referees', 'matches.id', 'matches_referees.match_id')
+                qb.where({'matches.id': match.attributes.id})
+            })
+            .fetch()
         })
         .then((result) => {
+            // var _log = (obj) => console.log(require('util').inspect(obj, {colors: true, depth: Infinity }))
+            // _log(result)
+            _match = result.attributes
+
             refereeData.match_id = _match.id
+
+            if( _match.matches_referee_id != null || _match.matches_referee_id != undefined)
+                refereeData.id = _match.matches_referee_id
+
 			//TODO: se está duplicando el referi cuando se actaliza el registro;
 			//para evitar eso es necesario devolver el id de la tabla referee_match
             return new Models.match_referee(refereeData).save()
@@ -234,15 +247,25 @@ define(['express'
 			_match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
-			// if(data.played && data.played === true){
-				StandingTable.calculateByGroup(data.group_id)
+			if(data.played && data.played === true){
+				StandingTable.calculateByGroup(_match.group_id)
 				//revisar matches para actualizar placeholders
 				//esto debe ocurrir inmediatamente despues de
 				//calcular el standing
-				PlaceholdersHelper.replacePlaceholders(data.group_id)
-			// }
+				// PlaceholdersHelper.replacePlaceholders(_match.group_id)
+			}
 			return result
 		})
+        .then((result) => {
+            if(data.played && data.played === true){
+                // StandingTable.calculateByGroup(_match.group_id)
+                //revisar matches para actualizar placeholders
+                //esto debe ocurrir inmediatamente despues de
+                //calcular el standing
+                PlaceholdersHelper.replacePlaceholders(_match.group_id)
+            }
+            return result
+        })
 		.then((result) => {
 			Response(res, _match)
 		})

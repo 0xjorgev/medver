@@ -15,67 +15,22 @@ define(['express',
 
     var router = express.Router();
 
-        router.get('/entities', (req, res) => {
-
-            Models.user
-            .query((qb) => {
-                qb.where({id: 2})
-            })
-            .fetch({withRelated: [
-                 'entity.related_from.relationship_type'
-                ,'entity.related_from.to.entity_type'
-                // ,'entity.related_from.from.entity_type'
-            ]})
-            .then((result) => {
-                var user = result.toJSON()
-                // _log(user)
-                //con esto se filtran las relaciones tipo 'coach'
-                return user.entity.related_from
-                .filter((rel) => rel.relationship_type.name == 'COACH')
-                //y con este map se extraen los ids de los teams
-                .map((teams) => teams.to.object_id)
-            })
-            .then((result) => {
-                _log(result)
-                return Models.team
-                .query((qb) => qb.whereIn('id', result))
-                .fetchAll()
-            })
-            .then((result) => {
-                Message(res, 'Success', '0', result)
-            })
-
-            // Models.entity
-            // .query((qb) => {
-            //     //filtrar por tipo de entidad de usuario
-            //     qb.where({object_id: 2, entity_type_id: 1})
-            // })
-            // .fetchAll({withRelated: ['entity_type'
-            //     ,'related_to.relationship_type'
-            //     ,'related_from.relationship_type'
-            // ]})
-            // .then((result) => _log(result.toJSON()) )
-
-
-        })
-
-
-      var getTeamByName = function(name1, name2){
+    var getTeamByName = function(name1, name2){
 
         return Models.team.query(function(qb){
           qb.where({name:name1})
           qb.orWhere({name: name2})
           qb.where({active:true})
-        })
+      })
         .fetchAll({debug: false})
         .then(function(team){
             console.log(`Team: ${{ team }}`,team)
             return team
         }).catch(function(error){
-           console.log('Failed:',error)
-            return null
-        })
-      }
+         console.log('Failed:',error)
+         return null
+     })
+    }
 
     router.get('/:category_id', function (req, res) {
 

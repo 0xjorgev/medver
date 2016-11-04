@@ -5,18 +5,31 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 var fs = require('fs')
-define(['express',
-        'uuid',
-        'njwt',
-        '../model/index',
-        '../util/password_gen_util',
-        '../util/knex_util',
-        '../util/request_message_util',
-        '../util/email_sender_util',
-        '../util/md5_gen_util',
-        '../util/response_message_util'
-         ],
-        function (express, uuid, nJwt, Models, Pwd_gen, Knex_util, Message, Email, Md5, Response) {
+define(['express'
+        ,'uuid'
+        ,'njwt'
+        ,'../model/index'
+        ,'../util/password_gen_util'
+        ,'../util/knex_util'
+        ,'../util/request_message_util'
+        ,'../util/email_sender_util'
+        ,'../util/md5_gen_util'
+        ,'../util/response_message_util'
+        ,'../util/logger_util'
+        ,'../helpers/auth_helper'
+        ],
+        function (express
+        ,uuid
+        ,nJwt
+        ,Models
+        ,Pwd_gen
+        ,Knex_util
+        ,Message
+        ,Email
+        ,Md5
+        ,Response
+        ,logger
+        ,auth){
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -59,8 +72,6 @@ define(['express',
                 result.attributes.permissions = ['list', 'create', 'update', 'delete']
             }
 
-            // console.log('---------------------------------', result)
-
             Response(res, result)
         })
         .catch((error) => {
@@ -86,7 +97,7 @@ define(['express',
         })
         .save().then(function(newUser){
             //content is from template/email/registerUser.html
-            var content =  `<td style="padding-left: 21%; color: #000;"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`    
+            var content =  `<td style="padding-left: 21%; color: #000;"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`
             send_email_from(email,'Welcome to Somosport', content)
 
             var claims = {
@@ -117,7 +128,7 @@ define(['express',
             Response(res, null, error)
         });
     });
-    
+
     router.post('/reset_password_request', function(req, res, next){
 
         var user = new Models.user;
@@ -140,8 +151,7 @@ define(['express',
             }
             else
             {
-                console.log('result',result)      
-                var email = result[0].email     
+                var email = result[0].email
                 var username = result[0].username
                 //Se crea el token
                 var claims = {
@@ -176,30 +186,18 @@ define(['express',
         var token = user_fgt.token;
         var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
         var verifiedJwt = nJwt.verify(token, secretKey)
-
-        console.log('user Id: ',verifiedJwt.body.user)
-        console.log('new password: ',user_fgt.password)
-        console.log('username: ',user_fgt.username)
-
         var User = new Models.user;
 
         Knex_util(User.tableName)
         .where('id','=',verifiedJwt.body.user)
         .where('active','=',1)
         .update({
-            'password' : user_fgt.password 
+            'password' : user_fgt.password
         }, ['id'])
-        .then(function(result){
-            console.log('result of reset password)', result)
-            Response(res, result)
-        })
-        .catch(function(error){
-            // Message(res, error.detail, error.code, null);
-            Response(res, null, error)
-        });
+        .then(result => Response(res, result))
+        .catch(error => Response(res, null, error))
     });
 
-    //TODO: Add profile update
     router.get('/', function(req, res){
         return Models.user
             .where({active:true})
@@ -210,5 +208,44 @@ define(['express',
                 Response(res, null, error)
             });
     })
+
+    router.get('/team', (req, res) => {
+        //se verifica unicamente que haya un usuario valido en el request
+        //no se requiere ningun permiso especial
+        var chk = auth.checkPermissions(req._currentUser, [])
+
+        if(chk.code !== 0){
+            Response(res, null, chk)
+            return
+        }
+        //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoyLCJyb2xlcyI6WyJhZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJsaXN0LWFsbCJdLCJsYW5nIjoiZW4iLCJqdGkiOiI3ODI2NzExNi01N2M0LTQ5OGEtODQyNy1iYjEwMDViN2IzMzYiLCJpYXQiOjE0NzgyNzE1MzN9.ieXwTbBXXaeXXeVGWlGMFqUGsLpZDtdwDUjnnViPlJU
+
+        logger.debug(req._currentUser)
+
+        Models.user
+        .query(qb => qb.where({id: req._currentUser.id}) )
+        .fetch({withRelated: [
+             'entity.related_from.relationship_type'
+            ,'entity.related_from.to.entity_type'
+            // ,'entity.related_from.from.entity_type'
+        ]})
+        .then(result => {
+            var user = result.toJSON()
+            //con esto se filtran las relaciones tipo 'coach'
+            return user.entity.related_from
+                .filter(rel => rel.relationship_type.name == 'COACH')
+                //y con este map se extraen los ids de los teams
+                .map(teams => teams.to.object_id)
+        })
+        .then(result => {
+            return Models.team
+                .query(qb => qb.whereIn('id', result))
+                .fetchAll()
+        })
+        .then(result => Response(res, result) )
+        .catch(error => Response(res, null, error))
+    })
+
+
     return router;
 });

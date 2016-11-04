@@ -28,13 +28,6 @@ produces:
 ###################################################
 
 paths:
-  /test/entities:
-    get:
-      summary: test entities
-      responses:
-        200:
-          description: A signed url for upload; a final URL to access the file
-
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport
@@ -167,6 +160,24 @@ paths:
       responses:
         200:
           description: Active user list
+  /user/team:
+    get:
+      summary: Returns a list of teams on which this user is a coach
+      description: Returns a list of teams on which this user is a coach
+      tags:
+        - User
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          # required: true
+      responses:
+        200:
+          description: User team list
+        403:
+          description: No Authorization-Token received
+        404:
+          description: No teams found
   /event/{match_id}:
     get:
       summary: Gets the events of a match, given its category_id

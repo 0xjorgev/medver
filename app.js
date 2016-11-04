@@ -11,9 +11,7 @@ var Response = require('./util/response_message_util') //in-house message handle
 var compression = require('compression');
 
 //logging lib, reaaaaally useful
-var inspect = require('util').inspect
-//log helper function
-var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
+var logger = require('./util/logger_util')
 
 var argv = require('minimist')(process.argv.slice(2));
 var subpath = express();
@@ -159,8 +157,7 @@ swagger.configure(applicationUrl, '1.0.0');
     var token = req.headers['Authorization-Token'] || req.headers['authorization-token']
 
     // console.log('=======================================================================')
-    // _log(req.headers)
-    // _log('token received: ' + token)
+    // logger.debug('token received: ' + token)
     // console.log('=======================================================================')
 
     if(token === undefined || token === null){
@@ -186,8 +183,7 @@ swagger.configure(applicationUrl, '1.0.0');
         next()
       }
       catch(error){
-        console.log('invalid token received')
-        _log(error)
+        logger.error(error)
         Response(res, null, error)
       }
     }

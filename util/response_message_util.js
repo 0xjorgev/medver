@@ -23,7 +23,7 @@ define(['express', 'util'], function (express, util) {
 
 			switch(error.name){
 				case 'InsufficientPermissionsError':
-					//thrown by auth_helper.js, when user doesnt have the required permissions to access a resource
+				//thrown by auth_helper.js, when user doesnt have the required permissions to access a resource
 				case 'JwtParseError':
 					code = 403
 					mess = error.userMessage

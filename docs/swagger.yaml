@@ -175,7 +175,7 @@ paths:
         200:
           description: User team list
         403:
-          description: No Authorization-Token received
+          description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No teams found
   /event/{match_id}:

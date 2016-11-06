@@ -170,7 +170,7 @@ paths:
         - name: Authorization-Token
           in: header
           type: string
-          # required: true
+          required: true
       responses:
         200:
           description: User team list
@@ -478,6 +478,10 @@ paths:
       produces:
       - application/json
       parameters:
+      - name: Authorization-Token
+        in: header
+        type: string
+        required: true
       - name: Body
         in: body
         required: true
@@ -512,6 +516,10 @@ paths:
       summary: Updates a team
       description: Updates a team
       parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
         - name: team_id
           in: path
           description: Team ID

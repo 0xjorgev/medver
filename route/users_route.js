@@ -218,9 +218,6 @@ define(['express'
             Response(res, null, chk)
             return
         }
-        //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoyLCJyb2xlcyI6WyJhZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJsaXN0LWFsbCJdLCJsYW5nIjoiZW4iLCJqdGkiOiI3ODI2NzExNi01N2M0LTQ5OGEtODQyNy1iYjEwMDViN2IzMzYiLCJpYXQiOjE0NzgyNzE1MzN9.ieXwTbBXXaeXXeVGWlGMFqUGsLpZDtdwDUjnnViPlJU
-
-        logger.debug(req._currentUser)
 
         Models.user
         .query(qb => qb.where({id: req._currentUser.id}) )

@@ -66,7 +66,7 @@ define(['express',
 		return Models.category_group_phase_team
 			.where({category_id:category_id})
 			.where({active:true})
-			.fetchAll({withRelated:['team','category','group','phase']})
+			.fetchAll({withRelated:['team','category','group','phase','status_type']})
 			.then(function (result) {
 				Response(res, result)
 			}).catch(function(error){
@@ -380,10 +380,10 @@ define(['express',
 	//==========================================================================
 	router.post('/:category_id/team/:team_id/invite', function(req, res){
 		var data = {}
-		data.category_id = req.params.category_id
-		data.team_id = req.params.team_id
-		console.log('POST', data)
-		saveCategory_group_phase_team(data, res)
+		req.body.category_id = req.params.category_id
+		req.body.team_id = req.params.team_id
+		console.log('POST', req.body)
+		saveCategory_group_phase_team(req.body, res)
 	})
 
 	//==========================================================================
@@ -416,11 +416,12 @@ define(['express',
 		console.log("data: ", data)
 		var spiderData = {}
 		spiderData.category_id = data.category_id
-		spiderData.team_id = data.team_id
-		spiderData.active = (data.active == undefined) ? true : data.active
-		spiderData.payment = (data.payment == undefined) ? false : data.payment
-		spiderData.document = (data.document == undefined) ? false : data.document
-		spiderData.roster = (data.roster == undefined) ? false : data.roster
+		spiderData.team_id     = data.team_id
+		spiderData.active      = (data.active == undefined) ? true : data.active
+		spiderData.payment     = (data.payment == undefined) ? false : data.payment
+		spiderData.document    = (data.document == undefined) ? false : data.document
+		spiderData.roster      = (data.roster == undefined) ? false : data.roster
+		spiderData.status_id   = data.status_id
 
 		if(data.phase_id){
 			spiderData.phase_id = data.phase_id

@@ -143,7 +143,8 @@ define(['express'
 			return Models.entity
 			.query(qb => {
 				qb.where({object_id: _team.attributes.id, entity_type_id: 2 })
-				qb.orWhere({object_id: data._currentUser.id, entity_type_id: 1 })
+				qb.orWhere({object_id: data._currentUser.id})
+				qb.where({entity_type_id: 1})
 			})
 			.fetchAll({withRelated: 'entity_type'})
 		})
@@ -179,6 +180,10 @@ define(['express'
 				// se asigna a teamEntity
 				if(teamEntity == null || teamEntity.length == 0)
 					teamEntity = result.toJSON()
+
+				logger.debug('--------------------------------')
+				logger.debug(userEntity)
+				logger.debug('--------------------------------')
 
 				// En caso de que sea una operación POST
 				// se asocia el usuario que se está creando

@@ -339,7 +339,7 @@ define(['express',
 	});
 
 	router.get('/rcompetition/:competition_id', function (req, res) {
-		console.log('competition_id List');
+
 		var comp_id = req.params.competition_id;
 		return Models.competition
 		.where({'id':comp_id})

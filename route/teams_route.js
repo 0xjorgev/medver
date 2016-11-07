@@ -6,8 +6,15 @@ define(['express'
 	,'../model/index'
 	,'../util/request_message_util'
 	,'../util/knex_util'
-	,'../util/response_message_util'],
-	function (express, Models, Message, Knex, Response) {
+	,'../util/response_message_util'
+	,'../util/logger_util'
+	],
+	function (express
+		,Models
+		,Message
+		,Knex
+		,Response
+		,logger){
 
 	var router = express.Router();
 
@@ -35,7 +42,6 @@ define(['express'
 		});
 	});
 
-	//Team by Id -> Returns 1 result
 	router.get('/:team_id', function (req, res) {
 		var team_id = req.params.team_id;
 		return Models.team
@@ -71,25 +77,24 @@ define(['express'
 	// CRUD functions
 	//==========================================================================
 
-	//TODO: move to helper
 	var saveTeam = function(data, res){
+		logger.debug(data)
 
 		var orgData = {}
 
-		if(data.organization_id){
+		if(data.organization_id)
 			orgData.id = data.organization_id
-		}
 		else{
 			orgData = {
 				//TODO: reemplazar el id por un code, en lugar del ID directo de base de datos
-				organization_type_id: 3, //organizacion tipo club
-				name: data.name + ' Club',
-				description: data.description,
+				//organizacion tipo club
+				organization_type_id: 3
+				,name: data.name + ' Club'
+				,description: data.description
 			}
 		}
 
 		var teamData = {}
-
 		if (data.name != undefined) teamData.name = data.name.trim()
 		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
 		if (data.category_type_id != undefined) teamData.category_type_id = data.category_type_id
@@ -100,84 +105,119 @@ define(['express'
 		if (data.short_name != undefined) teamData.short_name = data.short_name
 		if (data.description != undefined) teamData.description = data.description
 		if (data.id != undefined) teamData.id = data.id
-		//	teamData.short_name = data.short_name ? data.short_name : data.name.substr(0,2).toUpperCase()
-		//	teamData.description = data.description ? data.description : data.name
 
-		// spider is the 'category_group_phase_team' table
-		// var spiderData = {
-		// 	category_id: data.category_id,
-		// 	phase_id: data.phase_id,
-		// 	group_id: data.group_id,
-		// }
+		var _team = null
 
-		// if(data.category_group_phase_team_id){
-		// 	spiderData.id = data.category_group_phase_team_id
-		// }
-
-		var _team = undefined
+		//para asociar las entidades
+		var teamEntity = null
+		var userEntity = null
 
 		//let's lookup the organization by id or by the previously-trimmed name
-		Models.organization.query(function(qb){
+		Models.organization.query(qb => {
 			qb.where({id: teamData.organization_id})
 			qb.orWhere({name: orgData.name})
-		}).fetch()
-		.then(function(found){
+		})
+		.fetch()
+		.then(found => {
 			//if found, let's put its id on teamData
 			if(found){
 				teamData.organization_id = found.attributes.id
 				return teamData
 			}
 			else{
-				return new Models.organization(orgData).save().then(function(result){
-					teamData.organization_id = result.attributes.id
-					console.log('org created/updated', result.attributes)
-					return teamData
-				})
+				return new Models
+					.organization(orgData)
+					.save()
+					.then(result => {
+						teamData.organization_id = result.attributes.id
+						return teamData
+					})
 			}
 		})
-		.then(function(teamData){
-			//with the organization stuff all sorted out, let's create the team
-			return new Models.team(teamData).save()
-		})
-		.then((result) => {
-			Response(res, result)
-		})
-		// .then(function(new_team){
-		// 	//now let's associate the newly created team with the category
-		// 	_team = new_team.attributes
-		// 	console.log('team saved', _team)
-		// 	spiderData.team_id = new_team.attributes.id
-		// 	console.log('about to save in spider', spiderData)
-		// 	return new Models.category_group_phase_team(spiderData).save()
-		// })
-		// .then(function(spiderData){
-		// 	console.log('spider saved', spiderData.attributes)
+		//se salva el team
+		.then(teamData => new Models.team(teamData).save())
+		.then(result => {
+			_team = result
 
-		// 	//all ok, let's return the created team
-		// 	var action = data.id ? 'updated' : 'created'
-		// 	Message(res, `Team ${_team.id} ${action}`, '0', _team)
-		// })
-		.catch(function(error){
-			Response(res, null, error)
+			//se obtienen las entidades del team y del user en un solo query
+			return Models.entity
+			.query(qb => {
+				qb.where({object_id: _team.attributes.id, entity_type_id: 2 })
+				qb.orWhere({object_id: data._currentUser.id})
+				qb.where({entity_type_id: 1})
+			})
+			.fetchAll({withRelated: 'entity_type'})
 		})
+		.then(result => {
+			var tmp = result.toJSON()
+			teamEntity = tmp.filter(e => e.entity_type_id == 2)
+			userEntity = tmp.filter(e => e.entity_type_id == 1)
+
+			//la entidad usuario *debe* estar creada para este punto,
+			//o bien no sería usuario válido
+			//si no se obtiene una entidad para el equipo, se crea
+			if(teamEntity.length == 0){
+				//si no se encuentra una entidad asociada al equipo,
+				//se crea una nueva
+				return new Models.entity({
+						object_id: _team.attributes.id
+						,entity_type_id: 2 })
+						.save()
+			}
+			return result
+		})
+		.then(result => {
+			if (data.id) {
+				// los siguientes bloques de promises solo aplican cuando se está
+				// creando el team.
+				// en caso de actualización, simplemente se retorna
+				// el resultado del update y se termina el servicio
+				//TODO: los bloques anteriores no son necesarios cuando se hace update. fix!
+				return result
+			}
+			else{
+				// En caso de que la entidad team se haya creado en el promise anterior
+				// se asigna a teamEntity
+				if(teamEntity == null || teamEntity.length == 0)
+					teamEntity = result.toJSON()
+
+				logger.debug('--------------------------------')
+				logger.debug(userEntity)
+				logger.debug('--------------------------------')
+
+				// En caso de que sea una operación POST
+				// se asocia el usuario que se está creando
+				// con el team como owner del mismo
+				return new Models.entity_relationship({
+					ent_ref_from_id: userEntity[0].id
+					,ent_ref_to_id: teamEntity.id
+					,relationship_type_id: 1
+					,comment: 'OWNER'
+				}).save()
+			}
+		})
+		.then(result => Response(res, _team))
+		.catch(error => Response(res, null, error))
 	}
 
-	router.post('/', function (req, res) {
+	//creacion de team
+	router.post('/', (req, res) => {
 		var data = req.body
-		console.log('POST', data)
+		data._currentUser = req._currentUser
 		saveTeam(data, res)
 	});
 
+	//actualizacion de team
 	router.put('/:team_id', function(req, res, next){
 		var data = req.body
+		data._currentUser = req._currentUser
 		//setting the ID on the object to be saved is the way to signal bookshelf to create or update
 		data.id = req.params.team_id
-		console.log('PUT', data)
 		saveTeam(data, res)
 	});
 
 	var savePlayerTeam = (playerTeamData, res) => {
-		console.log('Save Player Team: ', playerTeamData)
+		logger.debug('savePlayerTeam', playerTeamData)
 		var playerData = playerTeamData.player
 		var teamData = playerTeamData.team_player
 
@@ -185,7 +225,8 @@ define(['express'
 		//version 1 -> insert into team roster without checking existance
 		var _playerResult = undefined
 
-		new Models.player(playerData).save()
+		new Models.player(playerData)
+		.save()
 		.then((result) => {
 			_playerResult = result
 			//teamData.player_id = result.attributes.id
@@ -195,16 +236,13 @@ define(['express'
 				position_id : teamData.position_id,
 				team_id : teamData.team_id
 			}
+
 			if(playerTeamData.team_player.id) team_player.id = playerTeamData.team_player.id
 
 			return new Models.player_team(team_player).save()
 		})
-		.then((result) => {
-			Response(res, {player: _playerResult, player_team: result})
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		})
+		.then(result => Response(res, {player: _playerResult, player_team: result}))
+		.catch(error => Response(res, null, error) )
 	}
 
 	// Saves into players_teams, the roster of this team
@@ -237,7 +275,8 @@ define(['express'
 		PlayerTeam.where({team_id: teamId, player_id: playerId})
 		.fetch()
 		.then((result) => {
-			return new Models.player_team({id: result.attributes.id, active: false})
+			return new Models
+				.player_team({id: result.attributes.id, active: false})
 				.save()
 		})
 		.then((result) => Response(res, result))

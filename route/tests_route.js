@@ -5,30 +5,32 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
+var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
+
 define(['express',
 	'../model/index',
 	'../util/request_message_util',
-	'../util/knex_util',
+	'../util/knex_util'
 	], function (express, Models, Message, Knex) {
 
     var router = express.Router();
 
-      var getTeamByName = function(name1, name2){
+    var getTeamByName = function(name1, name2){
 
         return Models.team.query(function(qb){
           qb.where({name:name1})
           qb.orWhere({name: name2})
           qb.where({active:true})
-        })
+      })
         .fetchAll({debug: false})
         .then(function(team){
             console.log(`Team: ${{ team }}`,team)
             return team
         }).catch(function(error){
-           console.log('Failed:',error)
-            return null
-        })
-      }
+         console.log('Failed:',error)
+         return null
+     })
+    }
 
     router.get('/:category_id', function (req, res) {
 
@@ -216,6 +218,5 @@ define(['express',
           //   res.json({message:error.detail, code: error.code, data: {} });
           // });
       });
-
     return router;
 });

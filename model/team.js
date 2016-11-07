@@ -16,8 +16,8 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './category_type', './organization', './player_team', './category_group_phase_team', 
-    './subdiscipline', './gender'], function (DB) 
+define(['./base_model', './category_type', './organization', './player_team', './category_group_phase_team',
+    './subdiscipline', './gender', './entity'], function (DB)
 {
 
     var Team = DB.Model.extend({
@@ -28,7 +28,7 @@ define(['./base_model', './category_type', './organization', './player_team', '.
         category_type: function(){
             return this.belongsTo('Category_type', 'category_type_id');
         },
-        
+
         subdiscipline: function(){
             return this.belongsTo('Subdiscipline', 'subdiscipline_id');
         },
@@ -55,6 +55,10 @@ define(['./base_model', './category_type', './organization', './player_team', '.
 
         summoned: function(){
             return this.hasMany('Category_team_player', 'team_id');
+        },
+
+        entity : function(){
+          return this.morphMany(Entity, 'object_id');
         }
 
         // player: function(){

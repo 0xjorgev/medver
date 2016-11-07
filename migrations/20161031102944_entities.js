@@ -1,22 +1,19 @@
 
 exports.up = function(knex, Promise) {
   return Promise.all([
-    knex.schema.createTable('entities_types', function(table){
+    knex.schema.createTable('entities', function(table){
       table.increments('id').primary();
+      table.integer('object_id');
+      table.integer('entity_type_id').references('entities_types.id');
       table.boolean('active').notNullable().defaultTo(true);
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
-      table.text('description');
     })
-    .then(function(){
-      //Add query
-            return knex.raw('');
-        })
   ]);
 };
 
 exports.down = function(knex, Promise) {
   return Promise.all([
-		knex.schema.dropTableIfExists('entities_types')
+		knex.schema.dropTableIfExists('entities')
 	])
 };

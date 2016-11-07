@@ -230,7 +230,10 @@ define(['express'
             var user = result.toJSON()
             //con esto se filtran las relaciones tipo 'coach'
             return user.entity.related_from
-                .filter(rel => rel.relationship_type.name == 'COACH')
+                .filter(rel => {
+                    var name = rel.relationship_type.name.toUpperCase()
+                    return name == 'COACH' || name == 'OWNER'
+                })
                 //y con este map se extraen los ids de los teams
                 .map(teams => teams.to.object_id)
         })
@@ -242,7 +245,6 @@ define(['express'
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))
     })
-
 
     return router;
 });

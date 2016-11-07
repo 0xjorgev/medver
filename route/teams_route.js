@@ -140,6 +140,14 @@ define(['express'
 			//eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoyLCJyb2xlcyI6WyJhZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJsaXN0LWFsbCJdLCJsYW5nIjoiZW4iLCJqdGkiOiI3ODI2NzExNi01N2M0LTQ5OGEtODQyNy1iYjEwMDViN2IzMzYiLCJpYXQiOjE0NzgyNzE1MzN9.ieXwTbBXXaeXXeVGWlGMFqUGsLpZDtdwDUjnnViPlJU
 			_team = result
 
+			// los sigientes bloques de promises solo aplican cuando se está
+			// creando el team. en caso de acutalización, simplemente se retorna
+			// el resultado del update y se termina el servicio
+			if(data.id) {
+				Response(res, _team)
+				return
+			}
+
 			//se obtienen las entidades del team y del user en un solo query
 			return Models.entity
 			.query(qb => {
@@ -152,9 +160,6 @@ define(['express'
 			var tmp = result.toJSON()
 			teamEntity = tmp.filter(e => e.entity_type_id == 2)
 			userEntity = tmp.filter(e => e.entity_type_id == 1)
-
-			logger.debug('-------------------')
-			logger.debug(tmp)
 
 			//la entidad usuario *debe* estar creada para este punto,
 			//o bien no sería usuario válido
@@ -170,15 +175,6 @@ define(['express'
 			return result
 		})
 		.then(result => {
-
-			// este bloque de promises solo aplica cuando se está creando el team
-			// en caso de acutalización, simplemente se retorna el resultado del
-			// update
-			// if(data.id) {
-			// 	Response(res, _team)
-			// 	return
-			// }
-
 			//en caso de que la entidad team se haya creado en el promise anterior
 			//se asigna a teamEntity
 			if(teamEntity == null || teamEntity.length == 0)

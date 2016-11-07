@@ -1663,6 +1663,89 @@ paths:
           description: Deleted logical category team invite
       security: []
 
+  /status_type:
+    get:
+      summary: Returns the list of Status Types active
+      description: Returns the list of Status Types active
+      operationId: Status_Type
+      tags:
+        - Status_Type
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: GET
+          uri: /status_type
+          headers:
+            Content-Type: application/json
+          body: >-
+            {
+              "category_id":5,
+              "team_id":27,
+              "phase_id":6,
+              "active":true
+            }
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: Status_Type
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  
+  /status_type/{id}:
+    get:
+      description: Return the detail of one Status Types
+      operationId: Get Status Type
+      tags:
+        - Status_Type
+      produces:
+      - application/json
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: GET
+          uri: /status_type/2
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: Get Status Type
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+
 
 #######################################################################
 #      _       __ _       _ _   _

@@ -78,7 +78,7 @@ define(['express'
 	//==========================================================================
 
 	var saveTeam = function(data, res){
-		logger.info(data)
+		logger.debug(data)
 
 		var orgData = {}
 
@@ -125,8 +125,8 @@ define(['express'
 				return teamData
 			}
 			else{
-				return
-					new Models.organization(orgData)
+				return new Models
+					.organization(orgData)
 					.save()
 					.then(result => {
 						teamData.organization_id = result.attributes.id
@@ -137,16 +137,7 @@ define(['express'
 		//se salva el team
 		.then(teamData => new Models.team(teamData).save())
 		.then(result => {
-			//eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoyLCJyb2xlcyI6WyJhZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJsaXN0LWFsbCJdLCJsYW5nIjoiZW4iLCJqdGkiOiI3ODI2NzExNi01N2M0LTQ5OGEtODQyNy1iYjEwMDViN2IzMzYiLCJpYXQiOjE0NzgyNzE1MzN9.ieXwTbBXXaeXXeVGWlGMFqUGsLpZDtdwDUjnnViPlJU
 			_team = result
-
-			// los sigientes bloques de promises solo aplican cuando se está
-			// creando el team. en caso de acutalización, simplemente se retorna
-			// el resultado del update y se termina el servicio
-			if(data.id) {
-				Response(res, _team)
-				return
-			}
 
 			//se obtienen las entidades del team y del user en un solo query
 			return Models.entity
@@ -175,20 +166,30 @@ define(['express'
 			return result
 		})
 		.then(result => {
-			//en caso de que la entidad team se haya creado en el promise anterior
-			//se asigna a teamEntity
-			if(teamEntity == null || teamEntity.length == 0)
-				teamEntity = result.toJSON()
+			if (data.id) {
+				// los siguientes bloques de promises solo aplican cuando se está
+				// creando el team.
+				// en caso de actualización, simplemente se retorna
+				// el resultado del update y se termina el servicio
+				//TODO: los bloques anteriores no son necesarios cuando se hace update. fix!
+				return result
+			}
+			else{
+				// En caso de que la entidad team se haya creado en el promise anterior
+				// se asigna a teamEntity
+				if(teamEntity == null || teamEntity.length == 0)
+					teamEntity = result.toJSON()
 
-			// En caso de que sea una operación POST
-			// se asocia el usuario que se está creando
-			// con el team como owner del mismo
-			return new Models.entity_relationship({
-				ent_ref_from_id: userEntity[0].id
-				,ent_ref_to_id: teamEntity.id
-				,relationship_type_id: 1
-				,comment: 'OWNER'
-			}).save()
+				// En caso de que sea una operación POST
+				// se asocia el usuario que se está creando
+				// con el team como owner del mismo
+				return new Models.entity_relationship({
+					ent_ref_from_id: userEntity[0].id
+					,ent_ref_to_id: teamEntity.id
+					,relationship_type_id: 1
+					,comment: 'OWNER'
+				}).save()
+			}
 		})
 		.then(result => Response(res, _team))
 		.catch(error => Response(res, null, error))

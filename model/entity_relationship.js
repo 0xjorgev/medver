@@ -8,7 +8,7 @@ define(['./base_model', './relationship_type']
         tableName: 'entities_relationships'
         ,hasTimestamps: true
         ,relationship_type: function(){
-          return this.belongsTo('Relationship_type', 'relationship_type');
+          return this.belongsTo('Relationship_type', 'relationship_type_id');
         }
         ,from: function(){
           return this.belongsTo('Entity','ent_ref_from_id');

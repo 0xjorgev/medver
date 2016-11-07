@@ -85,17 +85,20 @@ define(['express'
         var password = new_user.password;
         var email    = new_user.email;
         var origin = req.headers.origin
-        console.log('origin', origin)
 
-        var User = Models.user;
+        var _newUser = null
 
-        console.log('Username: ',username)
-        new User({
+        new Models.user({
             username: username,
-            email:email,
-            password:password
+            email: email,
+            password: password
         })
-        .save().then(function(newUser){
+        .save()
+        // .then(result => {
+        //     _newUser = result
+        //     //creación de nueva entidad
+        // })
+        .then(newUser => {
             //content is from template/email/registerUser.html
             var content =  `<td style="padding-left: 21%; color: #000;"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`
             send_email_from(email,'Welcome to Somosport', content)
@@ -120,11 +123,9 @@ define(['express'
             newUser.attributes.roles = ['admin', 'player']
             newUser.attributes.permissions = ['list', 'create', 'update', 'delete']
 
-            // Message(res, 'Success', '0', newUser);
             Response(res, newUser)
         })
         .catch(function(error){
-            // Message(res, error.detail, error.code, null);
             Response(res, null, error)
         });
     });
@@ -228,10 +229,10 @@ define(['express'
         ]})
         .then(result => {
             var user = result.toJSON()
-            //con esto se filtran las relaciones tipo 'coach'
+            //con esto se filtran las relaciones tipo 'coach' y owner
             return user.entity.related_from
                 .filter(rel => {
-                    var name = rel.relationship_type.name.toUpperCase()
+                    var name = (rel.relationship_type.name == undefined) ? '': rel.relationship_type.name.toUpperCase()
                     return name == 'COACH' || name == 'OWNER'
                 })
                 //y con este map se extraen los ids de los teams

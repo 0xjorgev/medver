@@ -5,7 +5,7 @@ exports.seed = function(knex, Promise) {
     knex('relationships_types').del(),
 
     // Inserts seed entries
-    knex('relationships_types').insert({name: 'Owner'}),
-    knex('relationships_types').insert({name: 'Associate'})
+    knex('relationships_types').insert({name: 'OWNER'}),
+    knex('relationships_types').insert({name: 'COACH'})
   );
 };

@@ -241,7 +241,11 @@ define(['express'
         .then(result => {
             return Models.team
                 .query(qb => qb.whereIn('id', result))
-                .fetchAll({withRelated: ['category_type', 'gender','category_group_phase_team.category.season.competition']})
+                .fetchAll({withRelated: ['category_type'
+					,'gender'
+					,'category_group_phase_team.category.season.competition'
+					,'category_group_phase_team.status_type'
+				]})
         })
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))

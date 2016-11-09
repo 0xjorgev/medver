@@ -23,7 +23,7 @@ define(['express'
 		return Models.team
 		.query(function(qb){})
 		.where({active:true})
-		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender']})
+		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'entity']})
 		.then((result) => Response(res, result))
 		.catch((error) =>  Response(res, null, error))
 	});
@@ -291,6 +291,18 @@ define(['express'
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error) )
 	})
+
+	//List of teams by category Type and gender
+	router.get('/category_type/:category_type_id/gender/:gender_id', function (req, res) {
+		return Models.team
+		.query(function(qb){})
+		.where({category_type_id:req.params.category_type_id})
+		.where({gender_id:req.params.gender_id})
+		.where({active:true})
+		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'entity']})
+		.then((result) => Response(res, result))
+		.catch((error) =>  Response(res, null, error))
+	});
 
 	return router;
 });

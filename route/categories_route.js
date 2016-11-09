@@ -590,7 +590,6 @@ define(['express',
 			});
 	});
 
-
 	var sortBy = (key) => {
 		return (a, b) => {
 			if (a['position'] > b['position']) return 1
@@ -667,6 +666,78 @@ define(['express',
 			Response(res, null, error)
 		})
 	})
+
+	//==========================================================================
+	// Create a invitation for a team to a category
+	//==========================================================================
+	router.post('/:category_id/team/:team_id/invite', function(req, res){
+		var data = {}
+		req.body.category_id = req.params.category_id
+		req.body.team_id = req.params.team_id
+		console.log('POST', req.body)
+		saveEntitiesRequestEntities(req.body, res)
+	})
+
+	//==========================================================================
+	// Update a category group phase team
+	//==========================================================================
+	router.put('/:category_id/team/:team_id/invite/:id', function(req, res){
+		var data = {}
+		data.id = req.params.id
+		req.body.category_id = req.params.category_id
+		req.body.team_id = req.params.team_id
+		console.log('PUT', req.body)
+		saveEntitiesRequestEntities(req.body, res)
+	})
+
+	router.delete('/:category_id/team/:team_id/invite/:id', function(req, res){
+		var data = {}
+		data.id = req.params.id
+		data.category_id = req.params.category_id
+		data.team_id = req.params.team_id
+		data.active = false
+		console.log('DELETE', data)
+		saveEntitiesRequestEntities(data, res)
+	})
+
+	//==========================================================================
+	// Save Entities Request
+	//==========================================================================
+	var saveEntitiesRequestEntities = function(data, res){
+
+		console.log("data: ", data)
+		var data = {}
+		data.category_id = data.category_id
+		data.team_id     = data.team_id
+		data.active      = (data.active == undefined) ? true : data.active
+		data.payment     = (data.payment == undefined) ? false : data.payment
+		data.document    = (data.document == undefined) ? false : data.document
+		data.roster      = (data.roster == undefined) ? false : data.roster
+		data.status_id   = data.status_id
+
+		if(data.phase_id){
+			spiderData.phase_id = data.phase_id
+		}
+
+		if(data.group_id){
+			spiderData.group_id = data.group_id
+		}
+
+		if(data.id){
+			console.log("data id: ", data.id)
+			spiderData.id = data.id
+		}
+
+		console.log("spiderData: ", spiderData)
+		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
+			console.log(`new_invitation:`, new_invitation);
+			Response(res, new_invitation);
+		})
+		.catch(function(error){
+			Response(res, null, error);
+		});
+	}
+
 
 	return router;
 

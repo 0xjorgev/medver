@@ -156,23 +156,31 @@ define(['express'
 		})
 		.then(result => {
 			var tmp = result.toJSON()
+
+			logger.debug(tmp)
+			logger.debug('........................................................')
+
 			teamEntity = tmp.filter(e => e.object_type == 'teams')
 			userEntity = tmp.filter(e => e.object_type == 'users')
+
+			// logger.debug(teamEntity)
 
 			//la entidad usuario *debe* estar creada para este punto,
 			//o bien no sería usuario válido
 			//si no se obtiene una entidad para el equipo, se crea
 			if(teamEntity.length == 0){
-				//si no se encuentra una entidad asociada al equipo,
-				//se crea una nueva
-				return
-					new Models.entity({
+				//si no se encuentra una entidad asociada al equipo, se crea una nueva
+				return new Models.entity({
 						object_id: _team.attributes.id
-						,object_type: 'teams'}).save()
+						,object_type: 'teams'})
+						.save()
 			}
 			return result
 		})
 		.then(result => {
+			logger.debug('entity!')
+			logger.debug(result.toJSON())
+
 			if (data.id) {
 				// los siguientes bloques de promises solo aplican cuando se está
 				// creando el team.

@@ -12,9 +12,9 @@ define(['./base_model'
         ,entity_type: function(){
             return this.belongsTo('Entity_type', 'entity_type_id');
         }
-        // object_id: () => {
-        //     return this.morphTo('object_id', User, Team);
-        // },
+        ,object: function() {
+            return this.morphTo('object', User, Team)
+        }
         ,related_from: function() {
           return this.hasMany('Entity_relationship', 'ent_ref_from_id');
         }

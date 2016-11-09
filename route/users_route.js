@@ -39,14 +39,14 @@ define(['express'
         var username = user_login.username;
         var password = user_login.password;
 
-        console.log(`Request values`, user_login);
+        logger.debug(`Request values`, user_login);
 
         return Models.user.query((qb) => {
             qb.where('username', username)
             qb.where('password', password)
             qb.where('active', true)
         })
-        .fetch()
+	    .fetch()
         .then((result) => {
             if (result !== null){
                 var userId = result.id
@@ -54,7 +54,7 @@ define(['express'
                 var claims = {
                     user: userId,
                     roles: ['admin'],
-                    permissions: ['list-all'],
+                    // permissions: ['list-all'],
                     lang: 'en'
                 }
 
@@ -68,15 +68,13 @@ define(['express'
                 delete result.attributes.password
 
                 //TODO: test only!
-                result.attributes.roles = ['admin', 'player']
-                result.attributes.permissions = ['list', 'create', 'update', 'delete']
+                result.attributes.roles = ['admin']
+                // result.attributes.permissions = ['list', 'create', 'update', 'delete']
             }
-
+			delete result.attributes.password
             Response(res, result)
         })
-        .catch((error) => {
-            Response(res, null, error)
-        });
+        .catch(error => Response(res, null, error))
     });
 
     router.post('/register', function(req, res, next){

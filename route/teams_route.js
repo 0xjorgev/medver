@@ -46,7 +46,13 @@ define(['express'
 		var team_id = req.params.team_id;
 		return Models.team
 		.where({id:team_id, active:true})
-		.fetch({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'player_team.position']})
+		.fetch({withRelated: ['category_type'
+			,'organization'
+			,'player_team.player'
+			,'subdiscipline'
+			,'gender'
+			,'entity'
+			,'player_team.position']})
 		.then( (result) => Response(res, result))
 		.catch((error) => Response(res, null, error));
 
@@ -161,6 +167,7 @@ define(['express'
 				//se crea una nueva
 				return new Models.entity({
 						object_id: _team.attributes.id
+						,object_type: 'teams'
 						,entity_type_id: 2 })
 						.save()
 			}

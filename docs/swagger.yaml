@@ -1709,6 +1709,7 @@ paths:
   
   /status_type/{id}:
     get:
+      summary: Return the detail of one Status Types
       description: Return the detail of one Status Types
       operationId: Get Status Type
       tags:
@@ -1721,6 +1722,45 @@ paths:
         required: true
         type: integer
         format: integer
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: GET
+          uri: /status_type/2
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: Get Status Type
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+
+  /status_type/type/{type}:
+    get:
+      summary: Return the list of Status Types by Type
+      description: Return the list of Status Types by Type
+      operationId: Get Status Type by type
+      tags:
+        - Status_Type
+      produces:
+      - application/json
+      parameters:
+      - name: type
+        in: path
+        required: true
+        type: string
       responses:
         200:
           description: 

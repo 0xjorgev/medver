@@ -6,9 +6,11 @@ exports.seed = function(knex, Promise) {
     knex('status_types').del(),
 
     // Inserts seed entries
-    knex('status_types').insert({description: 'In Process'})
-    ,knex('status_types').insert({description: 'Approved'})
-    ,knex('status_types').insert({description: 'Rejected'})
+    knex('status_types').insert({description: 'In Process', type:'pre-registration'})
+    ,knex('status_types').insert({description: 'Approved', type:'pre-registration'})
+    ,knex('status_types').insert({description: 'Rejected', type:'pre-registration'})
+    ,knex('status_types').insert({description: 'Acepted', type:'request'})
+    ,knex('status_types').insert({description: 'Rejected', type:'request'})
   )
 };
 

@@ -144,20 +144,20 @@ define(['express'
 		.then(teamData => new Models.team(teamData).save())
 		.then(result => {
 			_team = result
-
 			//se obtienen las entidades del team y del user en un solo query
 			return Models.entity
 			.query(qb => {
-				qb.where({object_id: _team.attributes.id, entity_type_id: 2 })
+				qb.where({object_id: _team.attributes.id,
+					object_type: 'teams' })
 				qb.orWhere({object_id: data._currentUser.id})
-				qb.where({entity_type_id: 1})
+				qb.where({object_type: 'users'})
 			})
-			.fetchAll({withRelated: 'entity_type'})
+			.fetchAll()
 		})
 		.then(result => {
 			var tmp = result.toJSON()
-			teamEntity = tmp.filter(e => e.entity_type_id == 2)
-			userEntity = tmp.filter(e => e.entity_type_id == 1)
+			teamEntity = tmp.filter(e => e.object_type == 'teams')
+			userEntity = tmp.filter(e => e.object_type == 'users')
 
 			//la entidad usuario *debe* estar creada para este punto,
 			//o bien no sería usuario válido
@@ -165,11 +165,10 @@ define(['express'
 			if(teamEntity.length == 0){
 				//si no se encuentra una entidad asociada al equipo,
 				//se crea una nueva
-				return new Models.entity({
+				return
+					new Models.entity({
 						object_id: _team.attributes.id
-						,object_type: 'teams'
-						,entity_type_id: 2 })
-						.save()
+						,object_type: 'teams'}).save()
 			}
 			return result
 		})
@@ -187,10 +186,6 @@ define(['express'
 				// se asigna a teamEntity
 				if(teamEntity == null || teamEntity.length == 0)
 					teamEntity = result.toJSON()
-
-				logger.debug('--------------------------------')
-				logger.debug(userEntity)
-				logger.debug('--------------------------------')
 
 				// En caso de que sea una operación POST
 				// se asocia el usuario que se está creando

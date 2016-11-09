@@ -54,7 +54,6 @@ define(['express'
                 var claims = {
                     user: userId,
                     roles: ['admin'],
-                    // permissions: ['list-all'],
                     lang: 'en'
                 }
 
@@ -70,8 +69,8 @@ define(['express'
                 //TODO: test only!
                 result.attributes.roles = ['admin']
                 // result.attributes.permissions = ['list', 'create', 'update', 'delete']
+				delete result.attributes.password
             }
-			delete result.attributes.password
             Response(res, result)
         })
         .catch(error => Response(res, null, error))
@@ -92,19 +91,23 @@ define(['express'
             password: password
         })
         .save()
-        // .then(result => {
-        //     _newUser = result
-        //     //creación de nueva entidad
-        // })
-        .then(newUser => {
+        .then(result => {
+            _newUser = result
+			return new Models.entity({
+				object_id: _newUser.attributes.id
+				,object_type: 'users'
+			})
+			.save()
+        })
+        .then(result => {
             //content is from template/email/registerUser.html
             var content =  `<td style="padding-left: 21%; color: #000;"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`
             send_email_from(email,'Welcome to Somosport', content)
 
             var claims = {
-                user: newUser.id,
+                user: _newUser.id,
                 roles: ['admin'],
-                permissions: ['list-all'],
+                permissions: [],
                 lang: 'en'
             }
 
@@ -114,18 +117,16 @@ define(['express'
             //TODO: does not expire, for now
             jwt.setExpiration()
 
-            newUser.attributes['Authorization-Token'] = jwt.compact()
-            delete newUser.attributes.password
+            _newUser.attributes['Authorization-Token'] = jwt.compact()
+            delete _newUser.attributes.password
 
             //TODO: test only!
-            newUser.attributes.roles = ['admin', 'player']
-            newUser.attributes.permissions = ['list', 'create', 'update', 'delete']
+            _newUser.attributes.roles = ['admin', 'player']
+            _newUser.attributes.permissions = ['list', 'create', 'update', 'delete']
 
-            Response(res, newUser)
+            Response(res, _newUser)
         })
-        .catch(function(error){
-            Response(res, null, error)
-        });
+        .catch(error => Response(res, null, error));
     });
 
     router.post('/reset_password_request', function(req, res, next){
@@ -139,8 +140,8 @@ define(['express'
         //Obtengo los datos del usuario
         Knex_util(user.tableName)
         .where(function(){
-            this.where('username',username_email)
-                .orWhere('email',username_email)
+            this.where('username', username_email)
+                .orWhere('email', username_email)
         })
         .then((result) => {
             if(result.length == 0){

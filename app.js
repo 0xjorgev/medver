@@ -95,6 +95,7 @@ swagger.configure(applicationUrl, '1.0.0');
   var test_ws =  require('./route/tests_route');
   var position_ws =  require('./route/positions_route');
   var status_type_ws =  require('./route/status_types_route');
+  var request_ws =  require('./route/requests_route');
 
   //put here all non business-related services
   var core_ws =  require('./route/core_route');
@@ -106,29 +107,30 @@ swagger.configure(applicationUrl, '1.0.0');
   //routes names
   var routes = {
     discipline      : 'discipline'
-    ,competition     : 'competition'
-    ,season          : 'season'
-    ,category        : 'category'
-    ,gender          : 'gender'
-    ,contact         : 'contact'
-    ,organization    : 'organization'
-    ,phase           : 'phase'
-    ,group           : 'group'
-    ,round           : 'round'
-    ,team            : 'team'
-    ,match           : 'match'
-    ,rule            : 'rule'
-    ,ruleset         : 'ruleset'
-    ,event           : 'event'
-    ,referee         : 'referee'
-    ,category_type   : 'category_type'
-    ,player          : 'player'
-    ,rule            : 'rule'
-    ,match_event     : 'matchevent'
-    ,subdiscipline   : 'subdiscipline'
-    ,test            : 'test'
-    ,position        : 'position'
-    ,status_type     : 'status_type'
+    ,competition    : 'competition'
+    ,season         : 'season'
+    ,category       : 'category'
+    ,gender         : 'gender'
+    ,contact        : 'contact'
+    ,organization   : 'organization'
+    ,phase          : 'phase'
+    ,group          : 'group'
+    ,round          : 'round'
+    ,team           : 'team'
+    ,match          : 'match'
+    ,rule           : 'rule'
+    ,ruleset        : 'ruleset'
+    ,event          : 'event'
+    ,referee        : 'referee'
+    ,category_type  : 'category_type'
+    ,player         : 'player'
+    ,rule           : 'rule'
+    ,match_event    : 'matchevent'
+    ,subdiscipline  : 'subdiscipline'
+    ,test           : 'test'
+    ,position       : 'position'
+    ,status_type    : 'status_type'
+    ,request        : 'request'
   }
 
   //Middleware
@@ -256,6 +258,7 @@ swagger.configure(applicationUrl, '1.0.0');
   app.use(`${api_prefix}${routes.test}`, test_ws);
   app.use(`${api_prefix}${routes.position}`, position_ws);
   app.use(`${api_prefix}${routes.status_type}`, status_type_ws);
+  app.use(`${api_prefix}${routes.request}`, request_ws);
 
   app.get(api_prefix, function(request, response){
     // app._router.stack.forEach(function(r){

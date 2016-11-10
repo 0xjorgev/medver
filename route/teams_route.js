@@ -306,5 +306,52 @@ define(['express'
 		.catch((error) =>  Response(res, null, error))
 	});
 
+
+	//==========================================================================
+	// Create a request of  request participation of one team to a category
+	//==========================================================================
+	router.post('/:id/category/:category_id/invitation', (req, res) => {
+		var category_id = req.params.category_id
+		var team_id = req.params.team_id
+
+		//Obtengo el id de las entidades Team y category
+		var teamEntity = null
+		var categoryEntity = null
+		var status = {}
+
+		Models.status_type
+		.where({code: 'request-pending'})
+		.fetch()
+		.then(found => {
+			status = found.attributes.id
+			return status
+		})
+		.then(status => {
+			Models.entity
+			.query(qb => {
+				qb.where({object_id: team_id,
+					object_type: 'teams' })
+				qb.orWhere({object_id: category_id})
+				qb.where({object_type: 'categories'})
+			})
+			.fetchAll()
+			.then((result) => {
+				var tmp = result.toJSON()
+				teamEntity = tmp.filter(e => e.object_type == 'teams')
+				categoryEntity = tmp.filter(e => e.object_type == 'categories')
+				//Salvamos en la tabla de request
+				Models.entity_request({
+					ent_ref_from_id: teamEntity[0].attributes.id
+					,ent_ref_to_id: categoryEntity[0].attributes.id
+					,status: status
+				}).save()
+				.then((result) => Response(res, result))
+				.catch((error) =>  Response(res, null, error))
+			})
+			.catch(error => Response(res, null, error))
+		})
+		.catch(error => Response(res, null, error))
+	})
+
 	return router;
 });

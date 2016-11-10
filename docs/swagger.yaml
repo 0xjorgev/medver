@@ -1663,6 +1663,7 @@ paths:
           description: Deleted logical category team invite
       security: []
 
+  
   /status_type:
     get:
       summary: Returns the list of Status Types active
@@ -1706,7 +1707,6 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-  
   /status_type/{id}:
     get:
       summary: Return the detail of one Status Types
@@ -1746,7 +1746,6 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-
   /status_type/type/{type}:
     get:
       summary: Return the list of Status Types by Type
@@ -1779,6 +1778,50 @@ paths:
         x-testShouldPass: true
         x-testEnabled: true
         x-testName: Get Status Type
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+
+  /request/{id}/type/{type}:
+    get:
+      summary: Return the list of request for the id of the type 
+      description: Return the list of request for the id of the type 
+      operationId: Get_Request_To
+      tags:
+        - Request
+      produces:
+      - application/json
+      parameters: 
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: type
+        in: path
+        required: true
+        type: string
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: GET
+          uri: /request/28/type/teams
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: http://localhost:3000/api/v1.0/request/28/type/teams
         x-testDescription: 
       x-operation-settings:
         CollectParameters: false

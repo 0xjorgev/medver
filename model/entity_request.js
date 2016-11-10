@@ -4,7 +4,7 @@ if (typeof define !== 'function') {
 
 define(['./base_model']
     ,function (DB) {
-    var Entity_relationship = DB.Model.extend({
+    var Entity_request = DB.Model.extend({
         tableName: 'entities_requests'
         ,hasTimestamps: true
         
@@ -13,6 +13,9 @@ define(['./base_model']
         }
         ,to: function(){
           return this.belongsTo('Entity','ent_ref_to_id');
+        }
+        ,status_type: function(){
+          return this.belongsTo('Status_type','status_id');
         }
     });
 

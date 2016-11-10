@@ -318,26 +318,26 @@ define(['express',
                                     console.log(`Match ${item}`);
                                     if(postitionMSE > team_quantity)
                                     {
-                                        Message(res, 'Create Simple Elimination successful', 0, {});
+                                        Response(res, 'Create Simple Elimination successful')
                                     }
                                 }).catch(function(error){
-                                    console.log(`{error: ${error}}`);
-                                    Message(res, error.detail, error.code, null);
+                                    console.log(`{error Match: ${error}}`);
+                                    Response(res, null, error)
                                 });
                             }
 
                         }).catch(function(error){
-                            console.log(`error: ${error}`);
-                            Message(res, error.detail, error.code, null);
+                            console.log(`error Round: ${error}`);
+                            Response(res, null, error)
                         });
                     }).catch(function(error){
-                        console.log(`{error: ${error}}`);
-                        Message(res, error.detail, error.code, null);
+                        console.log(`{error Group: ${error}}`);
+                        Response(res, null, error)
                     });
                 }
             }).catch(function(error){
-                console.log(`{error: ${error}}`);
-                Message(res, error.detail, error.code, null);
+                console.log(`{error Phase: ${error}}`);
+                Response(res, null, error)
             });
         }
     });
@@ -677,27 +677,41 @@ define(['express',
 		//Obtengo el id de las entidades Team y category
 		var teamEntity = null
 		var categoryEntity = null
+		var status = {}
 
-		Models.entity
-		.query(qb => {
-			qb.where({object_id: team_id,
-				object_type: 'teams' })
-			qb.orWhere({object_id: category_id})
-			qb.where({object_type: 'categories'})
+		Models.status_type
+		.where({code: 'request-pending'})
+		.fetch()
+		.then(found => {
+			status = found.attributes.id
+			return status
 		})
-		.fetchAll()
-		.then((result) => {
-			var tmp = result.toJSON()
-			teamEntity = tmp.filter(e => e.object_type == 'teams')
-			categoryEntity = tmp.filter(e => e.object_type == 'categories')
-
-			console.log('teamEntity', teamEntity)
-			console.log('categoryEntity', categoryEntity)
+		.then(status => {
+			Models.entity
+			.query(qb => {
+				qb.where({object_id: team_id,
+					object_type: 'teams' })
+				qb.orWhere({object_id: category_id})
+				qb.where({object_type: 'categories'})
+			})
+			.fetchAll()
+			.then((result) => {
+				var tmp = result.toJSON()
+				teamEntity = tmp.filter(e => e.object_type == 'teams')
+				categoryEntity = tmp.filter(e => e.object_type == 'categories')
+				//Salvamos en la tabla de request
+				Models.entity_request({
+					ent_ref_from_id: categoryEntity[0].attributes.id
+					,ent_ref_to_id: teamEntity[0].attributes.id
+					,status: status
+				}).save()
+				.then((result) => Response(res, result))
+				.catch((error) =>  Response(res, null, error))
+			})
+			.catch(error => Response(res, null, error))
 		})
 		.catch(error => Response(res, null, error))
 	})
-
-
 
 	return router;
 

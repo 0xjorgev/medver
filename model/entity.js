@@ -3,9 +3,12 @@ if (typeof define !== 'function') {
 }
 
 define(['./base_model'
+    ,'./team'
+    ,'./user'
+    ,'./category'
     ,'./entity_type'
     ,'./entity_relationship' ]
-    ,(DB) => {
+    ,(DB, Team, User, Category, Entity_type, Entity_relationship) => {
     var Entity = DB.Model.extend({
         tableName: 'entities'
         ,hasTimestamps: true

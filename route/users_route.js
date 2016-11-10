@@ -228,6 +228,8 @@ define(['express'
         ]})
         .then(result => {
             var user = result.toJSON()
+
+			logger.debug(user)
             //con esto se filtran las relaciones tipo 'coach' y owner
             return user.entity.related_from
                 .filter(rel => {

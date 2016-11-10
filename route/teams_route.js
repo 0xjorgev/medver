@@ -316,9 +316,9 @@ define(['express'
 
 
 	//==========================================================================
-	// Create a request of  request participation of one team to a category
+	// Create a team request for participation in a category
 	//==========================================================================
-	router.post('/:id/category/:category_id/invitation', (req, res) => {
+	router.post('/:team_id/category/:category_id/request', (req, res) => {
 		var category_id = req.params.category_id
 		var team_id = req.params.team_id
 
@@ -348,10 +348,10 @@ define(['express'
 				teamEntity = tmp.filter(e => e.object_type == 'teams')
 				categoryEntity = tmp.filter(e => e.object_type == 'categories')
 				//Salvamos en la tabla de request
-				Models.entity_request({
-					ent_ref_from_id: teamEntity[0].attributes.id
-					,ent_ref_to_id: categoryEntity[0].attributes.id
-					,status: status
+				new Models.entity_request({
+					ent_ref_from_id: teamEntity[0].id
+					,ent_ref_to_id: categoryEntity[0].id
+					,status_id: status
 				}).save()
 				.then((result) => Response(res, result))
 				.catch((error) =>  Response(res, null, error))

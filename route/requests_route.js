@@ -23,7 +23,7 @@ define(['express'
 
     
     //==========================================================================
-    // Obtiene todos los request realizados a un entidad
+    // Obtiene todos los request realizados a una entidad
     //==========================================================================
     router.get('/:id/type/:type', function (req, res) {
         //Para obtener las solicitudes que fueron enviadas a una entidad que estan pendientes
@@ -49,7 +49,7 @@ define(['express'
             .fetch()
             .then((entity) => {
                     console.log('Entidad', entity)
-                    return entity.attributes.id
+                    return entity.id
             })
             .then((entity_id) => {
                 console.log('Entidad Id:', entity_id)

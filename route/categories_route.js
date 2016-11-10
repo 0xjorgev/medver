@@ -670,21 +670,21 @@ define(['express',
 	//==========================================================================
 	// Create a request of participation of one team to a category
 	//==========================================================================
-	router.post('/:category_id/team/:team_id/invitation', (req, res) => {
+	router.post('/:category_id/team/:team_id/request', (req, res) => {
 		var category_id = req.params.category_id
 		var team_id = req.params.team_id
 
 		//Obtengo el id de las entidades Team y category
 		var teamEntity = null
 		var categoryEntity = null
-		var status = {}
+		var status_id = 0
 
 		Models.status_type
 		.where({code: 'request-pending'})
 		.fetch()
 		.then(found => {
-			status = found.attributes.id
-			return status
+			status_id = found.attributes.id
+			return found
 		})
 		.then(status => {
 			Models.entity
@@ -699,13 +699,15 @@ define(['express',
 				var tmp = result.toJSON()
 				teamEntity = tmp.filter(e => e.object_type == 'teams')
 				categoryEntity = tmp.filter(e => e.object_type == 'categories')
+				console.log('teamEntity', teamEntity[0].id)
+				console.log('categoryEntity', categoryEntity[0].id)
 				//Salvamos en la tabla de request
-				Models.entity_request({
-					ent_ref_from_id: categoryEntity[0].attributes.id
-					,ent_ref_to_id: teamEntity[0].attributes.id
-					,status: status
+				new Models.entity_request({
+					ent_ref_from_id: categoryEntity[0].id
+					,ent_ref_to_id: teamEntity[0].id
+					,status_id: status_id
 				}).save()
-				.then((result) => Response(res, result))
+				.then((result) =>  Response(res, result))
 				.catch((error) =>  Response(res, null, error))
 			})
 			.catch(error => Response(res, null, error))

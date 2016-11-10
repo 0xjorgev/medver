@@ -1784,7 +1784,7 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-
+  
   /request/{id}/type/{type}:
     get:
       summary: Return the list of request for the id of the type 
@@ -1828,7 +1828,95 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-
+  
+  /team/{team_id}/category/{category_id}/request:
+    post:
+      summary: Create one request for participated in the category from the team to participated 
+      description: 
+      operationId: Team_request_Category
+      tags:
+        - Team
+      produces:
+      - application/json
+      parameters: 
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: POST
+          uri: /team/30/category/5/request
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: Team_request_Category
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /category/{category_id}/team/{team_id}/request:
+    post:
+      summary: Create one request for participated in the category from the team to participated 
+      description: 
+      operationId: Category_request_Team
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters: 
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: POST
+          uri: /category/5/team/30/request
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: category_request_team
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
 
 #######################################################################
 #      _       __ _       _ _   _

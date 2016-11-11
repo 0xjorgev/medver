@@ -5,7 +5,8 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./entity', './organization'], function (DB, Entity) {
+define(['./base_model','./entity', './organization'],
+	function (DB, Entity) {
     var User = DB.Model.extend({
         tableName: 'users'
         ,hasTimestamps: true
@@ -16,7 +17,7 @@ define(['./base_model','./entity', './organization'], function (DB, Entity) {
             return this.hasMany('Competition_user','user_id');
         }
 		,entity : function(){
-		  return this.morphOne(Entity, 'object');
+		  return this.morphOne('Entity', 'object');
 		}
     });
     // uses Registry plugin

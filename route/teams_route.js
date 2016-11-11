@@ -23,9 +23,14 @@ define(['express'
 		return Models.team
 		.query(function(qb){})
 		.where({active:true})
-		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'entity']})
-		.then((result) => Response(res, result))
-		.catch((error) =>  Response(res, null, error))
+		.fetchAll({withRelated: ['category_type'
+			,'organization'
+			,'player_team.player'
+			,'subdiscipline'
+			,'gender'
+			,'entity']})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	});
 
 	router.get('/:team_id/player', function (req, res) {
@@ -53,8 +58,8 @@ define(['express'
 			,'gender'
 			,'entity'
 			,'player_team.position']})
-		.then( (result) => Response(res, result))
-		.catch((error) => Response(res, null, error));
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error));
 
 	});
 

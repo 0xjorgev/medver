@@ -10,7 +10,7 @@ define(['./base_model'
 	,'./category_group_phase_team'
 	,'./subdiscipline'
 	,'./gender'
-	], (DB, Entity) => {
+], (DB, Entity, Category) => {
 
     var Team = DB.Model.extend({
         tableName: 'teams',
@@ -42,7 +42,7 @@ define(['./base_model'
             return this.hasMany('Category_team_player', 'team_id');
         }
 		,entity : function(){
-          return this.morphMany(Entity, 'object');
+          return this.morphOne('Entity', 'object');
         }
     });
 

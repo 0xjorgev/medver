@@ -447,7 +447,7 @@ define(['express',
 	}
 
 	//==========================================================================
-	// Get all player of one category and one team
+	// Get all players of one category and one team
 	//==========================================================================
 	router.get('/:category_id/team/:team_id/player', function (req, res) {
 
@@ -455,15 +455,10 @@ define(['express',
 		var team_id = req.params.team_id;
 
 		return Models.category_team_player
-			.where({category_id:category_id})
-			.where({team_id:team_id})
-			.where({active:true})
-			.fetchAll({withRelated:['player']})
-			.then(function (result) {
-				Response(res, result)
-			}).catch(function(error){
-				Response(res, null, error)
-			});
+			.where({category_id:category_id, team_id:team_id, active: true})
+			.fetchAll({withRelated:['player', 'player_team.position']})
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error));
 	});
 
 	//==========================================================================
@@ -489,25 +484,23 @@ define(['express',
 	//==========================================================================
 	// Get the player of one category and one team
 	//==========================================================================
-	router.get('/:category_id/team/:team_id/player/:player_id', function (req, res) {
-
+	router.get('/:category_id/team/:team_id/player/:player_id', (req, res) => {
 		var category_id = req.params.category_id;
 		var team_id = req.params.team_id;
 		var player_id = req.params.player_id;
 
 		return Models.category_team_player
-			.where({category_id:category_id})
-			.where({team_id:team_id})
-			.where({player_id:player_id})
-			.where({active:true})
+			.where({
+				category_id:category_id
+				,team_id:team_id
+				,player_id:player_id
+				,active:true
+			})
 			.fetch({withRelated:['player']})
-			.then(function (result) {
-				Response(res, result)
-			}).catch(function(error){
-				// Message(res,error.details, error.code, []);
-				Response(res, null, error)
-			});
-	});
+			.fetch()
+			.then(result =>  Response(res, result))
+			.catch(error =>  Response(res, null, error))
+	})
 
 	//==========================================================================
 	// Create a category team player

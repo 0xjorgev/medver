@@ -5,24 +5,15 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./player', './category', './team'], function (DB) {
+define(['./base_model','./player', './category', './team', './player_team'], function (DB) {
 
     var Category_team_player = DB.Model.extend({
-        tableName: 'categories_teams_players',
-        hasTimestamps: true,
-
-        //relations
-        player: function(){
-            return this.belongsTo('Player', 'player_id');
-        },
-
-        category: function(){
-            return this.belongsTo('Category', 'category_id');
-        },
-
-        team: function(){
-            return this.belongsTo('Team', 'team_id');
-        }
+        tableName: 'categories_teams_players'
+        ,hasTimestamps: true
+        ,player: function(){ return this.belongsTo('Player', 'player_id'); }
+        ,category: function(){ return this.belongsTo('Category', 'category_id'); }
+        ,team: function(){ return this.belongsTo('Team', 'team_id'); }
+		,player_team: function(){ return this.belongsTo('Player_team', 'player_id'); }
     });
 
     // uses Registry plugin

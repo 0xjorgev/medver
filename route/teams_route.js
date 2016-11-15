@@ -3,18 +3,20 @@ if (typeof define !== 'function') {
 }
 
 define(['express'
-	,'../model/index'
-	,'../util/request_message_util'
-	,'../util/knex_util'
-	,'../util/response_message_util'
-	,'../util/logger_util'
+		,'../model/index'
+		,'../util/request_message_util'
+		,'../util/knex_util'
+		,'../util/response_message_util'
+		,'../util/logger_util'
+        ,'../helpers/auth_helper'
 	],
 	function (express
 		,Models
 		,Message
 		,Knex
 		,Response
-		,logger){
+		,logger
+        ,auth){
 
 	var router = express.Router();
 
@@ -41,6 +43,8 @@ define(['express'
 		.where({active:true})
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
+			//calculo la edad de cada jugador
+			var players = result.map(s)
 			Response(res, result)
 		}).catch(function(error){
 			Response(res, null, error)
@@ -87,7 +91,6 @@ define(['express'
 	//==========================================================================
 	// CRUD functions
 	//==========================================================================
-
 	var saveTeam = function(data, res){
 		logger.debug(data)
 
@@ -203,6 +206,7 @@ define(['express'
 				// En caso de que sea una operación POST
 				// se asocia el usuario que se está creando
 				// con el team como owner del mismo
+				console.log('Se hace la creacion de la realacion de la entidad con el usuario: ', userEntity[0].id)
 				return new Models.entity_relationship({
 					ent_ref_from_id: userEntity[0].id
 					,ent_ref_to_id: teamEntity.id
@@ -365,6 +369,55 @@ define(['express'
 		})
 		.catch(error => Response(res, null, error))
 	})
+
+	//==========================================================================
+	// Create a team request for participation in a category
+	//==========================================================================
+    router.get('/query/by_user', (req, res) => {
+        //se verifica unicamente que haya un usuario valido en el request
+        //no se requiere ningun permiso especial
+        console.log('Current User', req._currentUser)
+
+        var chk = auth.checkPermissions(req._currentUser, [])
+
+        if(chk.code !== 0){
+            Response(res, null, chk)
+            return
+        }
+
+        Models.user
+        .query(qb => qb.where({id: req._currentUser.id}) )
+        .fetch({withRelated: [
+             'entity.related_from.relationship_type'
+            ,'entity.related_from.to.entity_type'
+            // ,'entity.related_from.from.entity_type'
+        ]})
+        .then(result => {
+            var user = result.toJSON()
+
+			logger.debug(user)
+            //con esto se filtran las relaciones tipo 'coach' y owner
+            return user.entity.related_from
+                .filter(rel => {
+                    var name = (rel.relationship_type.name == undefined) ? '': rel.relationship_type.name.toUpperCase()
+                    return name == 'COACH' || name == 'OWNER'
+                })
+                //y con este map se extraen los ids de los teams
+                .map(teams => teams.to.object_id)
+        })
+        .then(result => {
+            return Models.team
+                .query(qb => qb.whereIn('id', result))
+                .fetchAll({withRelated: ['category_type'
+					,'gender'
+					,'category_group_phase_team.category.season.competition'
+					,'category_group_phase_team.status_type'
+					,'subdiscipline'
+				]})
+        })
+        .then(result => Response(res, result) )
+        .catch(error => Response(res, null, error))
+    })
 
 	return router;
 });

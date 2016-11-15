@@ -1590,7 +1590,7 @@ paths:
       summary: Returns a list of teams on which this user is an owner
       description: Returns a list of teams on which this user is an owner
       tags:
-        - team
+        - Team
       parameters:
         - name: Authorization-Token
           in: header

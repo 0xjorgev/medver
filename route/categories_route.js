@@ -456,8 +456,12 @@ define(['express',
 
 		return Models.category_team_player
 			.where({category_id:category_id, team_id:team_id, active: true})
-			.fetchAll({withRelated:['player.player_team.position']})
-			// .fetchAll({withRelated:['player','player_team.position']})
+			.fetchAll({withRelated: [
+				{"player.player_team": function(qb){
+					qb.where('team_id', team_id)
+				}}
+				,'player.player_team.position'
+			]})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
 	});

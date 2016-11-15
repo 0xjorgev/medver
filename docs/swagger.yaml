@@ -162,8 +162,8 @@ paths:
           description: Active user list
   /user/team:
     get:
-      summary: Returns a list of teams on which this user is a coach
-      description: Returns a list of teams on which this user is a coach
+      summary: Returns a list of teams on which this user is an owner
+      description: Returns a list of teams on which this user is an owner
       tags:
         - User
       parameters:
@@ -178,22 +178,269 @@ paths:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No teams found
-  /event/{match_id}:
+
+  /competition:
     get:
-      summary: Gets the events of a match, given its category_id
-      description: Gets the events of a match, given its category_id
+      summary: List of competitions managed by the user_id received in auth-token
+      description: List of competitions managed by the user_id received in auth-token
       tags:
-        - Event
+        - Competition
+      produces:
+      - application/json
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+        - name: sort
+          in: query
+          type: string
+          required: false
       responses:
         200:
-          description: Match event stream
+          description: List of competition managed by token user
+        404:
+          description: User doesn't manage any competitions
+      security: []
+    post:
+      summary: Creates a competition
+      description: Competition Creation
+      tags:
+        - Competition
+      produces:
+      - application/json
       parameters:
-        - name: match_id
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateCompetitionRequest'
+      responses:
+        200:
+          description: result
+      security: []
+  /competition/query/by_city:
+    get:
+      summary: List of competitions managed by the user_id received in auth-token & filtered by city
+      description: List of competitions managed by the user_id received in auth-token & filtered by city
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+      responses:
+        200:
+          description: List of competition managed by token user
+        404:
+          description: User doesn't manage any competitions
+      security: []
+  /competition/{competition_id}/season/{season_id}/category/{category_id}/publish:
+    put:
+      summary: Sets a category and a competition as published.
+      description: Sets a category and a competition as published. Sends emails to all admins
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: competition_id
+        in: path
+        description: Competition ID
+        required: true
+        type: integer
+        format: integer
+      - name: season_id
+        in: path
+        description: season ID
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        description: category ID
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          title: Competition & category publish Request
+          type: object
+          properties:
+            is_published:
+              type: boolean
+      responses:
+        200:
+          description: Competition update
+      security: []
+  /competition/{competition_id}:
+    get:
+      summary: Gets a competition given an id
+      description: Full competition Object
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: competition_id
+        in: path
+        required: true
+        type: integer
+      responses:
+        200:
+          description: result
+      security: []
+    put:
+      description: Competition Update
+      produces:
+      - application/json
+      tags:
+        - Competition
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/UpdateCompetitionRequest'
+      responses:
+        200:
+          description: result
+      security: []
+  /competition/{competition_id}/season/:
+    get:
+      summary: List of seasons for each competition
+      description: List of seasons for each competition
+      tags:
+        - Competition
+        - Season
+      produces:
+      - application/json
+      parameters:
+        - name: competition_id
           in: path
-          description: Match ID
+          required: true
+          type: integer
+      responses:
+        200:
+          description: results
+      security: []
+  /competition/competition_type:
+    get:
+      summary: Full List of competition types
+      description: Full List of competition types
+      operationId: Get_Competition_types
+      tags:
+        - Competition
+        - Competition Type
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: results
+      security: []
+  /competition/rcompetition/{competition_id}:
+    get:
+      summary: Get Complete Competition
+      description: Get All the competition tree
+      tags:
+        - Competition
+      operationId: Get Complete Competition tree
+      produces:
+      - application/json
+      parameters:
+        - name: competition_id
+          in: path
+          description: Competition ID
           required: true
           type: integer
           format: integer
+      responses:
+        200:
+          description: Competition object
+      security: []
+
+  /season:
+    get:
+      description: returns all seasons
+      tags:
+        - Season
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/FullSeasonListRequest'
+      responses:
+        200:
+          description: result
+      security: []
+  /season/{season_id}:
+    get:
+      description: get the detail of a season
+      parameters:
+        - name: season_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Season
+      produces:
+      - application/json
+      responses:
+        200:
+          description: result
+      security: []
+    post:
+      description: Creates a Season
+      tags:
+        - Season
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/SeasonCreationRequest'
+      responses:
+        200:
+          description: results
+      security: []
+    put:
+      description: season update
+      operationId: Update_Season Update_
+      produces:
+      - application/json
+      tags:
+        - Season
+      parameters:
+        - name: season_id
+          in: path
+          required: true
+          type: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/SeasonUpdateRequest'
+      responses:
+        200:
+          description: results
+      security: []
 
   /category/{category_id}/standing_table:
     get:
@@ -324,7 +571,6 @@ paths:
       responses:
         200:
           description: pending
-
   /category/{category_id}/team/{team_id}/player/{player_id}:
     get:
       summary: Gets the players that participate on a team in a category
@@ -424,6 +670,375 @@ paths:
         200:
           description: Update info of the summoned player of one team on one category successful
       security: []
+  /category/{category_id}/team:
+    get:
+      summary: Gets all teams invited to participate on a category
+      description: Gets all teams invited to participate on a category
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: results
+      security: []
+  /category/{category_id}/se:
+    post:
+      summary: Category Create SE
+      description: Create all phases groups, rounds and matches for a category for a competition of simple elimination
+      tags:
+        - Category
+      operationId: Create_Category SE_
+      produces:
+        - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/CategorySERequest'
+      responses:
+        200:
+          description: OK response
+      security: []
+  /category/{category_id}/teams/{team_id}/matches:
+    get:
+      summary: Returns the matches of a given team, under a category
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+        - name: team_id
+          in: path
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of matches given a category and a team
+  /category/{category_id}/team/{team_id}/invite:
+    post:
+      summary: Create Category Team Invite
+      operationId: Create Category Team Invite
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: Created Category Team Invite
+      security: []
+  /category/{category_id}/team/{team_id}/invite/{id}:
+    put:
+      summary: update Category Team Invite
+      operationId: Update Category Team Invite
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/UpdateCategoryTeamInviteRequest'
+      responses:
+        200:
+          description: Resource updated
+      security: []
+    delete:
+      summary: Delete logical Category Team Invite
+      operationId: Delete logical Category Team Invite
+      tags:
+        - Category
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: Deleted logical category team invite
+      security: []
+  /category/{category_id}/team_placeholders:
+    get:
+      summary: Returns team placeholders for future matches
+      description: Returns team placeholders for future matches.
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+        - name: category_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of placeholders
+      security: []
+  /category/{category_id}/team/{team_id}/request:
+    post:
+      summary: Create one request for participated in the category from the team to participated 
+      description: 
+      operationId: Category_request_Team
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters: 
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: POST
+          uri: /category/5/team/30/request
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: category_request_team
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+
+  /phase:
+    get:
+      summary: Complete list of phases
+      description: Complete list of phases
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: List of phases
+      security: []
+    post:
+      summary: Creates a phase
+      description: Creates a phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: Phase Creation Request
+            type: object
+            properties:
+              name:
+                type: string
+              position:
+                type: integer
+              category_id:
+                type: integer
+              participant_team:
+                type: integer
+              classified_team:
+                type: integer
+            required:
+            - category_id
+            - name
+      responses:
+        200:
+          description: Newly created phase
+      security: []
+  /phase/{phase_id}:
+    get:
+      summary: Gets a phase given its ID
+      description: Gets a phase given its ID
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: Detail of a phase
+      security: []
+    put:
+      summary: Updates a phase given its ID
+      description: Updates a phase given its ID
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: Phase Creation Request
+            type: object
+            properties:
+              name:
+                type: string
+              position:
+                type: integer
+              category_id:
+                type: integer
+              participant_team:
+                type: integer
+              classified_team:
+                type: integer
+              active:
+                type: boolean
+      responses:
+        200:
+          description: Resource updated
+  /phase/{phase_id}/team:
+    get:
+      summary: Returns the teams participating in a phase
+      description: Returns the teams participating in a phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: List of teams in a phase
+      security: []
+  /phase/{phase_id}/group_round_match:
+    get:
+      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
+      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
+      tags:
+        - Phase
+      responses:
+        200:
+          description: Match event stream
+      parameters:
+        - name: phase_id
+          in: path
+          description: Phase ID
+          required: true
+          type: integer
+          format: integer
+  /phase/{phase_id}/group_team:
+    get:
+      summary: returns groups & teams associated to this phase
+      description: returns groups & teams associated to this phase
+      tags:
+        - Phase
+      produces:
+      - application/json
+      parameters:
+        - name: phase_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: result
+      security: []
+
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -457,6 +1072,255 @@ paths:
           required: true
           type: integer
           format: integer
+  /group/:
+    get:
+      description: lists all groups
+      operationId: get Group_
+      tags:
+        - Group
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: list of groups
+      security: []
+    post:
+      description: Creates a group
+      tags:
+        - Group
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateGroupRequest'
+      responses:
+        200:
+          description: list of all matches
+  /group/{group_id}/team:
+    get:
+      description: get teams invited to play on this group
+      tags:
+        - Group
+        - Team
+      produces:
+      - application/json
+      parameters:
+        - name: group_id
+          in: path
+          description: Group ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: list of teams currently on this group
+      security: []
+  
+  /match:
+    get:
+      summary: Gets all matches
+      description: Gets all matches
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: list of all matches
+      security: []
+    post:
+      summary: Creates a match
+      description: Creates a match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateMatchRequest'
+      responses:
+        200:
+          description: match creation OK
+      security: []
+  /match/{match_id}:
+    get:
+      summary: Gets one match
+      description: Gets one match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: list of all matches
+      security: []
+    put:
+      summary: Updates a match
+      description: Updates a match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateMatchRequest'
+      responses:
+        200:
+          description: match creation OK
+      security: []
+  /match/{match_id}/player:
+    get:
+      summary: Returns the player list for this match, grouped by home_team & visitor_team
+      description: Returns the player list for this match, grouped by home_team & visitor_team
+      tags:
+        - Match
+        - Player
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: list of players available for this match
+  /match/{match_id}/team/{team_id}/player:
+    get:
+      summary: Gets the player list for this team & match
+      description: Gets the player list for this team & match
+      tags:
+        - Match
+        - Player
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        description: Team ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: List of players assigned to this match & team
+    put:
+      summary: Toggles the participation of the given player in this match
+      description: Toggles the participation of the given player in this match; necessary for updating the summoned player list for each match
+      tags:
+        - Match
+        - Player
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        description: Team ID
+        required: true
+        type: integer
+        format: integer
+      - name: player_data
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/MatchPlayerTeamRequest'
+      responses:
+        200:
+          description: Correct update of match player list
+  /match/{match_id}/team:
+    get:
+      summary: (documentation pending)
+      description: (documentation pending)
+      tags:
+        - Match
+        - Team
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: (documentation pending)
+
+  /round:
+    get:
+      summary: List all rounds
+      description: List all rounds
+      operationId: get round
+      produces:
+      - application/json
+      tags:
+        - Season
+      parameters: []
+      responses:
+        200:
+          description: list of rounds
+      security: []
+
+  /event/{match_id}:
+    get:
+      summary: Gets the events of a match, given its category_id
+      description: Gets the events of a match, given its category_id
+      tags:
+        - Event
+      responses:
+        200:
+          description: Match event stream
+      parameters:
+        - name: match_id
+          in: path
+          description: Match ID
+          required: true
+          type: integer
+          format: integer
+
   /team:
     get:
       summary: Gets the info of all teams
@@ -541,7 +1405,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
   /team/{team_id}/competition:
     get:
       summary: Returns the competitions where the given team is registered
@@ -563,7 +1426,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
   /team/{team_id}/player:
     get:
       summary: Gets the team's roster of players
@@ -679,6 +1541,68 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /team/{team_id}/category/{category_id}/request:
+    post:
+      summary: Create one request for participated in the category from the team to participated 
+      description: 
+      operationId: Team_request_Category
+      tags:
+        - Team
+      produces:
+      - application/json
+      parameters: 
+      - name: team_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: 
+      security: []
+      x-unitTests:
+      - request:
+          method: POST
+          uri: /team/30/category/5/request
+        expectedResponse:
+          x-allowExtraHeaders: true
+          x-bodyMatchMode: NONE
+          x-arrayOrderedMatching: false
+          x-arrayCheckCount: false
+          x-matchResponseSchema: true
+          headers: {}
+        x-testShouldPass: true
+        x-testEnabled: true
+        x-testName: Team_request_Category
+        x-testDescription: 
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /team/query/by_user:
+    get:
+      summary: Returns a list of teams on which this user is an owner
+      description: Returns a list of teams on which this user is an owner
+      tags:
+        - team
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+      responses:
+        200:
+          description: List of teams on which this user is an owner
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No teams found
 
   /player/{player_id}:
     get:
@@ -722,507 +1646,7 @@ paths:
       responses:
         200:
           description: List of events
-  /match:
-    get:
-      summary: Gets all matches
-      description: Gets all matches
-      tags:
-        - Match
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description: list of all matches
-      security: []
-    post:
-      summary: Creates a match
-      description: Creates a match
-      tags:
-        - Match
-      produces:
-      - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/CreateMatchRequest'
-      responses:
-        200:
-          description: match creation OK
-      security: []
-  /match/{match_id}:
-    get:
-      summary: Gets one match
-      description: Gets one match
-      tags:
-        - Match
-      produces:
-      - application/json
-      parameters:
-      - name: match_id
-        in: path
-        description: Match ID
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: list of all matches
-      security: []
-    put:
-      summary: Updates a match
-      description: Updates a match
-      tags:
-        - Match
-      produces:
-      - application/json
-      parameters:
-      - name: match_id
-        in: path
-        description: Match ID
-        required: true
-        type: integer
-        format: integer
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/CreateMatchRequest'
-      responses:
-        200:
-          description: match creation OK
-      security: []
 
-  /match/{match_id}/player:
-    get:
-      summary: Returns the player list for this match, grouped by home_team & visitor_team
-      description: Returns the player list for this match, grouped by home_team & visitor_team
-      tags:
-        - Match
-        - Player
-      produces:
-      - application/json
-      parameters:
-      - name: match_id
-        in: path
-        description: Match ID
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: list of players available for this match
-
-  /match/{match_id}/team/{team_id}/player:
-    get:
-      summary: Gets the player list for this team & match
-      description: Gets the player list for this team & match
-      tags:
-        - Match
-        - Player
-      produces:
-      - application/json
-      parameters:
-      - name: match_id
-        in: path
-        description: Match ID
-        required: true
-        type: integer
-        format: integer
-      - name: team_id
-        in: path
-        description: Team ID
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: List of players assigned to this match & team
-    put:
-      summary: Toggles the participation of the given player in this match
-      description: Toggles the participation of the given player in this match; necessary for updating the summoned player list for each match
-      tags:
-        - Match
-        - Player
-      produces:
-      - application/json
-      parameters:
-      - name: match_id
-        in: path
-        description: Match ID
-        required: true
-        type: integer
-        format: integer
-      - name: team_id
-        in: path
-        description: Team ID
-        required: true
-        type: integer
-        format: integer
-      - name: player_data
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/MatchPlayerTeamRequest'
-      responses:
-        200:
-          description: Correct update of match player list
-
-  /match/{match_id}/team:
-    get:
-      summary: (documentation pending)
-      description: (documentation pending)
-      tags:
-        - Match
-        - Team
-      produces:
-      - application/json
-      parameters:
-      - name: match_id
-        in: path
-        description: Match ID
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: (documentation pending)
-
-  /competition/{competition_id}:
-    get:
-      summary: Gets a competition given an id
-      description: Full competition Object
-      tags:
-        - Competition
-      produces:
-      - application/json
-      parameters:
-      - name: competition_id
-        in: path
-        required: true
-        type: integer
-      responses:
-        200:
-          description: result
-      security: []
-    put:
-      description: Competition Update
-      produces:
-      - application/json
-      tags:
-        - Competition
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/UpdateCompetitionRequest'
-      responses:
-        200:
-          description: result
-      security: []
-  /phase:
-    get:
-      summary: Complete list of phases
-      description: Complete list of phases
-      tags:
-        - Phase
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description: List of phases
-      security: []
-    post:
-      summary: Creates a phase
-      description: Creates a phase
-      tags:
-        - Phase
-      produces:
-      - application/json
-      parameters:
-        - name: Body
-          in: body
-          required: true
-          x-is-map: false
-          schema:
-            title: Phase Creation Request
-            type: object
-            properties:
-              name:
-                type: string
-              position:
-                type: integer
-              category_id:
-                type: integer
-              participant_team:
-                type: integer
-              classified_team:
-                type: integer
-            required:
-            - category_id
-            - name
-      responses:
-        200:
-          description: Newly created phase
-      security: []
-  /phase/{phase_id}:
-    get:
-      summary: Gets a phase given its ID
-      description: Gets a phase given its ID
-      tags:
-        - Phase
-      produces:
-      - application/json
-      parameters:
-        - name: phase_id
-          in: path
-          description: Phase ID
-          required: true
-          type: integer
-          format: integer
-      responses:
-        200:
-          description: Detail of a phase
-      security: []
-    put:
-      summary: Updates a phase given its ID
-      description: Updates a phase given its ID
-      tags:
-        - Phase
-      produces:
-      - application/json
-      parameters:
-        - name: phase_id
-          in: path
-          description: Phase ID
-          required: true
-          type: integer
-          format: integer
-        - name: Body
-          in: body
-          required: true
-          x-is-map: false
-          schema:
-            title: Phase Creation Request
-            type: object
-            properties:
-              name:
-                type: string
-              position:
-                type: integer
-              category_id:
-                type: integer
-              participant_team:
-                type: integer
-              classified_team:
-                type: integer
-              active:
-                type: boolean
-      responses:
-        200:
-          description: Resource updated
-  /category/{category_id}/team_placeholders:
-    get:
-      summary: Returns team placeholders for future matches
-      description: Returns team placeholders for future matches.
-      tags:
-        - Category
-      produces:
-      - application/json
-      parameters:
-        - name: category_id
-          in: path
-          description: Phase ID
-          required: true
-          type: integer
-          format: integer
-      responses:
-        200:
-          description: List of placeholders
-      security: []
-
-  /phase/{phase_id}/team:
-    get:
-      summary: Returns the teams participating in a phase
-      description: Returns the teams participating in a phase
-      tags:
-        - Phase
-      produces:
-      - application/json
-      parameters:
-        - name: phase_id
-          in: path
-          description: Phase ID
-          required: true
-          type: integer
-          format: integer
-      responses:
-        200:
-          description: List of teams in a phase
-      security: []
-  /phase/{phase_id}/group_round_match:
-    get:
-      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
-      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
-      tags:
-        - Phase
-      responses:
-        200:
-          description: Match event stream
-      parameters:
-        - name: phase_id
-          in: path
-          description: Phase ID
-          required: true
-          type: integer
-          format: integer
-
-  /phase/{phase_id}/group_team:
-    get:
-      summary: returns groups & teams associated to this phase
-      description: returns groups & teams associated to this phase
-      tags:
-        - Phase
-      produces:
-      - application/json
-      parameters:
-        - name: phase_id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description: result
-      security: []
-  /season:
-    get:
-      description: returns all seasons
-      tags:
-        - Season
-      produces:
-      - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/FullSeasonListRequest'
-      responses:
-        200:
-          description: result
-      security: []
-  /competition:
-    get:
-      summary: List of competitions managed by the user_id received in auth-token
-      description: List of competitions managed by the user_id received in auth-token
-      tags:
-        - Competition
-      produces:
-      - application/json
-      parameters:
-        - name: Authorization-Token
-          in: header
-          type: string
-          required: true
-        - name: sort
-          in: query
-          type: string
-          required: false
-      responses:
-        200:
-          description: List of competition managed by token user
-        404:
-          description: User doesn't manage any competitions
-      security: []
-    post:
-      summary: Creates a competition
-      description: Competition Creation
-      tags:
-        - Competition
-      produces:
-      - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/CreateCompetitionRequest'
-      responses:
-        200:
-          description: result
-      security: []
-
-  /competition/query/by_city:
-    get:
-      summary: List of competitions managed by the user_id received in auth-token & filtered by city
-      description: List of competitions managed by the user_id received in auth-token & filtered by city
-      tags:
-        - Competition
-      produces:
-      - application/json
-      parameters:
-        - name: Authorization-Token
-          in: header
-          type: string
-          required: true
-      responses:
-        200:
-          description: List of competition managed by token user
-        404:
-          description: User doesn't manage any competitions
-      security: []
-
-  /competition/{competition_id}/season/{season_id}/category/{category_id}/publish:
-    put:
-      summary: Sets a category and a competition as published.
-      description: Sets a category and a competition as published. Sends emails to all admins
-      tags:
-        - Competition
-      produces:
-      - application/json
-      parameters:
-      - name: competition_id
-        in: path
-        description: Competition ID
-        required: true
-        type: integer
-        format: integer
-      - name: season_id
-        in: path
-        description: season ID
-        required: true
-        type: integer
-        format: integer
-      - name: category_id
-        in: path
-        description: category ID
-        required: true
-        type: integer
-        format: integer
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          title: Competition & category publish Request
-          type: object
-          properties:
-            is_published:
-              type: boolean
-      responses:
-        200:
-          description: Competition update
-      security: []
   /gender:
     get:
       description: get gender list
@@ -1242,61 +1666,6 @@ paths:
         200:
           description: result
       security: []
-  /season/{season_id}:
-    get:
-      description: get the detail of a season
-      parameters:
-        - name: season_id
-          in: path
-          required: true
-          type: integer
-      tags:
-        - Season
-      produces:
-      - application/json
-      responses:
-        200:
-          description: result
-      security: []
-    post:
-      description: Creates a Season
-      tags:
-        - Season
-      produces:
-      - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/SeasonCreationRequest'
-      responses:
-        200:
-          description: results
-      security: []
-    put:
-      description: season update
-      operationId: Update_Season Update_
-      produces:
-      - application/json
-      tags:
-        - Season
-      parameters:
-        - name: season_id
-          in: path
-          required: true
-          type: integer
-        - name: Body
-          in: body
-          required: true
-          x-is-map: false
-          schema:
-            $ref: '#/definitions/SeasonUpdateRequest'
-      responses:
-        200:
-          description: results
-      security: []
   /gender/{gender_id}:
     get:
       description: Return info of a given gender
@@ -1314,24 +1683,7 @@ paths:
         200:
           description: results
       security: []
-  /competition/{competition_id}/season/:
-    get:
-      summary: List of seasons for each competition
-      description: List of seasons for each competition
-      tags:
-        - Competition
-        - Season
-      produces:
-      - application/json
-      parameters:
-        - name: competition_id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description: results
-      security: []
+
   /discipline/:
     get:
       summary: Lists all disciplines
@@ -1395,174 +1747,7 @@ paths:
       responses:
         200:
           description: '?'
-      security: []
-  /round:
-    get:
-      summary: List all rounds
-      description: List all rounds
-      operationId: get round
-      produces:
-      - application/json
-      tags:
-        - Season
-      parameters: []
-      responses:
-        200:
-          description: list of rounds
-      security: []
-  /competition/competition_type:
-    get:
-      summary: Full List of competition types
-      description: Full List of competition types
-      operationId: Get_Competition_types
-      tags:
-        - Competition
-        - Competition Type
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description: results
-      security: []
-  /category/{category_id}/team:
-    get:
-      summary: Gets all teams invited to participate on a category
-      description: Gets all teams invited to participate on a category
-      tags:
-        - Category
-        - Team
-      produces:
-      - application/json
-      parameters:
-        - name: category_id
-          in: path
-          description: Category ID
-          required: true
-          type: integer
-          format: integer
-      responses:
-        200:
-          description: results
-      security: []
-  /group/:
-    get:
-      description: lists all groups
-      operationId: get Group_
-      tags:
-        - Group
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description: list of groups
-      security: []
-    post:
-      description: Creates a group
-      tags:
-        - Group
-      produces:
-      - application/json
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/CreateGroupRequest'
-      responses:
-        200:
-          description: list of all matches
-  /group/{group_id}/team:
-    get:
-      description: get teams invited to play on this group
-      tags:
-        - Group
-        - Team
-      produces:
-      - application/json
-      parameters:
-        - name: group_id
-          in: path
-          description: Group ID
-          required: true
-          type: integer
-          format: integer
-      responses:
-        200:
-          description: list of teams currently on this group
-      security: []
-  /category/{category_id}/se:
-    post:
-      summary: Category Create SE
-      description: Create all phases groups, rounds and matches for a category for a competition of simple elimination
-      tags:
-        - Category
-      operationId: Create_Category SE_
-      produces:
-        - application/json
-      parameters:
-        - name: category_id
-          in: path
-          description: Category ID
-          required: true
-          type: integer
-          format: integer
-        - name: Body
-          in: body
-          required: true
-          x-is-map: false
-          schema:
-            $ref: '#/definitions/CategorySERequest'
-      responses:
-        200:
-          description: OK response
-      security: []
-
-  /competition/rcompetition/{competition_id}:
-    get:
-      summary: Get Complete Competition
-      description: Get All the competition tree
-      tags:
-        - Competition
-      operationId: Get Complete Competition tree
-      produces:
-      - application/json
-      parameters:
-        - name: competition_id
-          in: path
-          description: Competition ID
-          required: true
-          type: integer
-          format: integer
-      responses:
-        200:
-          description: Competition object
-      security: []
-
-  /category/{category_id}/teams/{team_id}/matches:
-    get:
-      summary: Returns the matches of a given team, under a category
-      tags:
-        - Category
-        - Team
-      produces:
-      - application/json
-      parameters:
-        - name: category_id
-          in: path
-          required: true
-          type: integer
-          format: integer
-        - name: team_id
-          in: path
-          required: true
-          type: integer
-          format: integer
-      responses:
-        200:
-          description: List of matches given a category and a team
+      security: [] 
 
   /subdiscipline/{subdiscipline_id}/event:
     get:
@@ -1579,90 +1764,6 @@ paths:
       responses:
         200:
           description: Active subdiscipline Available Events
-
-  /category/{category_id}/team/{team_id}/invite:
-    post:
-      summary: Create Category Team Invite
-      operationId: Create Category Team Invite
-      tags:
-        - Category
-        - Team
-      produces:
-      - application/json
-      parameters:
-      - name: category_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      - name: team_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: Created Category Team Invite
-      security: []
-  /category/{category_id}/team/{team_id}/invite/{id}:
-    put:
-      summary: update Category Team Invite
-      operationId: Update Category Team Invite
-      tags:
-        - Category
-        - Team
-      produces:
-      - application/json
-      parameters:
-      - name: category_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      - name: team_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/UpdateCategoryTeamInviteRequest'
-      responses:
-        200:
-          description: Resource updated
-      security: []
-    delete:
-      summary: Delete logical Category Team Invite
-      operationId: Delete logical Category Team Invite
-      tags:
-        - Category
-        - Team
-      produces:
-      - application/json
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      - name: category_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      - name: team_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: Deleted logical category team invite
-      security: []
-
   
   /status_type:
     get:
@@ -1827,97 +1928,10 @@ paths:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
+        IsMultiContentStreaming: falsee
   
-  /team/{team_id}/category/{category_id}/request:
-    post:
-      summary: Create one request for participated in the category from the team to participated 
-      description: 
-      operationId: Team_request_Category
-      tags:
-        - Team
-      produces:
-      - application/json
-      parameters: 
-      - name: team_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      - name: category_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: 
-      security: []
-      x-unitTests:
-      - request:
-          method: POST
-          uri: /team/30/category/5/request
-        expectedResponse:
-          x-allowExtraHeaders: true
-          x-bodyMatchMode: NONE
-          x-arrayOrderedMatching: false
-          x-arrayCheckCount: false
-          x-matchResponseSchema: true
-          headers: {}
-        x-testShouldPass: true
-        x-testEnabled: true
-        x-testName: Team_request_Category
-        x-testDescription: 
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
-  /category/{category_id}/team/{team_id}/request:
-    post:
-      summary: Create one request for participated in the category from the team to participated 
-      description: 
-      operationId: Category_request_Team
-      tags:
-        - Category
-      produces:
-      - application/json
-      parameters: 
-      - name: team_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      - name: category_id
-        in: path
-        required: true
-        type: integer
-        format: integer
-      responses:
-        200:
-          description: 
-      security: []
-      x-unitTests:
-      - request:
-          method: POST
-          uri: /category/5/team/30/request
-        expectedResponse:
-          x-allowExtraHeaders: true
-          x-bodyMatchMode: NONE
-          x-arrayOrderedMatching: false
-          x-arrayCheckCount: false
-          x-matchResponseSchema: true
-          headers: {}
-        x-testShouldPass: true
-        x-testEnabled: true
-        x-testName: category_request_team
-        x-testDescription: 
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
 
+  
 #######################################################################
 #      _       __ _       _ _   _
 #     | |     / _(_)     (_) | (_)

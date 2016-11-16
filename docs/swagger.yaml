@@ -841,14 +841,14 @@ paths:
       security: []
   /category/{category_id}/team/{team_id}/request:
     post:
-      summary: Create one request for participated in the category from the team to participated 
-      description: 
+      summary: Creates a request for a team's participation in a category
+      description: Creates a request for a team's participation in a category
       operationId: Category_request_Team
       tags:
         - Category
       produces:
       - application/json
-      parameters: 
+      parameters:
       - name: team_id
         in: path
         required: true
@@ -861,7 +861,7 @@ paths:
         format: integer
       responses:
         200:
-          description: 
+          description: OK
       security: []
       x-unitTests:
       - request:
@@ -877,7 +877,7 @@ paths:
         x-testShouldPass: true
         x-testEnabled: true
         x-testName: category_request_team
-        x-testDescription: 
+        x-testDescription:
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -1075,7 +1075,7 @@ paths:
   /group/:
     get:
       description: lists all groups
-      operationId: get Group_
+      operationId: get_group
       tags:
         - Group
       produces:
@@ -1120,7 +1120,7 @@ paths:
         200:
           description: list of teams currently on this group
       security: []
-  
+
   /match:
     get:
       summary: Gets all matches
@@ -1429,7 +1429,7 @@ paths:
   /team/{team_id}/player:
     get:
       summary: Gets the team's roster of players
-      description: Gets the team's roster of players
+      description: Gets the team's roster of players.
       parameters:
         - name: team_id
           in: path
@@ -1449,7 +1449,7 @@ paths:
             $ref: '#/definitions/Error'
     post:
       summary: Creates a player and inserts it in the team roster
-      description: Creates a player and inserts it in the team roster
+      description: Receives an object or an array of objects, as described in the model example
       parameters:
         - name: team_id
           in: path
@@ -1457,29 +1457,31 @@ paths:
           required: true
           type: integer
           format: integer
-        - name: player y team data
+        - name: player & team data
           in: body
           required: true
-          x-is-map: false
           schema:
-            title: PlayerTeamCreateRequest
-            type: object
-            properties:
-              player:
-                type: object
-                schema:
-                  name:
-                    type: string
-                  position:
-                    type: integer
-                  category_id:
-                    type: integer
-                  participant_team:
-                    type: integer
-                  classified_team:
-                    type: integer
-            required:
-            - player
+            $ref: '#/definitions/PlayerTeamData'
+            # type: array
+            # items:
+            #   type: object
+            #   player:
+            #     type: object
+            #     properties:
+            #       name:
+            #         type: string
+            #       position:
+            #         type: integer
+            #       category_id:
+            #         type: integer
+            #       participant_team:
+            #         type: integer
+            #       classified_team:
+            #         type: integer
+            #   team:
+            #       type: object
+            #       properties:
+            #         team_id: integer
       tags:
         - Team
         - Player
@@ -1543,14 +1545,14 @@ paths:
             $ref: '#/definitions/Error'
   /team/{team_id}/category/{category_id}/request:
     post:
-      summary: Create one request for participated in the category from the team to participated 
-      description: 
+      summary: Create one request for participated in the category from the team to participated
+      description: Create one request for participated in the category from the team to participated
       operationId: Team_request_Category
       tags:
         - Team
       produces:
       - application/json
-      parameters: 
+      parameters:
       - name: team_id
         in: path
         required: true
@@ -1563,7 +1565,7 @@ paths:
         format: integer
       responses:
         200:
-          description: 
+          description:
       security: []
       x-unitTests:
       - request:
@@ -1579,7 +1581,7 @@ paths:
         x-testShouldPass: true
         x-testEnabled: true
         x-testName: Team_request_Category
-        x-testDescription: 
+        x-testDescription:
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -1747,7 +1749,7 @@ paths:
       responses:
         200:
           description: '?'
-      security: [] 
+      security: []
 
   /subdiscipline/{subdiscipline_id}/event:
     get:
@@ -1764,7 +1766,7 @@ paths:
       responses:
         200:
           description: Active subdiscipline Available Events
-  
+
   /status_type:
     get:
       summary: Returns the list of Status Types active
@@ -1777,7 +1779,7 @@ paths:
       parameters: []
       responses:
         200:
-          description: 
+          description:
       security: []
       x-unitTests:
       - request:
@@ -1802,7 +1804,7 @@ paths:
         x-testShouldPass: true
         x-testEnabled: true
         x-testName: Status_Type
-        x-testDescription: 
+        x-testDescription:
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -1825,7 +1827,7 @@ paths:
         format: integer
       responses:
         200:
-          description: 
+          description:
       security: []
       x-unitTests:
       - request:
@@ -1841,7 +1843,7 @@ paths:
         x-testShouldPass: true
         x-testEnabled: true
         x-testName: Get Status Type
-        x-testDescription: 
+        x-testDescription:
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -1863,7 +1865,7 @@ paths:
         type: string
       responses:
         200:
-          description: 
+          description:
       security: []
       x-unitTests:
       - request:
@@ -1879,23 +1881,23 @@ paths:
         x-testShouldPass: true
         x-testEnabled: true
         x-testName: Get Status Type
-        x-testDescription: 
+        x-testDescription:
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-  
+
   /request/{id}/type/{type}:
     get:
-      summary: Return the list of request for the id of the type 
-      description: Return the list of request for the id of the type 
+      summary: Return the list of request for the id of the type
+      description: Return the list of request for the id of the type
       operationId: Get_Request_To
       tags:
         - Request
       produces:
       - application/json
-      parameters: 
+      parameters:
       - name: id
         in: path
         required: true
@@ -1907,7 +1909,7 @@ paths:
         type: string
       responses:
         200:
-          description: 
+          description:
       security: []
       x-unitTests:
       - request:
@@ -1923,15 +1925,15 @@ paths:
         x-testShouldPass: true
         x-testEnabled: true
         x-testName: http://localhost:3000/api/v1.0/request/28/type/teams
-        x-testDescription: 
+        x-testDescription:
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: falsee
-  
 
-  
+
+
 #######################################################################
 #      _       __ _       _ _   _
 #     | |     / _(_)     (_) | (_)
@@ -2278,6 +2280,53 @@ definitions:
         $ref: '#/definitions/CreateTeamRequest'
       team:
         $ref: '#/definitions/CreateGroupRequest'
+
+  PlayerTeamData:
+    type: array
+    items:
+      type: object
+      properties:
+        player:
+          type: object
+          description: player data
+          required: true
+          properties:
+            first_name:
+              type: string
+              description: First name of the player
+              required: true
+            last_name:
+              type: string
+              description: Last name of the player
+              required: true
+            birthday:
+              type: string
+              description: Player's date of birth. ex. 2001-02-12T00:00:00-04:00
+              required: true
+            nickname:
+              type: string
+              description: Player's nickname or familiar name
+              required: false
+            email:
+              type: string
+              description: Player's email
+              required: false
+            document_number:
+              type: string
+              description: Identification number of the player, if available
+              required: false
+        team_player:
+          type: object
+          required: true
+          properties:
+            number:
+              type: integer
+              description: Player's number on team
+              required: true
+            position_id:
+              type: integer
+              description: Player's position on the team
+              required: true
 
   UpdateCategoryTeamInviteRequest:
     title: Create Category Team InviteRequest

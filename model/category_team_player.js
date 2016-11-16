@@ -13,7 +13,6 @@ define(['./base_model','./player', './category', './team', './player_team'], fun
         ,player: function(){ return this.belongsTo('Player', 'player_id'); }
         ,category: function(){ return this.belongsTo('Category', 'category_id'); }
         ,team: function(){ return this.belongsTo('Team', 'team_id'); }
-		,player_team: function(){ return this.belongsTo('Player_team', 'player_id'); }
     });
 
     // uses Registry plugin

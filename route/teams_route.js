@@ -44,7 +44,7 @@ define(['express'
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
 			//calculo la edad de cada jugador
-			var players = result.map(s)
+			// var players = result.map(s)
 			Response(res, result)
 		}).catch(function(error){
 			Response(res, null, error)

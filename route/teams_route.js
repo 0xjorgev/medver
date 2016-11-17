@@ -44,7 +44,7 @@ define(['express'
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
 			//calculo la edad de cada jugador
-			// var players = result.map(s)
+			var players = result.map(s)
 			Response(res, result)
 		}).catch(function(error){
 			Response(res, null, error)
@@ -252,12 +252,18 @@ define(['express'
 			.save()
 			.then( savedPlayer => {
 				//se escribe el roster del equipo
-				return new Models.player_team({
+				var ptData = {
 					number	: data.team_player.number
 					,player_id : savedPlayer.attributes.id
 					,position_id : data.team_player.position_id
 					,team_id : data.team_player.team_id
-				})
+				}
+
+				if(data.team_player.id !== undefined && data.team_player.id !== null){
+					ptData.id = data.team_player.id
+				}
+				
+				return new Models.player_team(ptData)
 				.save()
 			})
 		}))
@@ -277,6 +283,7 @@ define(['express'
 	router.put('/:team_id/player/:player_id', function(req, res){
 		var data = req.body
 		data.id = req.params.team_id
+		data.player.id = parseInt(req.params.player_id)
 		console.log('PUT team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
 	})

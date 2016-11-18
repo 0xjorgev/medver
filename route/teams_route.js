@@ -44,9 +44,10 @@ define(['express'
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
 			//calculo la edad de cada jugador
-			var players = result.map(s)
+			//var players = result.map(s)
 			Response(res, result)
-		}).catch(function(error){
+		})
+		.catch(function(error){
 			Response(res, null, error)
 		});
 	});
@@ -165,9 +166,6 @@ define(['express'
 		.then(result => {
 			var tmp = result.toJSON()
 
-			logger.debug(tmp)
-			logger.debug('........................................................')
-
 			teamEntity = tmp.filter(e => e.object_type == 'teams')
 			userEntity = tmp.filter(e => e.object_type == 'users')
 
@@ -262,7 +260,7 @@ define(['express'
 				if(data.team_player.id !== undefined && data.team_player.id !== null){
 					ptData.id = data.team_player.id
 				}
-				
+
 				return new Models.player_team(ptData)
 				.save()
 			})

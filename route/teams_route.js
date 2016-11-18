@@ -44,7 +44,7 @@ define(['express'
 		.fetchAll({withRelated: ['player', 'position'], debug: false})
 		.then(function (result) {
 			//calculo la edad de cada jugador
-			// var players = result.map(s)
+			var players = result.map(s)
 			Response(res, result)
 		}).catch(function(error){
 			Response(res, null, error)
@@ -236,38 +236,44 @@ define(['express'
 	});
 
 	var savePlayerTeam = (playerTeamData, res) => {
-		logger.debug('savePlayerTeam', playerTeamData)
-		var playerData = playerTeamData.player
-		var teamData = playerTeamData.team_player
+
+		logger.debug('savePlayerTeam')
+		logger.debug(playerTeamData)
+
+		//mutation warning
+		if(!(Object.prototype.toString.call( playerTeamData ) === '[object Array]')) {
+			playerTeamData = [playerTeamData]
+		}
 
 		//TODO: check player existance
-		//version 1 -> insert into team roster without checking existance
-		var _playerResult = undefined
+		Promise.all(playerTeamData.map(data => {
+			//se escribe la tabla de jugador
+			return new Models.player(data.player)
+			.save()
+			.then( savedPlayer => {
+				//se escribe el roster del equipo
+				var ptData = {
+					number	: data.team_player.number
+					,player_id : savedPlayer.attributes.id
+					,position_id : data.team_player.position_id
+					,team_id : data.team_player.team_id
+				}
 
-		new Models.player(playerData)
-		.save()
-		.then((result) => {
-			_playerResult = result
-			//teamData.player_id = result.attributes.id
-			var team_player = {
-				number	: teamData.number,
-				player_id : result.attributes.id,
-				position_id : teamData.position_id,
-				team_id : teamData.team_id
-			}
-
-			if(playerTeamData.team_player.id) team_player.id = playerTeamData.team_player.id
-
-			return new Models.player_team(team_player).save()
-		})
-		.then(result => Response(res, {player: _playerResult, player_team: result}))
+				if(data.team_player.id !== undefined && data.team_player.id !== null){
+					ptData.id = data.team_player.id
+				}
+				
+				return new Models.player_team(ptData)
+				.save()
+			})
+		}))
+		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error) )
 	}
 
 	// Saves into players_teams, the roster of this team
 	router.post('/:team_id/player', function(req, res){
 		var data = req.body
-
 		//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
 		console.log('POST team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
@@ -277,6 +283,7 @@ define(['express'
 	router.put('/:team_id/player/:player_id', function(req, res){
 		var data = req.body
 		data.id = req.params.team_id
+		data.player.id = parseInt(req.params.player_id)
 		console.log('PUT team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
 	})

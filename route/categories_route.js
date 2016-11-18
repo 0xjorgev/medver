@@ -8,24 +8,28 @@ var inspect = require('util').inspect
 var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
 
-define(['express',
-		'../model/index',
-		'../util/request_message_util',
-		'../util/knex_util',
-		'../helpers/standing_table_helper',
-		'../util/response_message_util',
-		'../node_modules/lodash/lodash.min',
-		'bluebird'],
-	function (express,
-		Models,
-		Message,
-		Knex,
-		StandingTable,
-		Response,
-		_,
-		Promise) {
+define(['express'
+		,'../model/index'
+		,'../util/request_message_util'
+		,'../util/knex_util'
+		,'../helpers/standing_table_helper'
+		,'../util/response_message_util'
+		,'../node_modules/lodash/lodash.min'
+		,'bluebird'
+		,'../util/email_sender_util'
+		],
+	function (express
+		,Models 
+		,Message 
+		,Knex 
+		,StandingTable 
+		,Response 
+		,_ 
+		,Promise
+		,Email) {
 
 	var router = express.Router();
+    var send_email_from = Email(process.env.SENDER_EMAIL);
 
 	var mapper = function(phase) {
 		// console.log('Phase:', phase.attributes);
@@ -382,6 +386,9 @@ define(['express',
 		var data = {}
 		req.body.category_id = req.params.category_id
 		req.body.team_id = req.params.team_id
+		req.body._currentUser = req._currentUser
+		console.log('req.headers',req.headers)
+		req.body._origin = req.header.origin
 		console.log('POST', req.body)
 		saveCategory_group_phase_team(req.body, res)
 	})
@@ -412,8 +419,12 @@ define(['express',
 	// Save Category Group Phase Team
 	//==========================================================================
 	var saveCategory_group_phase_team = function(data, res){
-
 		console.log("data: ", data)
+		var _currentUser = data._currentUser
+		var _origin = data._origin
+
+		console.log("currentUser: ", _currentUser)
+
 		var spiderData = {}
 		spiderData.category_id = data.category_id
 		spiderData.team_id     = data.team_id
@@ -437,9 +448,17 @@ define(['express',
 		}
 
 		console.log("spiderData: ", spiderData)
-		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
+		return new Models.category_group_phase_team(spiderData).save()
+		.then(function(new_invitation){
 			console.log(`new_invitation:`, new_invitation);
-			Response(res, new_invitation);
+			var invitation = new_invitation
+			//Sent mail of inscription on category
+			console.log('DATA_ID:',data.id)
+			if(data.id == undefined)
+			{
+				email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
+			}
+			Response(res, invitation);
 		})
 		.catch(function(error){
 			Response(res, null, error);
@@ -712,6 +731,37 @@ define(['express',
 		})
 		.catch(error => Response(res, null, error))
 	})
+
+	var email_sender_invitation = function(user, origin, category_id, team_id)
+	{
+		console.log('/////////////////////INICIO DE ENVIO DE INVITACION POR CORREO PARA UN EQUIPO///////////////////////')
+		console.log('User: ', user)
+		console.log('origin: ', origin)
+		console.log('category_id: ', category_id)
+		console.log('team_id: ', team_id)
+		// var email = user.email
+		// var username = user.username
+		var email = "franciscoj.delablancam@gmail.com"
+		var username = "francisco j delablancam"
+		var _origin = origin
+
+		Models.category
+		.where({id:category_id})
+		.where({active:true})
+		.fetch()
+		.then(function (result) {
+			console.log('Category', result)
+			console.log('Category', result.attributes.name)
+			var _name = result.attributes.name
+			var content =  `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">    <!-- header -->    <table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table">        <tr>            <td width="20%" align="left" >                <img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png">            </td>            <td width="60%" align="center" ></td>            <td width="20%" align="rigth">                <img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png">            </td>        </tr>        <!-- Content -->        <tr style="background-color:#F6F6F6;color: #000">            <td width="20%" align="left" ></td>            <td width="60%" >                <p  style="font-style: italic; font-size:20px; ">Welcome to Somosport ${username}</p>                <p  style="font-style: italic; font-size:20px;">We will assist you to register your team at <strong>"${_name}"</strong></p>                <p>Thanks for signing up!</p>                <p>To continue with the registration of your Team in <strong>"${_name}"</strong>, please log in at <a href="${origin}">Login</a> and pick up where you left off</p>                <!--p>We're always here to help, so if you have questions visit us at [url]. <p-->                <p>Thanks,</p>                <p><strong>— The Somosport Team at Alianza</strong></p>            </td>            <td  align="rigth"></td>        <tr style="background-color:#F6F6F6;color: #000">            <td width="20%" align="left" ></td>             <td width="60%" >                <p>Note: This email was sent from an address that cannot accept incoming email.</p>                <p>You have received this business communication as part of our efforts to fulfill your request or service your account. Please note that you may receive this and other business communications from us even if you have opted out of marketing messages as that choice does not apply to important messages that could affect your service or software, or that are required by law.</p>                <p>Somosport respects your privacy. </p>               <p>© Somosport Inc.,</p>            </td>            <td width="20%"  align="rigth"></td>        </tr>             </table><!-- End wrapper table --></body>`
+			console.log('content', content)
+			send_email_from(email, 'Welcome to SomoSport', content )
+			
+			console.log('/////////////////////FIN DE ENVIO DE INVITACION POR CORREO PARA UN EQUIPO///////////////////////')
+		}).catch(function(error){
+			console.error(error)
+		});
+	}
 
 	return router;
 

@@ -99,7 +99,7 @@ define(['express'
 			})
 			.save()
         })
-        .then(result => {
+        .then((result) => {
 
             logger.debug(`Result Value`, result);
             //content is from template/email/registerUser.html

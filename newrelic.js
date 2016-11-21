@@ -10,7 +10,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name: ['ss-core-dev'],
+  app_name: [process.env.NEWRELIC_APP_NAME || 'ss-core'],
   /**
    * Your New Relic license key.
    */

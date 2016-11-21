@@ -328,7 +328,6 @@ define(['express'
 		.catch((error) =>  Response(res, null, error))
 	});
 
-
 	//==========================================================================
 	// Create a team request for participation in a category
 	//==========================================================================

@@ -8,24 +8,30 @@ var inspect = require('util').inspect
 var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
 
-define(['express',
-		'../model/index',
-		'../util/request_message_util',
-		'../util/knex_util',
-		'../helpers/standing_table_helper',
-		'../util/response_message_util',
-		'../node_modules/lodash/lodash.min',
-		'bluebird'],
-	function (express,
-		Models,
-		Message,
-		Knex,
-		StandingTable,
-		Response,
-		_,
-		Promise) {
+define(['express'
+		,'../model/index'
+		,'../util/request_message_util'
+		,'../util/knex_util'
+		,'../helpers/standing_table_helper'
+		,'../util/response_message_util'
+		,'../node_modules/lodash/lodash.min'
+		,'bluebird'
+		,'../util/email_sender_util'
+		,'../util/logger_util'
+		],
+	function (express
+		,Models 
+		,Message 
+		,Knex 
+		,StandingTable 
+		,Response 
+		,_ 
+		,Promise
+		,Email
+		,logger) {
 
 	var router = express.Router();
+    var send_email_from = Email(process.env.SENDER_EMAIL);
 
 	var mapper = function(phase) {
 		// console.log('Phase:', phase.attributes);
@@ -382,6 +388,9 @@ define(['express',
 		var data = {}
 		req.body.category_id = req.params.category_id
 		req.body.team_id = req.params.team_id
+		req.body._currentUser = req._currentUser
+		console.log('req.headers',req.headers)
+		req.body._origin = req.headers.origin
 		console.log('POST', req.body)
 		saveCategory_group_phase_team(req.body, res)
 	})
@@ -412,8 +421,12 @@ define(['express',
 	// Save Category Group Phase Team
 	//==========================================================================
 	var saveCategory_group_phase_team = function(data, res){
-
 		console.log("data: ", data)
+		var _currentUser = data._currentUser
+		var _origin = data._origin
+
+		console.log("currentUser: ", _currentUser)
+
 		var spiderData = {}
 		spiderData.category_id = data.category_id
 		spiderData.team_id     = data.team_id
@@ -437,9 +450,17 @@ define(['express',
 		}
 
 		console.log("spiderData: ", spiderData)
-		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
+		return new Models.category_group_phase_team(spiderData).save()
+		.then(function(new_invitation){
 			console.log(`new_invitation:`, new_invitation);
-			Response(res, new_invitation);
+			var invitation = new_invitation
+			//Sent mail of inscription on category
+			console.log('DATA_ID:',data.id)
+			if(data.id == undefined)
+			{
+				email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
+			}
+			Response(res, invitation);
 		})
 		.catch(function(error){
 			Response(res, null, error);
@@ -712,6 +733,43 @@ define(['express',
 		})
 		.catch(error => Response(res, null, error))
 	})
+
+	router.email_sender_invitation = function(user, origin, category_id, team_id)
+	{
+		var _origin = origin
+		var category
+		console.log('USER: ', user)
+		//OBTENGO LA CATEGORIA DE LA COMPETITION
+		Models.category
+			.where({id:category_id, active:true})
+			.fetch() 
+		.then(_category => {
+			category = _category
+			//Obtengo la entidad del team
+			return Models.entity
+			.where({object_id: team_id, object_type: 'teams'})
+			.fetch()
+		})
+		.then(_teamEntity => {
+				//logger.debug(_teamEntity.toJSON())
+				return Models.entity_relationship
+				.where({ent_ref_to_id: _teamEntity.attributes.id, relationship_type_id: 1})
+				.fetchAll({withRelated: ['from.object']})
+		})
+		.then(_relationships => {
+			realationships = _relationships.toJSON()
+			for (var i = realationships.length - 1; i >= 0; i--) {
+				username = realationships[i].from.object.username
+				email = realationships[i].from.object.email
+				var _name = category.attributes.name
+				var content =  `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;"><!-- header --><table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table"><tr><td width="20%" align="left" ><img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png"></td><td width="60%" align="center" ></td><td width="20%" align="rigth"><img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png"></td></tr><!-- Content --><tr style="background-color:#F6F6F6; color: #000"><td width="20%" align="left" ></td><td width="60%" ><p style="font-style: italic;font-size:20px">Welcome to Somosport ${username}</p><p style="font-style: italic;font-size:20px">We will assist you to register your team at <strong>"${_name}"</strong></p><p>Thanks for signing up!</p><p style="text-align: justify;">To continue with the registration of your Team in <strong>"${_name}"</strong>, please log in at <a href="${origin}">Login</a> and pick up where you left off</p><!--p>We're always here to help, so if you have questions visit us at [url]. <p--><p>Thanks,</p><p><strong>— The Somosport Team at Alianza</strong></p></td><td  align="rigth"></td><tr style="background-color:#F6F6F6; color: #000"><td width="20%" align="left" ></td><td width="60%" ><p style="text-align: justify;">Note: This email was sent from an address that cannot accept incoming email.</p><p style="text-align: justify;">You have received this business communication as part of our efforts to fulfill your request or service your account. Please note that you may receive this and other business communications from us even if you have opted out of marketing messages as that choice does not apply to important messages that could affect your service or software, or that are required by law.</p><p style="text-align: justify;">Somosport respects your privacy. </p><p style="text-align: justify;">© Somosport Inc.,</p></td><td width="20%"  align="rigth"></td></tr></table><!-- End wrapper table --></body>`
+				send_email_from(email, 'Welcome to SomoSport', content )
+			}
+		})
+		.catch(function(error){
+			console.error(error)
+		})
+	}
 
 	return router;
 

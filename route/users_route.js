@@ -107,7 +107,10 @@ define(['express'
         .then(result => {
             //content is from template/email/registerUser.html
             var content =  `<td style="padding-left: 21%; color: #000;"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`
-            send_email_from(email,'Welcome to Somosport', content)
+            var header = '<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;"><!-- header --><table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table"><tr style="background-color: #00796b; text-align: center;"><td><h5 style="line-height: 5px;text-align: center; font-size: 14px;"><img alt="SomoSport Logo"  href="${origin}" src="http://ss-management-dev.herokuapp.com/img/somosport-brand-small.png"></h5></td></tr><tr style="background-color:#F6F6F6;">'
+            var footer = '</tr><!-- End Content --><tr style="background-color: #00796b;"><td><h5 class="closing-text" style="color: #f6f6f6; line-height: 5px;text-align: center; font-size: 14px;">Thank you, Somosport!</h5></td></tr></table><!-- End wrapper table --></body>'
+            var content_html = header + content + footer
+            send_email_from(email,'Welcome to Somosport', content_html)
 
             var claims = {
                 user: _newUser.id,
@@ -173,8 +176,12 @@ define(['express'
                 var urlresetPassword = origin+'/reset_password/username/'+ username + '/rq_token/' + jwt.compact()
                 console.log('urlresetPassword', urlresetPassword)
                 var content =  `<td valign="top" class="top-content action-content" style="padding-left: 21%"><h1>${username},</h1><p>There was recently a request to change the password for your account.</p><p>You can change your password at any time by logging into <a href="${origin}">your account</a>.</p><p>If you requested this password change, click here to reset your password:</p><table cellspacing="0" cellpadding="0" class="action-button"><tr><td><a href="${urlresetPassword}"><span>Reset Password</span></a></td></tr></table><p>If you did not make this request, you can ignore this message and your password will remain the same.</p></td>`
-                console.log('content', content)
-                send_email_from(email, 'Reset Password Request', content )
+                
+                var header = '<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;"><!-- header --><table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table"><tr style="background-color: #00796b; text-align: center;"><td><h5 style="line-height: 5px;text-align: center; font-size: 14px;"><img alt="SomoSport Logo"  href="${origin}" src="http://ss-management-dev.herokuapp.com/img/somosport-brand-small.png"></h5></td></tr><tr style="background-color:#F6F6F6;">'
+                var footer = '</tr><!-- End Content --><tr style="background-color: #00796b;"><td><h5 class="closing-text" style="color: #f6f6f6; line-height: 5px;text-align: center; font-size: 14px;">Thank you, Somosport!</h5></td></tr></table><!-- End wrapper table --></body>'
+                var content_html = header + content + footer
+                
+                send_email_from(email, 'Reset Password Request', content_html )
                 Response(res, result)
             }
         })

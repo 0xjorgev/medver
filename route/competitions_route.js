@@ -164,7 +164,6 @@ define(['express',
 		new Contact({contact_post})
 		.save()
 		.then(function(new_contact){
-			console.log(`new_contact:`, new_contact);
 			Response(res, new_contact)
 		})
 		.catch(function(error){

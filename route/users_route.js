@@ -36,19 +36,21 @@ define(['express'
 
     router.post('/login', function (req, res, next) {
         var user_login = req.body;
-        var username = user_login.username;
-        var password = user_login.password;
+        var username = user_login.username.trim();
+        var password = user_login.password.trim();
 
-        logger.debug(`Request values`, user_login);
+        logger.debug(user_login)
 
         return Models.user.query((qb) => {
             qb.where('username', username)
-            qb.where('password', password)
-            qb.where('active', true)
+            qb.orWhere('email', username)
         })
 	    .fetch()
-        .then((result) => {
-            if (result !== null){
+        .then(result => {
+
+            if (result !== null
+                && result.attributes.password == password
+                && result.attributes.active == true){
                 var userId = result.id
 
                 var claims = {
@@ -57,30 +59,33 @@ define(['express'
                     lang: 'en'
                 }
 
-                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t392183729817398273918sjadhsjaduadmns88273e4idsiad7q32rned'
                 var jwt = nJwt.create(claims, signingKey)
 
                 //TODO: does not expire, for now
                 jwt.setExpiration()
-
                 result.attributes['Authorization-Token'] = jwt.compact()
-                delete result.attributes.password
 
-                //TODO: test only!
+                //TODO: reemplazar por una busqueda de roles adecuada
                 result.attributes.roles = ['admin']
-                // result.attributes.permissions = ['list', 'create', 'update', 'delete']
 				delete result.attributes.password
+                Response(res, result)
             }
-            Response(res, result)
+            else{
+                //cuando el user no existe o bien proveyó el password correcto,
+                //se retorna el status http 403 - "Unauthorized"
+                Response(res, null, auth.checkPermissions(req._currentUser, ['not-authorized!']))
+            }
+
         })
         .catch(error => Response(res, null, error))
     });
 
     router.post('/register', function(req, res, next){
         var new_user = req.body;
-        var username = new_user.username;
-        var password = new_user.password;
-        var email    = new_user.email;
+        var username = new_user.username.trim();
+        var password = new_user.password.trim();
+        var email    = new_user.email.trim();
         var origin = req.headers.origin
 
         var _newUser = null

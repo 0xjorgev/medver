@@ -59,7 +59,7 @@ define(['express'
                     lang: 'en'
                 }
 
-                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t392183729817398273918sjadhsjaduadmns88273e4idsiad7q32rned'
+                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
                 var jwt = nJwt.create(claims, signingKey)
 
                 //TODO: does not expire, for now

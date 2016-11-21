@@ -17,6 +17,7 @@ define(['express'
 		,'../node_modules/lodash/lodash.min'
 		,'bluebird'
 		,'../util/email_sender_util'
+		,'../util/logger_util'
 		],
 	function (express
 		,Models 
@@ -26,7 +27,8 @@ define(['express'
 		,Response 
 		,_ 
 		,Promise
-		,Email) {
+		,Email
+		,logger) {
 
 	var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -732,47 +734,41 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
-	var email_sender_invitation = function(user, origin, category_id, team_id)
+	router.email_sender_invitation = function(user, origin, category_id, team_id)
 	{
-		console.log('/////////////////////INICIO DE ENVIO DE INVITACION POR CORREO PARA UN EQUIPO///////////////////////')
-		console.log('User: ', user)
-		console.log('origin: ', origin)
-		console.log('category_id: ', category_id)
-		console.log('team_id: ', team_id)
-		// var email = user.email
-		// var username = user.username
-		var email = "franciscoj.delablancam@gmail.com"
-		var username = "francisco j delablancam"
 		var _origin = origin
+		var category
 		console.log('USER: ', user)
-		Models.user
-		.where({id:user.id})
-		.where({active:true})
-		.fetch()
-		.then(function (_user) {
-			console.log(_user)
-			email = _user.email
-			username =_user.name
-
-			Models.category
-			.where({id:category_id})
-			.where({active:true})
+		//OBTENGO LA CATEGORIA DE LA COMPETITION
+		Models.category
+			.where({id:category_id, active:true})
+			.fetch() 
+		.then(_category => {
+			category = _category
+			//Obtengo la entidad del team
+			return Models.entity
+			.where({object_id: team_id, object_type: 'teams'})
 			.fetch()
-			.then(function (result) {
-				console.log('Category', result)
-				console.log('Category', result.attributes.name)
-				var _name = result.attributes.name
-				var content =  `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">    <!-- header -->    <table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table">        <tr>            <td width="20%" align="left" >                <img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png">            </td>            <td width="60%" align="center" ></td>            <td width="20%" align="rigth">                <img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png">            </td>        </tr>        <!-- Content -->        <tr style="background-color:#F6F6F6;color: #000">            <td width="20%" align="left" ></td>            <td width="60%" >                <p  style="font-style: italic; font-size:20px; ">Welcome to Somosport ${username}</p>                <p  style="font-style: italic; font-size:20px;">We will assist you to register your team at <strong>"${_name}"</strong></p>                <p>Thanks for signing up!</p>                <p>To continue with the registration of your Team in <strong>"${_name}"</strong>, please log in at <a href="${origin}">Login</a> and pick up where you left off</p>                <!--p>We're always here to help, so if you have questions visit us at [url]. <p-->                <p>Thanks,</p>                <p><strong>— The Somosport Team at Alianza</strong></p>            </td>            <td  align="rigth"></td>        <tr style="background-color:#F6F6F6;color: #000">            <td width="20%" align="left" ></td>             <td width="60%" >                <p>Note: This email was sent from an address that cannot accept incoming email.</p>                <p>You have received this business communication as part of our efforts to fulfill your request or service your account. Please note that you may receive this and other business communications from us even if you have opted out of marketing messages as that choice does not apply to important messages that could affect your service or software, or that are required by law.</p>                <p>Somosport respects your privacy. </p>               <p>© Somosport Inc.,</p>            </td>            <td width="20%"  align="rigth"></td>        </tr>             </table><!-- End wrapper table --></body>`
-				console.log('content', content)
+		})
+		.then(_teamEntity => {
+				//logger.debug(_teamEntity.toJSON())
+				return Models.entity_relationship
+				.where({ent_ref_to_id: _teamEntity.attributes.id, relationship_type_id: 1})
+				.fetchAll({withRelated: ['from.object']})
+		})
+		.then(_relationships => {
+			realationships = _relationships.toJSON()
+			for (var i = realationships.length - 1; i >= 0; i--) {
+				username = realationships[i].from.object.username
+				email = realationships[i].from.object.email
+				var _name = category.attributes.name
+				var content =  `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;"><!-- header --><table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table"><tr><td width="20%" align="left" ><img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png"></td><td width="60%" align="center" ></td><td width="20%" align="rigth"><img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png"></td></tr><!-- Content --><tr style="background-color:#F6F6F6; color: #000"><td width="20%" align="left" ></td><td width="60%" ><p style="font-style: italic;font-size:20px">Welcome to Somosport ${username}</p><p style="font-style: italic;font-size:20px">We will assist you to register your team at <strong>"${_name}"</strong></p><p>Thanks for signing up!</p><p style="text-align: justify;">To continue with the registration of your Team in <strong>"${_name}"</strong>, please log in at <a href="${origin}">Login</a> and pick up where you left off</p><!--p>We're always here to help, so if you have questions visit us at [url]. <p--><p>Thanks,</p><p><strong>— The Somosport Team at Alianza</strong></p></td><td  align="rigth"></td><tr style="background-color:#F6F6F6; color: #000"><td width="20%" align="left" ></td><td width="60%" ><p style="text-align: justify;">Note: This email was sent from an address that cannot accept incoming email.</p><p style="text-align: justify;">You have received this business communication as part of our efforts to fulfill your request or service your account. Please note that you may receive this and other business communications from us even if you have opted out of marketing messages as that choice does not apply to important messages that could affect your service or software, or that are required by law.</p><p style="text-align: justify;">Somosport respects your privacy. </p><p style="text-align: justify;">© Somosport Inc.,</p></td><td width="20%"  align="rigth"></td></tr></table><!-- End wrapper table --></body>`
 				send_email_from(email, 'Welcome to SomoSport', content )
-				
-				console.log('/////////////////////FIN DE ENVIO DE INVITACION POR CORREO PARA UN EQUIPO///////////////////////')
-			}).catch(function(error){
-				console.error(error)
-			});
-		}).catch(function(error){
+			}
+		})
+		.catch(function(error){
 			console.error(error)
-		});
+		})
 	}
 
 	return router;

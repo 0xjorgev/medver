@@ -175,7 +175,8 @@ define(['express'
                 //TODO: does not expire, for now
                 jwt.setExpiration()
 
-                var urlresetPassword = origin+'/reset_password/username/'+ username + '/rq_token/' + jwt.compact()
+                // var urlresetPassword = origin+'/reset_password/username/'+ username + '/rq_token/' + jwt.compact()
+                var urlresetPassword = 'http://ss-competition-live.herokuapp.com/reset_password/username/'+ username + '/rq_token/' + jwt.compact()
                 console.log('urlresetPassword', urlresetPassword)
                 var content =  `<td valign="top" class="top-content action-content" style="padding-left: 21%"><h1>${username},</h1><p>There was recently a request to change the password for your account.</p><p>You can change your password at any time by logging into <a href="${origin}">your account</a>.</p><p>If you requested this password change, click here to reset your password:</p><table cellspacing="0" cellpadding="0" class="action-button"><tr><td><a href="${urlresetPassword}"><span>Reset Password</span></a></td></tr></table><p>If you did not make this request, you can ignore this message and your password will remain the same.</p></td>`
                 

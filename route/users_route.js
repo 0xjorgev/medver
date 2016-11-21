@@ -105,6 +105,8 @@ define(['express'
 			.save()
         })
         .then(result => {
+
+            logger.debug(`Email Value: ${email}`);
             //content is from template/email/registerUser.html
             var content =  `<td style="padding-left: 21%; color: #000;"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`
             send_email_from(email,'Welcome to Somosport', content)

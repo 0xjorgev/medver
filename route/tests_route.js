@@ -32,6 +32,11 @@ define(['express',
      })
     }
 
+
+    router.get('/sendgrid/', function(req, res){
+      Message(res,`User: ${process.env.SENDGRID_USERNAME}, Password:${process.env.SENDGRID_PASSWORD}`, '0', {a:'Done'});
+    })
+
     router.get('/:category_id', function (req, res) {
 
         console.log('Set Data for testing');

@@ -15,7 +15,7 @@ define(['sendgrid'], function (Email) {
                 subject:  `${subject}`,
                 html:     `${content}`
             }, function(err, json) {
-                if (err) { return console.error(err); }
+                if (err) { return console.error('Email Error:', err); }
                 console.log(`Email sent:`, json);
             });
 		}

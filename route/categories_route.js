@@ -734,7 +734,7 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
-	router.email_sender_invitation = function(user, origin, category_id, team_id)
+	var email_sender_invitation = function(user, origin, category_id, team_id)
 	{
 		var _origin = origin
 		var category

@@ -1652,26 +1652,19 @@ paths:
   /gender:
     get:
       description: get gender list
-      operationId: Get_Gender List_
+      operationId: get_gender_list
       produces:
       - application/json
       tags:
       - Gender
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/GenderListRequest'
       responses:
         200:
-          description: result
+          description: gender list
       security: []
   /gender/{gender_id}:
     get:
       description: Return info of a given gender
-      operationId: Get_Gender By Gender Id_
+      operationId: get_gender_list_by_id
       produces:
       - application/json
       parameters:

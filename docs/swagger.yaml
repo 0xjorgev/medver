@@ -1493,6 +1493,32 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /team/{team_id}/player/{player_id}:
+    get:
+      summary: Get the team's player
+      description: Get the team's player
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+        - name: player_id
+          in: path
+          description: PLAYER ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Team
+        - Player
+      responses:
+        200:
+          description: An team players
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     put:
       summary: Updates a player and inserts it in the team roster
       description: Updates a player and inserts it in the team roster

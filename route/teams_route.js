@@ -68,6 +68,24 @@ define(['express'
 
 	});
 
+	router.get('/:team_id/player/:player_id', function (req, res) {
+		var team_id = req.params.team_id;
+		var player_id = req.params.player_id;
+
+		return Models.player_team
+		.where({team_id:team_id})
+		.where({player_id:player_id})
+		.where({active:true})
+		.fetch({withRelated: ['player', 'position'], debug: false})
+		.then(function (result) {
+			//calculo la edad de cada jugador
+			//var players = result.map(s)
+			Response(res, result)
+		})
+		.catch(function(error){
+			Response(res, null, error)
+		});
+	});
 	//TODO: Esto parece no estar en uso, deberia arrojar error al probar
 	router.post('/organization/:org_id/category/:cat_id', function (req, res) {
 

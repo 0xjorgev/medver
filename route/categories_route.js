@@ -20,12 +20,12 @@ define(['express'
 		,'../util/logger_util'
 		],
 	function (express
-		,Models 
-		,Message 
-		,Knex 
-		,StandingTable 
-		,Response 
-		,_ 
+		,Models
+		,Message
+		,Knex
+		,StandingTable
+		,Response
+		,_
 		,Promise
 		,Email
 		,logger) {
@@ -67,17 +67,13 @@ define(['express'
 	}
 
 	//Teams by Category
-	router.get('/:category_id/team', function (req, res) {
+	router.get('/:category_id/team', (req, res) => {
 		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
-			.where({category_id:category_id})
-			.where({active:true})
-			.fetchAll({withRelated:['team','category','group','phase','status_type']})
-			.then(function (result) {
-				Response(res, result)
-			}).catch(function(error){
-				Response(res, null, error)
-			});
+			.where({category_id:category_id, active:true})
+			.fetchAll({withRelated:['team.player_team','category','group','phase','status_type']})
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error));
 	});
 
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result
@@ -742,7 +738,7 @@ define(['express'
 		//OBTENGO LA CATEGORIA DE LA COMPETITION
 		Models.category
 			.where({id:category_id, active:true})
-			.fetch() 
+			.fetch()
 		.then(_category => {
 			category = _category
 			//Obtengo la entidad del team

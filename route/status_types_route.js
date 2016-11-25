@@ -15,7 +15,6 @@ define(['express'
     var router = express.Router();
 
     router.get('/', function (req, res) {
-        console.log('Get all Status Types')
         return Models.status_type
         .query(function(qb){})
         .where({active:true})
@@ -25,12 +24,10 @@ define(['express'
     });
 
     router.get('/:status_type_id', function (req, res) {
-        
         var status_type_id = req.params.status_type_id;
         return Models.status_type
         .query(function(qb){})
-        .where({id:status_type_id})
-        .where({active:true})
+        .where({id:status_type_id, active:true})
         .fetch()
         .then((result) => Response(res, result))
         .catch((error) =>  Response(res, null, error))

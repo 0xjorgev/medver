@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
 				,knex.raw("update status_types set description_en = 'Approved', description_es='Aprobado' where description = 'Approved'")
 				,knex.raw("update status_types set description_en = 'Rejected', description_es='Rechazado' where description = 'Rejected'")
 				,knex.raw("update status_types set description_en = 'Pending', description_es='Pendiente' where description = 'Pending'")
-				,knex.raw("update status_types set description = 'Acepted', description_en = 'Accepted', description_es='Aceptado' where description = 'Acepted'")
+				,knex.raw("update status_types set description = 'Accepted', description_en = 'Accepted', description_es='Aceptado' where description = 'Acepted'")
 			])
 		})
 	])

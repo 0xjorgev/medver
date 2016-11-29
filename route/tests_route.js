@@ -213,15 +213,12 @@ define(['express',
           res.code = err.code;
           res.json({message:err.detail, code: err.code, data: {} });
         });
-
-          // .where('id','=',match_id)
-          // .update(updt, ['id'])
-          // .then(function(result){
-          //   Message(res, 'Success', '0', result);
-          // })
-          // .catch(function(error){
-          //   res.json({message:error.detail, code: error.code, data: {} });
-          // });
       });
+
+	//crea un jugador falso en el roster del equipo seleccionado
+	router.get('/fake/player/team/:team_id', (req, res) => {
+
+	})
+
     return router;
 });

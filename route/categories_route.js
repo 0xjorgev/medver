@@ -2,12 +2,6 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-//logging lib, reaaaaally useful
-var inspect = require('util').inspect
-//log helper function
-var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
-
-
 define(['express'
 		,'../model/index'
 		,'../util/request_message_util'
@@ -474,7 +468,7 @@ define(['express'
 		return Models.category_team_player
 			.where({category_id:category_id, team_id:team_id, active: true})
 			.fetchAll({withRelated: [
-				{"player.player_team": function(qb){
+				{'player.player_team': function(qb){
 					qb.where('team_id', team_id)
 				}}
 				,'player.player_team.position'
@@ -492,15 +486,10 @@ define(['express'
 		var team_id = req.params.team_id;
 
 		return Models.category_team_player
-			.where({category_id:category_id})
-			.where({active:true})
+			.where({category_id: category_id, active: true})
 			.fetchAll({withRelated:['player']})
-			.then(function (result) {
-				Response(res, result)
-			})
-			.catch(function(error){
-				Response(res, null, error)
-			});
+			.then(result => Response(res, result) )
+			.catch(error => Response(res, null, error) )
 	});
 
 	//==========================================================================
@@ -519,7 +508,6 @@ define(['express'
 				,active:true
 			})
 			.fetch({withRelated:['player']})
-			.fetch()
 			.then(result =>  Response(res, result))
 			.catch(error =>  Response(res, null, error))
 	})
@@ -534,7 +522,7 @@ define(['express'
 			body: req.body
 		}
 		console.log('POST', data)
-		saveCategory_team_player(data, res)
+		saveCategoryTeamPlayer(data, res)
 	})
 
 	//==========================================================================
@@ -546,66 +534,60 @@ define(['express'
 			body: req.body
 		}
 		console.log('PUT', data)
-		saveCategory_team_player(data, res)
+		saveCategoryTeamPlayer(data, res)
 	})
 
 	//==========================================================================
 	// Save Category Group Phase Team
 	//==========================================================================
-	var saveCategory_team_player = function(data, res){
+	var saveCategoryTeamPlayer = (data, res) => {
+		console.log('saveCategoryTeamPlayer', data.params)
 
-		console.log('params: ', data.params)
 		var summonedData = {
-			category_id: data.params.category_id,
-			team_id: data.params.team_id,
-			player_id: data.params.player_id,
-			active: data.body.active = (data.body.active == undefined) ? true : data.body.active,
-			number: data.body.number = (data.body.number == undefined) ? 0 : data.body.number,
-			position: data.body.position = (data.body.position == undefined) ? "" : data.body.position
+			category_id: data.params.category_id
+			,team_id: data.params.team_id
+			,player_id: data.params.player_id
+			,active: (data.body.active == undefined) ? true : data.body.active
+			,present_in_field: (data.body.present_in_field == undefined) ? false : data.body.present_in_field
+			// ,number:
+			// 	data.body.number = (data.body.number == undefined) ? 0 : data.body.number
+			// ,position:
+			// 	data.body.position = (data.body.position == undefined) ? ""  data.body.position
 		}
+
 		if(data.body.id){
 			console.log("data id: ", data.body.id)
 			summonedData.id = data.body.id
 		}
 
-		console.log('Summoned: ', summonedData);
-
 		return new Models.category_team_player(summonedData)
-		.save()
-		.then(function(summoned) {
-			console.log('Summoned response: ', summoned);
-			Response(res, summoned)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
+			.save()
+			.then(summoned => Response(res, summoned) )
+			.catch(error => Response(res, null, error) )
 	}
 
 	//==========================================================================
 	// Get all Phases with the teams of one category
 	//==========================================================================
 	router.get('/:category_id/phase/team', function (req, res) {
-
 		var category_id = req.params.category_id;
 		var phase_id = req.params.phase_id;
 		var group_id = req.params.group_id;
 
 		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
-			.where({category_id:category_id})
-			.where({active:true})
+			.where({category_id: category_id, active:true})
 			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team']})
 			.then(function (result) {
 				console.log(result);
 				var x = result.toJSON().category.phases
-
 				Response(res, x)
 			}).catch(function(error){
 				Response(res, null, error)
 			});
 	});
 
-	var sortBy = (key) => {
+	var sortBy = key => {
 		return (a, b) => {
 			if (a['position'] > b['position']) return 1
 			if (a['position'] < b['position']) return -1

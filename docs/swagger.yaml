@@ -630,7 +630,7 @@ paths:
         required: false
         x-is-map: false
         schema:
-          $ref: '#/definitions/CreateCategyTeamPlayer'
+          $ref: '#/definitions/CreateCategoryTeamPlayer'
       responses:
         200:
           description: Create info of the summoned player of one team on one category successful
@@ -2386,8 +2386,8 @@ definitions:
         type: string
     required:
     - id
-  CreateCategyTeamPlayer:
-    title: CreateCategyTeamPlayer
+  CreateCategoryTeamPlayer:
+    title: CreateCategoryTeamPlayer
     type: object
     properties:
       category_id:
@@ -2398,11 +2398,6 @@ definitions:
         type: string
       active:
         type: boolean
-      number:
-        type: integer
-        format: int32
-      position:
-        type: string
     required:
     - category_id
     - team_id

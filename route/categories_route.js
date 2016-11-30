@@ -521,7 +521,7 @@ define(['express'
 			params: req.params,
 			body: req.body
 		}
-		console.log('POST', data)
+		// console.log('POST', data)
 		saveCategoryTeamPlayer(data, res)
 	})
 
@@ -533,7 +533,7 @@ define(['express'
 			params: req.params,
 			body: req.body
 		}
-		console.log('PUT', data)
+		// console.log('PUT', data)
 		saveCategoryTeamPlayer(data, res)
 	})
 
@@ -541,8 +541,8 @@ define(['express'
 	// Save Category Group Phase Team
 	//==========================================================================
 	var saveCategoryTeamPlayer = (data, res) => {
-		console.log('saveCategoryTeamPlayer', data.params)
-
+		console.log('saveCategoryTeamPlayer')
+		logger.debug(data)
 		var summonedData = {
 			category_id: data.params.category_id
 			,team_id: data.params.team_id

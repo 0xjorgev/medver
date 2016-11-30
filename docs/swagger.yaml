@@ -552,7 +552,7 @@ paths:
     get:
       summary: Gets all the players that participate on a team in a category
       description: Get players by category_id and team_id
-      operationId: Get players by category_id and team_id
+      operationId: get_category_team_player_
       produces:
       - application/json
       parameters:
@@ -573,9 +573,9 @@ paths:
           description: pending
   /category/{category_id}/team/{team_id}/player/{player_id}:
     get:
-      summary: Gets the players that participate on a team in a category
-      description: Get players by category_id and team_id
-      operationId: Get players by category_id and team_id
+      summary: REVISAR Gets the players that participate on a team in a category
+      description: duplicado? Get players by category_id and team_id
+      operationId: get_category_team_player
       produces:
       - application/json
       parameters:
@@ -602,7 +602,7 @@ paths:
     post:
       summary: Create info of the summoned player of one team on one category
       description: Create info of the summoned player of one team on one category
-      # operationId: Update_http://localhost:3000/api/v1.0/category/5/team/37/player/467_
+      operationId: post_category_team_player
       tags:
         - Player
         - Category
@@ -2345,6 +2345,10 @@ definitions:
             position_id:
               type: integer
               description: Player's position on the team
+              required: true
+            team_id:
+              type: integer
+              description: Team identifier
               required: true
 
   UpdateCategoryTeamInviteRequest:

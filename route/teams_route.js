@@ -252,11 +252,10 @@ define(['express'
 	});
 
 	var savePlayerTeam = (playerTeamData, res) => {
-
 		logger.debug('savePlayerTeam')
 		logger.debug(playerTeamData)
 
-		//mutation warning
+		//chequeo de tipo array
 		if(!(Object.prototype.toString.call( playerTeamData ) === '[object Array]')) {
 			playerTeamData = [playerTeamData]
 		}

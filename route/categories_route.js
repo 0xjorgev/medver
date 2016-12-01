@@ -415,8 +415,6 @@ define(['express'
 		var _currentUser = data._currentUser
 		var _origin = data._origin
 
-		console.log("currentUser: ", _currentUser)
-
 		var spiderData = {}
 		spiderData.category_id = data.category_id
 		spiderData.team_id     = data.team_id
@@ -435,19 +433,15 @@ define(['express'
 		}
 
 		if(data.id){
-			console.log("data id: ", data.id)
 			spiderData.id = data.id
 		}
 
-		console.log("spiderData: ", spiderData)
 		return new Models.category_group_phase_team(spiderData).save()
 		.then(function(new_invitation){
-			console.log(`new_invitation:`, new_invitation);
+
 			var invitation = new_invitation
 			//Sent mail of inscription on category
-			console.log('DATA_ID:',data.id)
-			if(data.id == undefined)
-			{
+			if(data.id == undefined){
 				email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
 			}
 			Response(res, invitation);

@@ -11,7 +11,6 @@ define(['../node_modules/lodash/lodash.min'
 	authHelper.checkPermissions = (user, permissions) => {
 
 		// permissions = (typeof permissions == Array) ? permissions : [permissions]
-
 		// logger.debug('user.roles')
 		// logger.debug(user.roles[0])
 		// logger.debug('permissions required')

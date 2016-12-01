@@ -2,30 +2,30 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-//logging lib, reaaaaally useful
-var inspect = require('util').inspect
-//log helper function
-var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
-
-
-define(['express',
-		'../model/index',
-		'../util/request_message_util',
-		'../util/knex_util',
-		'../helpers/standing_table_helper',
-		'../util/response_message_util',
-		'../node_modules/lodash/lodash.min',
-		'bluebird'],
-	function (express,
-		Models,
-		Message,
-		Knex,
-		StandingTable,
-		Response,
-		_,
-		Promise) {
+define(['express'
+		,'../model/index'
+		,'../util/request_message_util'
+		,'../util/knex_util'
+		,'../helpers/standing_table_helper'
+		,'../util/response_message_util'
+		,'../node_modules/lodash/lodash.min'
+		,'bluebird'
+		,'../util/email_sender_util'
+		,'../util/logger_util'
+		],
+	function (express
+		,Models
+		,Message
+		,Knex
+		,StandingTable
+		,Response
+		,_
+		,Promise
+		,Email
+		,logger) {
 
 	var router = express.Router();
+    var send_email_from = Email(process.env.SENDER_EMAIL);
 
 	var mapper = function(phase) {
 		// console.log('Phase:', phase.attributes);
@@ -61,17 +61,13 @@ define(['express',
 	}
 
 	//Teams by Category
-	router.get('/:category_id/team', function (req, res) {
+	router.get('/:category_id/team', (req, res) => {
 		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
-			.where({category_id:category_id})
-			.where({active:true})
-			.fetchAll({withRelated:['team','category','group','phase','status_type']})
-			.then(function (result) {
-				Response(res, result)
-			}).catch(function(error){
-				Response(res, null, error)
-			});
+			.where({category_id:category_id, active:true})
+			.fetchAll({withRelated:['team.player_team','category','group','phase','status_type']})
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error));
 	});
 
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result
@@ -382,6 +378,9 @@ define(['express',
 		var data = {}
 		req.body.category_id = req.params.category_id
 		req.body.team_id = req.params.team_id
+		req.body._currentUser = req._currentUser
+		console.log('req.headers',req.headers)
+		req.body._origin = req.headers.origin
 		console.log('POST', req.body)
 		saveCategory_group_phase_team(req.body, res)
 	})
@@ -412,8 +411,12 @@ define(['express',
 	// Save Category Group Phase Team
 	//==========================================================================
 	var saveCategory_group_phase_team = function(data, res){
-
 		console.log("data: ", data)
+		var _currentUser = data._currentUser
+		var _origin = data._origin
+
+		console.log("currentUser: ", _currentUser)
+
 		var spiderData = {}
 		spiderData.category_id = data.category_id
 		spiderData.team_id     = data.team_id
@@ -437,9 +440,17 @@ define(['express',
 		}
 
 		console.log("spiderData: ", spiderData)
-		return new Models.category_group_phase_team(spiderData).save().then(function(new_invitation){
+		return new Models.category_group_phase_team(spiderData).save()
+		.then(function(new_invitation){
 			console.log(`new_invitation:`, new_invitation);
-			Response(res, new_invitation);
+			var invitation = new_invitation
+			//Sent mail of inscription on category
+			console.log('DATA_ID:',data.id)
+			if(data.id == undefined)
+			{
+				email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
+			}
+			Response(res, invitation);
 		})
 		.catch(function(error){
 			Response(res, null, error);
@@ -457,7 +468,7 @@ define(['express',
 		return Models.category_team_player
 			.where({category_id:category_id, team_id:team_id, active: true})
 			.fetchAll({withRelated: [
-				{"player.player_team": function(qb){
+				{'player.player_team': function(qb){
 					qb.where('team_id', team_id)
 				}}
 				,'player.player_team.position'
@@ -475,15 +486,10 @@ define(['express',
 		var team_id = req.params.team_id;
 
 		return Models.category_team_player
-			.where({category_id:category_id})
-			.where({active:true})
+			.where({category_id: category_id, active: true})
 			.fetchAll({withRelated:['player']})
-			.then(function (result) {
-				Response(res, result)
-			})
-			.catch(function(error){
-				Response(res, null, error)
-			});
+			.then(result => Response(res, result) )
+			.catch(error => Response(res, null, error) )
 	});
 
 	//==========================================================================
@@ -502,7 +508,6 @@ define(['express',
 				,active:true
 			})
 			.fetch({withRelated:['player']})
-			.fetch()
 			.then(result =>  Response(res, result))
 			.catch(error =>  Response(res, null, error))
 	})
@@ -516,8 +521,8 @@ define(['express',
 			params: req.params,
 			body: req.body
 		}
-		console.log('POST', data)
-		saveCategory_team_player(data, res)
+		// console.log('POST', data)
+		saveCategoryTeamPlayer(data, res)
 	})
 
 	//==========================================================================
@@ -528,67 +533,61 @@ define(['express',
 			params: req.params,
 			body: req.body
 		}
-		console.log('PUT', data)
-		saveCategory_team_player(data, res)
+		// console.log('PUT', data)
+		saveCategoryTeamPlayer(data, res)
 	})
 
 	//==========================================================================
 	// Save Category Group Phase Team
 	//==========================================================================
-	var saveCategory_team_player = function(data, res){
-
-		console.log('params: ', data.params)
+	var saveCategoryTeamPlayer = (data, res) => {
+		console.log('saveCategoryTeamPlayer')
+		logger.debug(data)
 		var summonedData = {
-			category_id: data.params.category_id,
-			team_id: data.params.team_id,
-			player_id: data.params.player_id,
-			active: data.body.active = (data.body.active == undefined) ? true : data.body.active,
-			number: data.body.number = (data.body.number == undefined) ? 0 : data.body.number,
-			position: data.body.position = (data.body.position == undefined) ? "" : data.body.position
+			category_id: data.params.category_id
+			,team_id: data.params.team_id
+			,player_id: data.params.player_id
+			,active: (data.body.active == undefined) ? true : data.body.active
+			,present_in_field: (data.body.present_in_field == undefined) ? false : data.body.present_in_field
+			// ,number:
+			// 	data.body.number = (data.body.number == undefined) ? 0 : data.body.number
+			// ,position:
+			// 	data.body.position = (data.body.position == undefined) ? ""  data.body.position
 		}
+
 		if(data.body.id){
 			console.log("data id: ", data.body.id)
 			summonedData.id = data.body.id
 		}
 
-		console.log('Summoned: ', summonedData);
-
 		return new Models.category_team_player(summonedData)
-		.save()
-		.then(function(summoned) {
-			console.log('Summoned response: ', summoned);
-			Response(res, summoned)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
+			.save()
+			.then(summoned => Response(res, summoned) )
+			.catch(error => Response(res, null, error) )
 	}
 
 	//==========================================================================
 	// Get all Phases with the teams of one category
 	//==========================================================================
 	router.get('/:category_id/phase/team', function (req, res) {
-
 		var category_id = req.params.category_id;
 		var phase_id = req.params.phase_id;
 		var group_id = req.params.group_id;
 
 		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
-			.where({category_id:category_id})
-			.where({active:true})
+			.where({category_id: category_id, active:true})
 			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team']})
 			.then(function (result) {
 				console.log(result);
 				var x = result.toJSON().category.phases
-
 				Response(res, x)
 			}).catch(function(error){
 				Response(res, null, error)
 			});
 	});
 
-	var sortBy = (key) => {
+	var sortBy = key => {
 		return (a, b) => {
 			if (a['position'] > b['position']) return 1
 			if (a['position'] < b['position']) return -1
@@ -712,6 +711,44 @@ define(['express',
 		})
 		.catch(error => Response(res, null, error))
 	})
+
+	var email_sender_invitation = function(user, origin, category_id, team_id)
+	{
+		var _origin = origin
+		var category
+		console.log('USER: ', user)
+		//OBTENGO LA CATEGORIA DE LA COMPETITION
+		Models.category
+			.where({id:category_id, active:true})
+			.fetch()
+		.then(_category => {
+			category = _category
+			//Obtengo la entidad del team
+			return Models.entity
+			.where({object_id: team_id, object_type: 'teams'})
+			.fetch()
+		})
+		.then(_teamEntity => {
+				//logger.debug(_teamEntity.toJSON())
+				return Models.entity_relationship
+				.where({ent_ref_to_id: _teamEntity.attributes.id, relationship_type_id: 1})
+				.fetchAll({withRelated: ['from.object']})
+		})
+		.then(_relationships => {
+			realationships = _relationships.toJSON()
+			for (var i = realationships.length - 1; i >= 0; i--) {
+				username = realationships[i].from.object.username
+				email = realationships[i].from.object.email
+				var _name = category.attributes.name
+				var content =  `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;"><!-- header --><table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table"><tr><td width="20%" align="left" ><img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png"></td><td width="60%" align="center" ></td><td width="20%" align="rigth"><img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png"></td></tr><!-- Content --><tr style="background-color:#F6F6F6; color: #000"><td width="20%" align="left" ></td><td width="60%" ><p style="font-style: italic;font-size:20px">Welcome to Somosport ${username}</p><p style="font-style: italic;font-size:20px">We will assist you to register your team at <strong>"${_name}"</strong></p><p>Thanks for signing up!</p><p style="text-align: justify;">To continue with the registration of your Team in <strong>"${_name}"</strong>, please log in at <a href="${origin}">Login</a> and pick up where you left off</p><!--p>We're always here to help, so if you have questions visit us at [url]. <p--><p>Thanks,</p><p><strong>— The Somosport Team at Alianza</strong></p></td><td  align="rigth"></td><tr style="background-color:#F6F6F6; color: #000"><td width="20%" align="left" ></td><td width="60%" ><p style="text-align: justify;">Note: This email was sent from an address that cannot accept incoming email.</p><p style="text-align: justify;">You have received this business communication as part of our efforts to fulfill your request or service your account. Please note that you may receive this and other business communications from us even if you have opted out of marketing messages as that choice does not apply to important messages that could affect your service or software, or that are required by law.</p><p style="text-align: justify;">Somosport respects your privacy. </p><p style="text-align: justify;">© Somosport Inc.,</p></td><td width="20%"  align="rigth"></td></tr></table><!-- End wrapper table --></body>`
+				//var content = `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">    <!-- header -->    <table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table">        <tr>            <td width="20%" align="left" >                <!-- <img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png"> -->            </td>            <td width="60%" align="center" >                <h5 style="line-height: 5px;text-align: center; font-size: 14px;">                    <img alt="SomoSport Logo"  href="${origin}" src="http://ss-management-dev.herokuapp.com/img/somosport-brand-small.png">                </h5>            </td>            <td width="20%" align="rigth">                <!-- <img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png"> -->            </td>        </tr>        <!-- Content -->        <tr style="background-color:#F6F6F6; color: #000">            <td width="20%" align="left" ><img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png"></td>            <td width="60%" >                <p style="font-style: italic;">Welcome to Somosport ${username}</p>                <p style="font-style: italic;"">We will assist you to register your team at <strong>"${_name}"</strong></p>                <p>Thanks for signing up!</p>                <p style="text-align: justify;">To continue with the registration of your Team in <strong>"${_name}"</strong>, please log in at <a href="${origin}">Login</a> and pick up where you left off</p>                <!--p>We're always here to help, so if you have questions visit us at [url]. <p-->                <p>Thanks,</p>                <p><strong>— The Somosport Team at Alianza</strong></p>            </td>            <td  align="rigth"><img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png"></td>        <tr style="background-color:#F6F6F6; color: #000">            <td width="20%" align="left" ></td>             <td width="60%" >                <p style="text-align: justify;">Note: This email was sent from an address that cannot accept incoming email.</p>                <p style="text-align: justify;">You have received this business communication as part of our efforts to fulfill your request or service your account. Please note that you may receive this and other business communications from us even if you have opted out of marketing messages as that choice does not apply to important messages that could affect your service or software, or that are required by law.</p>                <p style="text-align: justify;">Somosport respects your privacy. </p>                <p style="text-align: justify;">© Somosport Inc.</p>            </td>            <td width="20%"  align="rigth"></td>        </tr>          <tr style="background-color: #00796b;">            <td width="20%" align="left" ></td>             <td>                <h5 class="closing-text" style="color: #f6f6f6; line-height: 5px;text-align: center; font-size: 14px;">Thank you, Somosport!</h5>            </td>            <td width="20%"  align="rigth"></td>        </tr>            </table><!-- End wrapper table --></body>
+				//send_email_from(email, 'Welcome to SomoSport', content )
+			}
+		})
+		.catch(function(error){
+			console.error(error)
+		})
+	}
 
 	return router;
 

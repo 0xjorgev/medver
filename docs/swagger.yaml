@@ -552,7 +552,7 @@ paths:
     get:
       summary: Gets all the players that participate on a team in a category
       description: Get players by category_id and team_id
-      operationId: Get players by category_id and team_id
+      operationId: get_category_team_player_
       produces:
       - application/json
       parameters:
@@ -573,9 +573,9 @@ paths:
           description: pending
   /category/{category_id}/team/{team_id}/player/{player_id}:
     get:
-      summary: Gets the players that participate on a team in a category
-      description: Get players by category_id and team_id
-      operationId: Get players by category_id and team_id
+      summary: REVISAR Gets the players that participate on a team in a category
+      description: duplicado? Get players by category_id and team_id
+      operationId: get_category_team_player
       produces:
       - application/json
       parameters:
@@ -602,7 +602,7 @@ paths:
     post:
       summary: Create info of the summoned player of one team on one category
       description: Create info of the summoned player of one team on one category
-      # operationId: Update_http://localhost:3000/api/v1.0/category/5/team/37/player/467_
+      operationId: post_category_team_player
       tags:
         - Player
         - Category
@@ -630,7 +630,7 @@ paths:
         required: false
         x-is-map: false
         schema:
-          $ref: '#/definitions/CreateCategyTeamPlayer'
+          $ref: '#/definitions/CreateCategoryTeamPlayer'
       responses:
         200:
           description: Create info of the summoned player of one team on one category successful
@@ -1493,6 +1493,32 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /team/{team_id}/player/{player_id}:
+    get:
+      summary: Get the team's player
+      description: Get the team's player
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+        - name: player_id
+          in: path
+          description: PLAYER ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Team
+        - Player
+      responses:
+        200:
+          description: An team players
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     put:
       summary: Updates a player and inserts it in the team roster
       description: Updates a player and inserts it in the team roster
@@ -1652,26 +1678,19 @@ paths:
   /gender:
     get:
       description: get gender list
-      operationId: Get_Gender List_
+      operationId: get_gender_list
       produces:
       - application/json
       tags:
       - Gender
-      parameters:
-      - name: Body
-        in: body
-        required: true
-        x-is-map: false
-        schema:
-          $ref: '#/definitions/GenderListRequest'
       responses:
         200:
-          description: result
+          description: gender list
       security: []
   /gender/{gender_id}:
     get:
       description: Return info of a given gender
-      operationId: Get_Gender By Gender Id_
+      operationId: get_gender_list_by_id
       produces:
       - application/json
       parameters:
@@ -2327,6 +2346,10 @@ definitions:
               type: integer
               description: Player's position on the team
               required: true
+            team_id:
+              type: integer
+              description: Team identifier
+              required: true
 
   UpdateCategoryTeamInviteRequest:
     title: Create Category Team InviteRequest
@@ -2363,8 +2386,8 @@ definitions:
         type: string
     required:
     - id
-  CreateCategyTeamPlayer:
-    title: CreateCategyTeamPlayer
+  CreateCategoryTeamPlayer:
+    title: CreateCategoryTeamPlayer
     type: object
     properties:
       category_id:
@@ -2375,11 +2398,6 @@ definitions:
         type: string
       active:
         type: boolean
-      number:
-        type: integer
-        format: int32
-      position:
-        type: string
     required:
     - category_id
     - team_id

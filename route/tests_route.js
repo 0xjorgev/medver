@@ -32,6 +32,9 @@ define(['express',
      })
     }
 
+    router.get('/doorduino/', function(req, res){
+      Message(res,'sesame', '0', {a:'Done'});
+    })
 
     router.get('/sendgrid/', function(req, res){
       Message(res,`User: ${process.env.SENDGRID_USERNAME}, Password:${process.env.SENDGRID_PASSWORD}`, '0', {a:'Done'});

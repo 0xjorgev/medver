@@ -441,7 +441,39 @@ paths:
         200:
           description: results
       security: []
-
+  /category/{category_id}/match:
+    get:
+      summary: Returns the matches associated to to this category
+      description: Returns the matches associated to to this category
+      tags:
+        - Category
+        - Match
+      responses:
+        200:
+          description: Something
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+    post:
+      summary: Generates the matches for the given category id
+      description: Generates the matches for the given category id
+      tags:
+        - Category
+        - Match
+      responses:
+        200:
+          description: Something
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
   /category/{category_id}/standing_table:
     get:
       summary: Gets the current standing table for a given category_id, separated by phases & groups

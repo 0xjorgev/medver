@@ -10,7 +10,6 @@ define(['./base_model','./phase','./round'], function (DB) {
     var Group = DB.Model.extend({
         tableName: 'groups',
         hasTimestamps: true,
-
         //relations
         phase: function(){
             return this.belongsTo('Phase', 'phase_id');
@@ -23,8 +22,11 @@ define(['./base_model','./phase','./round'], function (DB) {
         },
         standing_table: function(){
             return this.hasMany('StandingTable', 'group_id');
-        }
-    });
+        },
+		matches: function(){
+			return this.hasMany('Match', 'group_id');
+		}
+	});
 
     // uses Registry plugin
     return DB.model('Group', Group);

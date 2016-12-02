@@ -12,6 +12,7 @@ define(['express'
 		,'bluebird'
 		,'../util/email_sender_util'
 		,'../util/logger_util'
+		,'js-combinatorics'
 		],
 	function (express
 		,Models
@@ -22,10 +23,12 @@ define(['express'
 		,_
 		,Promise
 		,Email
-		,logger) {
+		,logger
+		,Combinatorics
+	){
 
 	var router = express.Router();
-    var send_email_from = Email(process.env.SENDER_EMAIL);
+	var send_email_from = Email(process.env.SENDER_EMAIL);
 
 	var mapper = function(phase) {
 		// console.log('Phase:', phase.attributes);
@@ -337,6 +340,69 @@ define(['express'
             });
         }
     });
+
+	router.post('/:category_id/match', (req, res) => {
+		return Models.category
+			.where({id: req.params.category_id})
+			.fetch({withRelated: ['phases.groups']})
+			.then(result => {
+				var cat = result.toJSON()
+
+				var groupsWithTeams = []
+				var teamCount = 1
+				cat.phases.filter(ph => ph.position == 1)
+				.map(phase => {
+					phase.groups.map((group, index) => {
+						var teams = []
+						for (var i = 1; i <= group.participant_team; i++) {
+							//genero un equipo x participant_team
+							teams.push({
+								phase_id: phase.id
+								,group_id: group.id
+								,position: i
+								,name: `Team ${teamCount++}`
+							})
+						}
+						groupsWithTeams.push(teams)
+					})
+				})
+				return groupsWithTeams
+			})
+			.then(result => {
+				result.map(group => {
+					//por cada grupo, voy a generar los partidos posibles
+					var matches = Combinatorics.combination(group, 2)
+
+					logger.debug('----------------')
+
+					while(match = matches.next()){
+						new Models.match({
+							group_id: match[0].group_id
+							,placeholder_home_team_group: match[0].group_id
+							,placeholder_home_team_position: match[0].position
+							,placeholder_visitor_team_group: match[1].group_id
+							,placeholder_visitor_team_position: match[1].position
+							,location: 'TBA'
+						})
+						.save()
+						.then(r => logger.debug(r.toJSON()) )
+						.catch(e => console.log(e))
+					}
+				})
+
+				return 'ulefante'
+			})
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error))
+	})
+
+	router.get('/:category_id/match', (req, res) => {
+		Models.category
+		.where({id: req.params.category_id})
+		.fetch({withRelated: 'phases.groups.matches'})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error))
+	})
 
 	//==========================================================================
 	// Given a category and a team, returns the list of matches

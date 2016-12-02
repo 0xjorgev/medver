@@ -399,7 +399,10 @@ define(['express'
 	router.get('/:category_id/match', (req, res) => {
 		Models.category
 		.where({id: req.params.category_id})
-		.fetch({withRelated: 'phases.groups.matches'})
+		.fetch({withRelated:
+			['phases.groups.matches.home_team'
+			,'phases.groups.matches.visitor_team'
+		]})
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error))
 	})

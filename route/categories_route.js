@@ -12,6 +12,7 @@ define(['express'
 		,'bluebird'
 		,'../util/email_sender_util'
 		,'../util/logger_util'
+		,'js-combinatorics'
 		],
 	function (express
 		,Models
@@ -22,10 +23,12 @@ define(['express'
 		,_
 		,Promise
 		,Email
-		,logger) {
+		,logger
+		,Combinatorics
+	){
 
 	var router = express.Router();
-    var send_email_from = Email(process.env.SENDER_EMAIL);
+	var send_email_from = Email(process.env.SENDER_EMAIL);
 
 	var mapper = function(phase) {
 		// console.log('Phase:', phase.attributes);
@@ -338,6 +341,72 @@ define(['express'
         }
     });
 
+	router.post('/:category_id/match', (req, res) => {
+		return Models.category
+			.where({id: req.params.category_id})
+			.fetch({withRelated: ['phases.groups']})
+			.then(result => {
+				var cat = result.toJSON()
+
+				var groupsWithTeams = []
+				var teamCount = 1
+				cat.phases.filter(ph => ph.position == 1)
+				.map(phase => {
+					phase.groups.map((group, index) => {
+						var teams = []
+						for (var i = 1; i <= group.participant_team; i++) {
+							//genero un equipo x participant_team
+							teams.push({
+								phase_id: phase.id
+								,group_id: group.id
+								,position: i
+								,name: `Team ${teamCount++}`
+							})
+						}
+						groupsWithTeams.push(teams)
+					})
+				})
+				return groupsWithTeams
+			})
+			.then(result => {
+				result.map(group => {
+					//por cada grupo, voy a generar los partidos posibles
+					var matches = Combinatorics.combination(group, 2)
+
+					logger.debug('----------------')
+
+					while(match = matches.next()){
+						new Models.match({
+							group_id: match[0].group_id
+							,placeholder_home_team_group: match[0].group_id
+							,placeholder_home_team_position: match[0].position
+							,placeholder_visitor_team_group: match[1].group_id
+							,placeholder_visitor_team_position: match[1].position
+							,location: 'TBA'
+						})
+						.save()
+						.then(r => logger.debug(r.toJSON()) )
+						.catch(e => console.log(e))
+					}
+				})
+
+				return 'ulefante'
+			})
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error))
+	})
+
+	router.get('/:category_id/match', (req, res) => {
+		Models.category
+		.where({id: req.params.category_id})
+		.fetch({withRelated:
+			['phases.groups.matches.home_team'
+			,'phases.groups.matches.visitor_team'
+		]})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error))
+	})
+
 	//==========================================================================
 	// Given a category and a team, returns the list of matches
 	//==========================================================================
@@ -415,8 +484,6 @@ define(['express'
 		var _currentUser = data._currentUser
 		var _origin = data._origin
 
-		console.log("currentUser: ", _currentUser)
-
 		var spiderData = {}
 		spiderData.category_id = data.category_id
 		spiderData.team_id     = data.team_id
@@ -435,19 +502,15 @@ define(['express'
 		}
 
 		if(data.id){
-			console.log("data id: ", data.id)
 			spiderData.id = data.id
 		}
 
-		console.log("spiderData: ", spiderData)
 		return new Models.category_group_phase_team(spiderData).save()
 		.then(function(new_invitation){
-			console.log(`new_invitation:`, new_invitation);
+
 			var invitation = new_invitation
 			//Sent mail of inscription on category
-			console.log('DATA_ID:',data.id)
-			if(data.id == undefined)
-			{
+			if(data.id == undefined){
 				email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
 			}
 			Response(res, invitation);
@@ -521,7 +584,7 @@ define(['express'
 			params: req.params,
 			body: req.body
 		}
-		console.log('POST', data)
+		// console.log('POST', data)
 		saveCategoryTeamPlayer(data, res)
 	})
 
@@ -533,7 +596,7 @@ define(['express'
 			params: req.params,
 			body: req.body
 		}
-		console.log('PUT', data)
+		// console.log('PUT', data)
 		saveCategoryTeamPlayer(data, res)
 	})
 
@@ -541,8 +604,8 @@ define(['express'
 	// Save Category Group Phase Team
 	//==========================================================================
 	var saveCategoryTeamPlayer = (data, res) => {
-		console.log('saveCategoryTeamPlayer', data.params)
-
+		console.log('saveCategoryTeamPlayer')
+		logger.debug(data)
 		var summonedData = {
 			category_id: data.params.category_id
 			,team_id: data.params.team_id

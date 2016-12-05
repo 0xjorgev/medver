@@ -441,7 +441,39 @@ paths:
         200:
           description: results
       security: []
-
+  /category/{category_id}/match:
+    get:
+      summary: Returns the matches associated to to this category
+      description: Returns the matches associated to to this category
+      tags:
+        - Category
+        - Match
+      responses:
+        200:
+          description: Something
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+    post:
+      summary: Generates the matches for the given category id
+      description: Generates the matches for the given category id
+      tags:
+        - Category
+        - Match
+      responses:
+        200:
+          description: Something
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
   /category/{category_id}/standing_table:
     get:
       summary: Gets the current standing table for a given category_id, separated by phases & groups
@@ -630,7 +662,7 @@ paths:
         required: false
         x-is-map: false
         schema:
-          $ref: '#/definitions/CreateCategyTeamPlayer'
+          $ref: '#/definitions/CreateCategoryTeamPlayer'
       responses:
         200:
           description: Create info of the summoned player of one team on one category successful
@@ -2401,8 +2433,8 @@ definitions:
         type: string
     required:
     - id
-  CreateCategyTeamPlayer:
-    title: CreateCategyTeamPlayer
+  CreateCategoryTeamPlayer:
+    title: CreateCategoryTeamPlayer
     type: object
     properties:
       category_id:
@@ -2413,11 +2445,6 @@ definitions:
         type: string
       active:
         type: boolean
-      number:
-        type: integer
-        format: int32
-      position:
-        type: string
     required:
     - category_id
     - team_id

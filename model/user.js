@@ -20,6 +20,29 @@ define(['./base_model','./entity', './organization'],
 		  return this.morphOne('Entity', 'object');
 		}
     });
+
+	//obtiene las entidades asociadas a este usuario
+	User.getEntities = (user) => {
+		let u = Object.assign({}, user)
+		u.entity_id = user.entity.id
+		if(user.entity
+			&& user.entity.related_from
+			&& user.entity.related_from.length > 0){
+			u.related_entities = user
+			.entity
+			.related_from
+			.map(r => {
+				let stuff = Object.assign({},r.to.object)
+				stuff.relationship_type = r.relationship_type.name
+				stuff.object_type = r.to.object_type
+				delete stuff.to
+				return stuff
+			})
+		}
+		delete u.entity
+		return u
+	}
+
     // uses Registry plugin
     return DB.model('User', User);
 });

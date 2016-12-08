@@ -21,7 +21,15 @@ define(['./base_model'
         ,related_from: function() {
           return this.hasMany('Entity_relationship', 'ent_ref_from_id');
         }
-        ,related_to: function(){
+		,related_to: function(){
+			return this.hasMany('Entity_relationship', 'ent_ref_to_id');
+		}
+		//solo unos alias, para facilitar el razonamiento del codigos
+		//son copias de las dos relaciones anteriores
+        ,entities_related: function() {
+          return this.hasMany('Entity_relationship', 'ent_ref_from_id');
+        }
+        ,entities_related_to: function(){
           return this.hasMany('Entity_relationship', 'ent_ref_to_id');
         }
     });

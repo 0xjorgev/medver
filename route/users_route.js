@@ -17,6 +17,7 @@ define(['express'
         ,'../util/response_message_util'
         ,'../util/logger_util'
         ,'../helpers/auth_helper'
+        ,'lodash'
         ],
         function (express
         ,uuid
@@ -29,7 +30,8 @@ define(['express'
         ,Md5
         ,Response
         ,logger
-        ,auth){
+        ,auth
+		,_){
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -45,13 +47,21 @@ define(['express'
             qb.where('username', username)
             qb.orWhere('email', username)
         })
-	    .fetch()
+		.fetch({withRelated: [
+             'entity.related_from.relationship_type'
+            ,'entity.related_from.to.entity_type'
+        ]})
         .then(result => {
 
             if (result !== null
                 && result.attributes.password == password
                 && result.attributes.active == true){
                 var userId = result.id
+
+				let user = Models.user.getEntities(result.toJSON())
+				let userRoles = user.related_entities.map(e => {
+
+				})
 
                 var claims = {
                     user: userId,
@@ -69,6 +79,9 @@ define(['express'
                 //TODO: reemplazar por una busqueda de roles adecuada
                 result.attributes.roles = ['admin']
 				delete result.attributes.password
+
+
+
                 Response(res, result)
             }
             else{
@@ -215,15 +228,23 @@ define(['express'
         .catch(error => Response(res, null, error))
     });
 
-    router.get('/', function(req, res){
-        return Models.user
-            .where({active:true})
-            .fetchAll()
-            .then(function (result) {
-                Response(res, result)
-            }).catch(function(error){
-                Response(res, null, error)
-            });
+    router.get('/',  (req, res) => {
+		return Models.user
+			.query(qb => {
+				qb.select(['id', 'username', 'email', 'created_at', 'updated_at'])
+				qb.where({active: true})
+				qb.orderBy('username')
+			})
+			.fetchAll({withRelated: [
+				'entity.related_from.to.object',
+				'entity.related_from.relationship_type']})
+			.then(result => {
+				let users = result.toJSON()
+				//getEntities devuelve un objeto user con las entidades
+				return users.map(Models.user.getEntities)
+			})
+			.then(result => Response(res, result) )
+			.catch(error => Response(res, null, error) )
     })
 
     router.get('/team', (req, res) => {
@@ -241,12 +262,9 @@ define(['express'
         .fetch({withRelated: [
              'entity.related_from.relationship_type'
             ,'entity.related_from.to.entity_type'
-            // ,'entity.related_from.from.entity_type'
         ]})
         .then(result => {
             var user = result.toJSON()
-
-			logger.debug(user)
             //con esto se filtran las relaciones tipo 'coach' y owner
             return user.entity.related_from
                 .filter(rel => {

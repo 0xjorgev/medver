@@ -24,8 +24,6 @@ define(['express'
 
     var router = express.Router();
 
-    inspect = util.inspect
-
     //matches index
     router.get('/', (req, res) => {
         return Models.match
@@ -244,9 +242,8 @@ define(['express'
             .fetch()
         })
         .then((result) => {
-            // var _log = (obj) => console.log(require('util').inspect(obj, {colors: true, depth: Infinity }))
-            // _log(result)
-            _match = result.attributes
+
+            var _match = result.attributes
 
             refereeData.match_id = _match.id
 

@@ -98,15 +98,11 @@ gulp.task('nodemon', function() {
     vars: {
       //this overrides configFile file
       //'PORT': 3003
-      ///var/log/nginx/vhost-deluxe.codefuel.me-error_log
-      ///var/log/nginx/nginx-deluxe.codefuel.me
-      //12x3.12x3.
     }
   });
 
   nodemon({
-    exec: 'node --debug',
-    // script: 'tasks/cocacola_sf_20160813/load_cocacola_sf_20160813_data.js',
+    exec: 'node --debug --use_strict',
     script: 'app.js',
     ext: 'js html'
     // other config ...

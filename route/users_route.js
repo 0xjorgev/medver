@@ -1,10 +1,7 @@
-/**
- * Created by george on 16/02/16.
- */
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-var fs = require('fs')
+
 define(['express'
         ,'uuid'
         ,'njwt'
@@ -18,6 +15,7 @@ define(['express'
         ,'../util/logger_util'
         ,'../helpers/auth_helper'
         ,'lodash'
+        ,'fs'
         ],
         function (express
         ,uuid
@@ -31,7 +29,8 @@ define(['express'
         ,Response
         ,logger
         ,auth
-		,_){
+		,_
+		,fs){
 
     var router = express.Router();
     var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -59,9 +58,6 @@ define(['express'
                 var userId = result.id
 
 				let user = Models.user.getEntities(result.toJSON())
-				let userRoles = user.related_entities.map(e => {
-
-				})
 
                 var claims = {
                     user: userId,
@@ -79,8 +75,6 @@ define(['express'
                 //TODO: reemplazar por una busqueda de roles adecuada
                 result.attributes.roles = ['admin']
 				delete result.attributes.password
-
-
 
                 Response(res, result)
             }

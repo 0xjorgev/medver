@@ -5,7 +5,16 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+define(['express'
+	,'../model/index'
+	,'../util/request_message_util'
+	,'../util/response_message_util'
+	,'../util/knex_util',]
+	,(express
+		, Models
+		, Message
+		, Response
+		, Knex) => {
 
     var router = express.Router();
 
@@ -24,19 +33,21 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
         });
     });
 
-    router.post('/', function (req, res) {
-        //Model Instance
-        //{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
-        var Event_match_player        = Models.event_match_player;
-        var match_result  = req.body;
-        var match_id = match_result.match_id;
+	router.post('/', function (req, res) {
+		//Model Instance
+		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
+		let Event_match_player = Models.event_match_player
+		let match_result  = req.body
+		let match_id = match_result.match_id
 
-        new Event_match_player(match_result).save().then(function(new_team){
-            Message(res, 'Success', '0', match_result);
-        }).catch(function(error){
-            Message(res, error.detail, error.code, null);
-        });
-    });
+		new Event_match_player(match_result)
+		.save()
+		.then(result => {
+			Response(res, result)
+		}).catch(error => {
+			Response(res, null, error)
+		})
+	});
 
 
     // //'category', 'organization'

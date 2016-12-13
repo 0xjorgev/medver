@@ -10,7 +10,8 @@ define(['express'
 	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
 	,'../helpers/team_placeholders_helper'
-    ,'bluebird'
+    ,'../util/generic_util'
+    ,'../util/logger_util'
 	],
 	(express
 	,Models
@@ -20,7 +21,9 @@ define(['express'
 	,Response
 	,StandingTable
 	,PlaceholdersHelper
-    ,bluebird) => {
+    ,utilities
+    ,logger
+	) => {
 
     var router = express.Router();
 
@@ -285,5 +288,94 @@ define(['express'
         saveMatch(req, res)
     });
 
-    return router;
+	router.get('/:match_id/event', (req, res) => {
+		var match_id = req.params.match_id
+		return Models.event_match_player
+		.where({match_id: match_id, active: true})
+		.fetchAll({withRelated: ['match_id'
+			,'event_id'
+			,'player_in.player_team'
+			,'player_out.player_team'
+			,'team']
+			, debug: false})
+		.then(result => Response(res, result))
+		.catch((error) => Response(res, null, error))
+	})
+
+	router.post('/:match_id/event', (req, res) => {
+		//Model Instance
+		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
+		let matchId = req.params.match_id
+		let matchResult = req.body.map(_event => {
+			let event = _event
+			event.match_id = matchId
+			return event
+		})
+
+		return Promise.all(matchResult.map(mr => {
+			return new Models.event_match_player(mr)
+			.save()
+			.then(result => {
+				//creacion del feed item asociado a este evento
+				// logger.debug(result.toJSON())
+
+				//obtener entidades de los involucrados
+				//FIXME: se deberian buscar solo una vez las entidades team y match
+				return Models.entity.query(qb => {
+					qb.where({
+						object_id: result.attributes.team_id
+						,object_type: 'teams'
+					})
+					.orWhere({
+						object_id: result.attributes.match_id
+						,object_type: 'match'
+					})
+					//TODO: agregar busqueda de entidades de las personas
+				})
+				.fetchAll()
+				.then(entities => {
+
+					//FIXME: la creacion del feed item debe hacerse en el modelo
+					// y disparar la creacion del entity y de sus elementos relacionados
+
+					//TODO: de acuerdo al tipo de evento, deberia cambiar el mensaje. Adicionalmente, no todo evento requiere de un feedItem
+					//inicialmente voy a filtrar los goles y el fin del partido
+					return new Models.feed_item({
+						message_en: `(EN) feed item of + ${result.attributes.event_id} + ${result.attributes.player_in} + ${result.attributes.player_out} + ${result.attributes.instant} + ${result.attributes.team_id} + ${result.attributes.match_id}`
+						,message_es: `(ES) feed item de + ${result.attributes.event_id} + ${result.attributes.player_in} + ${result.attributes.player_out} + ${result.attributes.instant} + ${result.attributes.team_id} + ${result.attributes.match_id}`
+					})
+					.save()
+					.then(feedItem => {
+						//crear la entidad del Feed item
+						return new Models.entity({
+							object_id: feedItem.attributes.id
+							,object_type: 'feed_items'
+						})
+						.save()
+					})
+					.then(feedItem => {
+
+						// logger.debug(entities.toJSON())
+
+						//crear las relaciones correspondientes del feed con las entidades
+						return Promise.all(entities.toJSON().map(entity => {
+
+							return new Models.entity_relationship({
+								ent_ref_from_id: feedItem.attributes.id
+								,relationship_type_id: 1 //TODO: reemplazar x relacion apropiada
+								,ent_ref_to_id: entity.id
+								,comment: `FEED ITEM OF ${entity.object_type} ${entity.id}`
+							})
+							.save()
+						}))
+					})
+				})
+
+			})
+		}))
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	});
+
+	return router;
 });

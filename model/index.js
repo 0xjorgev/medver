@@ -40,6 +40,7 @@ define([
     ,'./entity_relationship'
     ,'./status_type'
     ,'./entity_request'
+    ,'./feed_item'
 ], function (Util
 	, Discipline
 	, Subdiscipline
@@ -73,7 +74,9 @@ define([
 	, Entity
 	, Entity_relationship
 	, Status_type
-	, Entity_request){
+	, Entity_request
+	, Feed_item
+	){
     return {
     	util:Util
     	,user:User
@@ -109,5 +112,6 @@ define([
         ,entity_relationship: Entity_relationship
         ,status_type: Status_type
         ,entity_request: Entity_request
+        ,feed_item: Feed_item
     };
 });

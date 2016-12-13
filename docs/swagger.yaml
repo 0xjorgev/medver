@@ -1320,7 +1320,46 @@ paths:
       responses:
         200:
           description: (documentation pending)
-
+  /match/{match_id}/event:
+    get:
+      summary: Gets the events associated to a specific match
+      description: Gets the events associated to a specific match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: List of events that happened during a match
+    post:
+      summary: registers the events that happened during a match
+      description: registers the events that happened during a match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: events
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/MatchEvents'
+      responses:
+        200:
+          description: (documentation pending)
   /round:
     get:
       summary: List all rounds
@@ -1494,26 +1533,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/PlayerTeamData'
-            # type: array
-            # items:
-            #   type: object
-            #   player:
-            #     type: object
-            #     properties:
-            #       name:
-            #         type: string
-            #       position:
-            #         type: integer
-            #       category_id:
-            #         type: integer
-            #       participant_team:
-            #         type: integer
-            #       classified_team:
-            #         type: integer
-            #   team:
-            #       type: object
-            #       properties:
-            #         team_id: integer
       tags:
         - Team
         - Player
@@ -2449,6 +2468,21 @@ definitions:
         type: boolean
       number:
         type: integer
+  MatchEvents:
+    type: array
+    items:
+      type: object
+      properties:
+        event_id:
+          type: integer
+        player_in:
+          type: integer
+        player_out:
+          type: integer
+        instant:
+          type: integer
+        team_id:
+          type: integer
   Error:
     title: error
     type: object

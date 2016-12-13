@@ -340,8 +340,20 @@ define(['express'
 					//TODO: de acuerdo al tipo de evento, deberia cambiar el mensaje. Adicionalmente, no todo evento requiere de un feedItem
 					//inicialmente voy a filtrar los goles y el fin del partido
 					return new Models.feed_item({
-						message_en: `(EN) feed item of + ${result.attributes.event_id} + ${result.attributes.player_in} + ${result.attributes.player_out} + ${result.attributes.instant} + ${result.attributes.team_id} + ${result.attributes.match_id}`
-						,message_es: `(ES) feed item de + ${result.attributes.event_id} + ${result.attributes.player_in} + ${result.attributes.player_out} + ${result.attributes.instant} + ${result.attributes.team_id} + ${result.attributes.match_id}`
+						message_en: `(EN) feed item of
+						event_id: ${result.attributes.event_id}
+						player_in: ${result.attributes.player_in}
+						player_out: ${result.attributes.player_out}
+						instant: ${result.attributes.instant}
+						team_id: ${result.attributes.team_id}
+						match_id: ${result.attributes.match_id}`
+						,message_es: `(ES) noticias de
+						event_id: ${result.attributes.event_id}
+						player_in: ${result.attributes.player_in}
+						player_out: ${result.attributes.player_out}
+						instant: ${result.attributes.instant}
+						team_id: ${result.attributes.team_id}
+						match_id: ${result.attributes.match_id}`
 					})
 					.save()
 					.then(feedItem => {
@@ -354,8 +366,8 @@ define(['express'
 					})
 					.then(feedItem => {
 						//crear las relaciones correspondientes del feed con las entidades
-						return Promise.all(entities.toJSON().map(entity => {
-
+						return Promise.all(entities.toJSON()
+							.map(entity => {
 							return new Models.entity_relationship({
 								ent_ref_from_id: feedItem.attributes.id
 								,relationship_type_id: 3 //feed item

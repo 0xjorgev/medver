@@ -284,7 +284,7 @@ define(['express'
 	router.get('/:user_id/feed', (req, res) => {
 		//se verifica unicamente que haya un usuario válido en el request
 		//no se requiere ningun permiso especial
-		var chk = auth.checkPermissions(req._currentUser, [])
+		const chk = auth.checkPermissions(req._currentUser, [])
 
 		if(chk.code !== 0){
 			Response(res, null, chk)
@@ -303,7 +303,7 @@ define(['express'
 			//ahora con las entidades relacionadas a este user,
 			//traigo los feeds asociados a ellas o al mismo usuario
 
-			//se extraen los ids de las entidates
+			//se extraen los ids de las entidades
 			let ids = user.related_entities.filter(rel => {
 				return rel.entity_id && rel.entity_id !== null
 			})
@@ -317,16 +317,21 @@ define(['express'
 				//filtrar solamente por tipo 3 -> feed item
 				qb.where('relationship_type_id', 3)
 			})
-			.fetchAll({withRelated: 'from.object'})
+			.fetchAll({withRelated: ['from.object', 'to.object']})
 			.then(rel => {
 				//proceso el resultado, para retornar solamente los feeds
-				return rel.toJSON().map( r => r.from.object )
+				return rel.toJSON().map( r => {
+					let fi = r.from.object
+					//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
+					let tmpTo = r.to.object
+					tmpTo.object_type = r.to.object_type
+					fi.related_entities = [tmpTo]
+					return r.from.object
+				})
 			})
 		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
-
-
 	})
 
     return router;

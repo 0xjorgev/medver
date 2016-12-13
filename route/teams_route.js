@@ -231,7 +231,18 @@ define(['express'
 				}).save()
 			}
 		})
-		.then(result => Response(res, _team))
+		.then(result => {
+			return Models.team
+			.where({id:_team.id, active:true})
+			.fetch({withRelated: ['category_type'
+				,'organization'
+				,'player_team.player'
+				,'subdiscipline'
+				,'gender'
+				,'entity'
+				,'player_team.position']})
+		})
+		.then(result =>{Response(res, result)})
 		.catch(error => Response(res, null, error))
 	}
 
@@ -250,6 +261,30 @@ define(['express'
 		data.id = req.params.team_id
 		saveTeam(data, res)
 	});
+
+	//inactivates the team
+	router.delete('/:team_id', function(req, res){
+		var teamId = req.params.team_id
+		var teamData = {}
+		if (teamId != undefined) teamData.id = teamId
+		
+		teamData.active = false
+
+		return new Models.team(teamData).save()
+		.then(result => {
+			return Models.team
+			.where({id:teamId})
+			.fetch({withRelated: ['category_type'
+				,'organization'
+				,'player_team.player'
+				,'subdiscipline'
+				,'gender'
+				,'entity'
+				,'player_team.position']})
+		})
+		.then((result) => Response(res, result))
+		.catch((error) => Response(res, null, error))
+	})
 
 	var savePlayerTeam = (playerTeamData, res) => {
 		logger.debug('savePlayerTeam')

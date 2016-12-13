@@ -334,7 +334,6 @@ define(['express'
 				})
 				.fetchAll()
 				.then(entities => {
-
 					//FIXME: la creacion del feed item debe hacerse en el modelo
 					// y disparar la creacion del entity y de sus elementos relacionados
 
@@ -354,15 +353,12 @@ define(['express'
 						.save()
 					})
 					.then(feedItem => {
-
-						// logger.debug(entities.toJSON())
-
 						//crear las relaciones correspondientes del feed con las entidades
 						return Promise.all(entities.toJSON().map(entity => {
 
 							return new Models.entity_relationship({
 								ent_ref_from_id: feedItem.attributes.id
-								,relationship_type_id: 1 //TODO: reemplazar x relacion apropiada
+								,relationship_type_id: 3 //feed item
 								,ent_ref_to_id: entity.id
 								,comment: `FEED ITEM OF ${entity.object_type} ${entity.id}`
 							})

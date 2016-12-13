@@ -25,6 +25,7 @@ define(['./base_model','./entity', './organization'],
 	User.getEntities = (user) => {
 		let u = Object.assign({}, user)
 		u.entity_id = user.entity.id
+
 		if(user.entity
 			&& user.entity.related_from
 			&& user.entity.related_from.length > 0){
@@ -35,6 +36,7 @@ define(['./base_model','./entity', './organization'],
 				let stuff = Object.assign({},r.to.object)
 				stuff.relationship_type = r.relationship_type.name
 				stuff.object_type = r.to.object_type
+				stuff.entity_id = r.ent_ref_to_id
 				delete stuff.to
 				return stuff
 			})

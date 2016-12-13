@@ -178,6 +178,30 @@ paths:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No teams found
+  /user/{user_id}/feed:
+    get:
+      summary: Returns the news feed of an user
+      description: Returns the news feed of an user
+      tags:
+        - User
+      parameters:
+      - name: Authorization-Token
+        in: header
+        type: string
+        required: true
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: User news feed
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No teams found
 
   /competition:
     get:

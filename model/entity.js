@@ -7,6 +7,7 @@ define(['./base_model'
     ,'./user'
     ,'./category'
     ,'./entity_type'
+    ,'./feed_item'
     ,'./entity_relationship' ]
     ,(DB, Team, User, Category, Entity_type, Entity_relationship) => {
     var Entity = DB.Model.extend({
@@ -16,7 +17,7 @@ define(['./base_model'
             return this.belongsTo('Entity_type', 'entity_type_id');
         }
         ,object: function() {
-            return this.morphTo('object', 'User', 'Team', 'Category')
+            return this.morphTo('object', 'User', 'Team', 'Category', 'Feed_item')
         }
         ,related_from: function() {
           return this.hasMany('Entity_relationship', 'ent_ref_from_id');

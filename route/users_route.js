@@ -262,7 +262,7 @@ define(['express'
             //con esto se filtran las relaciones tipo 'coach' y owner
             return user.entity.related_from
                 .filter(rel => {
-                    var name = (rel.relationship_type.name == undefined) ? '': rel.relationship_type.name.toUpperCase()
+                    var name = (rel.relationship_type.name == undefined) ? '' : rel.relationship_type.name.toUpperCase()
                     return name == 'COACH' || name == 'OWNER'
                 })
                 //y con este map se extraen los ids de los teams
@@ -280,6 +280,54 @@ define(['express'
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))
     })
+
+	router.get('/:user_id/feed', (req, res) => {
+		//se verifica unicamente que haya un usuario válido en el request
+		//no se requiere ningun permiso especial
+		var chk = auth.checkPermissions(req._currentUser, [])
+
+		if(chk.code !== 0){
+			Response(res, null, chk)
+			return
+		}
+
+		Models.user
+		.where({id: req.params.user_id})
+		.fetch({withRelated: [
+			'entity.related_from.to.object',
+			'entity.related_from.relationship_type']})
+		.then(user => {
+			return Models.user.getEntities(user.toJSON())
+		})
+		.then(user => {
+			//ahora con las entidades relacionadas a este user,
+			//traigo los feeds asociados a ellas o al mismo usuario
+
+			//se extraen los ids de las entidates
+			let ids = user.related_entities.filter(rel => {
+				return rel.entity_id && rel.entity_id !== null
+			})
+			.map(rel => rel.entity_id)
+
+
+			//obtengo las relaciones de las entidades
+			return Models.entity_relationship
+			.query(qb => {
+				qb.whereIn('ent_ref_to_id', ids)
+				//filtrar solamente por tipo 3 -> feed item
+				qb.where('relationship_type_id', 3)
+			})
+			.fetchAll({withRelated: 'from.object'})
+			.then(rel => {
+				//proceso el resultado, para retornar solamente los feeds
+				return rel.toJSON().map( r => r.from.object )
+			})
+		})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+
+
+	})
 
     return router;
 });

@@ -1,14 +1,21 @@
-/**
- * Created by george on 16/02/2016.
- */
-if (typeof define !== 'function') {
-    var define = require('amdefine')(module);
-}
+if (typeof define !== 'function')
+	var define = require('amdefine')(module);
 
 define(['./base_model','./entity', './organization'],
 	function (DB, Entity) {
     var User = DB.Model.extend({
-        tableName: 'users'
+		initialize: function(){
+			this.on('created', attrs => {
+				// this.set('number', 99)
+				new DB._models.Entity({
+					object_type: 'users'
+					,object_id: this.id
+				})
+				.save()
+			})
+		}
+		,tableName: 'users'
+		,hidden: ['password']
         ,hasTimestamps: true
         ,referee: function(){
             return this.hasMany('Match_referee');
@@ -19,6 +26,7 @@ define(['./base_model','./entity', './organization'],
 		,entity : function(){
 		  return this.morphOne('Entity', 'object');
 		}
+
     });
 
 	//obtiene las entidades asociadas a este usuario

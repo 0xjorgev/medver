@@ -1,29 +1,30 @@
-/**
- * Created by george on 17/02/16.
- */
-if (typeof define !== 'function') {
+if (typeof define !== 'function')
     var define = require('amdefine')(module);
-}
 
-define(['knex', 'bookshelf', '../knexfile', 'checkit'], function (Knex, Bookshelf, dbConfig, CheckIt) {
+define(['knex'
+	, 'bookshelf'
+	, '../knexfile'
+	, 'checkit']
+	, function (Knex
+		, Bookshelf
+		, dbConfig
+		, CheckIt) {
 
-	var bookshelf;
+	const config = process.env.NODE_ENV === 'development' ? dbConfig.development : dbConfig.production
 
-	if (process.env.NODE_ENV === 'development'){
-		bookshelf = new Bookshelf(new Knex(dbConfig.development));
-	} else {
-		bookshelf = new Bookshelf(new Knex(dbConfig.production));
-	}
+	let bookshelf = new Bookshelf(new Knex(config))
 
-    // enable Bookshelf plugins
-    bookshelf.plugin('registry');
+	//docs de los plugins de bookshelf
+	//https://github.com/tgriesser/bookshelf/wiki/Extensions%2C-plugins%2C-resources
 
-    /*
-    bookshelf.plugin('virtuals');
-    bookshelf.plugin('visibility');
-    */
+	//para cargar referencias a los modelos y evitar referencias circulares
+	bookshelf.plugin('registry');
+	//se utiliza para generar campos que no están en el esquema
+	bookshelf.plugin('virtuals');
+	//para ocultar por defecto algunos campos
+	bookshelf.plugin('visibility');
 
-    bookshelf.checkit = CheckIt
+	bookshelf.checkit = CheckIt
 
-    return bookshelf;
+	return bookshelf;
 });

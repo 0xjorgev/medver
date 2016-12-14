@@ -105,11 +105,7 @@ define(['express'
         .save()
         .then(result => {
             _newUser = result
-			return new Models.entity({
-				object_id: _newUser.attributes.id
-				,object_type: 'users'
-			})
-			.save()
+			return _newUser
         })
         .then(result => {
             //content is from template/email/registerUser.html
@@ -225,7 +221,6 @@ define(['express'
     router.get('/',  (req, res) => {
 		return Models.user
 			.query(qb => {
-				qb.select(['id', 'username', 'email', 'created_at', 'updated_at'])
 				qb.where({active: true})
 				qb.orderBy('username')
 			})

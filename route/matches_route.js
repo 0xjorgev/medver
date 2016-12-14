@@ -156,7 +156,6 @@ define(['express'
 
     var saveMatch = (req, res) => {
         //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
-        //https://github.com/hapijs/joi
         //https://github.com/tgriesser/checkit
         var data = req.body;
 
@@ -221,7 +220,7 @@ define(['express'
 		roundData.name = 'Round'
 
         //para almacenar el match creado
-        var _match = undefined
+        let _match = null
         //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
         //en caso de que la ronda exista, solo se hace update
         new Models.round(roundData)
@@ -232,8 +231,6 @@ define(['express'
             return new Match(matchData).save()
         })
 		.then((match) => {
-			//se guardan los datos del match para retornarse al final de la cadena
-            // _match = match.attributes
             // //TODO: asignacion temporal, mientras elimino round_id de esta tabla
             // _match.group_id = match.round.group_id
             return Models.match
@@ -245,9 +242,7 @@ define(['express'
             .fetch()
         })
         .then((result) => {
-
-            var _match = result.attributes
-
+            _match = result.attributes
             refereeData.match_id = _match.id
 
             if( _match.matches_referee_id != null || _match.matches_referee_id != undefined)
@@ -259,7 +254,8 @@ define(['express'
         })
         .then((result) => {
 			//se obtiene el ID del referee para devolverlo en la respuesta del servicio
-			_match.referee_id = result.attributes.referee_id
+			if(result.attributes.referee_id)
+				_match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){

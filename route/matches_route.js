@@ -313,66 +313,74 @@ define(['express'
 			.save()
 			.then(result => {
 				//creacion del feed item asociado a este evento
-				// logger.debug(result.toJSON())
 
 				//obtener entidades de los involucrados
 				//FIXME: se deberian buscar solo una vez las entidades team y match
 				return Models.entity.query(qb => {
-					qb.where({
-						object_id: result.attributes.team_id
-						,object_type: 'teams'
-					})
-					.orWhere({
-						object_id: result.attributes.match_id
-						,object_type: 'match'
-					})
+					// qb.where({
+					// 	object_id: result.attributes.team_id
+					// 	,object_type: 'teams'
+					// })
+					// .where({
+					// 	object_id: result.attributes.match_id
+					// 	,object_type: 'matches'
+					// })
+
 					//TODO: agregar busqueda de entidades de las personas
 				})
-				.fetchAll()
+				.fetchAll({debug: true})
 				.then(entities => {
-					//FIXME: la creacion del feed item debe hacerse en el modelo
-					// y disparar la creacion del entity y de sus elementos relacionados
+					//creacion de un feed item para el evento recién salvado
+					Models.feed_item.create({
+						data: {
+							object_type: 'events'
+							,object_id: result.attributes.id
+						}
+						,related_entities: entities.toJSON()
+					})
+
+					return 'hulefantes'
 
 					//TODO: de acuerdo al tipo de evento, deberia cambiar el mensaje. Adicionalmente, no todo evento requiere de un feedItem
 					//inicialmente voy a filtrar los goles y el fin del partido
-					return new Models.feed_item({
-						message_en: `(EN) feed item of
-						event_id: ${result.attributes.event_id}
-						player_in: ${result.attributes.player_in}
-						player_out: ${result.attributes.player_out}
-						instant: ${result.attributes.instant}
-						team_id: ${result.attributes.team_id}
-						match_id: ${result.attributes.match_id}`
-						,message_es: `(ES) noticias de
-						event_id: ${result.attributes.event_id}
-						player_in: ${result.attributes.player_in}
-						player_out: ${result.attributes.player_out}
-						instant: ${result.attributes.instant}
-						team_id: ${result.attributes.team_id}
-						match_id: ${result.attributes.match_id}`
-					})
-					.save()
-					.then(feedItem => {
-						//crear la entidad del Feed item
-						return new Models.entity({
-							object_id: feedItem.attributes.id
-							,object_type: 'feed_items'
-						})
-						.save()
-					})
-					.then(feedItem => {
-						//crear las relaciones correspondientes del feed con las entidades
-						return Promise.all(entities.toJSON()
-							.map(entity => {
-							return new Models.entity_relationship({
-								ent_ref_from_id: feedItem.attributes.id
-								,relationship_type_id: 3 //feed item
-								,ent_ref_to_id: entity.id
-								,comment: `FEED ITEM OF ${entity.object_type} ${entity.id}`
-							})
-							.save()
-						}))
-					})
+					// return new Models.feed_item({
+					// 	message_en: `(EN) feed item of
+					// 	event_id: ${result.attributes.event_id}
+					// 	player_in: ${result.attributes.player_in}
+					// 	player_out: ${result.attributes.player_out}
+					// 	instant: ${result.attributes.instant}
+					// 	team_id: ${result.attributes.team_id}
+					// 	match_id: ${result.attributes.match_id}`
+					// 	,message_es: `(ES) noticias de
+					// 	event_id: ${result.attributes.event_id}
+					// 	player_in: ${result.attributes.player_in}
+					// 	player_out: ${result.attributes.player_out}
+					// 	instant: ${result.attributes.instant}
+					// 	team_id: ${result.attributes.team_id}
+					// 	match_id: ${result.attributes.match_id}`
+					// })
+					// .save()
+					// .then(feedItem => {
+					// 	//crear la entidad del Feed item
+					// 	return new Models.entity({
+					// 		object_id: feedItem.attributes.id
+					// 		,object_type: 'feed_items'
+					// 	})
+					// 	.save()
+					// })
+					// .then(feedItem => {
+					// 	//crear las relaciones correspondientes del feed con las entidades
+					// 	return Promise.all(entities.toJSON()
+					// 		.map(entity => {
+					// 		return new Models.entity_relationship({
+					// 			ent_ref_from_id: feedItem.attributes.id
+					// 			,relationship_type_id: 3 //feed item
+					// 			,ent_ref_to_id: entity.id
+					// 			,comment: `FEED ITEM OF ${entity.object_type} ${entity.id}`
+					// 		})
+					// 		.save()
+					// 	}))
+					// })
 				})
 
 			})

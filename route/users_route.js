@@ -329,5 +329,17 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
+	router.get('/:user_id', (req, res) => {
+		Models.user
+		.forge({id: req.params.user_id})
+		.fetch()
+		.then(result => {
+			result.getEntities()
+
+			Response(res, result)
+		})
+		.catch(error => Response(res, null, error))
+	})
+
     return router;
 });

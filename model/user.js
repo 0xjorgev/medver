@@ -4,6 +4,10 @@ if (typeof define !== 'function')
 define(['./base_model','./entity', './organization'],
 	function (DB, Entity) {
     var User = DB.Model.extend({
+
+		//implementar esto para retornar siempre las relaciones
+		//https://github.com/tgriesser/bookshelf/issues/601
+
 		initialize: function(){
 			this.on('created', attrs => {
 				// this.set('number', 99)
@@ -26,7 +30,6 @@ define(['./base_model','./entity', './organization'],
 		,entity : function(){
 		  return this.morphOne('Entity', 'object');
 		}
-
     });
 
 	//obtiene las entidades asociadas a este usuario

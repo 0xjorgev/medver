@@ -201,7 +201,31 @@ paths:
         403:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
-          description: No teams found
+          description: No news found
+  /user/{user_id}:
+    get:
+      summary: Return info of a user
+      description: Return info of a user
+      tags:
+        - User
+      parameters:
+    #   - name: Authorization-Token
+    #     in: header
+    #     type: string
+    #     required: true
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: User info
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No user found
 
   /competition:
     get:

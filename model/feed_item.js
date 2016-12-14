@@ -2,8 +2,9 @@ if (typeof define !== 'function')
     var define = require('amdefine')(module);
 
 define(['./base_model'
+	,'../util/logger_util'
 	,'./entity'],
-	(DB) => {
+	(DB, logger) => {
 		var Feed_item = DB.Model.extend({
 			initialize: function(){
 				this.on('created', attrs => {
@@ -17,6 +18,9 @@ define(['./base_model'
 			}
 			,tableName: 'feed_items'
 			,hasTimestamps: true
+			,entity : function(){
+			  return this.morphOne('Entity', 'object');
+			}
 		}
 		,{
 			getTemplate: function(eventType){
@@ -43,7 +47,53 @@ define(['./base_model'
 				return template
 			}
 			,create: function(data){
-				// console.log('creating feed item', data)
+				let event = data.data
+				DB._models.Event.forge({id: event.object_id})
+				.fetch()
+				.then(e => {
+					//con el evento, se obtiene el codigo
+					let msg = this.getTemplate(e.attributes.code)
+					let team =
+						data.related_entities
+						.filter(ent => ent.object_type === 'teams')[0]
+					let match =
+						data.related_entities
+						.filter(ent => ent.object_type === 'matches')[0]
+
+					if(team){
+						msg = {
+							message_en: msg.message_en.replace('$TEAM', team.object.name)
+							,message_es: msg.message_es.replace('$TEAM', team.object.name)
+						}
+					}
+
+					if(match){
+						msg = {
+							message_en: msg.message_en.replace('$MATCH', `Match #${match.object.number}`)
+							,message_es: msg.message_es.replace('$MATCH', `Partido #${match.object.number}`)
+						}
+					}
+
+					return new DB._models.Feed_item(msg).save()
+						.then(feedItem => feedItem.load(['entity']))
+
+				})
+				.then(feedItem => {
+					const _feedItem = feedItem.toJSON()
+					return Promise.all(
+						data.related_entities
+						.map(targetEntity => {
+							const saveObj = {
+								ent_ref_from_id: _feedItem.entity.id
+								,relationship_type_id: 3 //feed item
+								,ent_ref_to_id: targetEntity.id
+								,comment: `FEED ITEM OF ${targetEntity.object_type} ${targetEntity.id}`
+							}
+							// logger.debug(saveObj)
+							return new DB._models.Entity_relationship(saveObj)
+								.save()
+					}))
+				})
 			}
 		})
 

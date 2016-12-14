@@ -79,6 +79,7 @@ define(['./base_model', './index' ,'./entity' ,'./round', './event_match_player'
 	,{
 		//metodos estaticos
 		getMatchNumber: function(){
+			console.log('implementar generador aqui')
 			return 567
 		}
 	})

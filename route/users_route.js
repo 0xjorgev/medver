@@ -299,31 +299,37 @@ define(['express'
 			//traigo los feeds asociados a ellas o al mismo usuario
 
 			//se extraen los ids de las entidades
-			let ids = user.related_entities.filter(rel => {
-				return rel.entity_id && rel.entity_id !== null
-			})
-			.map(rel => rel.entity_id)
+			let ids = null
 
-
-			//obtengo las relaciones de las entidades
-			return Models.entity_relationship
-			.query(qb => {
-				qb.whereIn('ent_ref_to_id', ids)
-				//filtrar solamente por tipo 3 -> feed item
-				qb.where('relationship_type_id', 3)
-			})
-			.fetchAll({withRelated: ['from.object', 'to.object']})
-			.then(rel => {
-				//proceso el resultado, para retornar solamente los feeds
-				return rel.toJSON().map( r => {
-					let fi = r.from.object
-					//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
-					let tmpTo = r.to.object
-					tmpTo.object_type = r.to.object_type
-					fi.related_entities = [tmpTo]
-					return r.from.object
+			if(user.related_entities){
+				ids = user.related_entities.filter(rel => {
+					return rel.entity_id && rel.entity_id !== null
 				})
-			})
+				.map(rel => rel.entity_id)
+
+				//obtengo las relaciones de las entidades
+				return Models.entity_relationship
+				.query(qb => {
+					qb.whereIn('ent_ref_to_id', ids)
+					//filtrar solamente por tipo 3 -> feed item
+					qb.where('relationship_type_id', 3)
+				})
+				.fetchAll({withRelated: ['from.object', 'to.object']})
+				.then(rel => {
+					//proceso el resultado, para retornar solamente los feeds
+					return rel.toJSON().map( r => {
+						let fi = r.from.object
+						//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
+						let tmpTo = r.to.object
+						tmpTo.object_type = r.to.object_type
+						fi.related_entities = [tmpTo]
+						return r.from.object
+					})
+				})
+			}
+			else {
+				return []
+			}
 		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))

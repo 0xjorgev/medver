@@ -5,7 +5,8 @@ define(['./base_model'
 	,'../util/logger_util'
 	,'./entity'],
 	(DB, logger) => {
-		var Feed_item = DB.Model.extend({
+
+		const Feed_item = DB.Model.extend({
 			initialize: function(){
 				this.on('created', attrs => {
 					// this.set('number', 99)
@@ -21,8 +22,7 @@ define(['./base_model'
 			,entity : function(){
 			  return this.morphOne('Entity', 'object');
 			}
-		}
-		,{
+		},{
 			getTemplate: function(eventType){
 				let template = null
 				switch (eventType) {
@@ -40,7 +40,7 @@ define(['./base_model'
 						break;
 					default:
 						template =  {
-							message_en: 'Something has happenened on $DATE',
+							message_en: 'Something has happened on $DATE',
 							message_es: 'Algo ha ocurrido el $DATE',
 						}
 				}

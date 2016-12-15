@@ -9,12 +9,7 @@ define(['./base_model'
 		const Feed_item = DB.Model.extend({
 			initialize: function(){
 				this.on('created', attrs => {
-					// this.set('number', 99)
-					new DB._models.Entity({
-						object_type: 'feed_items'
-						,object_id: this.id
-					})
-					.save()
+					//por problemas de asincronia, se crea la entidad con el metodo create
 				})
 			}
 			,tableName: 'feed_items'
@@ -25,17 +20,18 @@ define(['./base_model'
 		},{
 			getTemplate: function(eventType){
 				let template = null
+				//TODO: cargar desde un JSON o YML
 				switch (eventType) {
 					case '#GOL':
 						template =  {
-							message_en: '$PLAYER of $TEAM scored a goal against $RIVAL_TEAM on $DATE',
-							message_es: '$PLAYER de $TEAM anotó un gol contra $RIVAL_TEAM el $DATE',
+							message_en: '$PLAYER of $TEAM scored a goal on $INSTANT\' of $MATCH',
+							message_es: '$PLAYER de $TEAM anotó un gol el $INSTANT\' de $MATCH',
 						}
 						break;
 					case '#GEND':
 						template =  {
-							message_en: '$PLAYER of $TEAM scored a goal against $RIVAL_TEAM on $DATE',
-							message_es: '$PLAYER de $TEAM anotó un gol contra $RIVAL_TEAM el $DATE',
+							message_en: 'The $MATCH has ended: $SCORE',
+							message_es: 'El $MATCH ha terminado: $SCORE',
 						}
 						break;
 					default:
@@ -52,34 +48,26 @@ define(['./base_model'
 				.fetch()
 				.then(e => {
 					//con el evento, se obtiene el codigo
-					let msg = this.getTemplate(e.attributes.code)
-					let team =
-						data.related_entities
-						.filter(ent => ent.object_type === 'teams')[0]
-					let match =
-						data.related_entities
-						.filter(ent => ent.object_type === 'matches')[0]
+					let msg = processData(data.info, this.getTemplate(e.attributes.code))
 
-					if(team){
-						msg = {
-							message_en: msg.message_en.replace('$TEAM', team.object.name)
-							,message_es: msg.message_es.replace('$TEAM', team.object.name)
-						}
-					}
-
-					if(match){
-						msg = {
-							message_en: msg.message_en.replace('$MATCH', `Match #${match.object.number}`)
-							,message_es: msg.message_es.replace('$MATCH', `Partido #${match.object.number}`)
-						}
-					}
-
-					return new DB._models.Feed_item(msg).save()
-						.then(feedItem => feedItem.load(['entity']))
-
+					let _feedItem = null
+					return new DB._models.Feed_item(msg)
+						.save()
+						.then(feedItem => {
+							_feedItem = feedItem.toJSON()
+							return new DB._models.Entity({
+								object_type: 'feed_items'
+								,object_id: _feedItem.id
+							})
+							.save()
+						})
+						.then(entity => {
+							_feedItem.entity = entity.toJSON()
+							return _feedItem
+						})
 				})
 				.then(feedItem => {
-					const _feedItem = feedItem.toJSON()
+					const _feedItem = feedItem
 					return Promise.all(
 						data.related_entities
 						.map(targetEntity => {
@@ -96,6 +84,26 @@ define(['./base_model'
 				})
 			}
 		})
+
+		//toma un objeto info {placeholder: '$EJEMPLO', messages: {}}
+		const processData = (info, _template) => {
+			let template = _template
+
+			info.forEach((i, idx) => {
+				template = replaceValues(template, i.placeholder, i.messages)
+			})
+
+			return template
+		}
+
+		//reemplaza los valores en un template
+		const replaceValues = (template, placeholder, values) => {
+			return {
+				//TODO: se debería recorrer un arreglo de keys de idioma, para hacerlo generico
+				message_en: template.message_en.replace(placeholder, values['en'])
+				,message_es: template.message_es.replace(placeholder, values['es'])
+			}
+		}
 
 		return DB.model('Feed_item', Feed_item)
 	}

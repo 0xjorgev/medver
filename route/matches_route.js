@@ -313,7 +313,6 @@ define(['express'
 			.save()
 			.then(result => {
 				//creacion del feed item asociado a este evento
-
 				//obtener entidades de los involucrados
 				return Models.entity.query(qb => {
 					qb.where({
@@ -328,18 +327,86 @@ define(['express'
 							object_type: 'teams'
 						})
 					}
+					if(result.attributes.player_in){
+						qb.orWhere({
+							object_id: result.attributes.player_in
+						})
+						qb.where({
+							object_type: 'players'
+						})
+					}
 				})
 				.fetchAll({withRelated: 'object', debug: false})
-				.then(entities => {
+				.then(_entities => {
 					//creacion de un feed item para el evento recién salvado
 					//esto debería disparar un hilo separado de ejecucion
-					Models.feed_item.create({
-						data: {
-							object_type: 'events'
-							,object_id: result.attributes.event_id
+					let entities = _entities.toJSON()
+
+					let team =
+						entities.filter(ent => ent.object_type === 'teams')[0]
+					let match =
+						entities.filter(ent => ent.object_type === 'matches')[0]
+					let player =
+						entities.filter(ent => ent.object_type === 'players')[0]
+
+					let feedItemData = {}
+					feedItemData.data = {
+						object_type: 'events'
+						,object_id: result.attributes.event_id
+					}
+					feedItemData.related_entities = entities
+
+					//aqui va la info que se generará en cada evento
+					feedItemData.info = []
+
+					if(team){
+						feedItemData.info.push({ placeholder: '$TEAM'
+							,messages: {en: team.object.name, es: team.object.name}
+						})
+					}
+
+					if(match){
+						feedItemData.info.push({ placeholder: '$MATCH'
+							,messages: {
+								en: `Match #${match.object.number}`
+								,es: `Partido #${match.object.number}`
+							}
+						})
+
+						//TODO: es posible que en este punto todavia no se haya calculado el score final
+						//TODO: quizas es mejor generar los feeds en un proceso paralelo aparte
+						feedItemData.info.push({ placeholder: '$SCORE'
+							,messages: {
+								en: `${match.object.home_team_score} - ${match.object.visitor_team_score}`
+								,es: `${match.object.home_team_score} - ${match.object.visitor_team_score}`
+							}
+						})
+					}
+
+					if(player){
+						feedItemData.info.push({ placeholder: '$PLAYER'
+							,messages: {
+								en: `${player.object.first_name} ${player.object.last_name}`
+								,es: `${player.object.first_name} ${player.object.last_name}`
+							}
+						})
+					}
+
+					feedItemData.info.push({ placeholder: '$INSTANT'
+						,messages: {
+							en: mr.instant
+							,es: mr.instant
 						}
-						,related_entities: entities.toJSON()
 					})
+
+					feedItemData.info.push({ placeholder: '$DATE'
+						,messages: {
+							en: `on ${new Date().toString()}`
+							,es: `el ${new Date().toString()}`
+						}
+					})
+
+					Models.feed_item.create(feedItemData)
 
 					return result
 				})

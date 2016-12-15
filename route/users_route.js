@@ -318,11 +318,12 @@ define(['express'
 				.then(rel => {
 					//proceso el resultado, para retornar solamente los feeds
 					return rel.toJSON().map( r => {
-						let fi = r.from.object
+						// let fi = r.from.object
 						//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
 						let tmpTo = r.to.object
 						tmpTo.object_type = r.to.object_type
-						fi.related_entities = [tmpTo]
+						// fi.related_entities = [tmpTo]
+
 						return r.from.object
 					})
 				})

@@ -23,6 +23,7 @@ define(['./base_model'
 				,'Team'
 				,'Category'
 				,'Feed_item'
+				,'Player'
 				,'Match')
         }
         ,related_from: function() {

@@ -72,12 +72,19 @@ define(['./base_model', './index' ,'./entity' ,'./round', './event_match_player'
 		,referee: function(){
 			return this.hasMany('Match_referee');
 		}
+		,entity: function(){
+			return this.morphOne('Entity', 'object');
+		}
+		// ,feedItems: function(){
+		// 	return this.hasMany('Feed_item', 'object');
+		// }
+		//TODO: esta deberia tener una relacion through
 		// ,category: function() {
 		//   return this.hasMany('Category_group_phase_team')
 		// }
-	}
-	,{
+	},{
 		//metodos estaticos
+		//TODO: implementar generador de numeros de match
 		getMatchNumber: function(){
 			console.log('implementar generador aqui')
 			return 567

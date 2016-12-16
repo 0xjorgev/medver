@@ -372,9 +372,7 @@ define(['express'
 				result.map(group => {
 					//por cada grupo, voy a generar los partidos posibles
 					var matches = Combinatorics.combination(group, 2)
-
-					logger.debug('----------------')
-
+					let match = null
 					while(match = matches.next()){
 						new Models.match({
 							group_id: match[0].group_id

@@ -428,11 +428,21 @@ define(['express'
 
 		Models.match
 		.where({id: req.params.match_id})
+		// .fetch({withRelated: [
+		// 	'entity.related_to.from.object',
+		// 	'entity.related_to.relationship_type']})
+
+		//esto funciona, pero quiero que me devuelva los feeds flattened
+		// .fetch({withRelated: [
+		// 	'entity.feed_items.from.object'], debug: false})
+
+		//esto funciona, pero quiero que me devuelva los feeds flattened
 		.fetch({withRelated: [
-			'entity.related_from.to.object',
-			'entity.related_from.relationship_type']})
-		.then(user => {
-			return Models.user.getEntities(user.toJSON())
+			'entity.feed_items'], debug: false})
+		.then(result => {
+
+			logger.debug(result.toJSON())
+			return 'hulefante'
 		})
 		.then(user => {
 			//ahora con las entidades relacionadas a este user,

@@ -21,7 +21,7 @@ define(['knex'
 	bookshelf.plugin('registry');
 	//se utiliza para generar campos que no están en el esquema
 	bookshelf.plugin('virtuals');
-	//para ocultar por defecto algunos campos
+	//para ocultar por defecto algunos campos, por ejemplo, el password del user
 	bookshelf.plugin('visibility');
 
 	bookshelf.checkit = CheckIt

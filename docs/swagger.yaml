@@ -1275,6 +1275,25 @@ paths:
         200:
           description: match creation OK
       security: []
+  /match/{match_id}/feed:
+    get:
+      summary: Gets the feed of one match
+      description: Gets the feed of one match
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: list of all feed items for this match
+      security: []
   /match/{match_id}/player:
     get:
       summary: Returns the player list for this match, grouped by home_team & visitor_team

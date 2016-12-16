@@ -298,11 +298,18 @@ define(['express'
 		.catch((error) => Response(res, null, error))
 	})
 
+
+	//servicio para almacenar los eventos de un partido; genera feed items
 	router.post('/:match_id/event', (req, res) => {
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
-		let matchId = req.params.match_id
-		let matchResult = req.body.map(_event => {
+		const matchId = req.params.match_id
+
+		logger.debug(req.body)
+
+		const body = utilities.isArray(req.body) ? req.body : [req.body]
+
+		const matchResult = body.map(_event => {
 			let event = _event
 			event.match_id = matchId
 			return event
@@ -415,6 +422,59 @@ define(['express'
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
+
+	//feed de un match
+	router.get('/:match_id/feed', (req, res) => {
+
+		Models.match
+		.where({id: req.params.match_id})
+		.fetch({withRelated: [
+			'entity.related_from.to.object',
+			'entity.related_from.relationship_type']})
+		.then(user => {
+			return Models.user.getEntities(user.toJSON())
+		})
+		.then(user => {
+			//ahora con las entidades relacionadas a este user,
+			//traigo los feeds asociados a ellas o al mismo usuario
+
+			//se extraen los ids de las entidades
+			let ids = null
+
+			if(user.related_entities){
+				ids = user.related_entities.filter(rel => {
+					return rel.entity_id && rel.entity_id !== null
+				})
+				.map(rel => rel.entity_id)
+
+				//obtengo las relaciones de las entidades
+				return Models.entity_relationship
+				.query(qb => {
+					qb.whereIn('ent_ref_to_id', ids)
+					//filtrar solamente por tipo 3 -> feed item
+					qb.where('relationship_type_id', 3)
+				})
+				.fetchAll({withRelated: ['from.object', 'to.object']})
+				.then(rel => {
+					//proceso el resultado, para retornar solamente los feeds
+					return rel.toJSON().map( r => {
+						// let fi = r.from.object
+						//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
+						let tmpTo = r.to.object
+						tmpTo.object_type = r.to.object_type
+						// fi.related_entities = [tmpTo]
+
+						return r.from.object
+					})
+				})
+			}
+			else {
+				return []
+			}
+		})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
 
 	return router;
 });

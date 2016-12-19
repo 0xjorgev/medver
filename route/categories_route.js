@@ -369,7 +369,7 @@ define(['express'
 				return groupsWithTeams
 			})
 			.then(result => {
-				result.map(group => {
+				return result.map(group => {
 					//por cada grupo, voy a generar los partidos posibles
 					var matches = Combinatorics.combination(group, 2)
 					let match = null
@@ -387,8 +387,6 @@ define(['express'
 						.catch(e => console.log(e))
 					}
 				})
-
-				return 'ulefante'
 			})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error))

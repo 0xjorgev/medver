@@ -55,7 +55,6 @@ define(['./base_model','./entity', './organization'],
 		delete u.entity
 		return u
 	}
-
-    // uses Registry plugin
-    return DB.model('User', User);
+	// uses Registry plugin
+	return DB.model('User', User);
 });

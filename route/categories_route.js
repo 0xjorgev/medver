@@ -73,6 +73,18 @@ define(['express'
 			.catch(error => Response(res, null, error));
 	});
 
+	//Feed by Category
+	router.get('/:category_id/feed', (req, res) => {
+		var category_id = req.params.category_id;
+		return Models.feed_item.query( qb => {
+			qb.limit(10)
+			qb.orderBy('id', 'desc')
+		})
+			.fetchAll({withRelated:['entity.object']})
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error));
+	});
+
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result
 	router.get('/', function (req, res) {
 		return Models.category

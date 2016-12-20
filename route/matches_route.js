@@ -10,8 +10,8 @@ define(['express'
 	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
 	,'../helpers/team_placeholders_helper'
-    ,'../util/generic_util'
-    ,'../util/logger_util'
+	,'../util/generic_util'
+	,'../util/logger_util'
 	],
 	(express
 	,Models
@@ -440,22 +440,21 @@ define(['express'
 		.fetch({withRelated: [
 			'entity.feed_items'], debug: false})
 		.then(result => {
-
 			logger.debug(result.toJSON())
 			return 'hulefante'
 		})
 		.then(user => {
 			//ahora con las entidades relacionadas a este user,
 			//traigo los feeds asociados a ellas o al mismo usuario
-
 			//se extraen los ids de las entidades
 			let ids = null
-
 			if(user.related_entities){
 				ids = user.related_entities.filter(rel => {
 					return rel.entity_id && rel.entity_id !== null
 				})
 				.map(rel => rel.entity_id)
+
+				
 
 				//obtengo las relaciones de las entidades
 				return Models.entity_relationship
@@ -467,14 +466,15 @@ define(['express'
 				.fetchAll({withRelated: ['from.object', 'to.object']})
 				.then(rel => {
 					//proceso el resultado, para retornar solamente los feeds
-					return rel.toJSON().map( r => {
-						// let fi = r.from.object
+					return rel.toJSON()
+					.map(r => {
+						let fi = r.from.object
 						//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
-						let tmpTo = r.to.object
-						tmpTo.object_type = r.to.object_type
-						// fi.related_entities = [tmpTo]
-
-						return r.from.object
+						if(fi){
+							tmpTo.object_type = r.to.object_type
+							fi.related_entities = [r.to.object]
+						}
+						return fi
 					})
 				})
 			}

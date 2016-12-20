@@ -130,6 +130,7 @@ define(['express'
 		var teamData = {}
 		if (data.name != undefined) teamData.name = data.name.trim()
 		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
+		if (data.portrait_url != undefined) teamData.portrait_url = data.portrait_url
 		if (data.category_type_id != undefined) teamData.category_type_id = data.category_type_id
 		if (data.organization_id != undefined) teamData.organization_id = data.organization_id
 		if (data.subdiscipline_id != undefined) teamData.subdiscipline_id = data.subdiscipline_id

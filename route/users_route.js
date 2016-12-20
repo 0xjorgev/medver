@@ -297,7 +297,6 @@ define(['express'
 		.then(user => {
 			//ahora con las entidades relacionadas a este user,
 			//traigo los feeds asociados a ellas o al mismo usuario
-
 			//se extraen los ids de las entidades
 			let ids = null
 

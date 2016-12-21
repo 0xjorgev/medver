@@ -522,6 +522,23 @@ paths:
           required: true
           type: integer
           format: integer
+  /category/{category_id}/feed:
+    get:
+      summary: Returns the feed items associated to to this category
+      description: Returns the feed items associated to to this category
+      tags:
+        - Category
+        - Feed
+      responses:
+        200:
+          description: Something
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
   /category/{category_id}/standing_table:
     get:
       summary: Gets the current standing table for a given category_id, separated by phases & groups

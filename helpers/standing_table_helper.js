@@ -45,14 +45,40 @@ define(['../util/knex_util'
 
 			// })
 
+			// Autogoals made by home team (this will be added to visitor teams goals)
+			var home_team_autogoals = 0
+
+			// Autogoals made by visitor team (this will be added to home teams goals)
+			var visitor_team_autogoals = 0
+
 			events.forEach((event) => {
-				// console.log('\tevent', event)
+				console.log('\tevent', event)
 
 				if(event.match_id == match.match_id){
-					match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
-					match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+
+					// Setting Goals
+					if (event.event_id == 1) {
+						match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
+						match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+					}
+
+					// Setting Autogoals
+					if (event.event_id == 4) {
+						home_team_autogoals = (event.team_id == match.home_team_id) ? event.goals : home_team_autogoals
+						visitor_team_autogoals = (event.team_id == match.visitor_team_id) ? event.goals : visitor_team_autogoals
+					}
 				}
 			})
+
+			// console.log('\tmatch', match)
+
+			console.log('home without autogoals', match.home_team_goals);
+			match.home_team_goals = match.home_team_goals + visitor_team_autogoals;
+			console.log('home with autogoals', match.home_team_goals);
+
+			console.log('visitor without autogoals', match.visitor_team_goals);
+			match.visitor_team_goals = match.visitor_team_goals + home_team_autogoals;
+			console.log('visitor with autogoals', match.visitor_team_goals);
 
 			match.total_goals = match.home_team_goals + match.visitor_team_goals
 			return match

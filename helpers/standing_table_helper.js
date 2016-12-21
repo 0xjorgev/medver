@@ -51,6 +51,7 @@ define(['../util/knex_util'
 			// Autogoals made by visitor team (this will be added to home teams goals)
 			var visitor_team_autogoals = 0
 
+			// The property "goals" in the object "event" actually is the count of the event
 			events.forEach((event) => {
 				console.log('\tevent', event)
 
@@ -70,15 +71,9 @@ define(['../util/knex_util'
 				}
 			})
 
-			// console.log('\tmatch', match)
-
-			console.log('home without autogoals', match.home_team_goals);
+			// Adding autogoals
 			match.home_team_goals = match.home_team_goals + visitor_team_autogoals;
-			console.log('home with autogoals', match.home_team_goals);
-
-			console.log('visitor without autogoals', match.visitor_team_goals);
 			match.visitor_team_goals = match.visitor_team_goals + home_team_autogoals;
-			console.log('visitor with autogoals', match.visitor_team_goals);
 
 			match.total_goals = match.home_team_goals + match.visitor_team_goals
 			return match

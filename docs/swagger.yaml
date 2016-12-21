@@ -1797,6 +1797,26 @@ paths:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No teams found
+  /team/{team_id}/match:
+    get:
+      summary: Returns all the matches for the team
+      description: Returns all the matches for the team
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Team
+      responses:
+        200:
+          description: An array of past, future matches and the next match for the team 
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
   /player/{player_id}:
     get:

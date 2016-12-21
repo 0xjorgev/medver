@@ -508,12 +508,12 @@ define(['express'
 			futureMatches = allmatches.filter(function(g){
 							return g.date >= currentDate
 						})
-			nextMatche = futureMatches[0]
+			nextMatch = futureMatches[0]
 			pastMatches = allmatches.filter(function(g){
 							return g.date < currentDate
 						})
 			var schedule = {
-					nextMatche: nextMatche,
+					nextMatch: nextMatch,
 					futureMatches: futureMatches,
 					pastMatches: pastMatches
 				}

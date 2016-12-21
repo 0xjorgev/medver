@@ -71,14 +71,12 @@ define(['express'
 		.where({relationship_type_id: 3}) //solo feed items
 		.fetchAll()
 		.then(result => {
-			logger.debug('Relaciones feed item entontradas: ' + result.count())
 			return result.map(r => r.destroy())
 		})
 		.then(result => {
 			return Models.feed_item
 				.fetchAll()
 				.then(fis => {
-					logger.debug('FeedItems encontrados' + fis.count())
 					return fis.map(r => r.destroy())
 				})
 		})

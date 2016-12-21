@@ -297,7 +297,6 @@ define(['express'
 		.then(user => {
 			//ahora con las entidades relacionadas a este user,
 			//traigo los feeds asociados a ellas o al mismo usuario
-
 			//se extraen los ids de las entidades
 			let ids = null
 
@@ -314,24 +313,59 @@ define(['express'
 					//filtrar solamente por tipo 3 -> feed item
 					qb.where('relationship_type_id', 3)
 				})
-				.fetchAll({withRelated: ['from.object', 'to.object']})
+				.fetchAll({withRelated: ['from.object'], debug: false})
 				.then(rel => {
 					//proceso el resultado, para retornar solamente los feeds
-					return rel.toJSON().map( r => {
-						let fi = r.from.object
-						if(fi){
-							//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
-							let tmpTo = r.to.object
-							tmpTo.object_type = r.to.object_type
-							fi.related_entities = [tmpTo]
-						}
-						return fi
-					})
+					return rel.toJSON().map(r => r.from.object.id)
 				})
 			}
 			else {
 				return []
 			}
+		})
+		.then(feedItemIds => {
+			// logger.debug(feedItemIds)
+			//un arreglo con los ids de los feeds o uno vacio
+			if(feedItemIds.length == 0){
+				logger.debug('no feeds')
+				return []
+			}
+
+
+			return Models.feed_item.query(qb => {
+				qb.whereIn('id', feedItemIds)
+			})
+			.fetchAll()
+		})
+		.then(result => {
+			if(result.length == 0)
+				return []
+
+			//aqui se cargan los objetos relacionados al feed item
+			return result.load('entity.related_from.to.object')
+		})
+		//los proceso, para devolver unicamente el objeto
+		.then(result => {
+			return result.map(_feedItem => {
+				let feedItem = _feedItem
+				let fi = Object.assign({}, feedItem.toJSON())
+				delete fi.entity
+				fi.related_entities = []
+
+				if(feedItem.related('entity').related('related_from').isEmpty()){
+					return fi
+				}
+
+				return feedItem.related('entity')
+					.related('related_from')
+					.map(rel => {
+						let object = rel.related('to').related('object')
+						let tmpTo = object.toJSON()
+						tmpTo.object_type = rel.related('to').get('object_type')
+						fi.related_entities.push(tmpTo)
+						return fi
+					})
+			})
 		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))

@@ -45,14 +45,35 @@ define(['../util/knex_util'
 
 			// })
 
+			// Autogoals made by home team (this will be added to visitor teams goals)
+			var home_team_autogoals = 0
+
+			// Autogoals made by visitor team (this will be added to home teams goals)
+			var visitor_team_autogoals = 0
+
+			// The property "goals" in the object "event" actually is the count of the event
 			events.forEach((event) => {
-				// console.log('\tevent', event)
+				console.log('\tevent', event)
 
 				if(event.match_id == match.match_id){
-					match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
-					match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+
+					// Setting Goals
+					if (event.event_id == 1) {
+						match.home_team_goals = (event.team_id == match.home_team_id) ? event.goals : match.home_team_goals
+						match.visitor_team_goals = (event.team_id == match.visitor_team_id) ? event.goals : match.visitor_team_goals
+					}
+
+					// Setting Autogoals
+					if (event.event_id == 4) {
+						home_team_autogoals = (event.team_id == match.home_team_id) ? event.goals : home_team_autogoals
+						visitor_team_autogoals = (event.team_id == match.visitor_team_id) ? event.goals : visitor_team_autogoals
+					}
 				}
 			})
+
+			// Adding autogoals
+			match.home_team_goals = match.home_team_goals + visitor_team_autogoals;
+			match.visitor_team_goals = match.visitor_team_goals + home_team_autogoals;
 
 			match.total_goals = match.home_team_goals + match.visitor_team_goals
 			return match

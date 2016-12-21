@@ -1,6 +1,5 @@
-if (typeof define !== 'function') {
+if (typeof define !== 'function')
     var define = require('amdefine')(module);
-}
 
 define(['./base_model'
 	,'./team'
@@ -9,6 +8,7 @@ define(['./base_model'
 	,'./entity_type'
 	,'./feed_item'
 	,'./entity_relationship'
+	// ,'./entity_relationship'
 	],(DB
 		,Team
 		,User
@@ -16,31 +16,28 @@ define(['./base_model'
 		,Entity_type
 		,Entity_relationship
 		) => {
-	var Entity = DB.Model.extend({
-	tableName: 'entities'
-	,hasTimestamps: true
-	,entity_type: function(){
-	    return this.belongsTo('Entity_type', 'entity_type_id');
-	}
-	,object: function() {
-		return this.morphTo('object'
-			//listado de objetos que tienen entidades asociadas
-			,'User'
-			,'Team'
-			,'Category'
-			,'Feed_item'
-			,'Player'
-			,'Match')
+		var Entity = DB.Model.extend({
+		tableName: 'entities'
+		,hasTimestamps: true
+		,entity_type: function(){
+		    return this.belongsTo('Entity_type', 'entity_type_id');
+		}
+		,object: function() {
+			return this.morphTo('object'
+				//listado de objetos que tienen entidades asociadas
+				,'Event'
+				,'User'
+				,'Team'
+				,'Category'
+				,'Feed_item'
+				,'Player'
+				,'Match')
 		}
 		,related_from: function() {
 		  return this.hasMany('Entity_relationship', 'ent_ref_from_id');
 		}
 		,related_to: function(){
 			return this.hasMany('Entity_relationship', 'ent_ref_to_id');
-		}
-		,feed_items: function(){
-			return this.hasMany('Entity_relationship', 'ent_ref_to_id')
-				.query(qb => qb.where('id', 1916))
 		}
 	});
 

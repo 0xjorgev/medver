@@ -10,8 +10,8 @@ define(['express'
 	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
 	,'../helpers/team_placeholders_helper'
-    ,'../util/generic_util'
-    ,'../util/logger_util'
+	,'../util/generic_util'
+	,'../util/logger_util'
 	],
 	(express
 	,Models
@@ -298,7 +298,6 @@ define(['express'
 		.catch((error) => Response(res, null, error))
 	})
 
-
 	//servicio para almacenar los eventos de un partido; genera feed items
 	router.post('/:match_id/event', (req, res) => {
 		//Model Instance
@@ -315,10 +314,23 @@ define(['express'
 			return event
 		})
 
+		//paso 1 : cargar los relations al salvar el evento
+
 		return Promise.all(matchResult.map(mr => {
 			return new Models.event_match_player(mr)
 			.save()
+			// .then(matchResult => matchResult
+			// 	.load(['match.home_team'
+			// 	,'match.visitor_team'
+			// 	,'event'
+			// 	,'player_in'
+			// 	,'player_out']))
 			.then(result => {
+
+				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
+				// logger.debug(result.toJSON())
+				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
+
 				//creacion del feed item asociado a este evento
 				//obtener entidades de los involucrados
 				return Models.entity.query(qb => {
@@ -342,19 +354,33 @@ define(['express'
 							object_type: 'players'
 						})
 					}
+					if(result.attributes.player_out){
+						qb.orWhere({
+							object_id: result.attributes.player_out
+						})
+						qb.where({
+							object_type: 'players'
+						})
+					}
+					//los tipos de evento van a necesitar una entidad, entonces...
+					if(result.attributes.event_id){
+						qb.orWhere({
+							object_id: result.attributes.event_id
+						})
+						qb.where({
+							object_type: 'events'
+						})
+					}
 				})
 				.fetchAll({withRelated: 'object', debug: false})
 				.then(_entities => {
 					//creacion de un feed item para el evento recién salvado
 					//esto debería disparar un hilo separado de ejecucion
 					let entities = _entities.toJSON()
-
-					let team =
-						entities.filter(ent => ent.object_type === 'teams')[0]
-					let match =
-						entities.filter(ent => ent.object_type === 'matches')[0]
-					let player =
-						entities.filter(ent => ent.object_type === 'players')[0]
+					let team = entities.filter(ent => ent.object_type === 'teams')[0]
+					let match = entities.filter(ent => ent.object_type === 'matches')[0]
+					let player = entities.filter(ent => ent.object_type === 'players')[0]
+					let event = entities.filter(ent => ent.object_type === 'events')[0]
 
 					let feedItemData = {}
 					feedItemData.data = {
@@ -440,22 +466,21 @@ define(['express'
 		.fetch({withRelated: [
 			'entity.feed_items'], debug: false})
 		.then(result => {
-
 			logger.debug(result.toJSON())
 			return 'hulefante'
 		})
 		.then(user => {
 			//ahora con las entidades relacionadas a este user,
 			//traigo los feeds asociados a ellas o al mismo usuario
-
 			//se extraen los ids de las entidades
 			let ids = null
-
 			if(user.related_entities){
 				ids = user.related_entities.filter(rel => {
 					return rel.entity_id && rel.entity_id !== null
 				})
 				.map(rel => rel.entity_id)
+
+
 
 				//obtengo las relaciones de las entidades
 				return Models.entity_relationship
@@ -467,14 +492,15 @@ define(['express'
 				.fetchAll({withRelated: ['from.object', 'to.object']})
 				.then(rel => {
 					//proceso el resultado, para retornar solamente los feeds
-					return rel.toJSON().map( r => {
-						// let fi = r.from.object
+					return rel.toJSON()
+					.map(r => {
+						let fi = r.from.object
 						//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
-						let tmpTo = r.to.object
-						tmpTo.object_type = r.to.object_type
-						// fi.related_entities = [tmpTo]
-
-						return r.from.object
+						if(fi){
+							tmpTo.object_type = r.to.object_type
+							fi.related_entities = [r.to.object]
+						}
+						return fi
 					})
 				})
 			}

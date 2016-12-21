@@ -487,7 +487,7 @@ define(['express'
 		var team_id = req.params.team_id
 		var currentDate = new Date()
 		var pastMatches
-		var nextMatche
+		var nextMatch
 		var futureMatches
 		logger.debug('currentDate ' + currentDate)
 		//conseguimos los matches pasados

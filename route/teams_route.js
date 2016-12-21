@@ -477,5 +477,51 @@ define(['express'
         .catch(error => Response(res, null, error))
     })
 
+
+	//==========================================================================
+	// Get all the matches of a team
+	//==========================================================================
+    router.get('/:team_id/match', (req, res) => {
+    	//Se buscan todos los matches por el team_id
+		logger.debug('Get all the matches of the team ' + req.params.team_id)
+		var team_id = req.params.team_id
+		var currentDate = new Date()
+		var pastMatches
+		var nextMatche
+		var futureMatches
+		logger.debug('currentDate ' + currentDate)
+		//conseguimos los matches pasados
+        return Models.match
+        .query(qb => {
+			qb.where({home_team_id: team_id})
+			.orWhere({visitor_team_id: team_id})
+			.whereNot({date: null})
+			.where({active: true})
+			.orderBy('date')
+		})
+        .fetchAll({withRelated: ['home_team'
+        	, 'visitor_team'
+        	, 'group.phase.category'
+        	]})
+        .then(past => {
+        	var allmatches = past.toJSON()
+			futureMatches = allmatches.filter(function(g){
+							return g.date >= currentDate
+						})
+			nextMatche = futureMatches[0]
+			pastMatches = allmatches.filter(function(g){
+							return g.date < currentDate
+						})
+			var schedule = {
+					nextMatche: nextMatche,
+					futureMatches: futureMatches,
+					pastMatches: pastMatches
+				}
+			return schedule
+        })
+        .then(result => Response(res, result) )
+        .catch(error => Response(res, null, error))
+    })
+
 	return router;
 });

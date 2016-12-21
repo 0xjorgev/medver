@@ -75,6 +75,9 @@ define(['./base_model', './index' ,'./entity' ,'./round', './event_match_player'
 		,entity: function(){
 			return this.morphOne('Entity', 'object');
 		}
+		,group: function(){
+			return this.belongsTo('Group', 'group_id');
+		}
 		// ,feedItems: function(){
 		// 	return this.hasMany('Feed_item', 'object');
 		// }

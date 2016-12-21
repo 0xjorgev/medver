@@ -5,28 +5,14 @@ define(['./base_model'
 	,'../util/logger_util'
 	,'./entity'],
 	(DB, logger) => {
-
 		const Feed_item = DB.Model.extend({
 			initialize: function(){
-				this.on('created', attrs => {
-					//por problemas de asincronia, se crea la entidad con el metodo create
+				this.on('fetched', attrs => {
+					return this.load('entity')
 				})
 			}
 			,tableName: 'feed_items'
 			,hasTimestamps: true
-			// ,relatedEntities: function(){
-			// 	console.log('related entity');
-			// 	return DB._models.Entity_relationship
-			// 	.query(qb => {
-			// 		qb.where({ent_ref_from_id: this.id})
-			// 	})
-			// 	.fetchAll({withRelated: 'object'})
-			// }
-			,relatedEntities: function(){
-				return this
-					.hasMany('Entity_relationship', 'ent_ref_from_id')
-					.through('Entity', 'object_id')
-			}
 			//la entidad del feed item
 			,entity : function(){
 			  return this.morphOne('Entity', 'object');

@@ -95,9 +95,10 @@ define(['./base_model'
 								,ent_ref_to_id: targetEntity.id
 								,comment: `FEED ITEM OF ${targetEntity.object_type} ${targetEntity.id}`
 							}
-							// logger.debug(saveObj)
+
 							return new DB._models.Entity_relationship(saveObj)
 								.save()
+
 					}))
 				})
 			}

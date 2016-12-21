@@ -303,73 +303,42 @@ define(['express'
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
 		const matchId = req.params.match_id
-
 		logger.debug(req.body)
-
 		const body = utilities.isArray(req.body) ? req.body : [req.body]
-
 		const matchResult = body.map(_event => {
 			let event = _event
 			event.match_id = matchId
 			return event
 		})
 
-		//paso 1 : cargar los relations al salvar el evento
-
 		return Promise.all(matchResult.map(mr => {
 			return new Models.event_match_player(mr)
 			.save()
-			// .then(matchResult => matchResult
-			// 	.load(['match.home_team'
-			// 	,'match.visitor_team'
-			// 	,'event'
-			// 	,'player_in'
-			// 	,'player_out']))
 			.then(result => {
 
-				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-				// logger.debug(result.toJSON())
-				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-
 				//creacion del feed item asociado a este evento
-				//obtener entidades de los involucrados
+				//Se ubican las entidades involucradas con el evento
+				//FIXME: es posible cargar la entidad con el on('fetching')
 				return Models.entity.query(qb => {
 					qb.where({
 						object_type: 'matches',
 						object_id: result.attributes.match_id
 					})
 					if(result.attributes.team_id){
-						qb.orWhere({
-							object_id: result.attributes.team_id
-						})
-						qb.where({
-							object_type: 'teams'
-						})
+						qb.orWhere({ object_id: result.attributes.team_id })
+						qb.where({ object_type: 'teams' })
 					}
 					if(result.attributes.player_in){
-						qb.orWhere({
-							object_id: result.attributes.player_in
-						})
-						qb.where({
-							object_type: 'players'
-						})
+						qb.orWhere({ object_id: result.attributes.player_in })
+						qb.where({ object_type: 'players' })
 					}
 					if(result.attributes.player_out){
-						qb.orWhere({
-							object_id: result.attributes.player_out
-						})
-						qb.where({
-							object_type: 'players'
-						})
+						qb.orWhere({ object_id: result.attributes.player_out })
+						qb.where({ object_type: 'players' })
 					}
-					//los tipos de evento van a necesitar una entidad, entonces...
 					if(result.attributes.event_id){
-						qb.orWhere({
-							object_id: result.attributes.event_id
-						})
-						qb.where({
-							object_type: 'events'
-						})
+						qb.orWhere({ object_id: result.attributes.event_id })
+						qb.where({ object_type: 'events' })
 					}
 				})
 				.fetchAll({withRelated: 'object', debug: false})
@@ -387,11 +356,12 @@ define(['express'
 						object_type: 'events'
 						,object_id: result.attributes.event_id
 					}
+
+					//Estas son las entidades que serán relacionadas con el FI
 					feedItemData.related_entities = entities
 
-					//aqui va la info que se generará en cada evento
+					//En feedItemData.info se envian los datos que serán reemplazados en el template del FI
 					feedItemData.info = []
-
 					if(team){
 						feedItemData.info.push({ placeholder: '$TEAM'
 							,messages: {en: team.object.name, es: team.object.name}
@@ -403,15 +373,6 @@ define(['express'
 							,messages: {
 								en: `Match #${match.object.number}`
 								,es: `Partido #${match.object.number}`
-							}
-						})
-
-						//TODO: es posible que en este punto todavia no se haya calculado el score final
-						//TODO: quizas es mejor generar los feeds en un proceso paralelo aparte
-						feedItemData.info.push({ placeholder: '$SCORE'
-							,messages: {
-								en: `${match.object.home_team_score} - ${match.object.visitor_team_score}`
-								,es: `${match.object.home_team_score} - ${match.object.visitor_team_score}`
 							}
 						})
 					}
@@ -479,8 +440,6 @@ define(['express'
 					return rel.entity_id && rel.entity_id !== null
 				})
 				.map(rel => rel.entity_id)
-
-
 
 				//obtengo las relaciones de las entidades
 				return Models.entity_relationship

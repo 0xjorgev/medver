@@ -48,6 +48,21 @@ paths:
       responses:
         200:
           description: A signed url for upload; a final URL to access the file
+  /core/feed/rebuild:
+    post:
+      summary: Rebuilds feed items. Truncates feed item table.
+      description: Truncates feed_items table, deletes all feed item relations, then rebuilds all feed items.
+      tags:
+        - Core
+        - Feed
+      parameters:
+      - name: Authorization-Token
+        in: header
+        type: string
+        required: true
+      responses:
+        200:
+          description: OK message
   /user:
     get:
       summary: Returns the list of active users
@@ -184,6 +199,7 @@ paths:
       description: Returns the news feed of an user
       tags:
         - User
+        - Feed
       parameters:
       - name: Authorization-Token
         in: header

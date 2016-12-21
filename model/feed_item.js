@@ -14,6 +14,20 @@ define(['./base_model'
 			}
 			,tableName: 'feed_items'
 			,hasTimestamps: true
+			// ,relatedEntities: function(){
+			// 	console.log('related entity');
+			// 	return DB._models.Entity_relationship
+			// 	.query(qb => {
+			// 		qb.where({ent_ref_from_id: this.id})
+			// 	})
+			// 	.fetchAll({withRelated: 'object'})
+			// }
+			,relatedEntities: function(){
+				return this
+					.hasMany('Entity_relationship', 'ent_ref_from_id')
+					.through('Entity', 'object_id')
+			}
+			//la entidad del feed item
 			,entity : function(){
 			  return this.morphOne('Entity', 'object');
 			}
@@ -29,9 +43,13 @@ define(['./base_model'
 						}
 						break;
 					case '#GEND':
+						// template =  {
+						// 	message_en: 'The $MATCH has ended: $SCORE',
+						// 	message_es: 'El $MATCH ha terminado: $SCORE',
+						// }
 						template =  {
-							message_en: 'The $MATCH has ended: $SCORE',
-							message_es: 'El $MATCH ha terminado: $SCORE',
+							message_en: 'The $MATCH has ended',
+							message_es: 'El $MATCH ha terminado',
 						}
 						break;
 					default:

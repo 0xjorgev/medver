@@ -298,7 +298,6 @@ define(['express'
 		.catch((error) => Response(res, null, error))
 	})
 
-
 	//servicio para almacenar los eventos de un partido; genera feed items
 	router.post('/:match_id/event', (req, res) => {
 		//Model Instance
@@ -315,10 +314,23 @@ define(['express'
 			return event
 		})
 
+		//paso 1 : cargar los relations al salvar el evento
+
 		return Promise.all(matchResult.map(mr => {
 			return new Models.event_match_player(mr)
 			.save()
+			// .then(matchResult => matchResult
+			// 	.load(['match.home_team'
+			// 	,'match.visitor_team'
+			// 	,'event'
+			// 	,'player_in'
+			// 	,'player_out']))
 			.then(result => {
+
+				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
+				// logger.debug(result.toJSON())
+				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
+
 				//creacion del feed item asociado a este evento
 				//obtener entidades de los involucrados
 				return Models.entity.query(qb => {
@@ -342,19 +354,33 @@ define(['express'
 							object_type: 'players'
 						})
 					}
+					if(result.attributes.player_out){
+						qb.orWhere({
+							object_id: result.attributes.player_out
+						})
+						qb.where({
+							object_type: 'players'
+						})
+					}
+					//los tipos de evento van a necesitar una entidad, entonces...
+					if(result.attributes.event_id){
+						qb.orWhere({
+							object_id: result.attributes.event_id
+						})
+						qb.where({
+							object_type: 'events'
+						})
+					}
 				})
 				.fetchAll({withRelated: 'object', debug: false})
 				.then(_entities => {
 					//creacion de un feed item para el evento recién salvado
 					//esto debería disparar un hilo separado de ejecucion
 					let entities = _entities.toJSON()
-
-					let team =
-						entities.filter(ent => ent.object_type === 'teams')[0]
-					let match =
-						entities.filter(ent => ent.object_type === 'matches')[0]
-					let player =
-						entities.filter(ent => ent.object_type === 'players')[0]
+					let team = entities.filter(ent => ent.object_type === 'teams')[0]
+					let match = entities.filter(ent => ent.object_type === 'matches')[0]
+					let player = entities.filter(ent => ent.object_type === 'players')[0]
+					let event = entities.filter(ent => ent.object_type === 'events')[0]
 
 					let feedItemData = {}
 					feedItemData.data = {
@@ -454,7 +480,7 @@ define(['express'
 				})
 				.map(rel => rel.entity_id)
 
-				
+
 
 				//obtengo las relaciones de las entidades
 				return Models.entity_relationship

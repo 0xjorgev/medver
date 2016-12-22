@@ -70,7 +70,7 @@ define(['express',
         return Models.group
         .query(function(qb){})
         .where({'phase_id':phase_id, active:true})
-        .fetchAll({withRelated: ['rounds.matches.home_team', 'rounds.matches.visitor_team']})
+        .fetchAll({withRelated: ['rounds.matches.home_team', 'rounds.matches.visitor_team','rounds.matches.referee.user']})
         .then(function (result) {
             Response(res, result)
         })

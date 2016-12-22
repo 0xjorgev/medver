@@ -14,7 +14,7 @@ define(['./base_model', './match', './user'], function (DB) {
         },
 
         user: function(){
-            return this.belongsTo('User', 'user_id');
+            return this.belongsTo('User', 'referee_id');
         }
     });
 

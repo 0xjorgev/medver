@@ -296,6 +296,7 @@ define(['express'
 			return Models.user.getEntities(user.toJSON())
 		})
 		.then(user => {
+			// logger.debug(user)
 			//ahora con las entidades relacionadas a este user,
 			//traigo los feeds asociados a ellas o al mismo usuario
 			//se extraen los ids de las entidades
@@ -321,6 +322,7 @@ define(['express'
 				})
 			}
 			else {
+				logger.debug('user has no related entities')
 				return []
 			}
 		})

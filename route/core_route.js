@@ -83,14 +83,16 @@ define(['express'
 		.then(result => {
 			return Models.event_match_player
 			.fetchAll()
+			.then(events => {
+				return Promise.all(events.map(e => {
+					return e.load(['event','match', 'player_in', 'player_out'])
+				}))
+			})
 		})
 		.then(events => {
-			// return result
-
 			return events.map(result => {
 				return Models.entity.query(qb => {
 					const match = result.related('match')
-
 					qb.where({
 						object_type: 'matches',
 						object_id: result.attributes.match_id
@@ -121,11 +123,17 @@ define(['express'
 					//creacion de un feed item para el evento recién salvado
 					//esto debería disparar un hilo separado de ejecucion
 					let entities = _entities.toJSON()
-
-					let team = entities.filter(ent => ent.object_type === 'teams')[0]
+					let teams = entities.filter(ent => ent.object_type === 'teams')
+					let team = teams[0]
 					let match = entities.filter(ent => ent.object_type === 'matches')[0]
 					let player = entities.filter(ent => ent.object_type === 'players')[0]
 					let event = entities.filter(ent => ent.object_type === 'events')[0]
+
+					let homeTeam = teams.filter(
+						t => match.object.home_team.id === t.object.id )[0]
+					let visitorTeam = teams.filter(
+						t => match.object.visitor_team.id === t.object.id )[0]
+
 					let feedItemData = {}
 					feedItemData.data = {
 						object_type: 'events'
@@ -141,11 +149,24 @@ define(['express'
 							,messages: {en: team.object.name, es: team.object.name}
 						})
 					}
+
+					if(homeTeam){
+						feedItemData.info.push({ placeholder: '$HOME_TEAM'
+							,messages: {en: homeTeam.object.name, es: homeTeam.object.name}
+						})
+					}
+
+					if(visitorTeam){
+						feedItemData.info.push({ placeholder: '$VISITOR_TEAM'
+							,messages: {en: visitorTeam.object.name, es: visitorTeam.object.name}
+						})
+					}
+
 					if(match){
 						feedItemData.info.push({ placeholder: '$MATCH'
 							,messages: {
-								en: `Match #${match.object.number}`
-								,es: `Partido #${match.object.number}`
+								en: `Match #${match.object.number ? match.object.number : match.object.id}`
+								,es: `Partido #${match.object.number ? match.object.number : match.object.id}`
 							}
 						})
 					}
@@ -163,10 +184,11 @@ define(['express'
 							,es: result.attributes.instant
 						}
 					})
+
 					feedItemData.info.push({ placeholder: '$DATE'
 						,messages: {
-							en: `on ${new Date().toString()}`
-							,es: `el ${new Date().toString()}`
+							en: `on ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
+							,es: `el ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
 						}
 					})
 

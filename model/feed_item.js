@@ -17,6 +17,19 @@ define(['./base_model'
 			,entity : function(){
 			  return this.morphOne('Entity', 'object');
 			}
+			,addComment: function(data){
+				return DB._models.Comment.forge(data.message)
+				.save()
+				.then( result => {
+					logger.debug('el comment tiene entity?')
+					logger.debug(result)
+					return result
+				})
+				.then(result => {
+					//crear la relacion comment -> feed aqui
+					logger.debug(result)
+				})
+			}
 		},{
 			getTemplate: function(eventType){
 				let template = null
@@ -53,7 +66,6 @@ define(['./base_model'
 				.then(e => {
 					//con el evento, se obtiene el codigo
 					let msg = processData(data.info, this.getTemplate(e.attributes.code))
-
 					let _feedItem = null
 					return new DB._models.Feed_item(msg)
 						.save()
@@ -81,7 +93,6 @@ define(['./base_model'
 								,ent_ref_to_id: targetEntity.id
 								,comment: `FEED ITEM OF ${targetEntity.object_type} ${targetEntity.id}`
 							}
-
 							return new DB._models.Entity_relationship(saveObj)
 								.save()
 

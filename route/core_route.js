@@ -89,12 +89,18 @@ define(['express'
 
 			return events.map(result => {
 				return Models.entity.query(qb => {
+					const match = result.related('match')
+
 					qb.where({
 						object_type: 'matches',
 						object_id: result.attributes.match_id
 					})
-					if(result.attributes.team_id){
-						qb.orWhere({ object_id: result.attributes.team_id })
+					if(match.related('home_team').get('id')){
+						qb.orWhere({ object_id: match.related('home_team').get('id') })
+						qb.where({ object_type: 'teams' })
+					}
+					if(match.related('visitor_team').get('id')){
+						qb.orWhere({ object_id: match.related('visitor_team').get('id') })
 						qb.where({ object_type: 'teams' })
 					}
 					if(result.attributes.player_in){

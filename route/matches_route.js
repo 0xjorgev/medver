@@ -315,17 +315,22 @@ define(['express'
 			return new Models.event_match_player(mr)
 			.save()
 			.then(result => {
-
 				//creacion del feed item asociado a este evento
 				//Se ubican las entidades involucradas con el evento
 				//FIXME: es posible cargar la entidad con el on('fetching')
 				return Models.entity.query(qb => {
+					const match = result.related('match')
+					
 					qb.where({
 						object_type: 'matches',
 						object_id: result.attributes.match_id
 					})
-					if(result.attributes.team_id){
-						qb.orWhere({ object_id: result.attributes.team_id })
+					if(match.related('home_team').get('id')){
+						qb.orWhere({ object_id: match.related('home_team').get('id') })
+						qb.where({ object_type: 'teams' })
+					}
+					if(match.related('visitor_team').get('id')){
+						qb.orWhere({ object_id: match.related('visitor_team').get('id') })
 						qb.where({ object_type: 'teams' })
 					}
 					if(result.attributes.player_in){

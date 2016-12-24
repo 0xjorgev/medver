@@ -125,6 +125,7 @@ define(['./base_model'
 					}))
 				})
 			}
+			
 		})
 
 		//toma un objeto info {placeholder: '$EJEMPLO', messages: {}}

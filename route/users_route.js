@@ -36,9 +36,9 @@ define(['express'
     var send_email_from = Email(process.env.SENDER_EMAIL);
 
     router.post('/login', function (req, res, next) {
-        var user_login = req.body;
-        var username = user_login.username.trim();
-        var password = user_login.password.trim();
+        const user_login = req.body;
+        const username = user_login.username.trim();
+        const password = user_login.password.trim();
 
         logger.debug(user_login)
 
@@ -49,6 +49,7 @@ define(['express'
 		.fetch({withRelated: [
              'entity.related_from.relationship_type'
             ,'entity.related_from.to.entity_type'
+            ,'entity.related_from.to.object'
         ]})
         .then(result => {
 
@@ -57,29 +58,29 @@ define(['express'
                 && result.attributes.active == true){
                 var userId = result.id
 
+				//este metodo carga las relaciones del user con otras entidades
 				let user = Models.user.getEntities(result.toJSON())
 
-                var claims = {
+                const claims = {
                     user: userId,
                     roles: ['admin'],
                     lang: 'en'
                 }
 
-                var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
-                var jwt = nJwt.create(claims, signingKey)
+                const signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+                let jwt = nJwt.create(claims, signingKey)
 
                 //TODO: does not expire, for now
                 jwt.setExpiration()
-                result.attributes['Authorization-Token'] = jwt.compact()
+                user['Authorization-Token'] = jwt.compact()
 
                 //TODO: reemplazar por una busqueda de roles adecuada
-                result.attributes.roles = ['admin']
-				delete result.attributes.password
+                user.roles = ['admin']
 
-                Response(res, result)
+                Response(res, user)
             }
             else{
-                //cuando el user no existe o bien proveyó el password correcto,
+                //cuando el user no existe o bien envió el password correcto,
                 //se retorna el status http 403 - "Unauthorized"
                 Response(res, null, auth.checkPermissions(req._currentUser, ['not-authorized!']))
             }
@@ -295,6 +296,7 @@ define(['express'
 			return Models.user.getEntities(user.toJSON())
 		})
 		.then(user => {
+			// logger.debug(user)
 			//ahora con las entidades relacionadas a este user,
 			//traigo los feeds asociados a ellas o al mismo usuario
 			//se extraen los ids de las entidades
@@ -320,6 +322,7 @@ define(['express'
 				})
 			}
 			else {
+				logger.debug('user has no related entities')
 				return []
 			}
 		})

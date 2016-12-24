@@ -303,73 +303,47 @@ define(['express'
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
 		const matchId = req.params.match_id
-
 		logger.debug(req.body)
-
 		const body = utilities.isArray(req.body) ? req.body : [req.body]
-
 		const matchResult = body.map(_event => {
 			let event = _event
 			event.match_id = matchId
 			return event
 		})
 
-		//paso 1 : cargar los relations al salvar el evento
-
 		return Promise.all(matchResult.map(mr => {
 			return new Models.event_match_player(mr)
 			.save()
-			// .then(matchResult => matchResult
-			// 	.load(['match.home_team'
-			// 	,'match.visitor_team'
-			// 	,'event'
-			// 	,'player_in'
-			// 	,'player_out']))
 			.then(result => {
-
-				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-				// logger.debug(result.toJSON())
-				// logger.debug('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-
 				//creacion del feed item asociado a este evento
-				//obtener entidades de los involucrados
+				//Se ubican las entidades involucradas con el evento
+				//FIXME: es posible cargar la entidad con el on('fetching')
 				return Models.entity.query(qb => {
+					const match = result.related('match')
+
 					qb.where({
 						object_type: 'matches',
 						object_id: result.attributes.match_id
 					})
-					if(result.attributes.team_id){
-						qb.orWhere({
-							object_id: result.attributes.team_id
-						})
-						qb.where({
-							object_type: 'teams'
-						})
+					if(match.related('home_team').get('id')){
+						qb.orWhere({ object_id: match.related('home_team').get('id') })
+						qb.where({ object_type: 'teams' })
+					}
+					if(match.related('visitor_team').get('id')){
+						qb.orWhere({ object_id: match.related('visitor_team').get('id') })
+						qb.where({ object_type: 'teams' })
 					}
 					if(result.attributes.player_in){
-						qb.orWhere({
-							object_id: result.attributes.player_in
-						})
-						qb.where({
-							object_type: 'players'
-						})
+						qb.orWhere({ object_id: result.attributes.player_in })
+						qb.where({ object_type: 'players' })
 					}
 					if(result.attributes.player_out){
-						qb.orWhere({
-							object_id: result.attributes.player_out
-						})
-						qb.where({
-							object_type: 'players'
-						})
+						qb.orWhere({ object_id: result.attributes.player_out })
+						qb.where({ object_type: 'players' })
 					}
-					//los tipos de evento van a necesitar una entidad, entonces...
 					if(result.attributes.event_id){
-						qb.orWhere({
-							object_id: result.attributes.event_id
-						})
-						qb.where({
-							object_type: 'events'
-						})
+						qb.orWhere({ object_id: result.attributes.event_id })
+						qb.where({ object_type: 'events' })
 					}
 				})
 				.fetchAll({withRelated: 'object', debug: false})
@@ -377,45 +351,53 @@ define(['express'
 					//creacion de un feed item para el evento recién salvado
 					//esto debería disparar un hilo separado de ejecucion
 					let entities = _entities.toJSON()
-					let team = entities.filter(ent => ent.object_type === 'teams')[0]
+					let teams = entities.filter(ent => ent.object_type === 'teams')
+					let team = teams[0]
 					let match = entities.filter(ent => ent.object_type === 'matches')[0]
 					let player = entities.filter(ent => ent.object_type === 'players')[0]
 					let event = entities.filter(ent => ent.object_type === 'events')[0]
+
+					let homeTeam = teams.filter(
+						t => match.object.home_team.id === t.object.id )[0]
+					let visitorTeam = teams.filter(
+						t => match.object.visitor_team.id === t.object.id )[0]
 
 					let feedItemData = {}
 					feedItemData.data = {
 						object_type: 'events'
 						,object_id: result.attributes.event_id
 					}
+					//Estas son las entidades que serán relacionadas con el FI
 					feedItemData.related_entities = entities
 
-					//aqui va la info que se generará en cada evento
+					//En feedItemData.info se envian los datos que serán reemplazados en el template del FI
 					feedItemData.info = []
-
 					if(team){
 						feedItemData.info.push({ placeholder: '$TEAM'
 							,messages: {en: team.object.name, es: team.object.name}
 						})
 					}
 
-					if(match){
-						feedItemData.info.push({ placeholder: '$MATCH'
-							,messages: {
-								en: `Match #${match.object.number}`
-								,es: `Partido #${match.object.number}`
-							}
-						})
-
-						//TODO: es posible que en este punto todavia no se haya calculado el score final
-						//TODO: quizas es mejor generar los feeds en un proceso paralelo aparte
-						feedItemData.info.push({ placeholder: '$SCORE'
-							,messages: {
-								en: `${match.object.home_team_score} - ${match.object.visitor_team_score}`
-								,es: `${match.object.home_team_score} - ${match.object.visitor_team_score}`
-							}
+					if(homeTeam){
+						feedItemData.info.push({ placeholder: '$HOME_TEAM'
+							,messages: {en: homeTeam.object.name, es: homeTeam.object.name}
 						})
 					}
 
+					if(visitorTeam){
+						feedItemData.info.push({ placeholder: '$VISITOR_TEAM'
+							,messages: {en: visitorTeam.object.name, es: visitorTeam.object.name}
+						})
+					}
+
+					if(match){
+						feedItemData.info.push({ placeholder: '$MATCH'
+							,messages: {
+								en: `Match #${match.object.number ? match.object.number : match.object.id}`
+								,es: `Partido #${match.object.number ? match.object.number : match.object.id}`
+							}
+						})
+					}
 					if(player){
 						feedItemData.info.push({ placeholder: '$PLAYER'
 							,messages: {
@@ -424,24 +406,23 @@ define(['express'
 							}
 						})
 					}
-
 					feedItemData.info.push({ placeholder: '$INSTANT'
 						,messages: {
-							en: mr.instant
-							,es: mr.instant
+							en: result.attributes.instant
+							,es: result.attributes.instant
 						}
 					})
 
 					feedItemData.info.push({ placeholder: '$DATE'
 						,messages: {
-							en: `on ${new Date().toString()}`
-							,es: `el ${new Date().toString()}`
+							en: `on ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
+							,es: `el ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
 						}
 					})
 
 					Models.feed_item.create(feedItemData)
-
 					return result
+
 				})
 			})
 		}))
@@ -479,8 +460,6 @@ define(['express'
 					return rel.entity_id && rel.entity_id !== null
 				})
 				.map(rel => rel.entity_id)
-
-
 
 				//obtengo las relaciones de las entidades
 				return Models.entity_relationship

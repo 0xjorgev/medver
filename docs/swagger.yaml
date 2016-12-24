@@ -28,6 +28,57 @@ produces:
 ###################################################
 
 paths:
+
+  /feed_item/{feed_item_id}/comment:
+    get:
+      summary: Returns the comments of the given feed item
+      description: Returns the comments of the given feed item
+      tags:
+        - Feed
+        - Comment
+      parameters:
+        - name: feed_item_id
+          in: path
+          description: Feed item ID
+          required: true
+          type: integer
+          format: integer
+    responses:
+        200:
+          description: A signed url for upload; a final URL to access the file
+    post:
+      summary: Creates a comment associated with the given feed item
+      description: Creates a comment associated with the given feed item
+      tags:
+        - Feed
+        - Comment
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+        - name: feed_item_id
+          in: path
+          description: Feed item ID
+          required: true
+          type: integer
+          format: integer
+        - name: Body
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            title: Comment creation
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+            - message
+      responses:
+        200:
+          description: OK Message
+
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport
@@ -48,6 +99,21 @@ paths:
       responses:
         200:
           description: A signed url for upload; a final URL to access the file
+  /core/feed/rebuild:
+    post:
+      summary: Rebuilds feed items. Truncates feed item table.
+      description: Truncates feed_items table, deletes all feed item relations, then rebuilds all feed items.
+      tags:
+        - Core
+        - Feed
+      parameters:
+      - name: Authorization-Token
+        in: header
+        type: string
+        required: true
+      responses:
+        200:
+          description: OK message
   /user:
     get:
       summary: Returns the list of active users
@@ -184,6 +250,7 @@ paths:
       description: Returns the news feed of an user
       tags:
         - User
+        - Feed
       parameters:
       - name: Authorization-Token
         in: header
@@ -1796,7 +1863,7 @@ paths:
         - Team
       responses:
         200:
-          description: An array of past, future matches and the next match for the team 
+          description: An array of past, future matches and the next match for the team
         default:
           description: Unexpected error
           schema:

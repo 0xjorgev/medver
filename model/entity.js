@@ -31,6 +31,7 @@ define(['./base_model'
 				,'Category'
 				,'Feed_item'
 				,'Player'
+				,'Comment'
 				,'Match')
 		}
 		,related_from: function() {

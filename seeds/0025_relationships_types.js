@@ -5,11 +5,12 @@ exports.seed = function(knex, Promise) {
     knex('relationships_types').del(),
 
     // Inserts seed entries
-    knex('relationships_types').insert({name: 'OWNER'})
-    ,knex('relationships_types').insert({name: 'COACH'})
-    ,knex('relationships_types').insert({name: 'FEED ITEM OF'})
-	,knex('relationships_types').insert({name: 'FAN'})
-    ,knex('relationships_types').insert({name: 'PLAYER'})
+    knex('relationships_types').insert({name: 'OWNER'}) //1
+    ,knex('relationships_types').insert({name: 'COACH'}) //2
+    ,knex('relationships_types').insert({name: 'FEED ITEM OF'})//3
+	,knex('relationships_types').insert({name: 'FAN'}) //4
+    ,knex('relationships_types').insert({name: 'COMMENT OF'}) //5
+    ,knex('relationships_types').insert({name: 'PLAYER'})//6
     ,knex('relationships_types').insert({name: 'PARTICIPANT'})
     ,knex('relationships_types').insert({name: 'AFFILIATE'})
     ,knex('relationships_types').insert({name: 'SUMMONED'})

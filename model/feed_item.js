@@ -5,31 +5,30 @@ define(['./base_model'
 	,'../util/logger_util'
 	,'./entity'],
 	(DB, logger) => {
-
 		const Feed_item = DB.Model.extend({
 			initialize: function(){
-				this.on('created', attrs => {
-					//por problemas de asincronia, se crea la entidad con el metodo create
+				this.on('fetched', attrs => {
+					return this.load('entity')
 				})
 			}
 			,tableName: 'feed_items'
 			,hasTimestamps: true
-			// ,relatedEntities: function(){
-			// 	console.log('related entity');
-			// 	return DB._models.Entity_relationship
-			// 	.query(qb => {
-			// 		qb.where({ent_ref_from_id: this.id})
-			// 	})
-			// 	.fetchAll({withRelated: 'object'})
-			// }
-			,relatedEntities: function(){
-				return this
-					.hasMany('Entity_relationship', 'ent_ref_from_id')
-					.through('Entity', 'object_id')
-			}
 			//la entidad del feed item
 			,entity : function(){
 			  return this.morphOne('Entity', 'object');
+			}
+			,addComment: function(data){
+				return DB._models.Comment.forge(data.message)
+				.save()
+				.then( result => {
+					logger.debug('el comment tiene entity?')
+					logger.debug(result)
+					return result
+				})
+				.then(result => {
+					//crear la relacion comment -> feed aqui
+					logger.debug(result)
+				})
 			}
 		},{
 			getTemplate: function(eventType){
@@ -42,14 +41,41 @@ define(['./base_model'
 							message_es: '$PLAYER de $TEAM anotó un gol el $INSTANT\' de $MATCH',
 						}
 						break;
+					case '#AGOL':
+						template =  {
+							message_en: '$PLAYER of $TEAM scored an own goal on $INSTANT\' of $MATCH',
+							message_es: '$PLAYER de $TEAM anotó un autogol el $INSTANT\' de $MATCH',
+						}
+						break;
 					case '#GEND':
-						// template =  {
-						// 	message_en: 'The $MATCH has ended: $SCORE',
-						// 	message_es: 'El $MATCH ha terminado: $SCORE',
-						// }
 						template =  {
 							message_en: 'The $MATCH has ended',
 							message_es: 'El $MATCH ha terminado',
+						}
+						break;
+					case '#GSTART':
+						// }
+						template =  {
+							message_en: 'The $MATCH between $HOME_TEAM and $VISITOR_TEAM has started',
+							message_es: 'El $MATCH entre $HOME_TEAM Y $VISITOR_TEAM ha iniciado',
+						}
+						break;
+					case '#YELLOW':
+						template =  {
+							message_en: '$PLAYER_IN of $TEAM has received a yellow card on $INSTANT',
+							message_es: '$PLAYER_IN de $TEAM ha recibido una tarjeta amarilla en el minuto $INSTANT',
+						}
+						break;
+					case '#RED':
+						template =  {
+							message_en: '$PLAYER_IN of $TEAM has received a red card on $INSTANT\'',
+							message_es: '$PLAYER_IN de $TEAM ha recibido una tarjeta roja en el minuto $INSTANT\'',
+						}
+						break;
+					case '#CHANGE':
+						template =  {
+							message_en: '$TEAM has changed $PLAYER_OUT by $PLAYER_IN en el minuto $INSTANT\'',
+							message_es: '$TEAM ha cambiado a $PLAYER_OUT por $PLAYER_IN en el minuto $INSTANT\'',
 						}
 						break;
 					default:
@@ -67,7 +93,6 @@ define(['./base_model'
 				.then(e => {
 					//con el evento, se obtiene el codigo
 					let msg = processData(data.info, this.getTemplate(e.attributes.code))
-
 					let _feedItem = null
 					return new DB._models.Feed_item(msg)
 						.save()
@@ -95,7 +120,6 @@ define(['./base_model'
 								,ent_ref_to_id: targetEntity.id
 								,comment: `FEED ITEM OF ${targetEntity.object_type} ${targetEntity.id}`
 							}
-							// logger.debug(saveObj)
 							return new DB._models.Entity_relationship(saveObj)
 								.save()
 					}))

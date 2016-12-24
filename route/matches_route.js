@@ -98,7 +98,7 @@ define(['express'
                 qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
                 qb.where('matches.id',  match_id)
             }},
-            ], debug: false})
+            ], debug: true})
         .then( result => Response(res, result) )
 		.catch( error => Response(res, null, error) );
     });

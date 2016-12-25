@@ -48,7 +48,7 @@ define(['./base_model', './index' ,'./entity' ,'./round', './event_match_player'
 			}, this)
 
 			this.on('fetched', () => {
-				return this.load(['home_team','visitor_team'])
+				// return this.load(['home_team','visitor_team'])
 			})
 		}
 

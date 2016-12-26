@@ -259,7 +259,11 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-                StandingTable.calculateByGroup(_match.group_id)
+
+				console.log(_match);
+				logger.debug(_match);
+
+				StandingTable.calculateByGroup(_match.group_id)
                 .then(r => {
                     return PlaceholdersHelper
                         .replacePlaceholders(_match.group_id)

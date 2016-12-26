@@ -54,12 +54,9 @@ define(['./base_model'
 
 			this.on('fetched', () => {
 				const currentRelations = Object.keys(this.relations)
-				
-				if(currentRelations.indexOf('home_team') < 0)
-					this.load(['home_team'])
 
-				if(currentRelations.indexOf('visitor_team') < 0)
-					this.load(['visitor_team'])
+				if(currentRelations.indexOf('home_team') < 0 && currentRelations.indexOf('visitor_team') < 0)
+					return this.load(['home_team','visitor_team'])
 			})
 		}
 

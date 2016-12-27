@@ -66,7 +66,8 @@ define(['express',
     //Phase, group, round team by Phase_id
     router.get('/:phase_id/group_round_match', function (req, res) {
         var phase_id = req.params.phase_id;
-
+		//FIXME: este servicio deberia traer los matches por grupo, no por round.
+		//esto afectaria la pantalla de schedules en competition
         return Models.group
         .query(function(qb){})
         .where({'phase_id':phase_id, active:true})

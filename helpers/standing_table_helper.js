@@ -299,7 +299,6 @@ define(['../util/knex_util'
 		.then(result => {
 			//se retornan los rows afectados
 			var t = result.map(r => r.toJSON())
-			console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', t)
 			return t
 		})
 		.catch(error => {

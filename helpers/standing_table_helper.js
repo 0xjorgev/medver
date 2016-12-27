@@ -64,7 +64,7 @@ define(['../util/knex_util'
 					}
 
 					// Setting Autogoals
-					if (event.event_id == 4) {
+					if (event.event_id == 3) {
 						home_team_autogoals = (event.team_id == match.home_team_id) ? event.goals : home_team_autogoals
 						visitor_team_autogoals = (event.team_id == match.visitor_team_id) ? event.goals : visitor_team_autogoals
 					}
@@ -235,7 +235,7 @@ define(['../util/knex_util'
 
 			//query para obtener el # de goles de los matches
 			//event type 1 = gol, event type 4 autogol
-			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id in (1,4) and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`
+			var goalsByMatchSQL = `select match_id, event_id, team_id, count(*) as goals from events_matches_players where active = true and event_id in (1,3) and match_id in (${matchIds}) group by 1,2,3 order by 1,2,3`
 
 			return Knex.raw(goalsByMatchSQL)
 		})

@@ -9,9 +9,9 @@ var nJwt = require('njwt') //jwt token generator
 var Message = require('./util/request_message_util') //in-house message handler
 var Response = require('./util/response_message_util') //in-house message handler
 var compression = require('compression');
-
 var argv = require('minimist')(process.argv.slice(2));
 var subpath = express();
+const logger = require('./util/logger_util')
 
 //node port
 var port = process.env.PORT;

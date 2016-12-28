@@ -53,7 +53,7 @@ define(['../util/knex_util'
 
 			// The property "goals" in the object "event" actually is the count of the event
 			events.forEach((event) => {
-				console.log('\tevent', event)
+				// console.log('\tevent', event)
 
 				if(event.match_id == match.match_id){
 

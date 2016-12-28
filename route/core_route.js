@@ -8,6 +8,7 @@ define(['express'
 		,'../helpers/auth_helper'
 		,'../model/index'
 		,'../util/logger_util'
+		,'../util/knex_util'
 	],(
 		express
 		,Response
@@ -15,6 +16,7 @@ define(['express'
 		,auth
 		,Models
 		,logger
+		,Knex
 	) => {
 	const router = express.Router()
 
@@ -67,20 +69,15 @@ define(['express'
 			return
 		}
 
-		Models.entity_relationship
+		Knex('entities_relationships')
 		.where({relationship_type_id: 3}) //solo feed items
-		.fetchAll()
+		.del()
 		.then(result => {
-			return result.map(r => r.destroy())
+			logger.debug(`deleted ${result} feed item relations`)
+			return Knex('feed_items').del()
 		})
 		.then(result => {
-			return Models.feed_item
-				.fetchAll()
-				.then(fis => {
-					return fis.map(r => r.destroy())
-				})
-		})
-		.then(result => {
+			logger.debug(`deleted ${result} feed items`)
 			return Models.event_match_player
 			.fetchAll()
 			.then(events => {

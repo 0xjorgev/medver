@@ -97,19 +97,8 @@ define(['express'
                 qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
                 qb.where('matches.id',  match_id)
             }},
-<<<<<<< HEAD
-		], debug: true})
-        .then( result => {
-
-			// logger.debug(result.toJSON())
-
-			Response(res, result)
-			return
-		})
-=======
             ], debug: true})
         .then( result => Response(res, result) )
->>>>>>> master
 		.catch( error => Response(res, null, error) );
     });
 
@@ -269,7 +258,6 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-
 				console.log(_match);
 				logger.debug(_match);
 
@@ -334,7 +322,7 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	});
 
-	const createFeedItemFromEvent = (result) => {
+	const createFeedItemFromEvent = result => {
 		//creacion del feed item asociado a este evento
 		//Se ubican las entidades involucradas con el evento
 		return Models.entity.query(qb => {
@@ -368,17 +356,23 @@ define(['express'
 		.then(_entities => {
 			//creacion de un feed item para el evento recién salvado
 			//esto debería disparar un hilo separado de ejecucion
-			let entities = _entities.toJSON()
-			let teams = entities.filter(ent => ent.object_type === 'teams')
-			let team = teams[0]
-			let match = entities.filter(ent => ent.object_type === 'matches')[0]
-			let player = entities.filter(ent => ent.object_type === 'players')[0]
-			let event = entities.filter(ent => ent.object_type === 'events')[0]
+			const entities = _entities.toJSON()
+			const teams = entities.filter(ent => ent.object_type === 'teams')
+			const players = entities.filter(ent => ent.object_type === 'players')
+			const match = entities.filter(ent => ent.object_type === 'matches')[0]
+			const event = entities.filter(ent => ent.object_type === 'events')[0]
 
-			let homeTeam = teams.filter(
+			const team = teams.filter(
+				t => result.attributes.team_id === t.object.id )[0]
+			const homeTeam = teams.filter(
 				t => match.object.home_team.id === t.object.id )[0]
-			let visitorTeam = teams.filter(
+			const visitorTeam = teams.filter(
 				t => match.object.visitor_team.id === t.object.id )[0]
+
+			const playerIn = players.filter(
+				t => result.attributes.player_in === t.object.id )[0]
+			const playerOut = players.filter(
+				t => result.attributes.player_out === t.object.id )[0]
 
 			let feedItemData = {}
 			feedItemData.data = {
@@ -416,11 +410,21 @@ define(['express'
 					}
 				})
 			}
-			if(player){
-				feedItemData.info.push({ placeholder: '$PLAYER'
+
+			if(playerIn){
+				feedItemData.info.push({ placeholder: '$PLAYER_IN'
 					,messages: {
-						en: `${player.object.first_name} ${player.object.last_name}`
-						,es: `${player.object.first_name} ${player.object.last_name}`
+						en: `${playerIn.object.first_name} ${playerIn.object.last_name}`
+						,es: `${playerIn.object.first_name} ${playerIn.object.last_name}`
+					}
+				})
+			}
+
+			if(playerOut){
+				feedItemData.info.push({ placeholder: '$PLAYER_OUT'
+					,messages: {
+						en: `${playerOut.object.first_name} ${playerOut.object.last_name}`
+						,es: `${playerOut.object.first_name} ${playerOut.object.last_name}`
 					}
 				})
 			}
@@ -442,6 +446,9 @@ define(['express'
 			return result
 		})
 	}
+
+	//para importarlo desde core route, e utilizarlo para rebuild feed
+	router.createFeedItemFromEvent = createFeedItemFromEvent
 
 	//feed de un match
 	router.get('/:match_id/feed', (req, res) => {

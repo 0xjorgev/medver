@@ -49,12 +49,11 @@ define(['./base_model'
 						break;
 					case '#GEND':
 						template =  {
-							message_en: 'The $MATCH has ended',
-							message_es: 'El $MATCH ha terminado',
+							message_en: 'The $MATCH between $HOME_TEAM and $VISITOR_TEAM has ended',
+							message_es: 'El $MATCH entre $HOME_TEAM Y $VISITOR_TEAM ha terminado',
 						}
 						break;
 					case '#GSTART':
-						// }
 						template =  {
 							message_en: 'The $MATCH between $HOME_TEAM and $VISITOR_TEAM has started',
 							message_es: 'El $MATCH entre $HOME_TEAM Y $VISITOR_TEAM ha iniciado',
@@ -62,8 +61,8 @@ define(['./base_model'
 						break;
 					case '#YELLOW':
 						template =  {
-							message_en: '$PLAYER_IN of $TEAM has received a yellow card on $INSTANT',
-							message_es: '$PLAYER_IN de $TEAM ha recibido una tarjeta amarilla en el minuto $INSTANT',
+							message_en: '$PLAYER_IN of $TEAM has received a yellow card on $INSTANT\'',
+							message_es: '$PLAYER_IN de $TEAM ha recibido una tarjeta amarilla en el minuto $INSTANT\'',
 						}
 						break;
 					case '#RED':
@@ -74,7 +73,7 @@ define(['./base_model'
 						break;
 					case '#CHANGE':
 						template =  {
-							message_en: '$TEAM has changed $PLAYER_OUT by $PLAYER_IN en el minuto $INSTANT\'',
+							message_en: '$TEAM has changed $PLAYER_OUT by $PLAYER_IN on $INSTANT\'',
 							message_es: '$TEAM ha cambiado a $PLAYER_OUT por $PLAYER_IN en el minuto $INSTANT\'',
 						}
 						break;
@@ -125,7 +124,7 @@ define(['./base_model'
 					}))
 				})
 			}
-			
+
 		})
 
 		//toma un objeto info {placeholder: '$EJEMPLO', messages: {}}

@@ -37,14 +37,14 @@ define(['./base_model'
 				switch (eventType) {
 					case '#GOL':
 						template =  {
-							message_en: '$PLAYER of $TEAM scored a goal on $INSTANT\' of $MATCH',
-							message_es: '$PLAYER de $TEAM anotó un gol el $INSTANT\' de $MATCH',
+							message_en: '$PLAYER_IN of $TEAM scored a goal on $INSTANT\' of $MATCH',
+							message_es: '$PLAYER_IN de $TEAM anotó un gol el $INSTANT\' de $MATCH',
 						}
 						break;
 					case '#AGOL':
 						template =  {
-							message_en: '$PLAYER of $TEAM scored an own goal on $INSTANT\' of $MATCH',
-							message_es: '$PLAYER de $TEAM anotó un autogol el $INSTANT\' de $MATCH',
+							message_en: '$PLAYER_IN of $TEAM scored an own goal on $INSTANT\' of $MATCH',
+							message_es: '$PLAYER_IN de $TEAM anotó un autogol el $INSTANT\' de $MATCH',
 						}
 						break;
 					case '#GEND':

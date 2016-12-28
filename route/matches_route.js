@@ -12,6 +12,7 @@ define(['express'
 	,'../helpers/team_placeholders_helper'
 	,'../util/generic_util'
 	,'../util/logger_util'
+	,'../helpers/feed_item_helper'
 	],
 	(express
 	,Models
@@ -23,6 +24,7 @@ define(['express'
 	,PlaceholdersHelper
     ,utilities
     ,logger
+    ,FeedItemHelper
 	) => {
 
     var router = express.Router();
@@ -32,10 +34,10 @@ define(['express'
         return Models.match
         .query((qb) => {})
         .fetchAll({withRelated: ['home_team', 'visitor_team']} )
-        .then((result) => {
+        .then(result => {
             Response(res, result)
         })
-		.catch((error) => {
+		.catch(error => {
             Response(res, null, error)
         });
     });
@@ -316,7 +318,8 @@ define(['express'
 		return Promise.all(matchResult.map(mr => {
 			return new Models.event_match_player(mr)
 			.save()
-			.then(createFeedItemFromEvent)
+			// .then(createFeedItemFromEvent)
+			.then(FeedItemHelper.createFeedItemFromEvent)
 		}))
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))

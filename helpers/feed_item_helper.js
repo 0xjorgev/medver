@@ -1,13 +1,13 @@
 if (typeof define !== 'function')
 	var define = require('amdefine')(module);
 
-define(['../util/logger_util'],
-	(logger) => {
+define(['../util/logger_util'
+	,'../model/index'],
+	(logger, Models) => {
 
-	var feedItemHelper = {}
+	let FeedItemHelper = {}
 
-
-	const createFeedItemFromEvent = function(result){
+	FeedItemHelper.createFeedItemFromEvent = result => {
 		//creacion del feed item asociado a este evento
 		//Se ubican las entidades involucradas con el evento
 		return Models.entity.query(qb => {
@@ -41,17 +41,23 @@ define(['../util/logger_util'],
 		.then(_entities => {
 			//creacion de un feed item para el evento recién salvado
 			//esto debería disparar un hilo separado de ejecucion
-			let entities = _entities.toJSON()
-			let teams = entities.filter(ent => ent.object_type === 'teams')
-			let team = teams[0]
-			let match = entities.filter(ent => ent.object_type === 'matches')[0]
-			let player = entities.filter(ent => ent.object_type === 'players')[0]
-			let event = entities.filter(ent => ent.object_type === 'events')[0]
+			const entities = _entities.toJSON()
+			const teams = entities.filter(ent => ent.object_type === 'teams')
+			const players = entities.filter(ent => ent.object_type === 'players')
+			const match = entities.filter(ent => ent.object_type === 'matches')[0]
+			const event = entities.filter(ent => ent.object_type === 'events')[0]
 
-			let homeTeam = teams.filter(
+			const team = teams.filter(
+				t => result.attributes.team_id === t.object.id )[0]
+			const homeTeam = teams.filter(
 				t => match.object.home_team.id === t.object.id )[0]
-			let visitorTeam = teams.filter(
+			const visitorTeam = teams.filter(
 				t => match.object.visitor_team.id === t.object.id )[0]
+
+			const playerIn = players.filter(
+				t => result.attributes.player_in === t.object.id )[0]
+			const playerOut = players.filter(
+				t => result.attributes.player_out === t.object.id )[0]
 
 			let feedItemData = {}
 			feedItemData.data = {
@@ -89,11 +95,21 @@ define(['../util/logger_util'],
 					}
 				})
 			}
-			if(player){
-				feedItemData.info.push({ placeholder: '$PLAYER'
+
+			if(playerIn){
+				feedItemData.info.push({ placeholder: '$PLAYER_IN'
 					,messages: {
-						en: `${player.object.first_name} ${player.object.last_name}`
-						,es: `${player.object.first_name} ${player.object.last_name}`
+						en: `${playerIn.object.first_name} ${playerIn.object.last_name}`
+						,es: `${playerIn.object.first_name} ${playerIn.object.last_name}`
+					}
+				})
+			}
+
+			if(playerOut){
+				feedItemData.info.push({ placeholder: '$PLAYER_OUT'
+					,messages: {
+						en: `${playerOut.object.first_name} ${playerOut.object.last_name}`
+						,es: `${playerOut.object.first_name} ${playerOut.object.last_name}`
 					}
 				})
 			}
@@ -104,6 +120,7 @@ define(['../util/logger_util'],
 				}
 			})
 
+			//FIXME: date debe ser el created_at del event_match_player original
 			feedItemData.info.push({ placeholder: '$DATE'
 				,messages: {
 					en: `on ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
@@ -116,7 +133,5 @@ define(['../util/logger_util'],
 		})
 	}
 
-
-
-	return feedItemHelper
+	return FeedItemHelper
 })

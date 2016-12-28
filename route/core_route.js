@@ -9,7 +9,8 @@ define(['express'
 		,'../model/index'
 		,'../util/logger_util'
 		,'../util/knex_util'
-		,'../route/matches_route'
+		// ,'../route/matches_route'
+		,'../helpers/feed_item_helper'
 	],(
 		express
 		,Response
@@ -18,7 +19,8 @@ define(['express'
 		,Models
 		,logger
 		,Knex
-		,MatchRoute
+		// ,MatchRoute
+		,FeedItemHelper
 	) => {
 	const router = express.Router()
 
@@ -89,7 +91,11 @@ define(['express'
 			})
 		})
 		.then(events => {
-			return events.map(MatchRoute.createFeedItemFromEvent)
+
+			logger.debug(FeedItemHelper)
+
+			// return events.map(MatchRoute.createFeedItemFromEvent)
+			return events.map(FeedItemHelper.createFeedItemFromEvent)
 		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))

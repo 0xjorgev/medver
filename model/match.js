@@ -2,8 +2,13 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model', './index' ,'./entity' ,'./round', './event_match_player']
-, function (DB, Models) {
+define(['./base_model'
+,'./index'
+,'../util/logger_util'
+,'./entity'
+,'./round'
+,'./event_match_player']
+, function (DB, Models, logger) {
     var Match = DB.Model.extend({
         tableName: 'matches'
         ,hasTimestamps: true
@@ -48,7 +53,10 @@ define(['./base_model', './index' ,'./entity' ,'./round', './event_match_player'
 			}, this)
 
 			this.on('fetched', () => {
-				return this.load(['home_team','visitor_team'])
+				const currentRelations = Object.keys(this.relations)
+
+				if(currentRelations.indexOf('home_team') < 0 && currentRelations.indexOf('visitor_team') < 0)
+					return this.load(['home_team','visitor_team'])
 			})
 		}
 

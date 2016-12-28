@@ -377,11 +377,11 @@ define(['express'
 	router.get('/:user_id', (req, res) => {
 		Models.user
 		.forge({id: req.params.user_id})
-		.fetch()
+		.fetch({withRelated: [
+			'entity.related_from.to.object',
+			'entity.related_from.relationship_type']})
 		.then(result => {
-			result.getEntities()
-
-			Response(res, result)
+			Response(res, Models.user.getEntities(result.toJSON()))
 		})
 		.catch(error => Response(res, null, error))
 	})

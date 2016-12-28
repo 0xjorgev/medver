@@ -97,6 +97,7 @@ define(['express'
                 qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
                 qb.where('matches.id',  match_id)
             }},
+<<<<<<< HEAD
 		], debug: true})
         .then( result => {
 
@@ -105,6 +106,10 @@ define(['express'
 			Response(res, result)
 			return
 		})
+=======
+            ], debug: true})
+        .then( result => Response(res, result) )
+>>>>>>> master
 		.catch( error => Response(res, null, error) );
     });
 
@@ -264,7 +269,11 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-                StandingTable.calculateByGroup(_match.group_id)
+
+				console.log(_match);
+				logger.debug(_match);
+
+				StandingTable.calculateByGroup(_match.group_id)
                 .then(r => {
                     return PlaceholdersHelper
                         .replacePlaceholders(_match.group_id)

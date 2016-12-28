@@ -12,7 +12,7 @@ define(['./base_model'
 	,'./gender'
 ], (DB, Entity, Category) => {
 
-    var Team = DB.Model.extend({
+    let Team = DB.Model.extend({
         tableName: 'teams',
         hasTimestamps: true,
 

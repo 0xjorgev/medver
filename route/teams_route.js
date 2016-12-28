@@ -502,6 +502,9 @@ define(['express'
         .fetchAll({withRelated: ['home_team'
         	, 'visitor_team'
         	, 'group.phase.category'
+        	, 'result.event'
+        	, 'result.player_in'
+        	, 'result.player_out'
         	]})
         .then(past => {
         	var allmatches = past.toJSON()

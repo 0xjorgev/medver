@@ -80,9 +80,9 @@ define(['express'
 			qb.limit(10)
 			qb.orderBy('id', 'desc')
 		})
-			.fetchAll({withRelated:['entity.object']})
-			.then(result => Response(res, result))
-			.catch(error => Response(res, null, error));
+		.fetchAll({withRelated:['entity.object']})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error));
 	});
 
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result
@@ -640,19 +640,22 @@ define(['express'
 	//==========================================================================
 	// Get all Phases with the teams of one category
 	//==========================================================================
-	router.get('/:category_id/phase/team', function (req, res) {
-		var category_id = req.params.category_id;
-		var phase_id = req.params.phase_id;
-		var group_id = req.params.group_id;
+	router.get('/:category_id/phase/team', (req, res) => {
+		const category_id = req.params.category_id
 
-		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
-			.where({category_id: category_id, active:true})
-			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team']})
+			.where({category_id: category_id, active: true})
+			//FIXME: la relacion category_group_phase_team es la que se esta consultando
+			//por tanto, no es necesario consultarla nuevamente;
+			.fetch({withRelated:[ 'category.phases.category_group_phase_team.team', 'team']})
 			.then(function (result) {
-				console.log(result);
-				var x = result.toJSON().category.phases
-				Response(res, x)
+				if(result){
+					const x = result.toJSON().category.phases
+					Response(res, x)
+				}
+				else{
+					Response(res, [])
+				}
 			}).catch(function(error){
 				Response(res, null, error)
 			});

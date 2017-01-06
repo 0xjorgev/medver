@@ -712,10 +712,10 @@ paths:
         200:
           description: result
       security: []
-  /category/{category_id}/team/{team_id}/player/:
+  /category/{category_id}/team/{team_id}/player:
     get:
-      summary: Gets all the players that participate on a team in a category
-      description: Get players by category_id and team_id
+      summary: Gets all the players that participate on a team in a category. Also known as summoned players
+      description: Gets all the players that participate on a team in a category. Also knownas summoned players
       operationId: get_category_team_player_
       produces:
       - application/json
@@ -1454,8 +1454,8 @@ paths:
           description: Correct update of match player list
   /match/{match_id}/team:
     get:
-      summary: (documentation pending)
-      description: (documentation pending)
+      summary: Gets all the info associated with the teams with the match. Summoned players included
+      description: Gets all the info associated with the teams with the match. Summoned players included
       tags:
         - Match
         - Team

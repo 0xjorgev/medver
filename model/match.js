@@ -90,13 +90,9 @@ define(['./base_model'
 		,group: function(){
 			return this.belongsTo('Group', 'group_id');
 		}
-		// ,feedItems: function(){
-		// 	return this.hasMany('Feed_item', 'object');
-		// }
-		//TODO: esta deberia tener una relacion through
-		// ,category: function() {
-		//   return this.hasMany('Category_group_phase_team')
-		// }
+		,events: function(){
+			return this.hasMany('Event_match_player', 'match_id');
+		}
 	},{
 		//metodos estaticos
 		//TODO: implementar generador de numeros de match

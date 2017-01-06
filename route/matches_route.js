@@ -56,53 +56,63 @@ define(['express'
         });
     });
 
-    //=========================================================================
-    // Returns the player list for a given match
-    //=========================================================================
-    router.get('/:match_id/player', (req, res) => {
-        var match_id = req.params.match_id;
-        return Models.match
-        .where({'id': match_id})
-        .fetch({withRelated: ['home_team.match_player_team.player', 'visitor_team.match_player_team.player']})
-        .then((result) => {
-            Response(res, result);
-        })
+	//=========================================================================
+	// Returns the player list for a given match
+	//=========================================================================
+	router.get('/:match_id/player', (req, res) => {
+		var match_id = req.params.match_id;
+		return Models.match
+		.where({'id': match_id})
+		.fetch({withRelated: [
+			'home_team.match_player_team.player.player_team.position'
+			,'visitor_team.match_player_team.player.player_team.position'
+			,'events.event'
+			,'events.player_in'
+			,'events.player_out'
+			,'group']
+		})
+		.then((result) => {
+			Response(res, result);
+		})
 		.catch((error) => {
-            Response(res, null, error);
-        });
-    });
+			Response(res, null, error);
+		});
+	});
 
-    router.get('/:match_id/team', (req, res) => {
-        var match_id = req.params.match_id;
-        return Models.match
-        .where({'id': match_id})
-        .fetch({withRelated: [
-            // 'home_team.match_player_team.player.gender',
-            // 'visitor_team.match_player_team.player.gender',
-            'round.group.phase.category.category_type',
-            'round.group.phase.category.season.competition',
-            'home_team.summoned.player.gender',
-            'home_team.summoned.player.player_team.position',
-            { 'home_team.summoned': function(qb) {
-                qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.home_team_id')
-                qb.innerJoin('groups', 'matches.group_id', 'groups.id')
-                qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
-                qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
-                qb.where('matches.id',  match_id)
-            }},
-            'visitor_team.summoned.player.gender',
-            'visitor_team.summoned.player.player_team.position',
-            { 'visitor_team.summoned': function(qb) {
-                qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.visitor_team_id')
-                qb.innerJoin('groups', 'matches.group_id', 'groups.id')
-                qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
-                qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
-                qb.where('matches.id',  match_id)
-            }},
-            ], debug: true})
-        .then( result => Response(res, result) )
+	router.get('/:match_id/team', (req, res) => {
+		var match_id = req.params.match_id;
+		return Models.match
+		.where({'id': match_id})
+		.fetch({withRelated: [
+			'events.event',
+			'events.player_in',
+			'events.player_out',
+			'home_team.match_player_team',
+			'visitor_team.match_player_team',
+			'round.group.phase.category.category_type',
+			'round.group.phase.category.season.competition',
+			'home_team.summoned.player.gender',
+			'home_team.summoned.player.player_team.position',
+			{ 'home_team.summoned': function(qb) {
+				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.home_team_id')
+				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
+				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
+				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+				qb.where('matches.id',  match_id)
+			}},
+			'visitor_team.summoned.player.gender',
+			'visitor_team.summoned.player.player_team.position',
+			{ 'visitor_team.summoned': function(qb) {
+				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.visitor_team_id')
+				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
+				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
+				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+				qb.where('matches.id',  match_id)
+			}},
+		], debug: false})
+		.then( result => Response(res, result) )
 		.catch( error => Response(res, null, error) );
-    });
+	});
 
 
     //==========================================================================

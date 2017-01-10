@@ -165,6 +165,44 @@ define(['express'
         	})
     });
 
+    //==========================================================================
+    // Set the player list for a given match
+    // WIP
+    //==========================================================================
+
+    router.post('/:match_id/team/:team_id/player', (req, res) => {
+
+        var data = {}
+        // | number | position | team_id | player_id | match_id |
+
+        if(req.body.number != undefined) data.number = req.body.number
+        if(req.body.position != undefined) data.position = req.body.position
+        if(req.body.team_id != undefined) data.team_id = req.body.team_id
+        if(req.body.player_id != undefined) data.player_id = req.body.player_id
+        if(req.body.match_id != undefined) data.match_id = req.body.match_id
+
+        console.log('POST /:match_id/team/:team_id/player/', data)
+
+        const body = utilities.isArray(req.body) ? req.body : [req.body]
+    		const initial_player = body.map(_initial_player_list => {
+    			let initialPlayer = _initial_player_list
+    			initialPlayer.match_id = data.match_id
+          initialPlayer.number = data.number
+          initialPlayer.team_id = data.team_id
+          initialPlayer.player_id = data.player_id
+    			return initialPlayer
+    		})
+
+    		return Promise.all(initialPlayer.map(ip => {
+    			return new Models.match_team_player(mr)
+    			.save()
+    			// .then(createFeedItemFromEvent)
+    		}))
+    		.then(result => Response(res, result))
+    		.catch(error => Response(res, null, error))
+    	});
+    });
+
     const saveMatch = (req, res) => {
         //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
         //https://github.com/tgriesser/checkit

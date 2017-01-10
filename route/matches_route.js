@@ -22,39 +22,39 @@ define(['express'
 	,Response
 	,StandingTable
 	,PlaceholdersHelper
-    ,utilities
-    ,logger
-    ,FeedItemHelper
+	,utilities
+	,logger
+	,FeedItemHelper
 	) => {
 
-    var router = express.Router();
+	let router = express.Router();
 
-    //matches index
-    router.get('/', (req, res) => {
-        return Models.match
-        .query((qb) => {})
-        .fetchAll({withRelated: ['home_team', 'visitor_team']} )
-        .then(result => {
-            Response(res, result)
-        })
+	//matches index
+	router.get('/', (req, res) => {
+		return Models.match
+		.query((qb) => {})
+		.fetchAll({withRelated: ['home_team', 'visitor_team']} )
+		.then(result => {
+			Response(res, result)
+		})
 		.catch(error => {
-            Response(res, null, error)
-        });
-    });
+			Response(res, null, error)
+		});
+	});
 
-    //matches show
-    router.get('/:match_id', (req, res) => {
-        var match_id = req.params.match_id;
-        return Models.match
-        .where({'id':match_id})
-        .fetch({withRelated: ['home_team', 'visitor_team', 'round.group']})
-        .then( (result) => {
-            Response(res, result)
-        })
+	//matches show
+	router.get('/:match_id', (req, res) => {
+		var match_id = req.params.match_id;
+		return Models.match
+		.where({'id':match_id})
+		.fetch({withRelated: ['home_team', 'visitor_team', 'round.group']})
+		.then( (result) => {
+			Response(res, result)
+		})
 		.catch((error) => {
-            Response(res, null, error)
-        });
-    });
+			Response(res, null, error)
+		});
+	});
 
 	//=========================================================================
 	// Returns the player list for a given match
@@ -87,8 +87,12 @@ define(['express'
 			'events.event',
 			'events.player_in',
 			'events.player_out',
-			'home_team.match_player_team',
-			'visitor_team.match_player_team',
+			{ 'home_team.match_player_team': function(qb) {
+				qb.where('match_id',  match_id)
+			}},
+			{ 'visitor_team.match_player_team': function(qb) {
+				qb.where('match_id',  match_id)
+			}},
 			'round.group.phase.category.category_type',
 			'round.group.phase.category.season.competition',
 			'home_team.summoned.player.gender',

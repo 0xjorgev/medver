@@ -336,6 +336,8 @@ define(['express'
 
 			return Models.feed_item.query(qb => {
 				qb.whereIn('id', feedItemIds)
+				qb.limit('25')
+				qb.orderBy('created_at', 'desc')
 			})
 			.fetchAll()
 		})

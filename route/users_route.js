@@ -334,7 +334,6 @@ define(['express'
 				return []
 			}
 
-
 			return Models.feed_item.query(qb => {
 				qb.whereIn('id', feedItemIds)
 			})
@@ -359,15 +358,15 @@ define(['express'
 					return fi
 				}
 
-				return feedItem.related('entity')
+				feedItem.related('entity')
 					.related('related_from')
-					.map(rel => {
+					.forEach((rel, idx) => {
 						let object = rel.related('to').related('object')
 						let tmpTo = object.toJSON()
 						tmpTo.object_type = rel.related('to').get('object_type')
 						fi.related_entities.push(tmpTo)
-						return fi
 					})
+				return fi
 			})
 		})
 		.then(result => Response(res, result))

@@ -38,6 +38,7 @@ define([
     ,'./entity_request'
     ,'./feed_item'
     ,'./comment'
+    ,'./club'
 ], function (Util
 	, Discipline
 	, Subdiscipline
@@ -73,7 +74,8 @@ define([
 	, Status_type
 	, Entity_request
 	, Feed_item
-	, Comment
+    , Comment
+    , Club
 	){
     return {
     	util:Util
@@ -112,5 +114,6 @@ define([
         ,entity_request: Entity_request
         ,feed_item: Feed_item
         ,comment: Comment
+        ,club: Club
     };
 });

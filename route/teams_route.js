@@ -328,7 +328,7 @@ define(['express'
 		//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
 		console.log('POST team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
-	})
+	}) 
 
 	// updates players_teams, the roster of this team
 	router.put('/:team_id/player/:player_id', function(req, res){

@@ -94,6 +94,7 @@ var position_ws =  require('./route/positions_route');
 var status_type_ws =  require('./route/status_types_route');
 var request_ws =  require('./route/requests_route');
 const feed_item_ws = require('./route/feed_items_route')
+const club_ws = require('./route/clubs_route')
 
 //put here all non business-related services
 var core_ws =  require('./route/core_route');
@@ -130,6 +131,7 @@ var routes = {
 	,position       : 'position'
 	,status_type    : 'status_type'
 	,request        : 'request'
+	,club        	: 'club'
 }
 
 //Middleware
@@ -249,6 +251,7 @@ app.use(`${api_prefix}${routes.test}`, test_ws);
 app.use(`${api_prefix}${routes.position}`, position_ws);
 app.use(`${api_prefix}${routes.status_type}`, status_type_ws);
 app.use(`${api_prefix}${routes.request}`, request_ws);
+app.use(`${api_prefix}${routes.club}`, club_ws);
 
 app.get(api_prefix, function(request, response){
 	// app._router.stack.forEach(function(r){

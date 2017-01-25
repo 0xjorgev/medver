@@ -81,9 +81,11 @@ define(['express'
 	// Get a club by his id
 	//==========================================================================
 	router.get('/:club_id', function (req, res) {
+		
+		var clubId = req.params.club_id
 		return Models.club
 		.query(function(qb){})
-		.where({id:club_id})
+		.where({id:clubId})
 		.where({active:true})
 		.fetch()
 		.then(result => Response(res, result))

@@ -32,6 +32,7 @@ define(['./base_model'
 				,'Feed_item'
 				,'Player'
 				,'Comment'
+				,'Competition'
 				,'Match')
 		}
 		,related_from: function() {

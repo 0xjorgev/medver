@@ -2305,6 +2305,34 @@ paths:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No clubs found
+  /club/{club_id}/team:
+    get:
+      summary: Returns the teams members of the club
+      description: Returns the teams members of the club
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+        - name: club_id
+          in: path
+          description: Club ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Club
+      responses:
+        200:
+          description: An array of teams
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No teams found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 
 

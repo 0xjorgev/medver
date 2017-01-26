@@ -87,7 +87,9 @@ define(['express'
 		.query(function(qb){})
 		.where({id:clubId})
 		.where({active:true})
-		.fetch()
+		.fetch({withRelated: [
+             'entity'
+        ]})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
@@ -224,6 +226,13 @@ define(['express'
 
 	//creacion de club
 	router.post('/', (req, res) => {
+		//Verificacion de permisos
+        var chk = auth.checkPermissions(req._currentUser, [])
+        if(chk.code !== 0){
+            Response(res, null, chk)
+            return
+        }
+
 		var data = req.body
 		data._currentUser = req._currentUser
 		saveTeam(data, res)
@@ -231,6 +240,13 @@ define(['express'
 
 	//actualizacion de club
 	router.put('/:club_id', function(req, res, next){
+		//Verificacion de permisos
+        var chk = auth.checkPermissions(req._currentUser, [])
+        if(chk.code !== 0){
+            Response(res, null, chk)
+            return
+        }
+
 		var data = req.body
 		data._currentUser = req._currentUser
 		//setting the ID on the object to be saved is the way to signal bookshelf to create or update
@@ -255,6 +271,58 @@ define(['express'
 		.then((result) => Response(res, result))
 		.catch((error) => Response(res, null, error))
 	})
+
+	//==========================================================================
+	// Get all teams of a club
+	//==========================================================================
+	router.get('/:club_id/team', (req, res) => {
+		var clubId = req.params.club_id
+        //se verifica unicamente que haya un usuario valido en el request
+        //no se requiere ningun permiso especial
+        console.log('Current User', req._currentUser)
+
+        var chk = auth.checkPermissions(req._currentUser, [])
+
+        if(chk.code !== 0){
+            Response(res, null, chk)
+            return
+        }
+        //Obtengo la entidad de un club
+        Models.club
+        .query(qb => qb.where({id: clubId}) )
+        .fetch({withRelated: [
+             'entity.related_to.relationship_type'
+            ,'entity.related_to.from.entity_type'
+        ]})
+        .then(club => {
+            var club = club.toJSON()
+			logger.debug(club)
+            //con esto se filtran las relaciones tipo 'MEMBER'
+            return club.entity.related_to
+                .filter(rel => {
+                    var name = (rel.relationship_type.name == undefined)
+						? ''
+						: rel.relationship_type.name.toUpperCase()
+                    return name == 'MEMBER'
+                })
+                //y con este map se extraen los ids de los teams
+                .map(teams => teams.from.object_id)
+        })
+        .then(teamsID => {
+			logger.debug(teamsID)
+            return Models.team
+                .query(qb => qb.whereIn('id', teamsID))
+                .fetchAll({withRelated: ['category_type'
+					,'gender'
+					,'category_group_phase_team.category.season.competition'
+					,'category_group_phase_team.status_type'
+					,'subdiscipline'
+				]})
+        })
+        .then(result => Response(res, result) )
+        .catch(error => Response(res, null, error))
+    })
+
 
 	return router;
 });

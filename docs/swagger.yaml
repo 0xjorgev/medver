@@ -2281,6 +2281,10 @@ paths:
         200:
           description: object deleted
       parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
         - name: club_id
           in: path
           description: Club ID
@@ -2310,10 +2314,6 @@ paths:
       summary: Returns the teams members of the club
       description: Returns the teams members of the club
       parameters:
-        - name: Authorization-Token
-          in: header
-          type: string
-          required: true
         - name: club_id
           in: path
           description: Club ID

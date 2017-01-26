@@ -258,6 +258,15 @@ define(['express'
 	router.delete('/:club_id', function(req, res){
 		var clubId = req.params.club_id
 		var clubData = {}
+		//Requiere autorizacion por token
+        console.log('Current User', req._currentUser)
+        var chk = auth.checkPermissions(req._currentUser, [])
+
+        if(chk.code !== 0){
+            Response(res, null, chk)
+            return
+        }
+
 		if (clubId != undefined) clubData.id = clubId
 		
 		clubData.active = false
@@ -277,16 +286,7 @@ define(['express'
 	//==========================================================================
 	router.get('/:club_id/team', (req, res) => {
 		var clubId = req.params.club_id
-        //se verifica unicamente que haya un usuario valido en el request
         //no se requiere ningun permiso especial
-        console.log('Current User', req._currentUser)
-
-        var chk = auth.checkPermissions(req._currentUser, [])
-
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
         //Obtengo la entidad de un club
         Models.club
         .query(qb => qb.where({id: clubId}) )

@@ -2007,6 +2007,15 @@ paths:
           description: '?'
       security: []
 
+  /subdiscipline:
+    get:
+      summary: Returns the list of subdisciplines
+      description: Returns the list of subdisciplines
+      tags:
+        - Subdiscipline
+      responses:
+        200:
+          description: List of active subdisciplines
   /subdiscipline/{subdiscipline_id}/event:
     get:
       summary: Returns the list of subdiscipline Available Events

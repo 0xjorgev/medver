@@ -1,59 +1,53 @@
-/**
- * Created by greg on 28/04/15.
- */
 if (typeof define !== 'function') {
-    var define = require('amdefine')(module);
+	var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util'], function (express, Models, Message) {
+define(['express',
+	'../model/index',
+	'../util/response_message_util'],
+	(express,
+	Models,
+	Response) => {
+	let router = express.Router();
 
-    var router = express.Router();
+	router.get('/:subdiscipline_id/event', (req, res) => {
+		const subdiscipline_id = req.params.subdiscipline_id;
+		return Models.event
+		.where({subdiscipline_id: subdiscipline_id, active:true})
+		.fetchAll({withRelated: ['discipline'], debug: false})
+		.then(result => {
+			Response(res, result)
+		})
+		.catch(error => {
+			Response(res, null, error)
+		})
+	})
 
-    router.get('/:subdiscipline_id/event', function (req, res) {
+	router.get('/', (req, res) => {
+		const subdiscipline_id = req.params.subdiscipline_id
+		return Models.subdiscipline
+		.where({active: true})
+		.fetchAll({withRelated: ['discipline']})
+		.then(result => {
+			Response(res, result)
+		})
+		.catch(error => {
+			Response(res,null, error)
+		})
+	})
 
-        console.log('Events by Subdiscipline');
+	router.get('/:subdiscipline_id/position', (req, res) => {
+		var subdiscipline_id = req.params.subdiscipline_id
+		return Models.position
+		.where({'subdiscipline_id': subdiscipline_id, active: true})
+		.fetchAll()
+		.then(result => {
+			Response(res, result)
+		})
+		.catch(error => {
+			Response(res, null, error)
+		})
+	})
 
-        var subdiscipline_id = req.params.subdiscipline_id;
-
-        return Models.event
-        .where({subdiscipline_id:subdiscipline_id})
-        .where({active:true})
-        .fetchAll({withRelated: [], debug: false})
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
-    });
-
-    router.get('/', function (req, res) {
-
-        var subdiscipline_id = req.params.subdiscipline_id;
-
-        return Models.subdiscipline
-        .where({active:true})
-        .fetchAll()
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
-    });
-
-    router.get('/:subdiscipline_id/position', function (req, res) {
-
-        var subdiscipline_id = req.params.subdiscipline_id;
-
-        return Models.position
-        .where({'subdiscipline_id':subdiscipline_id})
-        .where({active:true})
-        .fetchAll()
-        .then(function (result) {
-            Message(res,'Success', '0', result);
-        }).catch(function(error){
-            Message(res,error.details, error.code, []);
-        });
-    });
-
-    return router;
+	return router
 });

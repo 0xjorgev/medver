@@ -7,7 +7,6 @@ define(['express', '../model/index', '../util/response_message_util'], function 
     var router = express.Router();
 
     router.get('/', function (req, res) {
-        console.log('Discipline get all');
         // tapping into Knex query builder to modify query being run
         return Models.discipline
         .query(function(qb){

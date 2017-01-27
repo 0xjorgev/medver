@@ -1511,6 +1511,36 @@ paths:
       responses:
         200:
           description: (documentation pending)
+
+  /match/:match_id/team/:team_id/player:
+    post:
+      summary: registers the starter eleven players for a match for each team
+      description: registers the starter eleven players for a match for each team
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        description: Team ID
+        required: true
+        type: integer
+        format: integer
+      - name: events
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/initialPlayers'
+      responses:
+        200:
+          description: (documentation pending)
   /round:
     get:
       summary: List all rounds
@@ -2655,6 +2685,7 @@ definitions:
       number:
         type: integer
   MatchEvents:
+    title: MatchEvents
     type: array
     items:
       type: object
@@ -2669,6 +2700,22 @@ definitions:
           type: integer
         team_id:
           type: integer
+
+  initialPlayers:
+      title: initialPlayers
+      type: array
+      items:
+        type: object
+        properties:
+          number:
+            type: integer
+          player_id:
+            type: integer
+          match_id:
+            type: integer
+          team_id:
+            type: integer
+
   Error:
     title: error
     type: object

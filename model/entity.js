@@ -32,10 +32,12 @@ define(['./base_model'
 				,'Feed_item'
 				,'Player'
 				,'Comment'
-				,'Match')
+				,'Competition'
+				,'Match'
+				,'Club')
 		}
 		,related_from: function() {
-		  return this.hasMany('Entity_relationship', 'ent_ref_from_id');
+			return this.hasMany('Entity_relationship', 'ent_ref_from_id');
 		}
 		,related_to: function(){
 			return this.hasMany('Entity_relationship', 'ent_ref_to_id');

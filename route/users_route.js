@@ -1,93 +1,100 @@
-if (typeof define !== 'function') {
+if (typeof define !== 'function')
     var define = require('amdefine')(module);
-}
 
 define(['express'
-        ,'uuid'
-        ,'njwt'
-        ,'../model/index'
-        ,'../util/password_gen_util'
-        ,'../util/knex_util'
-        ,'../util/request_message_util'
-        ,'../util/email_sender_util'
-        ,'../util/md5_gen_util'
-        ,'../util/response_message_util'
-        ,'../util/logger_util'
-        ,'../helpers/auth_helper'
-        ,'lodash'
-        ,'fs'
-        ],
-        function (express
-        ,uuid
-        ,nJwt
-        ,Models
-        ,Pwd_gen
-        ,Knex_util
-        ,Message
-        ,Email
-        ,Md5
-        ,Response
-        ,logger
-        ,auth
+		,'uuid'
+		,'njwt'
+		,'../model/index'
+		,'../util/password_gen_util'
+		,'../util/knex_util'
+		,'../util/request_message_util'
+		,'../util/email_sender_util'
+		,'../util/md5_gen_util'
+		,'../util/response_message_util'
+		,'../util/logger_util'
+		,'../helpers/auth_helper'
+		,'lodash'
+		,'fs'
+		],
+		function (express
+		,uuid
+		,nJwt
+		,Models
+		,Pwd_gen
+		,Knex_util
+		,Message
+		,Email
+		,Md5
+		,Response
+		,logger
+		,auth
 		,_
 		,fs){
 
-    var router = express.Router();
-    var send_email_from = Email(process.env.SENDER_EMAIL);
+	let router = express.Router();
+	const send_email_from = Email(process.env.SENDER_EMAIL);
 
-    router.post('/login', function (req, res, next) {
-        const user_login = req.body;
-        const username = user_login.username.trim();
-        const password = user_login.password.trim();
+	router.post('/login', function (req, res, next) {
+		const user_login = req.body;
+		const username = user_login.username.trim();
+		const password = user_login.password.trim();
 
-        logger.debug(user_login)
+		logger.debug(user_login)
 
-        return Models.user.query((qb) => {
-            qb.where('username', username)
-            qb.orWhere('email', username)
-        })
+		return Models.user.query((qb) => {
+			qb.where('username', username)
+			qb.orWhere('email', username)
+		})
 		.fetch({withRelated: [
-             'entity.related_from.relationship_type'
-            ,'entity.related_from.to.entity_type'
-            ,'entity.related_from.to.object'
-        ]})
-        .then(result => {
+			'entity.related_from.relationship_type'
+			,'entity.related_from.to.entity_type'
+			,'entity.related_from.to.object'
+		]})
+		.then(result => {
 
-            if (result !== null
-                && result.attributes.password == password
-                && result.attributes.active == true){
-                var userId = result.id
+			if (result !== null
+				&& result.attributes.password == password
+				&& result.attributes.active == true){
+					const userId = result.id
 
-				//este metodo carga las relaciones del user con otras entidades
-				let user = Models.user.getEntities(result.toJSON())
+					//este metodo carga las relaciones del user con otras entidades
+					let user = Models.user.getEntities(result.toJSON())
 
-                const claims = {
-                    user: userId,
-                    roles: ['admin'],
-                    lang: 'en'
-                }
+					const roles = user.related_entities.map(ent => {
+						return {
+							type: ent.object_type
+							,id: ent.id
+							,entity_id: ent.entity_id
+							,role: ent.relationship_type
+						}
+					})
+					delete user.related_entities
+					const claims = {
+						user: userId,
+						roles: roles,
+						lang: 'en',
+					}
 
-                const signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
-                let jwt = nJwt.create(claims, signingKey)
+					const signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
+					let jwt = nJwt.create(claims, signingKey)
 
-                //TODO: does not expire, for now
-                jwt.setExpiration()
-                user['Authorization-Token'] = jwt.compact()
+					//TODO: does not expire, for now
+					jwt.setExpiration()
+					user['Authorization-Token'] = jwt.compact()
 
-                //TODO: reemplazar por una busqueda de roles adecuada
-                user.roles = ['admin']
+					//TODO: reemplazar por una busqueda de roles adecuada
+					user.roles = roles
 
-                Response(res, user)
-            }
-            else{
-                //cuando el user no existe o bien envió el password correcto,
-                //se retorna el status http 403 - "Unauthorized"
-                Response(res, null, auth.checkPermissions(req._currentUser, ['not-authorized!']))
-            }
-
-        })
-        .catch(error => Response(res, null, error))
-    });
+					Response(res, user)
+				}
+				else{
+					//cuando el user no existe o si no envió el password correcto,
+					//se retorna el status http 403 - "Unauthorized"
+					Response(res, null, auth.checkPermissions(req._currentUser, ['not-authorized!']))
+				}
+			})
+			.catch(error => Response(res, null, error))
+		});
 
     router.post('/register', function(req, res, next){
         var new_user = req.body;
@@ -334,9 +341,10 @@ define(['express'
 				return []
 			}
 
-
 			return Models.feed_item.query(qb => {
 				qb.whereIn('id', feedItemIds)
+				qb.limit('25')
+				qb.orderBy('created_at', 'desc')
 			})
 			.fetchAll()
 		})
@@ -359,15 +367,15 @@ define(['express'
 					return fi
 				}
 
-				return feedItem.related('entity')
+				feedItem.related('entity')
 					.related('related_from')
-					.map(rel => {
+					.forEach((rel, idx) => {
 						let object = rel.related('to').related('object')
 						let tmpTo = object.toJSON()
 						tmpTo.object_type = rel.related('to').get('object_type')
 						fi.related_entities.push(tmpTo)
-						return fi
 					})
+				return fi
 			})
 		})
 		.then(result => Response(res, result))

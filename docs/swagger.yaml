@@ -2218,6 +2218,152 @@ paths:
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: falsee
 
+  /club:
+    get:
+      summary: Gets the info of all clubs
+      description: Gets the info of all clubs
+      tags:
+        - Club
+      responses:
+        200:
+          description: List of clubs
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a club
+      description: Creates a club
+      tags:
+        - Club
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization-Token
+        in: header
+        type: string
+        required: true
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/CreateClubRequest'
+      responses:
+        200:
+          description: club creation OK
+      security: []
+  /club/{club_id}:
+    get:
+      summary: Returns the detail of one club
+      description: Returns the detail of one club
+      parameters:
+        - name: club_id
+          in: path
+          description: Club ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Club
+      responses:
+        200:
+          description: An array of clubs
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a club
+      description: Updates a club
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+        - name: club_id
+          in: path
+          description: Club ID
+          required: true
+          type: integer
+          format: integer
+        - name: club data
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/CreateClubRequest'
+      tags:
+        - Club
+      responses:
+        200:
+          description: Resource updated
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Logical delete of a club given the id
+      description: Logical delete of a club given the id
+      tags:
+        - Club
+      responses:
+        200:
+          description: object deleted
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+        - name: club_id
+          in: path
+          description: Club ID
+          required: true
+          type: integer
+          format: integer
+  /club/query/by_user:
+    get:
+      summary: Returns a list of clubs on which this user is an owner
+      description: Returns a list of clubs on which this user is an owner
+      tags:
+        - Club
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+      responses:
+        200:
+          description: List of clubs on which this user is an owner
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No clubs found
+  /club/{club_id}/team:
+    get:
+      summary: Returns the teams members of the club
+      description: Returns the teams members of the club
+      parameters:
+        - name: club_id
+          in: path
+          description: Club ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Club
+      responses:
+        200:
+          description: An array of teams
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No teams found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
 
 
 #######################################################################
@@ -2722,3 +2868,22 @@ definitions:
     properties:
       description:
         type: string
+
+
+  CreateClubRequest:
+    title: Club Creation/Update Request
+    type: object
+    properties:
+      name:
+        type: string
+      logo_url:
+        type: string
+      short_name:
+        type: string
+      description:
+        type: string
+      organization_id:
+        type: integer
+        description: If not provided, a new 'club' organization will be created under the same name as the club
+    required:
+      - nam

@@ -111,7 +111,7 @@ define(['express'
 	// CRUD functions
 	//==========================================================================
 	var saveTeam = function(data, res){
-		logger.debug(data)
+		console.log('SAVE TEAM')
 
 		var orgData = {}
 
@@ -145,6 +145,7 @@ define(['express'
 		//para asociar las entidades
 		var teamEntity = null
 		var userEntity = null
+		var clubEntity = null
 
 		//let's lookup the organization by id or by the previously-trimmed name
 		Models.organization.query(qb => {
@@ -203,8 +204,8 @@ define(['express'
 			return result
 		})
 		.then(result => {
-			logger.debug('entity!')
-			logger.debug(result.toJSON())
+			// logger.debug('entity!')
+			// logger.debug(result.toJSON())
 
 			if (data.id) {
 				// los siguientes bloques de promises solo aplican cuando se está
@@ -223,7 +224,7 @@ define(['express'
 				// En caso de que sea una operación POST
 				// se asocia el usuario que se está creando
 				// con el team como owner del mismo
-				console.log('Se hace la creacion de la realacion de la entidad con el usuario: ', userEntity[0].id)
+				// console.log('Se hace la creacion de la realacion de la entidad con el usuario: ', userEntity[0].id)
 				return new Models.entity_relationship({
 					ent_ref_from_id: userEntity[0].id
 					,ent_ref_to_id: teamEntity.id
@@ -233,6 +234,51 @@ define(['express'
 			}
 		})
 		.then(result => {
+			//Obtenemos los datos del club
+			if(data.club_id)
+			{
+				return Models.club
+					.query(function(qb){})
+					.where({id:data.club_id})
+					.fetch({withRelated: [
+			             'entity'
+			        ]})
+			}
+			else
+				return //si no se envia el club Id
+		})
+		.then(clubResult => {
+			var club = clubResult.toJSON()
+			console.log('CLUB',club)
+			if (data.id) {
+				// los siguientes bloques de promises solo aplican cuando se está
+				// creando el team.
+				// en caso de actualización, simplemente se retorna
+				// el resultado del update y se termina el servicio
+				//TODO: los bloques anteriores no son necesarios cuando se hace update. fix!
+				return result
+			}
+			else{
+				// En caso de que la entidad team se haya creado en el promise anterior
+				// se asigna a teamEntity
+				if(clubEntity == null || clubEntity.length == 0)
+					clubEntity = club.entity
+
+				// En caso de que sea una operación POST
+				// se asocia el usuario que se está creando
+				// con el team como owner del mismo
+				console.log('Se crea la relacion entre el club: '+ clubEntity.id + ' teamEntity.id '+ teamEntity.id)
+				return new Models.entity_relationship({
+					ent_ref_from_id: teamEntity.id
+					,ent_ref_to_id: clubEntity.id
+					,relationship_type_id: 6
+					,comment: 'MEMBER'
+				}).save()
+			}
+
+		})
+		.then(result => {
+			//return the complete information of the team
 			return Models.team
 			.where({id:_team.id, active:true})
 			.fetch({withRelated: ['category_type'
@@ -328,7 +374,7 @@ define(['express'
 		//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
 		console.log('POST team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
-	})
+	}) 
 
 	// updates players_teams, the roster of this team
 	router.put('/:team_id/player/:player_id', function(req, res){

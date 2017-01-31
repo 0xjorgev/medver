@@ -1,7 +1,7 @@
 if (typeof define !== 'function')
     var define = require('amdefine')(module)
 
-define(['util'], function (util) {
+define(['util', 'lme'], function (util, lme) {
     var inspect = util.inspect
     var _log = obj => console.log(inspect(obj, {colors: true, depth: Infinity }))
 
@@ -33,15 +33,15 @@ define(['util'], function (util) {
     }
 
     logger.debug = obj => {
-    	if(LOG_LEVEL_DEBUG >= getCurrentLogLevel()) _log(obj)
+    	if(LOG_LEVEL_DEBUG >= getCurrentLogLevel()) lme.d(_log(obj))
     }
 
     logger.info  = obj => {
-    	if(LOG_LEVEL_INFO >= getCurrentLogLevel()) _log(obj)
+    	if(LOG_LEVEL_INFO >= getCurrentLogLevel()) lme.s(_log(obj))
     }
 
     logger.error = obj => {
-    	if(LOG_LEVEL_ERROR >= getCurrentLogLevel()) _log(obj)
+    	if(LOG_LEVEL_ERROR >= getCurrentLogLevel()) lme.e(_log(obj))
     }
 
     return logger

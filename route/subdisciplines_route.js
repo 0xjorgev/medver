@@ -14,7 +14,7 @@ define(['express',
 		const subdiscipline_id = req.params.subdiscipline_id;
 		return Models.event
 		.where({subdiscipline_id: subdiscipline_id, active:true})
-		.fetchAll({withRelated: ['discipline'], debug: false})
+		.fetchAll({withRelated: ['subdiscipline.discipline'], debug: false})
 		.then(result => {
 			Response(res, result)
 		})

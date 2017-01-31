@@ -204,8 +204,6 @@ define(['express'
 			return result
 		})
 		.then(result => {
-			// logger.debug('entity!')
-			// logger.debug(result.toJSON())
 
 			if (data.id) {
 				// los siguientes bloques de promises solo aplican cuando se está
@@ -250,23 +248,13 @@ define(['express'
 		.then(clubResult => {
 			var club = clubResult.toJSON()
 			console.log('CLUB',club)
-			if (data.id) {
-				// los siguientes bloques de promises solo aplican cuando se está
-				// creando el team.
-				// en caso de actualización, simplemente se retorna
-				// el resultado del update y se termina el servicio
-				//TODO: los bloques anteriores no son necesarios cuando se hace update. fix!
-				return result
-			}
-			else{
-				// En caso de que la entidad team se haya creado en el promise anterior
-				// se asigna a teamEntity
+			if (data.club_id) {
+				// En caso de que la entidad team se haya creado desde un club
 				if(clubEntity == null || clubEntity.length == 0)
 					clubEntity = club.entity
 
 				// En caso de que sea una operación POST
-				// se asocia el usuario que se está creando
-				// con el team como owner del mismo
+				// se asocia el equipo como miembre de un club
 				console.log('Se crea la relacion entre el club: '+ clubEntity.id + ' teamEntity.id '+ teamEntity.id)
 				return new Models.entity_relationship({
 					ent_ref_from_id: teamEntity.id
@@ -274,6 +262,9 @@ define(['express'
 					,relationship_type_id: 6
 					,comment: 'MEMBER'
 				}).save()
+			}
+			else{
+				return result
 			}
 
 		})

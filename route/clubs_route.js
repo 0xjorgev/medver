@@ -323,6 +323,81 @@ define(['express'
         .catch(error => Response(res, null, error))
     })
 
+    //==========================================================================
+	// Get all Matches of a club
+	//==========================================================================
+	router.get('/:club_id/match', (req, res) => {
+		var clubId = req.params.club_id
+		var currentDate = new Date()
+		var pastMatches
+		var nextMatch
+		var futureMatches
+        //no se requiere ningun permiso especial
+        //Obtengo la entidad de un club
+        Models.club
+        .query(qb => qb.where({id: clubId}) )
+        .fetch({withRelated: [
+             'entity.related_to.relationship_type'
+            ,'entity.related_to.from.entity_type'
+        ]})
+        .then(club => {
+            var club = club.toJSON()
+			logger.debug(club)
+            //con esto se filtran las relaciones tipo 'MEMBER'
+            return club.entity.related_to
+                .filter(rel => {
+                    var name = (rel.relationship_type.name == undefined)
+						? ''
+						: rel.relationship_type.name.toUpperCase()
+                    return name == 'MEMBER'
+                })
+                //y con este map se extraen los ids de los teams
+                .map(teams => teams.from.object_id)
+        })
+        .then(teamsID => {
+			logger.debug(teamsID)
+			return Models.match
+		        .query(qb => 
+					qb.whereIn('home_team_id', teamsID)
+					.orWhereIn('visitor_team_id', teamsID)
+					.whereNot({date: null})
+					.where({active: true})
+					.orderBy('date')
+				)
+		        .fetchAll({withRelated: ['home_team'
+		        	, 'visitor_team'
+		        	, 'group.phase.category'
+		        	, 	{ 'result': function(qb) {
+							qb.whereIn('team_id',  teamsID)
+						}}
+					, 'result.event'
+		        	, 'result.player_in'
+		        	, 'result.player_out'
+		        	]})
+        })
+        .then(matches => {
+
+        	var allmatches = matches.toJSON()
+
+			logger.debug(allmatches)
+			futureMatches = allmatches.filter(function(g){
+							return g.date >= currentDate
+						})
+			nextMatch = futureMatches[0]
+			pastMatches = allmatches.filter(function(g){
+							return g.date < currentDate
+						})
+			var schedule = {
+					nextMatch: nextMatch,
+					futureMatches: futureMatches,
+					pastMatches: pastMatches
+				}
+			return schedule
+        })
+        .then(result => Response(res, result) )
+        .catch(error => Response(res, null, error))
+    })
+
 
 	return router;
 });

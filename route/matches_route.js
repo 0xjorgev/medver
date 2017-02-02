@@ -189,6 +189,7 @@ define(['express'
           initialPlayer.number = _initial_player_list.number
           initialPlayer.team_id = team_id//_initial_player_list.team_id
           initialPlayer.player_id = _initial_player_list.player_id
+          initialPlayer.is_initial = _initial_player_list.is_initial
     			return initialPlayer
     		})
 

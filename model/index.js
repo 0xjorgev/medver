@@ -39,6 +39,7 @@ define([
     ,'./feed_item'
     ,'./comment'
     ,'./club'
+    ,'./terms_conditions'
 ], function (Util
 	, Discipline
 	, Subdiscipline
@@ -76,6 +77,7 @@ define([
 	, Feed_item
     , Comment
     , Club
+    ,Term_Condition
 	){
     return {
     	util:Util
@@ -107,7 +109,7 @@ define([
         ,organization:Organization
         ,position:Position
         ,category_team_player:Category_team_player
-		,standing_table: StandingTable
+		    ,standing_table: StandingTable
         ,entity: Entity
         ,entity_relationship: Entity_relationship
         ,status_type: Status_type
@@ -115,5 +117,6 @@ define([
         ,feed_item: Feed_item
         ,comment: Comment
         ,club: Club
+        ,term_condition: Term_Condition
     };
 });

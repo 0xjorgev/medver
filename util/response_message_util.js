@@ -1,19 +1,48 @@
-if (typeof define !== 'function') {
+if (typeof define !== 'function')
     var define = require('amdefine')(module);
-}
 
-define(['express', 'util'], function (express, util) {
+define(['express'
+	,'util'
+	,'../util/logger_util'
+	,'redis'
+	,'bluebird'
+	],
+	(express
+	,util
+	,logger
+	,redis
+	,bluebird
+	) => {
 
-	var inspect = util.inspect
-	//log helper function
-	var _log = (obj) => console.log(inspect(obj, {colors: true, depth: Infinity }))
-
+	const inspect = util.inspect
 	// List of HTTP codes and their uses
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 	var message =  function(res, result, error){
 
 		var code = 200
 		var mess = 'Undefined response message'
+
+		//codigo para estadisticas de servicios
+		if(process.env.SERVICE_STATS){
+			const path = res.req.route.path
+			const client = redis.createClient(
+				'redis://h:pf91v0pvlljcdpbktgg4823ajpn@ec2-54-243-224-12.compute-1.amazonaws.com:7639')
+			const key = `${path}`
+			client.get(key, (error, result) => {
+				if(error){
+					logger.debug('error')
+					logger.error(error)
+				}
+				else{
+					if(result !== null){
+						client.incr(key)
+					}
+					else {
+						client.set(key, 1)
+					}
+				}
+			})
+		}
 
 		//checks if it's a validation failure message
 		if(error) {
@@ -88,8 +117,8 @@ define(['express', 'util'], function (express, util) {
 				break
 			default:
 				console.log('code', code, 'message', mess)
-				if(result) _log(result)
-				if(error) _log(error.stack)
+				if(result) logger.debug(result)
+				if(error) logger.debug(error.stack)
 				res.status(500).json({ message: 'Unhandled error: ' + mess, code: 500, data: result, error: error});
 		}
     }

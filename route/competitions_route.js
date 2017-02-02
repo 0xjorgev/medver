@@ -10,10 +10,19 @@ define(['express',
 		'../util/knex_util',
 		'../util/email_sender_util',
 		'../helpers/auth_helper',
-		'../node_modules/lodash/lodash.min'],
-		function (express, util, Models, Message, Response, Knex, Email, auth, lodash) {
+		'../node_modules/lodash/lodash.min',
+		'../util/logger_util'],
+		function (express
+			,util
+			,Models
+			,Message
+			,Response
+			,Knex
+			,Email
+			,auth
+			,lodash
+		 	,logger) {
 
-	var _log = (obj) => console.log(util.inspect(obj, {colors: true, depth: Infinity }))
 	var router = express.Router();
 	var send_email_from = Email(process.env.SENDER_EMAIL);
 
@@ -87,16 +96,17 @@ define(['express',
 			})
 			.fetchAll({
 				withRelated: [
-					'discipline',
-					'subdiscipline',
-					'competition_type',
-					'seasons',
-					'seasons.categories',
-					'competition_user.users']
+					'discipline'
+					,'subdiscipline'
+					,'competition_type'
+					,'seasons'
+					,'seasons.categories'
+					,'competition_user.users']
+				,debug: true
 					// esto no funciono, pero debe haber alguna forma de hacerlo funcionar
 					// , columns: ['competition_user.users.username','competition_user.users.email']
 			})
-			.then((result) => {
+			.then(result => {
 				//se elimina el password de los users
 				result = result.map((comp) => {
 					comp.relations.competition_user.map((user) => {

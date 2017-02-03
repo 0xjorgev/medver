@@ -97,7 +97,7 @@ define(['express'
     //==========================================================================
 	// CRUD functions
 	//==========================================================================
-	var saveTeam = function(data, res){
+	var saveClub = function(data, res){
 		logger.debug(data)
 
 		var orgData = {}
@@ -235,7 +235,7 @@ define(['express'
 
 		var data = req.body
 		data._currentUser = req._currentUser
-		saveTeam(data, res)
+		saveClub(data, res)
 	});
 
 	//actualizacion de club
@@ -251,7 +251,7 @@ define(['express'
 		data._currentUser = req._currentUser
 		//setting the ID on the object to be saved is the way to signal bookshelf to create or update
 		data.id = req.params.club_id
-		saveTeam(data, res)
+		saveClub(data, res)
 	});
 
 	//inactivates the club

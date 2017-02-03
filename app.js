@@ -92,6 +92,7 @@ const status_type_ws =  require('./route/status_types_route');
 const request_ws =  require('./route/requests_route');
 const feed_item_ws = require('./route/feed_items_route')
 const club_ws = require('./route/clubs_route')
+const paypal_ws = require('./route/paypal_route')
 //put here all non business-related services
 const core_ws =  require('./route/core_route');
 const apiVersion = 'v1.0';
@@ -127,6 +128,7 @@ const routes = {
 	,status_type	: 'status_type'
 	,request		: 'request'
 	,club			: 'club'
+  ,paypal :'paypal'
 }
 
 //Middleware
@@ -247,6 +249,11 @@ app.use(`${api_prefix}${routes.position}`, position_ws);
 app.use(`${api_prefix}${routes.status_type}`, status_type_ws);
 app.use(`${api_prefix}${routes.request}`, request_ws);
 app.use(`${api_prefix}${routes.club}`, club_ws);
+app.use(`${api_prefix}${routes.paypal}`, paypal_ws);
+// app.use(`${api_prefix}${routes.paypal}`, paypal_ws);
+// app.use(`/api/v1.0/paypal`, paypal_ws);
+
+console.log("THIS IS THE ROUTE", `${api_prefix}${routes.paypal}`);
 
 app.get(api_prefix, function(request, response){
 	// app._router.stack.forEach(function(r){

@@ -286,39 +286,15 @@ define(['express'
 	//==========================================================================
 	router.get('/:club_id/team', (req, res) => {
 		var clubId = req.params.club_id
-        //no se requiere ningun permiso especial
-        //Obtengo la entidad de un club
-        Models.club
-        .query(qb => qb.where({id: clubId}) )
-        .fetch({withRelated: [
-             'entity.related_to.relationship_type'
-            ,'entity.related_to.from.entity_type'
-        ]})
-        .then(club => {
-            var club = club.toJSON()
-			logger.debug(club)
-            //con esto se filtran las relaciones tipo 'MEMBER'
-            return club.entity.related_to
-                .filter(rel => {
-                    var name = (rel.relationship_type.name == undefined)
-						? ''
-						: rel.relationship_type.name.toUpperCase()
-                    return name == 'MEMBER'
-                })
-                //y con este map se extraen los ids de los teams
-                .map(teams => teams.from.object_id)
-        })
-        .then(teamsID => {
-			logger.debug(teamsID)
-            return Models.team
-                .query(qb => qb.whereIn('id', teamsID))
-                .fetchAll({withRelated: ['category_type'
-					,'gender'
-					,'category_group_phase_team.category.season.competition'
-					,'category_group_phase_team.status_type'
-					,'subdiscipline'
-				]})
-        })
+        return Models.team
+            .query(qb => qb.where('club_id', clubId))
+            .fetchAll({withRelated: ['category_type'
+				,'gender'
+				,'category_group_phase_team.category.season.competition'
+				,'category_group_phase_team.status_type'
+				,'subdiscipline'
+				,'club'
+			]})
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))
     })
@@ -373,6 +349,8 @@ define(['express'
 					, 'result.event'
 		        	, 'result.player_in'
 		        	, 'result.player_out'
+		        	, 'home_team.club'
+		        	, 'visitor_team.club'
 		        	]})
         })
         .then(matches => {

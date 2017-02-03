@@ -30,7 +30,8 @@ define(['express'
 			,'player_team.player'
 			,'subdiscipline'
 			,'gender'
-			,'entity']})
+			,'entity'
+			,'club']})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
@@ -62,7 +63,8 @@ define(['express'
 			,'subdiscipline'
 			,'gender'
 			,'entity'
-			,'player_team.position']})
+			,'player_team.position'
+			,'club']})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error));
 
@@ -117,6 +119,10 @@ define(['express'
 
 		if(data.organization_id)
 			orgData.id = data.organization_id
+		else if(data.club_id)
+		{
+			//Obtenemos el id de la organizacion del club si se lo asociamos al team
+		}
 		else{
 			orgData = {
 				//TODO: reemplazar el id por un code, en lugar del ID directo de base de datos
@@ -138,6 +144,7 @@ define(['express'
 		if (data.meta != undefined) teamData.meta = data.meta
 		if (data.short_name != undefined) teamData.short_name = data.short_name
 		if (data.description != undefined) teamData.description = data.description
+		if (data.club_id != undefined) teamData.club_id = data.club_id
 		if (data.id != undefined) teamData.id = data.id
 
 		var _team = null
@@ -230,43 +237,6 @@ define(['express'
 					,comment: 'OWNER'
 				}).save()
 			}
-		})
-		.then(result => {
-			//Obtenemos los datos del club
-			if(data.club_id)
-			{
-				return Models.club
-					.query(function(qb){})
-					.where({id:data.club_id})
-					.fetch({withRelated: [
-			             'entity'
-			        ]})
-			}
-			else
-				return //si no se envia el club Id
-		})
-		.then(clubResult => {
-			var club = clubResult.toJSON()
-			console.log('CLUB',club)
-			if (data.club_id) {
-				// En caso de que la entidad team se haya creado desde un club
-				if(clubEntity == null || clubEntity.length == 0)
-					clubEntity = club.entity
-
-				// En caso de que sea una operación POST
-				// se asocia el equipo como miembre de un club
-				console.log('Se crea la relacion entre el club: '+ clubEntity.id + ' teamEntity.id '+ teamEntity.id)
-				return new Models.entity_relationship({
-					ent_ref_from_id: teamEntity.id
-					,ent_ref_to_id: clubEntity.id
-					,relationship_type_id: 6
-					,comment: 'MEMBER'
-				}).save()
-			}
-			else{
-				return result
-			}
-
 		})
 		.then(result => {
 			//return the complete information of the team

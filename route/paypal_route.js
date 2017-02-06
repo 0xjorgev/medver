@@ -26,29 +26,17 @@ define(['express'
     // Returns the player list for a given match
     //=========================================================================
     router.post('/', (req, res) => {
+      var body = req.body;
+      //Add Search for Competition
+      //Update the team - Competition payment status
+      console.log("*****************************");
+      console.log("payPal Response:", body.custom);
+      console.log("*****************************");
+      logger.debug(Object.keys(req));
+      console.log("*****************************");
 
-      console.log("payPal Response:", req);
-      logger.debug(req);
-
-      //logger.debug("payPal Objects:", req);
-      //logger.debug(req)
-      // var match_id = req.params.match_id;
-      //return Models.match
-      // .where({'id': match_id})
-      // .fetch({withRelated: [
-      //   'home_team.match_player_team.player.player_team.position'
-      //   ,'visitor_team.match_player_team.player.player_team.position'
-      //   ,'events.event'
-      //   ,'events.player_in'
-      //   ,'events.player_out'
-      //   ,'group']
-      // })
-      // .then((result) => {
         Response(res, 'This was posted on paypal service');
-      // })
-      // .catch((error) => {
-      //   Response(res, null, error);
-      // });
+
     });
 
     return router;

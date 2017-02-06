@@ -512,6 +512,8 @@ define(['express'
         	, 'result.event'
         	, 'result.player_in'
         	, 'result.player_out'
+		    , 'home_team.club'
+		    , 'visitor_team.club'
         	]})
         .then(past => {
         	var allmatches = past.toJSON()

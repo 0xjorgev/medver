@@ -33,7 +33,7 @@ define(['express'
       //Add Search for Competition
       //Update the team - Competition payment status
       console.log("*****************************");
-      console.log("payPal Response:", , "cat:", cat_id, "team:", team_id);
+      console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
       console.log("*****************************");
       logger.debug(Object.keys(req));
       console.log("*****************************");

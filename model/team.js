@@ -41,8 +41,11 @@ define(['./base_model'
 		,summoned: function(){
             return this.hasMany('Category_team_player', 'team_id');
         }
-		,entity : function(){
+        ,entity : function(){
           return this.morphOne('Entity', 'object');
+        }
+        ,club : function(){
+          return this.belongsTo('Club', 'club_id');
         }
     });
 

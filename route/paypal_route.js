@@ -27,10 +27,12 @@ define(['express'
     //=========================================================================
     router.post('/', (req, res) => {
       var body = req.body;
+      var cat_id = body.custom.category_id;
+      var team_id = body.custom.team_id;
       //Add Search for Competition
       //Update the team - Competition payment status
       console.log("*****************************");
-      console.log("payPal Response:", body.custom);
+      console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
       console.log("*****************************");
       logger.debug(Object.keys(req));
       console.log("*****************************");

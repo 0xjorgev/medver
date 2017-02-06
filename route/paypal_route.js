@@ -30,7 +30,9 @@ define(['express'
     //=========================================================================
     router.get('/', (req, res) => {
 
-      console.log(req);
+      console.log("payPal Response:", req);
+
+      logger.debug("payPal Objects:", req);
       //logger.debug(req)
       // var match_id = req.params.match_id;
       //return Models.match

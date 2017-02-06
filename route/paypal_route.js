@@ -29,6 +29,7 @@ define(['express'
 
       console.log("payPal Response:", req);
       logger.debug(req);
+
       //logger.debug("payPal Objects:", req);
       //logger.debug(req)
       // var match_id = req.params.match_id;
@@ -43,7 +44,7 @@ define(['express'
       //   ,'group']
       // })
       // .then((result) => {
-        Response(res, '');
+        Response(res, 'This was posted on paypal service');
       // })
       // .catch((error) => {
       //   Response(res, null, error);

@@ -17,22 +17,19 @@ define(['express'
 	,Knex
 	,util
 	,Response
-	,StandingTable
-	,PlaceholdersHelper
 	,utilities
 	,logger
-	,FeedItemHelper
 	) => {
 
     let router = express.Router();
     //=========================================================================
     // Returns the player list for a given match
     //=========================================================================
-    router.get('/', (req, res) => {
+    router.post('/', (req, res) => {
 
       console.log("payPal Response:", req);
-
-      logger.debug("payPal Objects:", req);
+      logger.debug(req);
+      //logger.debug("payPal Objects:", req);
       //logger.debug(req)
       // var match_id = req.params.match_id;
       //return Models.match

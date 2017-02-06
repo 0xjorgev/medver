@@ -169,6 +169,39 @@ define(['express'
         	})
     });
 
+    //==========================================================================
+    // Set the initial player list for a given match
+    // WIP
+    //==========================================================================
+
+    router.post('/:match_id/team/:team_id/player', (req, res) => {
+        var data = {}
+        // | number | position | team_id | player_id | match_id |
+        var match_id = req.params.match_id;
+        var team_id = req.params.team_id;
+
+        console.log('POST /:match_id/team/:team_id/player/', data)
+
+        const body = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
+    		const initial_player = body.map(_initial_player_list => {
+    			let initialPlayer = _initial_player_list
+    			initialPlayer.match_id = match_id//_initial_player_list.match_id
+          initialPlayer.number = _initial_player_list.number
+          initialPlayer.team_id = team_id//_initial_player_list.team_id
+          initialPlayer.player_id = _initial_player_list.player_id
+          initialPlayer.is_initial = _initial_player_list.is_initial
+    			return initialPlayer
+    		})
+
+    		return Promise.all(initial_player.map(ip => {
+    			return new Models.match_team_player(ip)
+    			.save()
+    			// .then(createFeedItemFromEvent)
+    		}))
+    		.then(result => Response(res, result))
+    		.catch(error => Response(res, null, error))
+    	});
+
     const saveMatch = (req, res) => {
         //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
         //https://github.com/tgriesser/checkit

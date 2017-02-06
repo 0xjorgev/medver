@@ -12,8 +12,8 @@ exports.up = function(knex, Promise) {
 		})
 		.then(function(){
 				//Add query
-                return knex.raw('');
-            })
+      return knex.raw('');
+      })
 	]);
 };
 

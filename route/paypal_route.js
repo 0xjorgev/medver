@@ -23,9 +23,9 @@ define(['express'
 
     let router = express.Router();
 
-    var updateCompetitionCategory = function(cat_id, team_id){
+    var updateCompetitionCategory = function(res, cat_id, team_id){
 
-        var pre_reg = new Models.Category_group_phase_team;
+        var pre_reg = new Models.category_group_phase_team;
 
         return Knex(pre_reg.tableName)
         .where('category_id','=',cat_id)
@@ -52,7 +52,7 @@ define(['express'
       var cat_id = json.category_id;
       var team_id = json.team_id;
 
-      updateCompetitionCategory(cat_id, team_id)
+      updateCompetitionCategory(res, cat_id, team_id)
       //Add Search for Competition
       //Update the team - Competition payment status
        console.log("*****************************");

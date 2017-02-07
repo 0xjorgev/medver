@@ -7,7 +7,7 @@ if (typeof define !== 'function') {
 
 define(['./base_model', './category', './team', './status_type'], function (DB) {
 
-    var Category_group_phase_team = DB.Model.extend({
+    var Category_pre_registration = DB.Model.extend({
         tableName: 'categories_pre_registrations',
         hasTimestamps: true,
 

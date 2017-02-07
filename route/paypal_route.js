@@ -33,9 +33,11 @@ define(['express'
         .where('team_id','=', team_id)
         .update({'payment' = true}, ['id'])
         .then(function(result){
+          console.log("Success on Paypal Update");
           Response(res, result)
         })
         .catch(function(err){
+          console.log("Error on Paypal Update");
           Response(res, null, err)
         });
     }
@@ -53,11 +55,11 @@ define(['express'
       updateCompetitionCategory(cat_id, team_id)
       //Add Search for Competition
       //Update the team - Competition payment status
-      // console.log("*****************************");
-      // console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
-      // console.log("*****************************");
-      // logger.debug(Object.keys(req));
-      // console.log("*****************************");
+       console.log("*****************************");
+       console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
+       console.log("*****************************");
+       logger.debug(Object.keys(req));
+       console.log("*****************************");
 
         //Response(res, 'This was posted on paypal service');
 

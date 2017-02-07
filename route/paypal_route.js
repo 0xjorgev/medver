@@ -51,14 +51,18 @@ define(['express'
       var json = JSON.parse(body.custom);
       var cat_id = json.category_id;
       var team_id = json.team_id;
+      var payment_status = body.payment_status;
 
-      updateCompetitionCategory(res, cat_id, team_id)
-      //Add Search for Competition
-      //Update the team - Competition payment status
-       console.log("*****************************");
-       console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
-       console.log("*****************************");
-       logger.debug(Object.keys(req));
+      if (payment_status == "Processed" || payment_status == "Completed") {
+        updateCompetitionCategory(res, cat_id, team_id)
+      } else {
+        Response(res, '');
+      }
+
+       //console.log("*****************************");
+       //console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
+       //console.log("*****************************");
+       //logger.debug(Object.keys(req));
        console.log("*****************************");
        logger.debug(body);
        console.log("*****************************");

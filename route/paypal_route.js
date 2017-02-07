@@ -31,7 +31,7 @@ define(['express'
         .where('category_id','=',cat_id)
         .where('active','=',1)
         .where('team_id','=', team_id)
-        .update({'payment' = true}, ['id'])
+        .update({'payment' : true}, ['id'])
         .then(function(result){
           console.log("Success on Paypal Update");
           Response(res, result)

@@ -22,6 +22,25 @@ define(['express'
 	) => {
 
     let router = express.Router();
+
+    var updateCompetitionCategory = function(cat_id, team_id){
+
+        var pre_reg = new Models.Category_group_phase_team;
+
+        return Knex(pre_reg.tableName)
+        .where('category_id','=',cat_id)
+        .where('active','=',1)
+        .where('team_id','=', team_id)
+        .update({'payment' = true}, ['id'])
+        .then(function(result){
+          Response(res, result)
+        })
+        .catch(function(err){
+          Response(res, null, err)
+        });
+    }
+
+
     //=========================================================================
     // Returns the player list for a given match
     //=========================================================================
@@ -30,15 +49,17 @@ define(['express'
       var json = JSON.parse(body.custom);
       var cat_id = json.category_id;
       var team_id = json.team_id;
+
+      updateCompetitionCategory(cat_id, team_id)
       //Add Search for Competition
       //Update the team - Competition payment status
-      console.log("*****************************");
-      console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
-      console.log("*****************************");
-      logger.debug(Object.keys(req));
-      console.log("*****************************");
+      // console.log("*****************************");
+      // console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
+      // console.log("*****************************");
+      // logger.debug(Object.keys(req));
+      // console.log("*****************************");
 
-        Response(res, 'This was posted on paypal service');
+        //Response(res, 'This was posted on paypal service');
 
     });
 

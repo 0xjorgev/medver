@@ -60,6 +60,8 @@ define(['express'
        console.log("*****************************");
        logger.debug(Object.keys(req));
        console.log("*****************************");
+       logger.debug(body);
+       console.log("*****************************");
 
         //Response(res, 'This was posted on paypal service');
 

@@ -10,6 +10,7 @@ define(['express'
 	,'../util/response_message_util'
 	,'../util/generic_util'
 	,'../util/logger_util'
+  ,'http'
 	],
 	(express
 	,Models
@@ -19,6 +20,7 @@ define(['express'
 	,Response
 	,utilities
 	,logger
+  ,http
 	) => {
 
     let router = express.Router();

@@ -99,6 +99,8 @@ define(['express'
                console.log(response);
              }
         })
+
+        testReq.end();
       } else {
         Response(res, 'Paypal');
       }

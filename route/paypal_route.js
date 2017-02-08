@@ -24,7 +24,7 @@ define(['express'
     var http = require("http");
     let router = express.Router();
 
-    var updateCompetitionCategory = function(res, cat_id, team_id){
+    var updateCompetitionCategory = function(cat_id, team_id){
 
         var pre_reg = new Models.category_group_phase_team;
 
@@ -35,11 +35,11 @@ define(['express'
         .update({'payment' : true}, ['id'])
         .then(function(result){
           console.log("Success on Paypal Update");
-          Response(res, result)
+          // Response(res, result)
         })
         .catch(function(err){
           console.log("Error on Paypal Update");
-          Response(res, 'Paypal')
+          // Response(res, 'Paypal')
         });
     }
 
@@ -80,7 +80,7 @@ define(['express'
 
                  //The IPN is verified
                  console.log('Verified IPN!');
-                 updateCompetitionCategory(res, cat_id, team_id);
+                 updateCompetitionCategory(cat_id, team_id);
                } else if (body.substring(0, 7) === 'INVALID') {
 
                  //The IPN invalid

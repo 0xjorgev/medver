@@ -38,7 +38,6 @@ define(['express'
 	router.get('/query/by_user', (req, res) => {
         //se verifica unicamente que haya un usuario valido en el request
         //no se requiere ningun permiso especial
-        console.log('Current User', req._currentUser)
 
         var chk = auth.checkPermissions(req._currentUser, [])
 

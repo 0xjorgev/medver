@@ -22,33 +22,53 @@ define(['express'
 	) => {
 
     let router = express.Router();
+
+    var updateCompetitionCategory = function(res, cat_id, team_id){
+
+        var pre_reg = new Models.category_group_phase_team;
+
+        return Knex(pre_reg.tableName)
+        .where('category_id','=',cat_id)
+        .where('active','=',1)
+        .where('team_id','=', team_id)
+        .update({'payment' : true}, ['id'])
+        .then(function(result){
+          console.log("Success on Paypal Update");
+          Response(res, result)
+        })
+        .catch(function(err){
+          console.log("Error on Paypal Update");
+          Response(res, null, err)
+        });
+    }
+
+
     //=========================================================================
     // Returns the player list for a given match
     //=========================================================================
     router.post('/', (req, res) => {
+      var body = req.body;
+      var json = JSON.parse(body.custom);
+      var cat_id = json.category_id;
+      var team_id = json.team_id;
+      var payment_status = body.payment_status;
 
-      console.log("payPal Response:", req);
-      logger.debug(req);
+      if (payment_status == "Processed" || payment_status == "Completed") {
+        updateCompetitionCategory(res, cat_id, team_id)
+      } else {
+        Response(res, '');
+      }
 
-      //logger.debug("payPal Objects:", req);
-      //logger.debug(req)
-      // var match_id = req.params.match_id;
-      //return Models.match
-      // .where({'id': match_id})
-      // .fetch({withRelated: [
-      //   'home_team.match_player_team.player.player_team.position'
-      //   ,'visitor_team.match_player_team.player.player_team.position'
-      //   ,'events.event'
-      //   ,'events.player_in'
-      //   ,'events.player_out'
-      //   ,'group']
-      // })
-      // .then((result) => {
-        Response(res, 'This was posted on paypal service');
-      // })
-      // .catch((error) => {
-      //   Response(res, null, error);
-      // });
+       //console.log("*****************************");
+       //console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
+       //console.log("*****************************");
+       //logger.debug(Object.keys(req));
+       console.log("*****************************");
+       logger.debug(body);
+       console.log("*****************************");
+
+        //Response(res, 'This was posted on paypal service');
+
     });
 
     return router;

@@ -142,10 +142,6 @@ define(['express'
             _newUser.attributes['Authorization-Token'] = jwt.compact()
             delete _newUser.attributes.password
 
-            //TODO: test only!
-            _newUser.attributes.roles = ['admin', 'player']
-            _newUser.attributes.permissions = ['list', 'create', 'update', 'delete']
-
             Response(res, _newUser)
         })
         .catch(error => Response(res, null, error));

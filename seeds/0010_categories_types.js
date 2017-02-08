@@ -9,18 +9,6 @@ exports.seed = function(knex, Promise) {
     // Inserts seed entries
 
     /*
-        TODO: Verify relationships with conditional data!!
-
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
-        gender_id:1, season_id:1
         gender_id:1, season_id:1
         gender_id:1, season_id:1
 

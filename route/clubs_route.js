@@ -52,18 +52,13 @@ define(['express'
         .fetch({withRelated: [
              'entity.related_from.relationship_type'
             ,'entity.related_from.to.entity_type'
-            // ,'entity.related_from.from.entity_type'
         ]})
         .then(result => {
             var user = result.toJSON()
-			// logger.debug(user)
-            //con esto se filtran las relaciones tipo 'coach' y owner
+            //con esto se filtran las relaciones para que sean los clubs
             return user.entity.related_from
                 .filter(rel => {
-                    var name = (rel.relationship_type.name == undefined)
-						? ''
-						: rel.relationship_type.name.toUpperCase()
-                    return name == 'COACH' || name == 'OWNER'
+                    return rel.to.object_type == 'clubs'
                 })
                 //y con este map se extraen los ids de los clubs
                 .map(clubs => clubs.to.object_id)

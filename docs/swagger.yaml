@@ -657,6 +657,15 @@ paths:
         200:
           description: result
       security: []
+  /category_type:
+    get:
+      summary: Gets the list of category types
+      description: Gets the list of category types
+      tags:
+        - Category Type
+      responses:
+        200:
+          description: A list of category types
   /category/{category_id}:
     get:
       summary: Gets a category given an id

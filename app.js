@@ -251,9 +251,6 @@ app.use(`${api_prefix}${routes.status_type}`, status_type_ws);
 app.use(`${api_prefix}${routes.request}`, request_ws);
 app.use(`${api_prefix}${routes.club}`, club_ws);
 app.use(`${api_prefix}${routes.paypal}`, paypal_ws);
-// app.use(`/api/v1.0/paypal`, paypal_ws);
-
-console.log("THIS IS THE ROUTE", `${api_prefix}${routes.paypal}`);
 
 app.get(api_prefix, function(request, response){
 	// app._router.stack.forEach(function(r){

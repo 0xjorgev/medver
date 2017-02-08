@@ -21,7 +21,6 @@ define(['express'
 	,logger
 	) => {
 
-    var http = require("http");
     let router = express.Router();
 
     var updateCompetitionCategory = function(cat_id, team_id){

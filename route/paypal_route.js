@@ -75,31 +75,33 @@ define(['express'
         //post to thirdparty service
         var testReq = http.request(options, function(res) {
           console.log('Inside testReq');
-          let body = res.body;
-          console.log('response Body:', body);
-          if (res.statusCode === 200) {
-               //Inspect IPN validation result and act accordingly
-               if (body.substring(0, 8) === 'VERIFIED') {
 
-                 //The IPN is verified
-                 console.log('Verified IPN!');
-                 updateCompetitionCategory(cat_id, team_id);
-               } else if (body.substring(0, 7) === 'INVALID') {
+          res.on('data', function(chunk){
+              let body = chunk.body;
+              console.log('response Body:', body);
+              if (res.statusCode === 200) {
+                   //Inspect IPN validation result and act accordingly
+                   if (body.substring(0, 8) === 'VERIFIED') {
 
-                 //The IPN invalid
-                 console.log('Invalid IPN!');
-               } else {
-                 //Unexpected response body
-                 console.log('Unexpected response body!');
-                 console.log(body);
-               }
-             }else{
-               //Unexpected response
-               console.log('Unexpected response!');
-               console.log(response);
-             }
-        })
+                     //The IPN is verified
+                     console.log('Verified IPN!');
+                     updateCompetitionCategory(cat_id, team_id);
+                   } else if (body.substring(0, 7) === 'INVALID') {
 
+                     //The IPN invalid
+                     console.log('Invalid IPN!');
+                   } else {
+                     //Unexpected response body
+                     console.log('Unexpected response body!');
+                     console.log(body);
+                   }
+                 }else{
+                   //Unexpected response
+                   console.log('Unexpected response!');
+                   console.log(response);
+                 }
+            })
+          })
         testReq.end();
       } else {
         Response(res, 'Paypal');

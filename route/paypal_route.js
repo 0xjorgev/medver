@@ -73,13 +73,14 @@ define(['express'
         Response(res, 'Paypal');
         console.log('After 200');
         //post to thirdparty service
-        var testReq = http.request(options, function(res) {
+        var testReq = http.request(options, function(response) {
+
           console.log('Inside testReq');
 
-          res.on('data', function(chunk){
+          response.on('data', function(chunk){
               let body = chunk.body;
               console.log('response Body:', body);
-              if (res.statusCode === 200) {
+              if (response.statusCode === 200) {
                    //Inspect IPN validation result and act accordingly
                    if (body.substring(0, 8) === 'VERIFIED') {
 

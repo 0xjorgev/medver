@@ -95,7 +95,7 @@ define(['express'
                console.log('Unexpected response!');
                console.log(response);
              }
-        }
+        })
       } else {
         Response(res, 'Paypal');
       }

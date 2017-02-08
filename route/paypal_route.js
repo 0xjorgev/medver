@@ -72,7 +72,7 @@ define(['express'
         console.log('Status is completed');
         Response(res, 'Paypal');
         //post to thirdparty service
-        var testReq = http.post(options, function(res) {
+        var testReq = http.request(options, function(res) {
           console.log('Inside testReq');
           let body = res.body;
           console.log('response Body:', body);

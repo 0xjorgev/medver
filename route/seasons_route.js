@@ -40,6 +40,16 @@ define(['express',
     });
 
     router.post('/', function (req, res) {
+
+		//TODO: validar permisologias despues de modificar el checkPermissions
+		// var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
+		//
+		// if (chk.code != 0){
+		// 	Response(res, null, chk)
+		// 	return
+		// }
+		//
+
         //Model Instance
         var Season = Models.season;
         var season_post = req.body;

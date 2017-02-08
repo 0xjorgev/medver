@@ -68,12 +68,13 @@ define(['express'
       };
 
       if (payment_status == "Completed") {
+        console.log('Status is completed');
         Response(res, 'Paypal');
         //post to thirdparty service
         var testReq = http.post(options, function(res) {
-
-          var body = res.body;
-
+          console.log('Inside testReq');
+          let body = res.body;
+          console.log('response Body:', body);
           if (res.statusCode === 200) {
                //Inspect IPN validation result and act accordingly
                if (body.substring(0, 8) === 'VERIFIED') {

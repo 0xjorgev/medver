@@ -119,10 +119,7 @@ define(['express'
 
 		if(data.organization_id)
 			orgData.id = data.organization_id
-		else if(data.club_id)
-		{
-			//Obtenemos el id de la organizacion del club si se lo asociamos al team
-		}
+
 		else{
 			orgData = {
 				//TODO: reemplazar el id por un code, en lugar del ID directo de base de datos
@@ -435,7 +432,7 @@ define(['express'
 	})
 
 	//==========================================================================
-	// Create a team request for participation in a category
+	// Get all active teams that are related to the user
 	//==========================================================================
     router.get('/query/by_user', (req, res) => {
         //se verifica unicamente que haya un usuario valido en el request
@@ -454,18 +451,13 @@ define(['express'
         .fetch({withRelated: [
              'entity.related_from.relationship_type'
             ,'entity.related_from.to.entity_type'
-            // ,'entity.related_from.from.entity_type'
         ]})
         .then(result => {
             var user = result.toJSON()
-			// logger.debug(user)
-            //con esto se filtran las relaciones tipo 'coach' y owner
+            //con esto se filtran las relaciones para que solo sean los equipos
             return user.entity.related_from
                 .filter(rel => {
-                    var name = (rel.relationship_type.name == undefined)
-						? ''
-						: rel.relationship_type.name.toUpperCase()
-                    return name == 'COACH' || name == 'OWNER'
+                    return rel.to.object_type == 'teams'
                 })
                 //y con este map se extraen los ids de los teams
                 .map(teams => teams.to.object_id)
@@ -483,7 +475,6 @@ define(['express'
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))
     })
-
 
 	//==========================================================================
 	// Get all the matches of a team

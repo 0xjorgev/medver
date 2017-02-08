@@ -71,6 +71,7 @@ define(['express'
       if (payment_status == "Completed") {
         console.log('Status is completed');
         Response(res, 'Paypal');
+        console.log('After 200');
         //post to thirdparty service
         var testReq = http.request(options, function(res) {
           console.log('Inside testReq');

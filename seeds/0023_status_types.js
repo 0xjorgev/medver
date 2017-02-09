@@ -13,6 +13,7 @@ exports.seed = function(knex, Promise) {
     ,knex('status_types').insert({description: 'Rejected', type:'request', code: 'request-rejected'})
     ,knex('status_types').insert({description: 'Pending', type:'request', code: 'request-pending'})
     ,knex('status_types').insert({description: 'Payment Pending', type:'pre-registration', code: 'pre-registration-payment-pending'})
+    ,knex('status_types').insert({description: 'Paid', type:'pre-registration', code: 'pre-registration-paid'})
   )
 };
 

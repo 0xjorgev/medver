@@ -112,6 +112,7 @@ const routes = {
 	,phase			: 'phase'
 	,group			: 'group'
 	,round			: 'round'
+	,round			: 'round'
 	,team			: 'team'
 	,match			: 'match'
 	,rule			: 'rule'

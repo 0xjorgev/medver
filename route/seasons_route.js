@@ -1,169 +1,164 @@
 /**
- * Created by george on 08/03/16.
- */
+* Created by george on 08/03/16.
+*/
 if (typeof define !== 'function') {
-    var define = require('amdefine')(module);
+	var define = require('amdefine')(module);
 }
 
 define(['express',
-	'../model/index',
-	'../util/request_message_util',
-	'../util/response_message_util',
-	'../util/knex_util'], function (express,
+		'../model/index',
+		'../util/response_message_util',
+		'../util/knex_util',
+		'../util/logger_util'
+	],(
+		express,
 		Models,
-		Message,
 		Response,
-		Knex) {
+		Knex,
+		logger
+	) => {
 
-    var router = express.Router();
+		let router = express.Router()
 
-    router.get('/', function (req, res) {
-        return Models.season
-        .query(function(qb){})
-        .where({active:true})
-        .fetchAll({debug:true, withRelated: ['categories']})
-        .then(function (result) {
-            Response(res, result)
-        }).catch(function(error){
-			Response(res, null, error)
-        });
-    });
+		//TODO: traer todas las temporadas a la vez no tiene mucho sentido. Eliminar
+		router.get('/', (req, res) => {
+			return Models.season
+			.where({active: true})
+			.fetchAll({debug: false, withRelated: ['categories']})
+			.then(function (result) {
+				Response(res, result)
+			})
+			.catch(function(error){
+				Response(res, null, error)
+			});
+		});
 
-    //Seasons by Id -> Returns 1 result
-    router.get('/:season_id', (req, res) => {
-        var season_id = req.params.season_id;
-        return Models.season
-	        .where({id:season_id})
-	        .fetch({withRelated: ['categories', 'categories.gender', 'categories.category_type']})
-	        .then(result => Response(res, result))
+		//Seasons by Id -> Returns 1 result
+		router.get('/:season_id', (req, res) => {
+			var season_id = req.params.season_id;
+			return Models.season
+			.where({id:season_id})
+			.fetch({withRelated: ['categories', 'categories.gender', 'categories.category_type']})
+			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error))
-    });
+		});
 
-    router.post('/', function (req, res) {
+		const processSeasonRequest = (body => {
+			let data = {}
+			if(body.id != undefined) data.id = body.id
+			if(body.name != undefined) data.name = body.name
+			if(body.description != undefined) data.description = body.description
+			if(body.game_title != undefined) data.game_title = body.game_title
+			if(body.active != undefined) data.active = body.active
+			if(body.init_at != undefined) data.init_at = body.init_at
+			if(body.ends_at != undefined) data.ends_at = body.ends_at
+			if(body.competition_id != undefined) data.competition_id = body.competition_id
+			if(body.meta != undefined) data.meta = body.meta
 
-		//TODO: validar permisologias despues de modificar el checkPermissions
-		// var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
-		//
-		// if (chk.code != 0){
-		// 	Response(res, null, chk)
-		// 	return
-		// }
-		//
+			return data
+		})
 
-        //Model Instance
-        var Season = Models.season;
-        var season_post = req.body;
-        var competition_id = season_post.competition_id;
-        var name = season_post.name;
-        var description = season_post.description;
-        var game_title = season_post.game_title;
-        var init_at = season_post.init_at;
-        var ends_at = season_post.ends_at;
+		router.post('/', function (req, res) {
 
-        console.log('req.body: ', req.body);
+			//TODO: validar permisologias despues de modificar el checkPermissions
+			// var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
+			//
+			// if (chk.code != 0){
+			// 	Response(res, null, chk)
+			// 	return
+			// }
+			//
 
-        new Season(season_post)
-		.save()
-		.then(function(new_season){
-            Response(res, new_season)
-        })
-		.catch(function(error){
-			Response(res, null, error)
-        });
-    });
+			//Model Instance
+			var Season = Models.season;
+			logger.debug('req.body')
+			logger.debug(req.body)
 
+			const data = processSeasonRequest(req.body)
 
-    router.put('/:season_id', function(req, res, next){
-        console.log('Season PUT', req.body);
-        //Model Instance
-        var season = new Models.season;
+			new Season(data).save()
+			.then(new_season => {
+				Response(res, new_season)
+			})
+			.catch(error => {
+				Response(res, null, error)
+			})
+		});
 
-        //URL Request, Season Id
-        var season_id = req.params.season_id;
-        var season_upd = req.body;
-        var competition_id = season_upd.competition_id;
-        var name = season_upd.name;
-        var description = season_upd.description;
-        var game_title = season_upd.game_title;
+		router.put('/:season_id', function(req, res, next){
+			logger.debug(req.body)
+			const season = new Models.season;
+			const season_id = req.params.season_id;
+			const data = processSeasonRequest(req.body)
 
-        Knex(season.tableName)
-        .where('id','=',season_id)
-        .where('active','=',1)
-        .update(season_upd, ['id'])
-        .then(function(result){
-            if (result.length != 0){
-            	Response(res, result)
-            } else {
-                Message(res, 'Username or email not found', '404', result);
-            }
-        })
-        .catch(function(err){
-			Response(res, null, err)
-        });
-    });
+			Knex(season.tableName)
+			.where('id','=',season_id)
+			.update(data, ['id'])
+			.then(result => Response(res, result) )
+			.catch(err => Response(res, null, err) )
+		});
 
-    //Add to new schemma
-    //Category Season Methods
-    router.get('/:season_id/category', function (req, res) {
-        var season_id = req.params.season_id;
-        return Models.category
-        .where({season_id:season_id})
-        //.fetchAll({withRelated: ['phases'], debug:true})
-        .fetchAll({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug: false})
-        .then(function (result) {
-            Response(res, result)
-        })
-		.catch(function(error){
-            Response(res, null, error)
-        });
-    });
+		//Add to new schema
+		//Category Season Methods
+		router.get('/:season_id/category', function (req, res) {
+			var season_id = req.params.season_id;
+			return Models.category
+			.where({season_id:season_id})
+			//.fetchAll({withRelated: ['phases'], debug:true})
+			.fetchAll({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug: false})
+			.then(function (result) {
+				Response(res, result)
+			})
+			.catch(function(error){
+				Response(res, null, error)
+			});
+		});
 
+		router.get('/:season_id/category/:cat_id', function (req, res) {
+			var season_id = req.params.season_id;
+			var cat_id = req.params.cat_id;
 
-    router.get('/:season_id/category/:cat_id', function (req, res) {
-        var season_id = req.params.season_id;
-        var cat_id = req.params.cat_id;
+			return Models.category
+			.where({season_id:season_id})
+			.where({id:cat_id})
+			.fetch({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug: false})
+			.then(function (result) {
+				Response(res, result)
+			}).catch(function(error){
+				Response(res, null, error)
+			});
+		});
 
-        return Models.category
-        .where({season_id:season_id})
-        .where({id:cat_id})
-        .fetch({withRelated: ['category', 'season', 'classification','gender', 'phases'], debug: false})
-        .then(function (result) {
-            Response(res, result)
-        }).catch(function(error){
-			Response(res, null, error)
-        });
-    });
+		router.post('/:season_id/category', function (req, res) {
+			var season_id = req.params.season_id;
+			//Model Instance
+			var Category = Models.category;
+			var category_post = req.body;
+			var competition_id = category_post.competition_id;
+			var name = category_post.name;
+			var description = category_post.description;
+			var game_title = category_post.game_title;
+			var init_at = category_post.init_at;
+			var ends_at = category_post.ends_at;
 
-    router.post('/:season_id/category', function (req, res) {
-        var season_id = req.params.season_id;
-        //Model Instance
-        var Category = Models.category;
-        var category_post = req.body;
-        var competition_id = category_post.competition_id;
-        var name = category_post.name;
-        var description = category_post.description;
-        var game_title = category_post.game_title;
-        var init_at = category_post.init_at;
-        var ends_at = category_post.ends_at;
+			console.log('req.body: ', req.body);
 
-        console.log('req.body: ', req.body);
+			new Category_Season({
+				name: name,
+				description:description,
+				game_title:game_title,
+				init_at:init_at,
+				ends_at:ends_at,
+				competition_id: competition_id
+			})
+			.save()
+			.then(function(new_category){
+				Response(res, new_category)
+			})
+			.catch(function(error){
+				Response(res, null, error)
+			});
+		});
 
-        new Category_Season({
-            name: name,
-            description:description,
-            game_title:game_title,
-            init_at:init_at,
-            ends_at:ends_at,
-            competition_id: competition_id
-        })
-		.save()
-		.then(function(new_category){
-            Response(res, new_category)
-        })
-		.catch(function(error){
-			Response(res, null, error)
-        });
-    });
-
-    return router;
-});
+		return router;
+	});

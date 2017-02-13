@@ -58,7 +58,7 @@ define(['express'
     const requestPaypalCompletion = (option, cat_id, team_id) => {
       console.log('Before testReq');
 
-      http.request(option, function(error, response, body) {
+      var reqTest = http.request(option, function(error, response, body) {
 
             response.on('data', function (chunk) {
                 console.log('Response: ' + chunk);
@@ -87,6 +87,8 @@ define(['express'
                  console.log(response);
                }
         })
+
+        reqTest.end();
     }
 
     //=========================================================================

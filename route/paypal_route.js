@@ -25,7 +25,20 @@ define(['express'
 
     let router = express.Router();
 
-    var updateCompetitionCategory = function(cat_id, team_id){
+    const fetchPaymentStatus = (res, status, cat_id, team_id) => {
+
+      return Models.status_type
+      .where({'description':status})
+      .fetch()
+      .then(function(result){
+        updateCompetitionCategory(res, cat_id, team_id, result.id);
+      })
+      .catch(function(err){
+        console.log("Error on status Fetch");
+      });
+    }
+
+    const updateCompetitionCategory = (res, cat_id, team_id, status_id) => {
 
         var pre_reg = new Models.category_group_phase_team;
 
@@ -33,23 +46,19 @@ define(['express'
         .where('category_id','=',cat_id)
         .where('active','=',1)
         .where('team_id','=', team_id)
-        .update({'payment' : true}, ['id'])
+        .update({'payment' : true, 'status_id':status_id}, ['id'])
         .then(function(result){
-          console.log("Success on Paypal Update");
-          // Response(res, result)
+          Response(res, 'Paypal');
         })
         .catch(function(err){
-          console.log("Error on Paypal Update");
-          // Response(res, 'Paypal')
+          Response(res, 'Paypal');
         });
     }
 
-    var requestPaypalCompletion = function(option, cat_id, team_id){
-      console.log('Inside requestPaypalCompletion');
+    const requestPaypalCompletion = (option, cat_id, team_id) => {
       var testReq = http.request(option, function(res) {
 
         console.log('Inside testReq');
-
         res.on('error', function(error) {
           console.error(error);
         });
@@ -63,7 +72,7 @@ define(['express'
 
                    //The IPN is verified
                    console.log('Verified IPN!');
-                   updateCompetitionCategory(cat_id, team_id);
+                   //updateCompetitionCategory(cat_id, team_id);
                  } else if (body.substring(0, 7) === 'INVALID') {
 
                    //The IPN invalid
@@ -91,28 +100,30 @@ define(['express'
       var cat_id = json.category_id;
       var team_id = json.team_id;
       var payment_status = body.payment_status;
-      // var cmd_body = 'cmd=_notify-validate&' + body;
-      // var options = {
-      // 	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
-      //   host: 'https://www.sandbox.paypal.com',
-      //   path: '/cgi-bin/webscr',
-      // 	method: 'POST',
-      // 	headers: {
-      // 		'Connection': 'close'
-      // 	},
-      // 	body: cmd_body,
-      // 	strictSSL: true,
-      // 	rejectUnauthorized: false,
-      // 	requestCert: true,
-      // 	agent: false
-      // };
+      var cmd_body = 'cmd=_notify-validate&' + body;
+      var options = {
+      	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
+        host: 'https://ipnpb.sandbox.paypal.com',
+        path: '/cgi-bin/webscr',
+      	method: 'POST',
+      	headers: {
+      		'Connection': 'close'
+      	},
+      	body: cmd_body,
+      	strictSSL: true,
+      	rejectUnauthorized: false,
+      	requestCert: true,
+      	agent: false
+      };
 
       if (payment_status == "Completed") {
         console.log('Status is completed');
-        updateCompetitionCategory(cat_id, team_id);
-        //requestPaypalCompletion(options, cat_id, team_id)
-        Response(res, 'Paypal');
-        console.log('After 200');
+        //fetchPaymentStatus(res, 'Paid', cat_id, team_id);
+
+        //updateCompetitionCategory(cat_id, team_id);
+        requestPaypalCompletion(options, cat_id, team_id)
+        console.log('Status is completed 2');
+        // console.log('After 200');
         //post to thirdparty service
 
       } else {

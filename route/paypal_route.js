@@ -57,7 +57,7 @@ define(['express'
 
     const requestPaypalCompletion = (option, cat_id, team_id) => {
       console.log('Before testReq');
-      http.request(option, function(res) {
+      var testReq = http.request(option, function(res) {
 
         console.log('Inside testReq');
         res.on('error', function(error) {
@@ -90,6 +90,8 @@ define(['express'
                }
           //})
         })
+
+        testReq.resume()
     }
 
     //=========================================================================

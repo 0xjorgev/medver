@@ -56,7 +56,8 @@ define(['express'
     }
 
     const requestPaypalCompletion = (option, cat_id, team_id) => {
-      var testReq = http.request(option, function(res) {
+      console.log('Before testReq');
+      http.request(option, function(res) {
 
         console.log('Inside testReq');
         res.on('error', function(error) {
@@ -96,10 +97,9 @@ define(['express'
     //=========================================================================
     router.post('/', (req, res) => {
       var body = req.body;
-      console.log("Body Print: ", body);
-       var json = JSON.parse(body.custom);
-      // var cat_id = json.category_id;
-      // var team_id = json.team_id;
+      var json = JSON.parse(body.custom);
+      var cat_id = json.category_id;
+      var team_id = json.team_id;
       var payment_status = body.payment_status;
       var cmd_body = 'cmd=_notify-validate&' + body;
       var options = {

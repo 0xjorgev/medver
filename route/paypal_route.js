@@ -57,9 +57,9 @@ define(['express'
 
     const requestPaypalCompletion = (option, cat_id, team_id) => {
       console.log('Before testReq');
-      var testReq = http.request(option, function(res) {
+      http.request(option, function(error, response, body) {
 
-        console.log('Inside testReq');
+        console.log('Inside testReq: ', error, response, body);
         res.on('error', function(error) {
           console.error(error);
         });
@@ -88,10 +88,7 @@ define(['express'
                  console.log('Unexpected response!');
                  console.log(response);
                }
-          //})
         })
-
-        testReq.resume()
     }
 
     //=========================================================================

@@ -96,6 +96,7 @@ define(['express'
     //=========================================================================
     router.post('/', (req, res) => {
       var body = req.body;
+      console.log("Body Print: ", body);
       var json = JSON.parse(body.custom);
       var cat_id = json.category_id;
       var team_id = json.team_id;

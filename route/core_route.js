@@ -101,5 +101,12 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
+	router.get('/classification_type', (req, res) => {
+		Models.classification
+		.fetchAll()
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
+
 	return router
 })

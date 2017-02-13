@@ -38,7 +38,6 @@ define(['express'
 	router.get('/query/by_user', (req, res) => {
         //se verifica unicamente que haya un usuario valido en el request
         //no se requiere ningun permiso especial
-        console.log('Current User', req._currentUser)
 
         var chk = auth.checkPermissions(req._currentUser, [])
 
@@ -305,27 +304,13 @@ define(['express'
 		var futureMatches
         //no se requiere ningun permiso especial
         //Obtengo la entidad de un club
-        Models.club
-        .query(qb => qb.where({id: clubId}) )
-        .fetch({withRelated: [
-             'entity.related_to.relationship_type'
-            ,'entity.related_to.from.entity_type'
-        ]})
-        .then(club => {
-            var club = club.toJSON()
-			logger.debug(club)
-            //con esto se filtran las relaciones tipo 'MEMBER'
-            return club.entity.related_to
-                .filter(rel => {
-                    var name = (rel.relationship_type.name == undefined)
-						? ''
-						: rel.relationship_type.name.toUpperCase()
-                    return name == 'MEMBER'
-                })
-                //y con este map se extraen los ids de los teams
-                .map(teams => teams.from.object_id)
-        })
-        .then(teamsID => {
+        Models.team
+        .query(qb => qb.where({club_id: clubId}) )
+        .fetchAll()
+        .then(teams => {
+        	var teamsID = teams.toJSON(teams).map(team => {
+    			return team.id
+    		})
 			logger.debug(teamsID)
 			return Models.match
 		        .query(qb => 

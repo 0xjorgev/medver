@@ -657,11 +657,22 @@ paths:
         200:
           description: result
       security: []
+  /core/classification_type:
+    get:
+      summary: Gets the list of category types
+      description: Gets the list of category types
+      tags:
+        - Classification Type
+        - Core
+      responses:
+        200:
+          description: A list of category types
   /category_type:
     get:
       summary: Gets the list of category types
       description: Gets the list of category types
       tags:
+        - Core
         - Category Type
       responses:
         200:

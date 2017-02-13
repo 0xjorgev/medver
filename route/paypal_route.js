@@ -58,16 +58,15 @@ define(['express'
     const requestPaypalCompletion = (option, cat_id, team_id) => {
       console.log('Before testReq');
       http.request(option, function(error, response, body) {
-
         console.log('Inside testReq: ', error, response, body);
-        res.on('error', function(error) {
-          console.error(error);
-        });
+        // res.on('error', function(error) {
+        //   console.error(error);
+        // });
 
         //response.on('data', function(chunk){
-            let body = res.body;
-            console.log('response Body:', body);
-            if (res.statusCode === 200) {
+            // let body2 = res.body;
+            console.log('response Body:', body2);
+            if (response.statusCode === 200) {
                  //Inspect IPN validation result and act accordingly
                  if (body.substring(0, 8) === 'VERIFIED') {
 

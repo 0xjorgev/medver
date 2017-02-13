@@ -97,9 +97,9 @@ define(['express'
     router.post('/', (req, res) => {
       var body = req.body;
       console.log("Body Print: ", body);
-      var json = JSON.parse(body.custom);
-      var cat_id = json.category_id;
-      var team_id = json.team_id;
+       var json = JSON.parse(body.custom);
+      // var cat_id = json.category_id;
+      // var team_id = json.team_id;
       var payment_status = body.payment_status;
       var cmd_body = 'cmd=_notify-validate&' + body;
       var options = {
@@ -124,7 +124,8 @@ define(['express'
         //fetchPaymentStatus(res, 'Paid', cat_id, team_id);
 
         //updateCompetitionCategory(cat_id, team_id);
-        requestPaypalCompletion(options, cat_id, team_id)
+        // requestPaypalCompletion(options, cat_id, team_id)
+        requestPaypalCompletion(options, 1, 1)
         console.log('Status is completed 2');
         // console.log('After 200');
         //post to thirdparty service

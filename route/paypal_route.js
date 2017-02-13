@@ -116,6 +116,8 @@ define(['express'
       	agent: false
       };
 
+      console.log('IPN FROM PAYPAL');
+
       if (payment_status == "Completed") {
         console.log('Status is completed');
         //fetchPaymentStatus(res, 'Paid', cat_id, team_id);

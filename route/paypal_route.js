@@ -10,7 +10,7 @@ define(['express'
 	,'../util/response_message_util'
 	,'../util/generic_util'
 	,'../util/logger_util'
-  ,'http'
+  ,'https'
 	],
 	(express
 	,Models
@@ -20,7 +20,7 @@ define(['express'
 	,Response
 	,utilities
 	,logger
-  ,http
+  ,https
 	) => {
 
     let router = express.Router();
@@ -65,7 +65,7 @@ define(['express'
     const requestPaypalCompletion = (option, cat_id, team_id) => {
 		console.log('Before testReq', option);
 
-		const reqTest = http.request(option, function(res) {
+		const reqTest = https.request(option, function(res) {
 			// console.log('body!', body);
 
 			// if(response){

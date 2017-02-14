@@ -136,7 +136,9 @@ define(['express'
 		    port: 443,
       	method: 'POST',
       	headers: {
-      		'Connection': 'close'
+      		'Connection': 'close',
+          'Content-Type': 'application/json',
+          'Content-Length': cmd_body.length
       	},
       	body: cmd_body,
       	strictSSL: true,

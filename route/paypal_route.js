@@ -114,8 +114,8 @@ define(['express'
 		  console.log(`problem with request: ${e.message}`);
 		});
 
-
-		reqTest.end();
+    return reqTest
+		// reqTest.end();
 	}
 
     //=========================================================================
@@ -153,7 +153,10 @@ define(['express'
         //updateCompetitionCategory(cat_id, team_id);
         // requestPaypalCompletion(options, cat_id, team_id)
 
-		requestPaypalCompletion(options, 1, 1)
+		var reqTest = requestPaypalCompletion(options, 1, 1)
+
+    reqTest.write('no se donde saldra esto pero gue');
+    reqTest.end();
 
 		console.log('Status is completed 2');
 

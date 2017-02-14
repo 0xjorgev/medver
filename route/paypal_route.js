@@ -28,8 +28,8 @@ define(['express'
 	//papotico test
 	router.post('/papotico', (req,res) => {
 		logger.debug('papoticooooooo')
-		// return Response(res, 'uuuu que fino')
-		return Response(res, null,{message: 'uuuu que malo'})
+		return Response(res, 'uuuu que fino')
+		// return Response(res, null,{message: 'uuuu que malo'})
 	})
 
     const fetchPaymentStatus = (res, status, cat_id, team_id) => {
@@ -97,11 +97,6 @@ define(['express'
 			// 		console.log(response);
 			// 	}
 			// }
-			//
-			// if(error){
-			// 	// console.log('uuuu que malo hubo error');
-			// 	logger.debug(error)
-			// }
 
 			console.log(`STATUS: ${res.statusCode}`);
 			console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
@@ -132,19 +127,19 @@ define(['express'
       var cat_id = json.category_id;
       var team_id = json.team_id;
       var payment_status = body.payment_status;
-      var cmd_body = 'cmd=_notify-validate&' + body;
+      var cmd_body = 'cmd=_notify-validate&' + JSON.stringify(body);
       var options = {
       	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
         // host: 'https://ipnpb.sandbox.paypal.com',
         host: 'localhost',
         path: '/api/v1.0/paypal/papotico',
-		port:3000,
+		port: 3000,
       	method: 'POST',
       	headers: {
       		'Connection': 'close'
       	},
-     //  	body: cmd_body,
-      	body: {"test": 1234},
+      	body: cmd_body,
+     //  	body: {"test": 1234},
       	strictSSL: true,
       	rejectUnauthorized: false,
       	requestCert: true,
@@ -165,7 +160,7 @@ define(['express'
 
 		// console.log('After 200');
         //post to thirdparty service
-
+		Response(res, 'Done!');
       } else {
         Response(res, 'Paypal');
       }

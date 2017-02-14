@@ -131,9 +131,9 @@ define(['express'
       var options = {
       	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
         // host: 'https://ipnpb.sandbox.paypal.com',
-        host: 'localhost',
-        path: '/api/v1.0/paypal/papotico',
-		port: 3000,
+        host: 'ipnpb.sandbox.paypal.com',
+        path: '/cgi-bin/webscr',
+		    port: 443,
       	method: 'POST',
       	headers: {
       		'Connection': 'close'

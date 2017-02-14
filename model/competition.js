@@ -22,7 +22,8 @@ define(['./base_model'
 				return entity.save()
 				.then(result => {
 					logger.debug('entity of competition saved')
-					logger.debug(result)
+					// logger.debug(result)
+					logger.debug(this)
 				})
 			}
 		)},

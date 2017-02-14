@@ -241,12 +241,17 @@ define(['express',
 
 	//Create Competition
 	router.post('/', function (req, res) {
+		var chk = auth.checkPermissions(req._currentUser, [])
+		// fallo en el chequeo de auth
+		if (chk.code != 0){
+			Response(res, null, chk)
+			return
+		}
 
-		var Competition = Models.competition;
+		logger.debug('Competition POST')
+		logger.debug(req.body)
 
-		console.log('Req Values:', req.body);
-
-		var competition_post = {
+		const competition_post = {
 			name: req.body.name,
 			discipline_id: req.body.discipline_id,
 			subdiscipline_id: req.body.subdiscipline_id,
@@ -254,14 +259,14 @@ define(['express',
 			description: req.body.description,
 			img_url: req.body.img_url,
 			is_published: req.body.is_published,
-			created_by_id: req.body.created_by_id,
+			created_by_id: req._currentUser.id,
 			meta: req.body.meta
 		}
 
-		var newCompetition = undefined
+		let newCompetition = null
 
 		//por defecto, al momento de la creacion, se coloca al usuario creador como admin
-		new Competition( competition_post )
+		new Models.competition( competition_post )
 		.save()
 		.then((result) => {
 			newCompetition = result
@@ -272,9 +277,9 @@ define(['express',
 			})
 			.save()
 		})
-		.then((result) => Response(res, newCompetition))
-		.catch((error) => Response(res, null, error))
-	});
+		.then(result => Response(res, newCompetition))
+		.catch(error => Response(res, null, error))
+	})
 
 	//Competition Update
 	router.put('/:competition_id/', function(req, res) {
@@ -330,37 +335,16 @@ define(['express',
 		.catch((error) => Response(res, null, error) )
 	});
 
-	//TODO: falta desarrollar
-	router.post('/:comp_id/admin_user/', function(req, res, next){
-		console.log('Create Competitions Admins');
-		var Competition_user = Models.competition_user
-		var comp_user = req.body;
-
-		new Competition_user( comp_user
-		).save().then(function(new_admin_user){
-			console.log(`{new_admin_user:}`, new_admin_user);
-			Message(res, 'Success', '0', new_admin_user);
-		}).catch(function(error){
-			console.log(`{error: ${error}}`);
-			Message(res, error.detail, error.code, null);
-		});
-	});
-
 	router.get('/rcompetition/:competition_id', function (req, res) {
-
 		var comp_id = req.params.competition_id;
 		return Models.competition
 		.where({'id':comp_id})
-		// .fetch( {withRelated: ['discipline.subdisciplines', 'competition_type', 'seasons','seasons.categories.classification', 'seasons.categories.phases', 'seasons.categories.phases.groups','seasons.categories.category_group_phase_team.group.rounds.matches.home_team', 'seasons.categories.category_group_phase_team.group.rounds.matches.visitor_team']} )
-		//Testing new characteristics
 		.fetch( {withRelated: ['discipline.subdisciplines',
 			'competition_user.users',
 			'competition_type',
-			// 'seasons',
 			'seasons.categories.category_type',
 			'seasons.categories.gender',
 			'seasons.categories.classification',
-			// 'seasons.categories.phases',
 			'seasons.categories.phases.groups']} )
 		.then(function (result) {
 			Response(res, result)

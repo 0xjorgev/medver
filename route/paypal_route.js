@@ -10,7 +10,7 @@ define(['express'
 	,'../util/response_message_util'
 	,'../util/generic_util'
 	,'../util/logger_util'
-  ,'http'
+  ,'https'
 	],
 	(express
 	,Models
@@ -20,7 +20,7 @@ define(['express'
 	,Response
 	,utilities
 	,logger
-  ,http
+  ,https
 	) => {
 
     let router = express.Router();
@@ -65,7 +65,7 @@ define(['express'
     const requestPaypalCompletion = (option, cat_id, team_id) => {
 		console.log('Before testReq', option);
 
-		const reqTest = http.request(option, function(res) {
+		const reqTest = https.request(option, function(res) {
 			// console.log('body!', body);
 
 			// if(response){
@@ -114,8 +114,8 @@ define(['express'
 		  console.log(`problem with request: ${e.message}`);
 		});
 
-
-		reqTest.end();
+    return reqTest
+		// reqTest.end();
 	}
 
     //=========================================================================
@@ -131,15 +131,16 @@ define(['express'
       var options = {
       	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
         // host: 'https://ipnpb.sandbox.paypal.com',
-        host: 'localhost',
-        path: '/api/v1.0/paypal/papotico',
-		port: 3000,
+        host: 'ipnpb.sandbox.paypal.com',
+        path: '/cgi-bin/webscr',
+		    port: 443,
       	method: 'POST',
       	headers: {
-      		'Connection': 'close'
+      		'Connection': 'close',
+          'Content-Type': 'application/json',
+          'Content-Length': cmd_body.length
       	},
       	body: cmd_body,
-     //  	body: {"test": 1234},
       	strictSSL: true,
       	rejectUnauthorized: false,
       	requestCert: true,
@@ -154,23 +155,30 @@ define(['express'
         //updateCompetitionCategory(cat_id, team_id);
         // requestPaypalCompletion(options, cat_id, team_id)
 
-		requestPaypalCompletion(options, 1, 1)
+		var reqTest = requestPaypalCompletion(options, 1, 1)
+    .then(result => {
+      console.log('-------------------',result);
+    })
+
+    reqTest.write('no se donde saldra esto pero gue');
+    reqTest.end();
 
 		console.log('Status is completed 2');
 
 		// console.log('After 200');
         //post to thirdparty service
-		Response(res, 'Done!');
-      } else {
-        Response(res, 'Paypal');
-      }
+          Response(res, 'Done!')
+        }
+        else {
+          Response(res, 'Paypal')
+        }
        //console.log("*****************************");
        //console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
        //console.log("*****************************");
        //logger.debug(Object.keys(req));
-       console.log("*****************************");
-       logger.debug(body);
-       console.log("*****************************");
+      //  console.log("*****************************");
+      //  logger.debug(body);
+      //  console.log("*****************************");
 
         //Response(res, 'This was posted on paypal service');
 

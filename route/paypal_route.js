@@ -139,7 +139,6 @@ define(['express'
       		'Connection': 'close'
       	},
       	body: cmd_body,
-     //  	body: {"test": 1234},
       	strictSSL: true,
       	rejectUnauthorized: false,
       	requestCert: true,
@@ -160,7 +159,7 @@ define(['express'
 
 		// console.log('After 200');
         //post to thirdparty service
-		Response(res, 'Done!');
+        Response(res, 'Done!');
       } else {
         Response(res, 'Paypal');
       }
@@ -168,9 +167,9 @@ define(['express'
        //console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
        //console.log("*****************************");
        //logger.debug(Object.keys(req));
-       console.log("*****************************");
-       logger.debug(body);
-       console.log("*****************************");
+      //  console.log("*****************************");
+      //  logger.debug(body);
+      //  console.log("*****************************");
 
         //Response(res, 'This was posted on paypal service');
 

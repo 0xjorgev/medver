@@ -13,6 +13,7 @@ define(['express'
 	,'../util/generic_util'
 	,'../util/logger_util'
 	,'../helpers/feed_item_helper'
+  , 'bookshelf'
 	],
 	(express
 	,Models
@@ -25,14 +26,21 @@ define(['express'
 	,utilities
 	,logger
 	,FeedItemHelper
+  ,bookshelf
 	) => {
 
 	let router = express.Router();
 
 	//matches index
 	router.get('/', (req, res) => {
+
 		return Models.match
 		.query((qb) => {})
+    // .fetchPage({
+    //   pageSize: 5, // Defaults to 10 if not specified
+    //   page: 1, // Defaults to 1 if not specified
+    //   withRelated: ['home_team','visitor_team'] // Passed to Model#fetchAll
+    // })
 		.fetchAll({withRelated: ['home_team', 'visitor_team']} )
 		.then(result => {
 			Response(res, result)

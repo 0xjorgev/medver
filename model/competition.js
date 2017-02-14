@@ -2,19 +2,28 @@
 if (typeof define !== 'function')
 	var define = require('amdefine')(module);
 
-define(['./base_model', './discipline', './subdiscipline', './competition_type', './season'], function (DB) {
-
+define(['./base_model'
+	,'../util/logger_util'
+	,'./discipline'
+	,'./subdiscipline'
+	,'./competition_type'
+	,'./season'
+], (DB, logger)  => {
 	var Competition = DB.Model.extend({
 		tableName: 'competitions',
 		hasTimestamps: true,
 		initialize: function() {
-			this.on('created', match => {
-				const entity =
-				new DB._models.Entity({
+			this.on('created', result => {
+				const entity = new DB._models.Entity({
 					object_type: 'competitions'
 					,object_id: this.id
 				})
-				entity.save()
+
+				return entity.save()
+				.then(result => {
+					logger.debug('entity of competition saved')
+					logger.debug(result)
+				})
 			}
 		)},
 		discipline: function(){

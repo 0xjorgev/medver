@@ -25,6 +25,13 @@ define(['express'
 
     let router = express.Router();
 
+	//papotico test
+	router.post('/papotico', (req,res) => {
+		logger.debug('papoticooooooo')
+		// return Response(res, 'uuuu que fino')
+		return Response(res, null,{message: 'uuuu que malo'})
+	})
+
     const fetchPaymentStatus = (res, status, cat_id, team_id) => {
 
       return Models.status_type
@@ -56,40 +63,65 @@ define(['express'
     }
 
     const requestPaypalCompletion = (option, cat_id, team_id) => {
-      console.log('Before testReq');
+		console.log('Before testReq', option);
 
-      var reqTest = http.request(option, function(error, response, body) {
+		const reqTest = http.request(option, function(res) {
+			// console.log('body!', body);
 
-            response.on('data', function (chunk) {
-                console.log('Response: ' + chunk);
-                console.log('Inside testReq: ', error, response, body);
-            });
+			// if(response){
+			// 	response.on('data', function (chunk) {
+			// 		console.log('Response: ' + chunk);
+			// 		console.log('Inside testReq: ', error, response, body);
+			// 	});
+			//
+			// 	if (response.statusCode === 200) {
+			// 		//Inspect IPN validation result and act accordingly
+			// 		if (body.substring(0, 8) === 'VERIFIED') {
+			//
+			// 			//The IPN is verified
+			// 			console.log('Verified IPN!');
+			// 			//updateCompetitionCategory(cat_id, team_id);
+			// 		} else if (body.substring(0, 7) === 'INVALID') {
+			//
+			// 			//The IPN invalid
+			// 			console.log('Invalid IPN!');
+			// 		} else {
+			// 			//Unexpected response body
+			// 			console.log('Unexpected response body!');
+			// 			console.log(body);
+			// 		}
+			// 	}
+			// 	else{
+			// 		//Unexpected response
+			// 		console.log('Unexpected response!');
+			// 		console.log(response);
+			// 	}
+			// }
+			//
+			// if(error){
+			// 	// console.log('uuuu que malo hubo error');
+			// 	logger.debug(error)
+			// }
 
-            if (response.statusCode === 200) {
-                 //Inspect IPN validation result and act accordingly
-                 if (body.substring(0, 8) === 'VERIFIED') {
+			console.log(`STATUS: ${res.statusCode}`);
+			console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
 
-                   //The IPN is verified
-                   console.log('Verified IPN!');
-                   //updateCompetitionCategory(cat_id, team_id);
-                 } else if (body.substring(0, 7) === 'INVALID') {
+			res.setEncoding('utf8');
+			res.on('data', (chunk) => {
+				console.log(`BODY: ${chunk}`);
+			});
+			res.on('end', () => {
+				console.log('No more data in response.');
+			});
+		})
 
-                   //The IPN invalid
-                   console.log('Invalid IPN!');
-                 } else {
-                   //Unexpected response body
-                   console.log('Unexpected response body!');
-                   console.log(body);
-                 }
-               }else{
-                 //Unexpected response
-                 console.log('Unexpected response!');
-                 console.log(response);
-               }
-        })
+		reqTest.on('error', (e) => {
+		  console.log(`problem with request: ${e.message}`);
+		});
 
-        reqTest.end();
-    }
+
+		reqTest.end();
+	}
 
     //=========================================================================
     // Returns the player list for a given match
@@ -103,13 +135,16 @@ define(['express'
       var cmd_body = 'cmd=_notify-validate&' + body;
       var options = {
       	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
-        host: 'https://ipnpb.sandbox.paypal.com',
-        path: '/cgi-bin/webscr',
+        // host: 'https://ipnpb.sandbox.paypal.com',
+        host: 'localhost',
+        path: '/api/v1.0/paypal/papotico',
+		port:3000,
       	method: 'POST',
       	headers: {
       		'Connection': 'close'
       	},
-      	body: cmd_body,
+     //  	body: cmd_body,
+      	body: {"test": 1234},
       	strictSSL: true,
       	rejectUnauthorized: false,
       	requestCert: true,
@@ -121,12 +156,14 @@ define(['express'
       if (payment_status == "Completed") {
         console.log('Status is completed');
         //fetchPaymentStatus(res, 'Paid', cat_id, team_id);
-
         //updateCompetitionCategory(cat_id, team_id);
         // requestPaypalCompletion(options, cat_id, team_id)
-        requestPaypalCompletion(options, 1, 1)
-        console.log('Status is completed 2');
-        // console.log('After 200');
+
+		requestPaypalCompletion(options, 1, 1)
+
+		console.log('Status is completed 2');
+
+		// console.log('After 200');
         //post to thirdparty service
 
       } else {

@@ -102,14 +102,13 @@ define(['express',
 					,'seasons'
 					,'seasons.categories'
 					,'competition_user.users']
-				,debug: true
-					// esto no funciono, pero debe haber alguna forma de hacerlo funcionar
-					// , columns: ['competition_user.users.username','competition_user.users.email']
+				,debug: false
 			})
 			.then(result => {
 				//se elimina el password de los users
-				result = result.map((comp) => {
-					comp.relations.competition_user.map((user) => {
+				result = result.map(comp => {
+					comp.relations.competition_user
+					.map(user => {
 						delete user.relations.users.attributes.password
 						return user
 					})
@@ -117,7 +116,7 @@ define(['express',
 				})
 				Response(res, result)}
 			)
-			.catch((error) => Response(res, null, error) )
+			.catch(error => Response(res, null, error) )
 	});
 
 	//Competitions Types List -> Array of results [Competition_type]

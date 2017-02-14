@@ -156,6 +156,9 @@ define(['express'
         // requestPaypalCompletion(options, cat_id, team_id)
 
 		var reqTest = requestPaypalCompletion(options, 1, 1)
+    .then(result => {
+      console.log('-------------------',result);
+    })
 
     reqTest.write('no se donde saldra esto pero gue');
     reqTest.end();
@@ -164,10 +167,11 @@ define(['express'
 
 		// console.log('After 200');
         //post to thirdparty service
-        Response(res, 'Done!');
-      } else {
-        Response(res, 'Paypal');
-      }
+          Response(res, 'Done!')
+        }
+        else {
+          Response(res, 'Paypal')
+        }
        //console.log("*****************************");
        //console.log("payPal Response:", body.custom, "cat:", cat_id, "team:", team_id);
        //console.log("*****************************");

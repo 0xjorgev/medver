@@ -68,6 +68,39 @@ define(['express'
 							,role: ent.relationship_type
 						}
 					})
+
+					//TODO: codigo con intento de disminuir la cant de datos enviadon en el token
+					// const roleList = user.related_entities
+					// .reduce((set, ent) => {
+					// 	set.add(ent.relationship_type)
+					// 	return set
+					// }, new Set())
+					//
+					// // logger.debug(roleList)
+					//
+					// const roles2 = user.related_entities
+					// .reduce( (arr, ent) => {
+					// 	let tmp = {}
+					//
+					// 	if(tmp[ent.relationship_type] == undefined){
+					// 		tmp[ent.relationship_type] = []
+					// 		tmp[ent.relationship_type].push({
+					// 			id: ent.id
+					// 			,type: ent.object_type
+					// 		})
+					// 	}
+					// 	else{
+					// 		tmp[ent.relationship_type].push = {
+					// 			id: ent.id
+					// 			,type: ent.object_type
+					// 		}
+					// 	}
+					// 	arr.push(tmp)
+					// 	return arr
+					// }, [])
+					//
+					// logger.debug(roles2)
+
 					delete user.related_entities
 					const claims = {
 						user: userId,
@@ -385,7 +418,10 @@ define(['express'
 			'entity.related_from.to.object',
 			'entity.related_from.relationship_type']})
 		.then(result => {
-			Response(res, Models.user.getEntities(result.toJSON()))
+			let user = result.toJSON()
+			user.roles = result.roles()
+			delete user.entity
+			Response(res, user)
 		})
 		.catch(error => Response(res, null, error))
 	})

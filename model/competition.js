@@ -13,19 +13,37 @@ define(['./base_model'
 		tableName: 'competitions',
 		hasTimestamps: true,
 		initialize: function() {
-			this.on('created', result => {
+			this.on('created', savedObject => {
+
 				const entity = new DB._models.Entity({
 					object_type: 'competitions'
 					,object_id: this.id
 				})
 
+				const savedCompetition = this
 				return entity.save()
-				.then(result => {
-					logger.debug('entity of competition saved')
-					// logger.debug(result)
-					logger.debug(this)
+				.then(competitionEntity => {
+					//se busca la entidad del usuario creador de la comp
+					return DB._models.User
+					.where({id: savedCompetition.attributes.created_by_id})
+					.fetch({withRelated: ['entity'], debug: true})
+					.then(competitionOwner => {
+						//se salva la relacion OWNER entre el user y la comp
+						return DB._models.Entity_relationship.forge({
+							ent_ref_from_id: competitionOwner.relations.entity.id
+							,ent_ref_to_id: competitionEntity.id
+							,relationship_type_id: 1
+							,comment: 'OWNER'
+						})
+						.save()
+					})
 				})
 			}
+
+			// this.on('updated', savedObject => {
+			//
+			// })
+			
 		)},
 		discipline: function(){
 			return this.belongsTo('Discipline', 'discipline_id');

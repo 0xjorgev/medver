@@ -325,6 +325,10 @@ paths:
       produces:
       - application/json
       parameters:
+      - name: Authorization-Token
+        in: header
+        type: string
+        required: true
       - name: Body
         in: body
         required: true

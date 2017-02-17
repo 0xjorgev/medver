@@ -52,6 +52,29 @@ define(['./base_model'
 			delete u.entity
 			return u
 		}
+		//esta funcion
+		,roles: function(){
+			const user = this.toJSON()
+			let roles = []
+
+			if(user.entity
+				&& user.entity.related_from
+				&& user.entity.related_from.length > 0){
+
+				roles = user.entity.related_from
+				.map(r => {
+					let stuff = {}
+					stuff.id = r.id
+					stuff.role = r.relationship_type.name
+					stuff.object_type = r.to.object_type
+					return stuff
+				})
+			}
+
+			return roles
+
+		}
+
 	});
 
 	//obtiene las entidades asociadas a este usuario

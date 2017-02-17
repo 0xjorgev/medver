@@ -39,11 +39,6 @@ define(['./base_model'
 					})
 				})
 			}
-
-			// this.on('updated', savedObject => {
-			//
-			// })
-			
 		)},
 		discipline: function(){
 			return this.belongsTo('Discipline', 'discipline_id');

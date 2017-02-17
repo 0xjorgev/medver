@@ -41,7 +41,7 @@ define(['express'
 
 		logger.debug(user_login)
 
-		return Models.user.query((qb) => {
+		return Models.user.query(qb => {
 			qb.where('username', username)
 			qb.orWhere('email', username)
 		})
@@ -50,61 +50,18 @@ define(['express'
 			,'entity.related_from.to.entity_type'
 			,'entity.related_from.to.object'
 		]})
-		.then(result => {
+		.then(foundUser => {
+			if (foundUser !== null
+				&& foundUser.attributes.password == password
+				&& foundUser.attributes.active == true){
+					const userId = foundUser.id
 
-			if (result !== null
-				&& result.attributes.password == password
-				&& result.attributes.active == true){
-					const userId = result.id
+					let user = foundUser.toJSON()
+					user.roles = foundUser.roles()
+					delete user.entity
 
-					//este metodo carga las relaciones del user con otras entidades
-					let user = Models.user.getEntities(result.toJSON())
-
-					const roles = user.related_entities.map(ent => {
-						return {
-							type: ent.object_type
-							,id: ent.id
-							,entity_id: ent.entity_id
-							,role: ent.relationship_type
-						}
-					})
-
-					//TODO: codigo con intento de disminuir la cant de datos enviadon en el token
-					// const roleList = user.related_entities
-					// .reduce((set, ent) => {
-					// 	set.add(ent.relationship_type)
-					// 	return set
-					// }, new Set())
-					//
-					// // logger.debug(roleList)
-					//
-					// const roles2 = user.related_entities
-					// .reduce( (arr, ent) => {
-					// 	let tmp = {}
-					//
-					// 	if(tmp[ent.relationship_type] == undefined){
-					// 		tmp[ent.relationship_type] = []
-					// 		tmp[ent.relationship_type].push({
-					// 			id: ent.id
-					// 			,type: ent.object_type
-					// 		})
-					// 	}
-					// 	else{
-					// 		tmp[ent.relationship_type].push = {
-					// 			id: ent.id
-					// 			,type: ent.object_type
-					// 		}
-					// 	}
-					// 	arr.push(tmp)
-					// 	return arr
-					// }, [])
-					//
-					// logger.debug(roles2)
-
-					delete user.related_entities
 					const claims = {
 						user: userId,
-						roles: roles,
 						lang: 'en',
 					}
 
@@ -114,9 +71,6 @@ define(['express'
 					//TODO: does not expire, for now
 					jwt.setExpiration()
 					user['Authorization-Token'] = jwt.compact()
-
-					//TODO: reemplazar por una busqueda de roles adecuada
-					user.roles = roles
 
 					Response(res, user)
 				}
@@ -426,5 +380,5 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
-    return router;
+	return router;
 });

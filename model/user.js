@@ -4,8 +4,12 @@ if (typeof define !== 'function')
 define(['./base_model'
 	,'../util/logger_util'
 	,'./entity'
+	,'lodash'
 	,'./organization'],
-	(DB, logger, Entity) => {
+	(DB
+	,logger
+	,Entity
+	,_ ) => {
 		var User = DB.Model.extend({
 		initialize: function(){
 			this.on('created', attrs => {
@@ -52,29 +56,45 @@ define(['./base_model'
 			delete u.entity
 			return u
 		}
-		//esta funcion
 		,roles: function(){
 			const user = this.toJSON()
-			let roles = []
-
 			if(user.entity
 				&& user.entity.related_from
 				&& user.entity.related_from.length > 0){
 
-				roles = user.entity.related_from
+				//BEGIN OF ROLE PROCESSING FROM HELL
+				//se obtienen todas las relaciones que tiene el user con otras
+				//entidades
+				const roles = user.entity.related_from
 				.map(r => {
 					let stuff = {}
 					stuff.id = r.id
-					stuff.role = r.relationship_type.name
-					stuff.object_type = r.to.object_type
+					stuff.role = r.relationship_type.name.toLowerCase()
+					stuff.type = r.to.object_type
 					return stuff
 				})
+
+				//se agrupan las relaciones por 'Rol', es decir, el tipo de relacion
+				let _roles = _(roles).groupBy('role').value()
+
+				//ahora se agrupan x tipo de entidad
+				Object.keys(_roles).forEach(role => {
+					let tmp = _(_roles[role]).groupBy('type').value()
+
+					//se extraen los ids de cada una de las entidades
+					Object.keys(tmp).map(type => {
+						tmp[type] = tmp[type].map(elem => elem.id )
+					})
+					_roles[role] = tmp
+				})
+
+				//profit!
+				return _roles
 			}
-
-			return roles
-
+			else {
+				return []
+			}
 		}
-
 	});
 
 	//obtiene las entidades asociadas a este usuario

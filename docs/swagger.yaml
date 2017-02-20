@@ -423,6 +423,16 @@ paths:
       tags:
         - Competition
       parameters:
+      - name: Authorization-Token
+        in: header
+        type: string
+        required: true
+      - name: competition_id
+        in: path
+        description: Competition ID
+        required: true
+        type: integer
+        format: integer
       - name: Body
         in: body
         required: true

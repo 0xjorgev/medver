@@ -62,15 +62,18 @@ define(['express',
 
 	//List of competitions
 	router.get('/', function (req, res) {
-
 		//req._currentUser is the user recovered from token
 		//to get competitions the user should have these permissions
-		var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
-		//fallo en el chequeo de auth
-		// if (chk.code != 0){
-		// 	Response(res, null, chk)
-		// 	return
-		// }
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'competitions'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
 		return Models.competition
 			.query(function(qb){
@@ -241,17 +244,22 @@ define(['express',
 
 	//Create Competition
 	router.post('/', function (req, res) {
-		var chk = auth.checkPermissions(req._currentUser, [])
-		// fallo en el chequeo de auth
-		if (chk.code != 0){
-			Response(res, null, chk)
+
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'competitions'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
 			return
 		}
 
 		logger.debug('Competition POST')
 		logger.debug(req.body)
 
-		const competition_post = {
+		const competitionPost = {
 			name: req.body.name,
 			discipline_id: req.body.discipline_id,
 			subdiscipline_id: req.body.subdiscipline_id,
@@ -264,16 +272,14 @@ define(['express',
 		}
 
 		let newCompetition = null
-
 		//por defecto, al momento de la creacion, se coloca al usuario creador como admin
-		new Models.competition( competition_post )
+		Models.competition.forge(competitionPost)
 		.save()
-		.then((result) => {
+		.then(result => {
 			newCompetition = result
-
 			return new Models.competition_user({
 				competition_id: newCompetition.attributes.id,
-				user_id: competition_post.created_by_id
+				user_id: competitionPost.created_by_id
 			})
 			.save()
 		})
@@ -282,14 +288,27 @@ define(['express',
 	})
 
 	//Competition Update
-	router.put('/:competition_id/', function(req, res) {
+	router.put('/:competition_id/', (req, res) => {
+		const competition = Models.competition
+		const competition_id = req.params.competition_id
+		const upd_published = false
+		const compData = req.body
 
-		var competition = Models.competition
-		var competition_id = req.params.competition_id
-		var upd_published = false
+		logger.debug('Request body')
+		logger.debug(compData)
+		logger.debug(competition_id)
 
-		var compData = req.body
-		console.log('Request body', compData)
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'competitions'
+			,object_id: req.params.competition_id
+			,permissions: ['owner', 'admin']
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
 		var competition_upd = {
 			name: req.body.name,
@@ -302,7 +321,7 @@ define(['express',
 			meta: req.body.meta
 		}
 
-		var thisCompetition = undefined
+		var thisCompetition = null
 
 		// Obtengo los datos de la competition antes de actualizar
 		Models.competition

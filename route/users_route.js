@@ -61,8 +61,9 @@ define(['express'
 					delete user.entity
 
 					const claims = {
-						user: userId,
-						lang: 'en',
+						user: userId
+						,roles: user.roles
+						,lang: 'en'
 					}
 
 					const signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
@@ -268,12 +269,15 @@ define(['express'
     })
 
 	router.get('/:user_id/feed', (req, res) => {
-		//se verifica unicamente que haya un usuario válido en el request
-		//no se requiere ningun permiso especial
-		const chk = auth.checkPermissions(req._currentUser, [])
 
-		if(chk.code !== 0){
-			Response(res, null, chk)
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: ''
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
 			return
 		}
 

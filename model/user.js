@@ -65,17 +65,16 @@ define(['./base_model'
 				//BEGIN OF ROLE PROCESSING FROM HELL
 				//se obtienen todas las relaciones que tiene el user con otras
 				//entidades
-				const roles = user.entity.related_from
+				const _roles = _(user.entity.related_from)
 				.map(r => {
 					let stuff = {}
-					stuff.id = r.id
+					stuff.id = r.to.object_id
 					stuff.role = r.relationship_type.name.toLowerCase()
 					stuff.type = r.to.object_type
 					return stuff
 				})
-
 				//se agrupan las relaciones por 'Rol', es decir, el tipo de relacion
-				let _roles = _(roles).groupBy('role').value()
+				.groupBy('role').value()
 
 				//ahora se agrupan x tipo de entidad
 				Object.keys(_roles).forEach(role => {

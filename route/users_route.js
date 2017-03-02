@@ -309,7 +309,7 @@ define(['express'
 					//filtrar solamente por tipo 3 -> feed item
 					qb.where('relationship_type_id', 3)
 				})
-				.fetchAll({withRelated: ['from.object'], debug: false})
+				.fetchAll({withRelated: ['from.object']})
 				.then(rel => {
 					//proceso el resultado, para retornar solamente los feeds
 					return rel.toJSON().map(r => r.from.object.id)

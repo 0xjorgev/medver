@@ -2,17 +2,17 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['express',
-		'util',
-		'../model/index',
-		'../util/request_message_util',
-		'../util/response_message_util',
-		'../util/knex_util',
-		'../util/email_sender_util',
-		'../helpers/auth_helper',
-		'../node_modules/lodash/lodash.min',
-		'../util/logger_util'],
-		function (express
+define(['express'
+		,'util'
+		,'../model/index'
+		,'../util/request_message_util'
+		,'../util/response_message_util'
+		,'../util/knex_util'
+		,'../util/email_sender_util'
+		,'../helpers/auth_helper'
+		,'../node_modules/lodash/lodash.min'
+		,'../util/logger_util']
+		,(express
 			,util
 			,Models
 			,Message
@@ -21,9 +21,9 @@ define(['express',
 			,Email
 			,auth
 			,lodash
-		 	,logger) {
+		 	,logger) => {
 
-	var router = express.Router();
+	let router = express.Router()
 	var send_email_from = Email(process.env.SENDER_EMAIL);
 
 	router.get('/:comp_id/admin_user/', function(req, res, next){
@@ -244,6 +244,7 @@ define(['express',
 
 	//Create Competition
 	router.post('/', function (req, res) {
+		logger.debug(req.body)
 
 		const permissionCheck = auth.checkPermissions({
 			user: req._currentUser
@@ -255,9 +256,6 @@ define(['express',
 			Response(res, null, permissionCheck)
 			return
 		}
-
-		logger.debug('Competition POST')
-		logger.debug(req.body)
 
 		const competitionPost = {
 			name: req.body.name,

@@ -2,13 +2,12 @@ if (typeof define !== 'function')
 var define = require('amdefine')(module)
 
 define(['util', 'lme'], function (util, lme) {
-	var inspect = util.inspect
-	const _log = obj => {
-		return inspect(obj, {colors: true, depth: Infinity })
-	}
 
-	let logger = {}
-	logger.lme = lme
+    const _log = obj => util.inspect(obj, {colors: true, depth: Infinity })
+
+	let logger = {
+		lme: lme //expongo la libreria completa, just in case
+	}
 	const LOG_LEVEL_DEBUG = 0
 	const LOG_LEVEL_INFO = 100
 	const LOG_LEVEL_ERROR = 500

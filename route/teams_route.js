@@ -113,29 +113,14 @@ define(['express'
 	// CRUD functions
 	//==========================================================================
 	var saveTeam = function(data, res){
-		console.log('SAVE TEAM')
-
-		var orgData = {}
-
-		if(data.organization_id)
-			orgData.id = data.organization_id
-
-		else{
-			orgData = {
-				//TODO: reemplazar el id por un code, en lugar del ID directo de base de datos
-				//organizacion tipo club
-				organization_type_id: 3
-				,name: data.name + ' Club'
-				,description: data.description
-			}
-		}
 
 		var teamData = {}
+		var clubData = {}
+
 		if (data.name != undefined) teamData.name = data.name.trim()
 		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
 		if (data.portrait_url != undefined) teamData.portrait_url = data.portrait_url
 		if (data.category_type_id != undefined) teamData.category_type_id = data.category_type_id
-		if (data.organization_id != undefined) teamData.organization_id = data.organization_id
 		if (data.subdiscipline_id != undefined) teamData.subdiscipline_id = data.subdiscipline_id
 		if (data.gender_id != undefined) teamData.gender_id = data.gender_id
 		if (data.meta != undefined) teamData.meta = data.meta
@@ -144,110 +129,41 @@ define(['express'
 		if (data.club_id != undefined) teamData.club_id = data.club_id
 		if (data.id != undefined) teamData.id = data.id
 
-		var _team = null
 
-		//para asociar las entidades
-		var teamEntity = null
-		var userEntity = null
-		var clubEntity = null
-
-		//let's lookup the organization by id or by the previously-trimmed name
-		Models.organization.query(qb => {
-			qb.where({id: teamData.organization_id})
-			qb.orWhere({name: orgData.name})
+		//let's lookup for the club by id 
+		return Models.club.query(qb => {
+			qb.where({id: teamData.club_id})
 		})
 		.fetch()
 		.then(found => {
-			//if found, let's put its id on teamData
+			//if found, let's put its id on clubData
 			if(found){
-				teamData.organization_id = found.attributes.id
-				return teamData
+				return found
 			}
-			else{
-				return new Models
-					.organization(orgData)
-					.save()
-					.then(result => {
-						teamData.organization_id = result.attributes.id
-						return teamData
-					})
+			else
+			{
+				//Seteamos el club en base al los datos del equipo y lo salvamos
+				clubData.name = teamData.name
+				clubData.short_name = teamData.short_name
+				clubData.description = ''
+				clubData.logo_url = teamData.logo_url
+				clubData.portrait_url = teamData.portrait_url
+				clubData._currentUser = data._currentUser
+				return Models.club.saveClub(clubData)
 			}
 		})
-		//se salva el team
-		.then(teamData => new Models.team(teamData).save())
-		.then(result => {
-			_team = result
-			//se obtienen las entidades del team y del user en un solo query
-			return Models.entity
-			.query(qb => {
-				qb.where({object_id: _team.attributes.id,
-					object_type: 'teams' })
-				qb.orWhere({object_id: data._currentUser.id})
-				qb.where({object_type: 'users'})
-			})
-			.fetchAll()
+		.then(club => {
+			logger.debug(club)
+			clubData.id  = club.attributes.id
+			teamData.club_id = clubData.id
+			teamData._currentUser = data._currentUser
+			return Models.team.saveTeam(teamData)
 		})
 		.then(result => {
-			var tmp = result.toJSON()
-
-			teamEntity = tmp.filter(e => e.object_type == 'teams')
-			userEntity = tmp.filter(e => e.object_type == 'users')
-
-			// logger.debug(teamEntity)
-
-			//la entidad usuario *debe* estar creada para este punto,
-			//o bien no sería usuario válido
-			//si no se obtiene una entidad para el equipo, se crea
-			if(teamEntity.length == 0){
-				//si no se encuentra una entidad asociada al equipo, se crea una nueva
-				return new Models.entity({
-						object_id: _team.attributes.id
-						,object_type: 'teams'})
-						.save()
-			}
-			return result
+			logger.debug('Response Save Team')
+			logger.debug(result)
+			Response(res, result)
 		})
-		.then(result => {
-
-			if (data.id) {
-				// los siguientes bloques de promises solo aplican cuando se está
-				// creando el team.
-				// en caso de actualización, simplemente se retorna
-				// el resultado del update y se termina el servicio
-				//TODO: los bloques anteriores no son necesarios cuando se hace update. fix!
-				return result
-			}
-			else{
-				// En caso de que la entidad team se haya creado en el promise anterior
-				// se asigna a teamEntity
-				if(teamEntity == null || teamEntity.length == 0)
-					teamEntity = result.toJSON()
-
-				// En caso de que sea una operación POST
-				// se asocia el usuario que se está creando
-				// con el team como owner del mismo
-				// console.log('Se hace la creacion de la realacion de la entidad con el usuario: ', userEntity[0].id)
-				return new Models.entity_relationship({
-					ent_ref_from_id: userEntity[0].id
-					,ent_ref_to_id: teamEntity.id
-					,relationship_type_id: 1
-					,comment: 'OWNER'
-				}).save()
-			}
-		})
-		.then(result => {
-			//return the complete information of the team
-			return Models.team
-			.where({id:_team.id, active:true})
-			.fetch({withRelated: ['category_type'
-				,'organization'
-				,'player_team.player'
-				,'subdiscipline'
-				,'gender'
-				,'entity'
-				,'player_team.position']})
-		})
-		.then(result =>{Response(res, result)})
 		.catch(error => Response(res, null, error))
 	}
 

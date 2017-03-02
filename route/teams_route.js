@@ -159,11 +159,7 @@ define(['express'
 			teamData._currentUser = data._currentUser
 			return Models.team.saveTeam(teamData)
 		})
-		.then(result => {
-			logger.debug('Response Save Team')
-			logger.debug(result)
-			Response(res, result)
-		})
+		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	}
 

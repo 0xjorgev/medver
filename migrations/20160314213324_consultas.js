@@ -11,6 +11,7 @@ exports.up = function(knex, Promise) {
 			table.integer('tipo_consulta_id').references('tipo_consultas.id').index();
 			table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
+
 		})
 	]);
 };

@@ -67,15 +67,16 @@ define(['express',
 		//URL Request, Season Id
 		const groupId = req.params.group_id;
 		const groupUpd = buildGroupData(req.body)
+		let updateResult = null
 
 		Knex('groups')
 		.where({ id: groupId, active: true })
 		.update(groupUpd, ['id'])
 		.then(result => {
-			logger.debug(result)
+			updateResult = result
 			return updatePhase(groupUpd)
 		})
-		.then(result => Response(res, result) )
+		.then(result => Response(res, updateResult) )
 		.catch(error => Response(res, null, error) )
 	});
 
@@ -110,6 +111,7 @@ define(['express',
 		if(data.phase_id != undefined) obj.phase_id = data.phase_id
 		if(data.classified_team != undefined) obj.classified_team = data.classified_team
 		if(data.participant_team != undefined) obj.participant_team = data.participant_team
+		if(data.active != undefined) obj.active = data.active
 		logger.debug(data)
 		return obj
 	}

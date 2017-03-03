@@ -12,8 +12,8 @@ define(['./base_model','./category', './group', './category_group_phase_team'], 
 		}
 		,validations: {
 			name: ['required']
-			,classified_team: ['required', 'numeric','greaterThan:0']
-			,participant_team: ['required', 'numeric','greaterThan:0']
+			// ,classified_team: ['required', 'numeric','greaterThan:0']
+			// ,participant_team: ['required', 'numeric','greaterThan:0']
 			,position: ['required', 'numeric','greaterThan:0']
 		}
 		,validate: function(model, attrs, options) {

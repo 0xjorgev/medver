@@ -139,14 +139,16 @@ define(['express',
 	})
 
 	router.put('/:phase_id', function (req, res) {
-		logger.debug(req.body)
-
-		let preData = Object.create({}, req.body)
+		// logger.debug(req.body)
+		let preData = Object.create(req.body,{})
 		preData.id = req.params.phase_id
+
 		const data = buildData(preData)
 
+		logger.debug(data)
+
 		Knex('phases')
-		.where('id','=',phase_id)
+		.where('id','=',preData.id)
 		.update(data, ['id'])
 		.then(result => {
 			Response(res, result)

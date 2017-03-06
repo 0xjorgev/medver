@@ -102,10 +102,11 @@ define(['express'
 					'discipline'
 					,'subdiscipline'
 					,'competition_type'
-					,'seasons'
-					,'seasons.categories'
+					,'seasons.categories.category_type'
+					,'seasons.categories.gender'
+					,'seasons.categories.classification'
+					// ,'seasons.categories.phases.groups'
 					,'competition_user.users']
-				,debug: false
 			})
 			.then(result => {
 				//se elimina el password de los users

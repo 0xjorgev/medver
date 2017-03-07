@@ -64,9 +64,11 @@ define(['./base_model'
             //para asociar las entidades
             var teamEntity = null
             var userEntity = null
+			let savedTeam = null
 
             return new DB._models.Team(teamData).save()
             .then(result => {
+				savedTeam = result
                 teamData.id = result.attributes.id
                 //se obtienen las entidades del team y del user en un solo query
                 return DB._models.Entity
@@ -88,7 +90,7 @@ define(['./base_model'
                 if(teamEntity.length == 0){
                     //si no se encuentra una entidad asociada al equipo, se crea una nueva
                     return new DB._models.Entity({
-                            object_id: _team.id
+                            object_id: savedTeam.id
                             ,object_type: 'teams'})
                             .save()
                 }

@@ -3,7 +3,7 @@ if (typeof define !== 'function')
 
 define(['util', 'lme'], function (util, lme) {
     var inspect = util.inspect
-    var _log = obj => console.log(inspect(obj, {colors: true, depth: Infinity }))
+    var _log = obj => inspect(obj, {colors: true, depth: Infinity })
 
     var logger = {}
     var LOG_LEVEL_DEBUG = 0

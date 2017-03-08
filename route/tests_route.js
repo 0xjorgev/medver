@@ -13,7 +13,8 @@ define(['express'
 	,'../util/knex_util'
   ,'../util/response_message_util'
   ,'../util/object_map_util'
-], function (express, Models, Message, Knex, Response, ReplaceHelper) {
+  ,'../util/email_sender_util'
+], function (express, Models, Message, Knex, Response, ReplaceHelper, Email) {
 
     var router = express.Router();
 
@@ -366,7 +367,7 @@ define(['express'
 
   const send_status_email = function(data){
 
-    console.log("Status Email ", data.template)
+    // console.log("Status Email ", data.template)
     var tag = {
       COACH_KEY: `${data.user.attributes.username}`
       ,TEAM_KEY: `${data.team.attributes.name}`
@@ -378,7 +379,8 @@ define(['express'
     var template = template_string_replace(data.template
         ,tag ,process.env.SENDER_EMAIL
         ,'Información de registro para Torneos'
-        ,'jorgevmendoza@gmail.com' ,'jorgevmendoza@gmail.com')
+        ,'jorgevmendoza@gmail.com')
+        //,data.user.attributes.email,'jorgevmendoza@gmail.com')
 }
 
 //==========================================================================
@@ -389,11 +391,8 @@ define(['express'
   var fs = require('fs');
     fs.readFile(file, 'utf8', function(err, contents) {
       contents = ReplaceHelper(tag, contents)
-      console.log("contents: ", contents)
-        // contents = contents.replace(tag[0], tag[1])
-        // contents = contents.replace(tag[2], tag[3])
-        // var email = Email(sender)
-        // email(to, subject, contents)
+      var send = Email(process.env.SENDER_EMAIL)
+      send(to, subject, contents)
     });
   }
 

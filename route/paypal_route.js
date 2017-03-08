@@ -135,25 +135,25 @@ define(['express'
       var cat_id = json.category_id;
       var team_id = json.team_id;
       var payment_status = body.payment_status;
-      var cmd_body = 'cmd=_notify-validate&' + JSON.stringify(body);
-      var options = {
-      	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
-        // host: 'https://ipnpb.sandbox.paypal.com',
-        host: 'ipnpb.sandbox.paypal.com',
-        path: '/cgi-bin/webscr',
-		    port: 443,
-      	method: 'POST',
-      	headers: {
-      		'Connection': 'close',
-          'Content-Type': 'application/json',
-          'Content-Length': cmd_body.length
-      	},
-      	body: cmd_body,
-      	strictSSL: true,
-      	rejectUnauthorized: false,
-      	requestCert: true,
-      	agent: false
-      };
+      // var cmd_body = 'cmd=_notify-validate&' + JSON.stringify(body);
+      // var options = {
+      // 	//url: 'https://www.sandbox.paypal.com/cgi-bin/webscr',
+      //   // host: 'https://ipnpb.sandbox.paypal.com',
+      //   host: 'ipnpb.sandbox.paypal.com',
+      //   path: '/cgi-bin/webscr',
+		  //   port: 443,
+      // 	method: 'POST',
+      // 	headers: {
+      // 		'Connection': 'close',
+      //     'Content-Type': 'application/json',
+      //     'Content-Length': cmd_body.length
+      // 	},
+      // 	body: cmd_body,
+      // 	strictSSL: true,
+      // 	rejectUnauthorized: false,
+      // 	requestCert: true,
+      // 	agent: false
+      // };
 
       console.log('IPN FROM PAYPAL');
 
@@ -161,18 +161,18 @@ define(['express'
         console.log('Status is completed');
 
         fetchPaymentStatus(res, 'Paid', cat_id, team_id);
-        //updateCompetitionCategory(cat_id, team_id);
+        updateCompetitionCategory(cat_id, team_id);
         //requestPaypalCompletion(options, cat_id, team_id)
 
-		var reqTest = requestPaypalCompletion(options, 1, 1)
-    .then(result => {
-      console.log('-------------------',result);
-    })
-
-    reqTest.write('no se donde saldra esto pero gue');
-    reqTest.end();
-
-		console.log('Status is completed 2');
+		// var reqTest = requestPaypalCompletion(options, 1, 1)
+    // .then(result => {
+    //
+    // })
+    //
+    // reqTest.write('no se donde saldra esto pero gue');
+    // reqTest.end();
+    //
+		// console.log('Status is completed 2');
 
 		// console.log('After 200');
         //post to thirdparty service

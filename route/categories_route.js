@@ -13,6 +13,7 @@ define(['express'
 		,'../util/email_sender_util'
 		,'../util/logger_util'
 		,'js-combinatorics'
+		,'../util/object_map_util'
 		],
 	function (express
 		,Models
@@ -25,6 +26,7 @@ define(['express'
 		,Email
 		,logger
 		,Combinatorics
+		,ReplaceHelper
 	){
 
 	var router = express.Router();
@@ -513,6 +515,24 @@ define(['express'
 			spiderData.id = data.id
 		}
 
+		//WIP Jorge
+		//Send email over status changes
+		var status = previous_registration_status(data)
+
+		// //Compare status (previous status) vs data.status
+		// if (status.id != data.status_id) {
+		//
+		// 	var emailTemplate = email_status_template(status.id)
+		// 	var team_owner = team_owner_email(spiderData.team_id)
+		//
+		//
+		// 	//Send Email ----> Send Email`
+		//
+		//
+		//
+		// }
+
+
 		return new Models.category_group_phase_team(spiderData).save()
 		.then(function(new_invitation){
 
@@ -521,6 +541,7 @@ define(['express'
 			if(data.id == undefined){
 				email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
 			}
+
 			Response(res, invitation);
 		})
 		.catch(function(error){
@@ -528,6 +549,173 @@ define(['express'
 		});
 	}
 
+	//==========================================================================
+	// Get previous team - competition - registration status
+	//==========================================================================
+	//
+	const previous_registration_status = (data) => {
+		return Models.category_group_phase_team
+			.where({
+				team_id: data.team_id
+				,category_id: data.category_id
+			})
+			.fetch({withRelated:['status_type']})
+			.then(function(result){
+				//return result
+				if (result.attributes.status_id != data.status_id) {
+					var email_template = email_status_template(result.attributes.id)
+					var owner_email = team_owner_email(email_template, data)
+					//TODO
+					//Send Email ----> Send Email
+				}
+			})
+			.catch(function(err){
+				return null
+			})
+	}
+
+	//==========================================================================
+	// Get previous status send Email by Status
+	//==========================================================================
+	const email_status_template = (status) => {
+
+		switch (status.status_id.code) {
+			case "pre-registration-in-progress": return './template/email/alianza_status_accepted.html'
+			case "pre-registration-approved": return './template/email/alianza_status_accepted.html';
+			case "pre-registration-rejected": return './template/email/alianza_status_accepted.html';
+			case "pre-registration-paid": return './template/email/alianza_status_accepted.html';
+			default: return './template/email/alianza_status_accepted.html';
+		}
+	}
+
+	//==========================================================================
+	// Get previous status send Email by Status
+	//==========================================================================
+
+	const send_status_email = function(object){
+
+		var tag = {
+			COACH_KEY: `${object.user.firstname} ${object.user.lastname}`
+		}
+
+		TEAM_KEY
+		TORNEO_KEY
+		CATEGORIA_KEY
+		CIUDAD_KEY
+		// var tag = ['{{CLIENT}}'
+		// 					,quote_m.client.attributes.firstname
+		// 					,'{{LINK}}'
+		// 					,path+Gen(quote_m.quote_id) ]
+
+		var template = template_string_replace(status_info.template
+				,tag ,process.env.SENDER_EMAIL
+				,'Your Taxcare quote is waiting for you'
+				,quote_m.client.attributes.email ,quote_m.agent.attributes.email)
+}
+
+//==========================================================================
+// Get previous status send Email by Status
+//==========================================================================
+
+	const template_string_replace = function(file, tag, sender, subject, to){
+	var fs = require('fs');
+		fs.readFile(file, 'utf8', function(err, contents) {
+			contents = ReplaceHelper(tag, contents)
+			console.log("contents: ", contents)
+				// contents = contents.replace(tag[0], tag[1])
+				// contents = contents.replace(tag[2], tag[3])
+				// var email = Email(sender)
+				// email(to, subject, contents)
+		});
+	}
+
+	//==========================================================================
+	//Find current owner (User) based on team_id
+	//==========================================================================
+	const team_owner_email = (email_template, data) => {
+		//Buscar Id entidad Team_id
+		//entity_relationship -> to (id_entidad_equipo) -> relationship_Type 1 (Owner)
+			return Models.entity
+				.where({object_id:data.team_id, active:true, object_type:'teams'})
+				.fetch()
+				.then(function(result){
+					console.log("Object_id", result.attributes.object_id)
+					console.log("Entity_id", result.attributes.id)
+					return Models.entity_relationship
+					.where({ent_ref_to_id:result.attributes.id, relationship_type_id:1, active:true})
+					.fetch({withRelated:['from', 'to']})
+					.then(function(innerResult){
+						console.log("Father Object_id: " , innerResult.relations.from.attributes.object_id)
+						return Models.user
+						.where({id:innerResult.relations.from.attributes.object_id})
+						.fetch()
+						.then(function(user_result){
+							data.user = user_result
+							console.log("User Found: ", user_result)
+								//return user_result
+								team_data(data)
+						})
+						.catch(function(user_error){
+							console.log("No user Found!: ", user_error)
+								return user_error
+						})
+					})
+					.catch(function(InnerError){
+						return InnerError
+					})
+				})
+				.catch(function(error){
+					return error
+				});
+	}
+
+	//==========================================================================
+	// Get Team Full Data
+	//==========================================================================
+	const team_data = (data) => {
+		return Models.team
+			.where({id:data.team_id, active:true})
+			.fetch()
+			.then((result) => {
+				data.team = result
+				competition_data(data)
+				//return data
+			})
+			.catch((error) => {
+				return {}
+			})
+	}
+
+	//==========================================================================
+	// Get Competition Full Data
+	//==========================================================================
+	const competition_data = (data) => {
+		return Models.category
+			.where({id:data.category_id, active:true})
+			.fetch({withRelated:'season.competition'})
+			.then((result) => {
+				data.category = result
+				return data
+			})
+			.catch((error) => {
+				return {}
+			})
+	}
+
+	//==========================================================================
+	// Get Season Full Data
+	//==========================================================================
+	// const season_data = (competition_id) => {
+	// 	return Models.category
+	// 		.where({id:competition_id, active:true})
+	// 		.fetch()
+	// 		.then((result) => {
+	// 			return result
+	// 		})
+	// 		.catch((error) => {
+	// 			return {}
+	// 		})
+	// }
 	//==========================================================================
 	// Get all players of one category and one team
 	//==========================================================================

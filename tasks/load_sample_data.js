@@ -5,8 +5,10 @@ var Knex = require('knex')
 var Config = require('../knexfile.js')
 var Models = require('../model/index.js')
 var knex = new Knex(process.env.NODE_ENV ? Config[process.env.NODE_ENV] : Config['development']);
-
 var _log = (obj) => console.log(inspect(obj, { colors: true, depth: Infinity }))
+
+
+
 
 console.log('----------------- cargando datos de prueba poncho -----------------')
 
@@ -127,4 +129,3 @@ knex.transaction((tr) => {
 	console.log(error)
 	process.exit(1)
 })
-

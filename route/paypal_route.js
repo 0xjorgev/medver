@@ -63,60 +63,68 @@ define(['express'
     }
 
     const requestPaypalCompletion = (option, cat_id, team_id) => {
-		console.log('Before testReq', option);
+        updateCompetitionCategory(cat_id, team_id);
+    }
 
-		const reqTest = https.request(option, function(res) {
-			// console.log('body!', body);
-
-			// if(response){
-			// 	response.on('data', function (chunk) {
-			// 		console.log('Response: ' + chunk);
-			// 		console.log('Inside testReq: ', error, response, body);
-			// 	});
-			//
-			// 	if (response.statusCode === 200) {
-			// 		//Inspect IPN validation result and act accordingly
-			// 		if (body.substring(0, 8) === 'VERIFIED') {
-			//
-			// 			//The IPN is verified
-			// 			console.log('Verified IPN!');
-			// 			//updateCompetitionCategory(cat_id, team_id);
-			// 		} else if (body.substring(0, 7) === 'INVALID') {
-			//
-			// 			//The IPN invalid
-			// 			console.log('Invalid IPN!');
-			// 		} else {
-			// 			//Unexpected response body
-			// 			console.log('Unexpected response body!');
-			// 			console.log(body);
-			// 		}
-			// 	}
-			// 	else{
-			// 		//Unexpected response
-			// 		console.log('Unexpected response!');
-			// 		console.log(response);
-			// 	}
-			// }
-
-			console.log(`STATUS: ${res.statusCode}`);
-			console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-
-			res.setEncoding('utf8');
-			res.on('data', (chunk) => {
-				console.log(`BODY: ${chunk}`);
-			});
-			res.on('end', () => {
-				console.log('No more data in response.');
-			});
-		})
-
-		reqTest.on('error', (e) => {
-		  console.log(`problem with request: ${e.message}`);
-		});
-
-    return reqTest
-		// reqTest.end();
-	}
+  //   const requestPaypalCompletion = (option, cat_id, team_id) => {
+  //
+  //     updateCompetitionCategory(cat_id, team_id);
+  //
+  //
+	// 	console.log('Before testReq', option);
+  //
+	// 	const reqTest = https.request(option, function(res) {
+	// 		// console.log('body!', body);
+  //
+	// 		// if(response){
+	// 		// 	response.on('data', function (chunk) {
+	// 		// 		console.log('Response: ' + chunk);
+	// 		// 		console.log('Inside testReq: ', error, response, body);
+	// 		// 	});
+	// 		//
+	// 		// 	if (response.statusCode === 200) {
+	// 		// 		//Inspect IPN validation result and act accordingly
+	// 		// 		if (body.substring(0, 8) === 'VERIFIED') {
+	// 		//
+	// 		// 			//The IPN is verified
+	// 		// 			console.log('Verified IPN!');
+	// 		// 			//updateCompetitionCategory(cat_id, team_id);
+	// 		// 		} else if (body.substring(0, 7) === 'INVALID') {
+	// 		//
+	// 		// 			//The IPN invalid
+	// 		// 			console.log('Invalid IPN!');
+	// 		// 		} else {
+	// 		// 			//Unexpected response body
+	// 		// 			console.log('Unexpected response body!');
+	// 		// 			console.log(body);
+	// 		// 		}
+	// 		// 	}
+	// 		// 	else{
+	// 		// 		//Unexpected response
+	// 		// 		console.log('Unexpected response!');
+	// 		// 		console.log(response);
+	// 		// 	}
+	// 		// }
+  //
+	// 		console.log(`STATUS: ${res.statusCode}`);
+	// 		console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+  //
+	// 		res.setEncoding('utf8');
+	// 		res.on('data', (chunk) => {
+	// 			console.log(`BODY: ${chunk}`);
+	// 		});
+	// 		res.on('end', () => {
+	// 			console.log('No more data in response.');
+	// 		});
+	// 	})
+  //
+	// 	reqTest.on('error', (e) => {
+	// 	  console.log(`problem with request: ${e.message}`);
+	// 	});
+  //
+  //   return reqTest
+	// 	// reqTest.end();
+	// }
 
     //=========================================================================
     // Returns the player list for a given match
@@ -151,9 +159,10 @@ define(['express'
 
       if (payment_status == "Completed") {
         console.log('Status is completed');
-        //fetchPaymentStatus(res, 'Paid', cat_id, team_id);
+
+        fetchPaymentStatus(res, 'Paid', cat_id, team_id);
         //updateCompetitionCategory(cat_id, team_id);
-        // requestPaypalCompletion(options, cat_id, team_id)
+        //requestPaypalCompletion(options, cat_id, team_id)
 
 		var reqTest = requestPaypalCompletion(options, 1, 1)
     .then(result => {
@@ -183,6 +192,5 @@ define(['express'
         //Response(res, 'This was posted on paypal service');
 
     });
-
     return router;
 });

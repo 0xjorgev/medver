@@ -45,9 +45,6 @@ define(['./base_model'
         //metodos
         //saveTeam un team y sus relaciones con un usuario
         saveTeam: function(_team){
-            logger.debug('saveTeam from model')
-            logger.debug(_team)
-
             var teamData = {}
             if (_team.name != undefined) teamData.name = _team.name.trim()
             if (_team.logo_url != undefined) teamData.logo_url = _team.logo_url

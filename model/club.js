@@ -47,9 +47,6 @@ define(['./base_model'
         //metodos
         //saveClub un club y sus relaciones con un usuario
         saveClub: function(_club){
-        	logger.debug('saveClub from model')
-        	logger.debug(_club)
-
         	var _currentUser = _club._currentUser
 
 			var clubData = {}
@@ -84,8 +81,6 @@ define(['./base_model'
 				clubEntity = tmp.filter(e => e.object_type == 'clubs')
 				userEntity = tmp.filter(e => e.object_type == 'users')
 
-				// logger.debug(clubEntity)
-
 				//la entidad usuario *debe* estar creada para este punto,
 				//o bien no sería usuario válido
 				//si no se obtiene una entidad para el club, se crea
@@ -99,8 +94,6 @@ define(['./base_model'
 				return result
 			})
 			.then(result => {
-				logger.debug('entity!')
-				logger.debug(result.toJSON())
 
 				if (_club.id) {
 					// los siguientes bloques de promises solo aplican cuando se está
@@ -119,7 +112,6 @@ define(['./base_model'
 					// En caso de que sea una operación POST
 					// se asocia el usuario que se está creando
 					// con el club como owner del mismo
-					console.log('Se hace la creacion de la realacion de la entidad con el usuario: ', userEntity[0].id)
 					return new DB._models.Entity_relationship({
 						ent_ref_from_id: userEntity[0].id
 						,ent_ref_to_id: clubEntity.id

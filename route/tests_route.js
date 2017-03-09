@@ -315,8 +315,6 @@ define(['express'
   //==========================================================================
   //
   const previous_registration_status = (data) => {
-    console.log("This summer it's gonna hurt like a mother fucker")
-    console.log("Data: ", data)
     return Models.category_group_phase_team
       .where({
         team_id: data.team_id
@@ -345,19 +343,17 @@ define(['express'
   // Get previous status send Email by Status
   //==========================================================================
   const email_status_template = (status) => {
-
-    console.log("Status: ", status)
     switch (status) {
       case "pre-registration-in-progress":
-        return './template/email/alianza_status_accepted.html'
+        return './template/email/alianza_status_invited.html'
       case "pre-registration-approved":
-        return './template/email/alianza_status_accepted.html';
+        return './template/email/alianza_status_approved.html';
       case "pre-registration-rejected":
-        return './template/email/alianza_status_accepted.html';
+        return './template/email/alianza_status_rejected.html';
       case "pre-registration-paid":
-        return './template/email/alianza_status_accepted.html';
+        return './template/email/alianza_status_paid.html';
       default:
-        return './template/email/alianza_status_accepted.html';
+        return './template/email/alianza_status_registrated.html';
     }
   }
 
@@ -380,7 +376,7 @@ define(['express'
         ,tag ,process.env.SENDER_EMAIL
         ,'Información de registro para Torneos'
         ,'jorgevmendoza@gmail.com')
-        //,data.user.attributes.email,'jorgevmendoza@gmail.com')
+        //,data.user.attributes.email)
 }
 
 //==========================================================================
@@ -406,24 +402,24 @@ define(['express'
         .where({object_id:data.team_id, active:true, object_type:'teams'})
         .fetch()
         .then(function(result){
-          console.log("Object_id", result.attributes.object_id)
-          console.log("Entity_id", result.attributes.id)
+          // console.log("Object_id", result.attributes.object_id)
+          // console.log("Entity_id", result.attributes.id)
           return Models.entity_relationship
           .where({ent_ref_to_id:result.attributes.id, relationship_type_id:1, active:true})
           .fetch({withRelated:['from', 'to']})
           .then(function(innerResult){
-            console.log("Father Object_id: " , innerResult.relations.from.attributes.object_id)
+            // console.log("Father Object_id: " , innerResult.relations.from.attributes.object_id)
             return Models.user
             .where({id:innerResult.relations.from.attributes.object_id})
             .fetch()
             .then(function(user_result){
               data.user = user_result
-              console.log("User Found: ", user_result)
+              // console.log("User Found: ", user_result)
                 //return user_result
                 team_data(data)
             })
             .catch(function(user_error){
-              console.log("No user Found!: ", user_error)
+              // console.log("No user Found!: ", user_error)
                 return user_error
             })
           })
@@ -445,7 +441,7 @@ define(['express'
       .fetch()
       .then((result) => {
         data.team = result
-        console.log("Team Data: ", data)
+        // console.log("Team Data: ", data)
         competition_data(data)
         //return data
       })
@@ -464,11 +460,10 @@ define(['express'
       .then((result) => {
         data.category = result
         var status_email = send_status_email(data)
+        return
         // console.log("Full Data: ", data)
         // console.log("Season Rel Data: ", JSON.parse(data.category.relations.season.attributes.meta).ciudad)
         //return data
-
-
       })
       .catch((error) => {
         return {}

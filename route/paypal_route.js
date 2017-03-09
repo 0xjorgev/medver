@@ -25,7 +25,6 @@ define(['express'
   ,https
   ,ReplaceHelper
   ,Email
-  ,
 	) => {
 
     let router = express.Router();

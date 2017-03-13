@@ -55,6 +55,9 @@ define(['express'
         .then(result => {
             var user = result.toJSON()
             //con esto se filtran las relaciones para que sean los clubs
+
+            logger.debug(user)
+
             return user.entity.related_from
                 .filter(rel => {
                     return rel.to.object_type == 'clubs'
@@ -93,12 +96,8 @@ define(['express'
 	//==========================================================================
 	var saveClub = function(data, res){
 
-		Models.club.saveClub(data)
-		.then(result => {
-			logger.debug('Respuesta del metodo saveClub')
-			logger.debug(result)
-			Response(res, result)
-		})
+		return Models.club.saveClub(data)
+		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	}
 
@@ -137,7 +136,7 @@ define(['express'
 		var clubId = req.params.club_id
 		var clubData = {}
 		//Requiere autorizacion por token
-        console.log('Current User', req._currentUser)
+        // console.log('Current User', req._currentUser)
         var chk = auth.checkPermissions(req._currentUser, [])
 
         if(chk.code !== 0){
@@ -195,7 +194,7 @@ define(['express'
         	var teamsID = teams.toJSON(teams).map(team => {
     			return team.id
     		})
-			logger.debug(teamsID)
+			// logger.debug(teamsID)
 			return Models.match
 		        .query(qb => 
 					qb.whereIn('home_team_id', teamsID)
@@ -221,7 +220,7 @@ define(['express'
 
         	var allmatches = matches.toJSON()
 
-			logger.debug(allmatches)
+			// logger.debug(allmatches)
 			futureMatches = allmatches.filter(function(g){
 							return g.date >= currentDate
 						})

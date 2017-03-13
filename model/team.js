@@ -91,7 +91,8 @@ define(['./base_model'
                             ,object_type: 'teams'})
                             .save()
                 }
-                return result
+                else
+                    return result
             })
             .then(result => {
                 if (_team.id) {
@@ -129,7 +130,8 @@ define(['./base_model'
                     ,'subdiscipline'
                     ,'gender'
                     ,'entity'
-                    ,'player_team.position']})
+                    ,'player_team.position'
+                    ,'club']})
             })
         }
     })

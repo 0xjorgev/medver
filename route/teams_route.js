@@ -114,8 +114,8 @@ define(['express'
 	//==========================================================================
 	var saveTeam = function(data, res){
 
-		var teamData = {}
-		var clubData = {}
+		let teamData = {}
+		let clubData = {}
 
 		if (data.name != undefined) teamData.name = data.name.trim()
 		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
@@ -128,7 +128,6 @@ define(['express'
 		if (data.description != undefined) teamData.description = data.description
 		if (data.club_id != undefined) teamData.club_id = data.club_id
 		if (data.id != undefined) teamData.id = data.id
-
 
 		//let's lookup for the club by id 
 		return Models.club.query(qb => {

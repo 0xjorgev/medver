@@ -250,19 +250,7 @@ define(['express',
 		}
 
 		logger.debug('Competition POST')
-		logger.debug(req.body)
-
-		const competition_post = {
-			name: req.body.name,
-			discipline_id: req.body.discipline_id,
-			subdiscipline_id: req.body.subdiscipline_id,
-			competition_type_id: req.body.competition_type_id,
-			description: req.body.description,
-			img_url: req.body.img_url,
-			is_published: req.body.is_published,
-			created_by_id: req._currentUser.id,
-			meta: req.body.meta
-		}
+		let competition_post = buildCompetitionData(req.body)
 
 		let newCompetition = null
 
@@ -271,7 +259,6 @@ define(['express',
 		.save()
 		.then((result) => {
 			newCompetition = result
-
 			return new Models.competition_user({
 				competition_id: newCompetition.attributes.id,
 				user_id: competition_post.created_by_id
@@ -282,28 +269,29 @@ define(['express',
 		.catch(error => Response(res, null, error))
 	})
 
+	const buildCompetitionData = (data) => {
+		let compData = {}
+		if(data.id != undefined) compData.id = data.id
+		if(data.name != undefined) compData.name = data.name
+		if(data.description != undefined) compData.description = data.description
+		if(data.discipline_id != undefined) compData.discipline_id = data.discipline_id
+		if(data.subdiscipline_id != undefined) compData.subdiscipline_id = data.subdiscipline_id
+		if(data.competition_type_id != undefined) compData.competition_type_id = data.competition_type_id
+		if(data.is_published != undefined) compData.is_published = data.is_published
+		if(data.img_url != undefined) compData.img_url = data.img_url
+		if(data.portrait_url != undefined) compData.portrait_url = data.portrait_url
+		if(data.meta != undefined) compData.meta = data.meta
+		return compData
+	}
+
 	//Competition Update
 	router.put('/:competition_id/', function(req, res) {
+		const competition_id = req.params.competition_id
+		const upd_published = false
+		let thisCompetition = null
+		let competitionUpd = buildCompetitionData(req.body)
 
-		var competition = Models.competition
-		var competition_id = req.params.competition_id
-		var upd_published = false
-
-		var compData = req.body
-		console.log('Request body', compData)
-
-		var competition_upd = {
-			name: req.body.name,
-			description: req.body.description,
-			discipline_id: req.body.discipline_id,
-			subdiscipline_id: req.body.subdiscipline_id,
-			competition_type_id: req.body.competition_type_id,
-			is_published: req.body.is_published,
-			img_url: req.body.img_url,
-			meta: req.body.meta
-		}
-
-		var thisCompetition = undefined
+		logger.debug(competitionUpd)
 
 		// Obtengo los datos de la competition antes de actualizar
 		Models.competition
@@ -313,15 +301,15 @@ define(['express',
 			thisCompetition = result
 			return Knex('competitions')
 				.where({id: result.attributes.id})
-				.update(competition_upd, ['id'])
+				.update(competitionUpd, ['id'])
 		})
 		.then((result) => {
 			//should I send emails to admins?
-			var newIsPublished = competition_upd.is_published
-			var oldIsPublished = thisCompetition.attributes.is_published
+			const newIsPublished = competitionUpd.is_published
+			const oldIsPublished = thisCompetition.attributes.is_published
 
 			if(newIsPublished != oldIsPublished) {
-				var fullUrl = `${process.env.COMPETITION_PORTAL_URL}/${competition_id}`
+				const fullUrl = `${process.env.COMPETITION_PORTAL_URL}/${competition_id}`
 				thisCompetition.relations.competition_user.map((u) => {
 					console.log(`Sending mails to ${u.relations.users.attributes.email}`)
 					send_email_from(u.relations.users.attributes.email,

@@ -1,9 +1,9 @@
-if (typeof define !== 'function') 
+if (typeof define !== 'function')
 	var define = require('amdefine')(module);
 
 define(['../node_modules/lodash/lodash.min'
 	,'../util/logger_util'
-	,'nJwt'
+	,'njwt'
 	,'../model/index'
 	],( _
 		,logger

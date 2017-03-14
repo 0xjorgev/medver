@@ -9,7 +9,6 @@ define(['express'
 		,'../model/index'
 		,'../util/logger_util'
 		,'../util/knex_util'
-		// ,'../route/matches_route'
 		,'../helpers/feed_item_helper'
 	],(
 		express
@@ -19,7 +18,6 @@ define(['express'
 		,Models
 		,logger
 		,Knex
-		// ,MatchRoute
 		,FeedItemHelper
 	) => {
 	const router = express.Router()
@@ -99,6 +97,30 @@ define(['express'
 		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
+	})
+
+	//crea las entidades de todos los objetos que lo requieran
+	router.post('/entities/build', (req, res) => {
+		const chk = auth.checkPermissions(req._currentUser, [])
+		if(chk.code !== 0){
+			Response(res, null, chk)
+			return
+		}
+
+		//construir entidades
+		// ,'Event'
+		// ,'User'
+		// ,'Team'
+		// ,'Category'
+		// ,'Feed_item'
+		// ,'Player'
+		// ,'Comment'
+		// ,'Competition'
+		// ,'Match'
+		// ,'Club'
+
+		//construir relaciones
+
 	})
 
 	router.get('/classification_type', (req, res) => {

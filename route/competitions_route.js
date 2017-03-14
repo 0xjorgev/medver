@@ -288,6 +288,7 @@ define(['express'
 		if(data.is_published != undefined) compData.is_published = data.is_published
 		if(data.img_url != undefined) compData.img_url = data.img_url
 		if(data.portrait_url != undefined) compData.portrait_url = data.portrait_url
+		if(data.created_by_id != undefined) compData.created_by_id = data.created_by_id
 		if(data.meta != undefined) compData.meta = data.meta
 		return compData
 	}

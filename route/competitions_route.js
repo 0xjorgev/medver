@@ -42,7 +42,6 @@ define(['express'
 		//	 return Knex.insert(adminData).into('competitions_users')
 		// })
 
-
 		console.log('Competitions Admins');
 		var comp_id = req.params.comp_id;
 		// console.log('Model: ' , Models.competition_user.tableName);

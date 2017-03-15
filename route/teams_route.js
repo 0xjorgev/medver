@@ -351,10 +351,14 @@ define(['express'
 		//se verifica unicamente que haya un usuario valido en el request
 		//no se requiere ningun permiso especial
 
-		var chk = auth.checkPermissions(req._currentUser, [])
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'teams'
+			,permissions: []
+		})
 
-		if(chk.code !== 0){
-			Response(res, null, chk)
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
 			return
 		}
 

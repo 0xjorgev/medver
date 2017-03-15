@@ -36,5 +36,43 @@ define(['express'
 		});
 	});
 
+	var save = function(data, res){
+
+		return Models.event_calendar.saveEventCalendar(data)
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	}
+
+	//creacion de club
+	router.post('/', (req, res) => {
+		//Verificacion de permisos
+        // var chk = auth.checkPermissions(req._currentUser, [])
+        // if(chk.code !== 0){
+        //     Response(res, null, chk)
+        //     return
+        // }
+
+		var data = req.body
+		data._currentUser = req._currentUser
+		save(data, res)
+	});
+
+	//actualizacion de club
+	router.put('/:club_id', function(req, res, next){
+		//Verificacion de permisos
+        var chk = auth.checkPermissions(req._currentUser, [])
+        if(chk.code !== 0){
+            Response(res, null, chk)
+            return
+        }
+
+		var data = req.body
+		data._currentUser = req._currentUser
+		//setting the ID on the object to be saved is the way to signal bookshelf to create or update
+		data.id = req.params.club_id
+		save(data, res)
+	});
+	
+
 	return router;
 });

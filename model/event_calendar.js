@@ -35,46 +35,45 @@ define(['./base_model'
         //metodos
         //saveEventCalendar un club y sus relaciones con un usuario
         saveEventCalendar: function(_eventCalendar){
-        	var _currentUser = _eventCalendar._currentUser
+        	let _currentUser = _eventCalendar._currentUser
 
-			var data = {}
-			if (_eventCalendar.title != undefined) data.title = _eventCalendar.title.trim()
-			if (_eventCalendar.start_at != undefined) data.start_at = _eventCalendar.start_at
-			if (_eventCalendar.end_at != undefined) data.end_at = _eventCalendar.end_at
+			//para asociar las entidades
+			let eventCalendarEntity = null
+			let userEntity = null
+			let entityParent = null
+			let saveEventCalendar = null
+			let data = {}
+			
+			if (_eventCalendar.title != undefined) data.title = _eventCalendar.title
+			if (_eventCalendar.startsAt != undefined) data.start_at = _eventCalendar.startsAt
+			if (_eventCalendar.endsAt != undefined) data.end_at = _eventCalendar.endsAt
 			if (_eventCalendar.place != undefined) data.place = _eventCalendar.place
 			if (_eventCalendar.comment != undefined) data.comment = _eventCalendar.comment
 			if (_eventCalendar.active != undefined) data.active = _eventCalendar.active
 			if (_eventCalendar.events_calendars_types_id != undefined) data.events_calendars_types_id = _eventCalendar.events_calendar_types_id
 			if (_eventCalendar.id != undefined) data.id = _eventCalendar.id
-
-			//para asociar las entidades
-			var eventCalendarEntity = null
-			var userEntity = null
-
-			return new DB._models.EventCalendar(data).save()
+			if (_eventCalendar.entityParent != undefined) entityParent = _eventCalendar.entityParent
+			
+			//Salvamos el evento del calendario
+			return new DB._models.Event_calendar(data).save()
 			.then(result => {
-				_eventCalendar.id = result.attributes.id
-				//se obtienen las entidades del eventCalendar y del user en un solo query
+				saveEventCalendar = result
+				//se busca la entidad del eventCalendar
 				return DB._models.Entity
 				.query(qb => {
 					qb.where({object_id: result.attributes.id,
 						object_type: 'events_calendars' })
-					qb.orWhere({object_id: _currentUser.id})
-					qb.where({object_type: 'users'})
 				})
 				.fetchAll()
 			})
 			.then(result => {
 				var tmp = result.toJSON()
 				eventCalendarEntity = tmp.filter(e => e.object_type == 'events_calendars')
-				userEntity = tmp.filter(e => e.object_type == 'users')
-				//la entidad usuario *debe* estar creada para este punto,
-				//o bien no sería usuario válido
 				//si no se obtiene una entidad para el eventCalendar, se crea
 				if(eventCalendarEntity.length == 0){
 					//si no se encuentra una entidad asociada al equipo, se crea una nueva
 					return new DB._models.Entity({
-							object_id: _eventCalendar.id
+							object_id: saveEventCalendar.id
 							,object_type: 'events_calendars'})
 							.save()
 				}
@@ -99,17 +98,20 @@ define(['./base_model'
 					// se asocia el usuario que se está creando
 					// con el eventCalendar como owner del mismo
 					return new DB._models.Entity_relationship({
-						ent_ref_from_id: userEntity[0].id
-						,ent_ref_to_id: clubEntity.id
-						,relationship_type_id: 1
-						,comment: 'OWNER'
+						ent_ref_from_id: result.id
+						,ent_ref_to_id: entityParent.id
+						,relationship_type_id: 8
+						,comment: 'EVENT CALENDAR OF'
 					}).save()
 				}
 			})
 			.then(result => {
-				return DB._models.EventCalendar
-				.where({id:_eventCalendar.id})
-				.fetch()
+				return DB._models.Event_calendar
+				.where({id:saveEventCalendar.id})
+				.fetch({withRelated: [
+                    ,'entity.related_from'
+                    ,'entity.related_to' 
+                    ]})
 			})
 	    }
     })

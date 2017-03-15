@@ -324,7 +324,7 @@ define(['express'
 			// logger.debug(feedItemIds)
 			//un arreglo con los ids de los feeds o uno vacio
 			if(feedItemIds.length == 0){
-				logger.debug('no feeds')
+				// logger.debug('no feeds')
 				return []
 			}
 

@@ -461,7 +461,7 @@ define(['express'
 		console.log('req.headers',req.headers)
 		req.body._origin = req.headers.origin
 		console.log('POST', req.body)
-		saveCategory_group_phase_team(req.body, res)
+		saveCategoryGroupPhaseTeam(req.body, res)
 	})
 
 	//==========================================================================
@@ -473,7 +473,7 @@ define(['express'
 		req.body.category_id = req.params.category_id
 		req.body.team_id = req.params.team_id
 		//console.log('PUT', req.body)
-		saveCategory_group_phase_team(req.body, res)
+		saveCategoryGroupPhaseTeam(req.body, res)
 	})
 
 	router.delete('/:category_id/team/:team_id/invite/:id', function(req, res){
@@ -483,36 +483,34 @@ define(['express'
 		data.team_id = req.params.team_id
 		data.active = false
 		console.log('DELETE', data)
-		saveCategory_group_phase_team(data, res)
+		saveCategoryGroupPhaseTeam(data, res)
 	})
 
 	//==========================================================================
 	// Save Category Group Phase Team
 	//==========================================================================
-	var saveCategory_group_phase_team = function(data, res){
+	const buildCategoryGroupPhaseTeamData = (data) => {
+		let spiderData = {}
+		if(data.id != undefined) spiderData.id = data.id
+		if(data.category_id != undefined) spiderData.category_id = data.category_id
+		if(data.team_id != undefined) spiderData.team_id = data.team_id
+		if(data.status_id != undefined) spiderData.status_id = data.status_id
+		if(data.phase_id != undefined) spiderData.phase_id = data.phase_id
+		if(data.group_id != undefined) spiderData.group_id = data.group_id
+		if(data.active != undefined) spiderData.active = data.active
+		if(data.payment != undefined) spiderData.payment = data.payment
+		if(data.document != undefined) spiderData.document = data.documen
+		if(data.roster != undefined) spiderData.roster = data.roster
+		return spiderData
+	}
+
+
+	const saveCategoryGroupPhaseTeam = (data, res) => {
 		// console.log("data: ", data)
 		var _currentUser = data._currentUser
 		var _origin = data._origin
-		var spiderData = {}
-		spiderData.category_id = data.category_id
-		spiderData.team_id     = data.team_id
-		spiderData.active      = (data.active == undefined) ? true : data.active
-		spiderData.payment     = (data.payment == undefined) ? false : data.payment
-		spiderData.document    = (data.document == undefined) ? false : data.document
-		spiderData.roster      = (data.roster == undefined) ? false : data.roster
-		spiderData.status_id   = data.status_id
 
-		if(data.phase_id){
-			spiderData.phase_id = data.phase_id
-		}
-
-		if(data.group_id){
-			spiderData.group_id = data.group_id
-		}
-
-		if(data.id){
-			spiderData.id = data.id
-		}
+		let spiderData = buildCategoryGroupPhaseTeamData(data)
 
 		var innerData = {}
 		innerData.team_id = data.team_id

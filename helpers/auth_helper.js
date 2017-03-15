@@ -14,6 +14,10 @@ define(['../node_modules/lodash/lodash.min'
 	let authHelper = {}
 
 	authHelper.checkPermissions = (options) => {
+
+		if(!options)
+			return false
+
 		//user que viene en el token
 		const user = options.user
 		//tipo de objeto a verificar. Se utiliza el table_name de los modelos: competitions, users, etc

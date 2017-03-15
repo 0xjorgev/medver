@@ -14,7 +14,7 @@ define(['./base_model'
 		initialize: function(){
 			this.on('created', attrs => {
 				// this.set('number', 99)
-				new DB._models.Entity({
+				return new DB._models.Entity({
 					object_type: 'users'
 					,object_id: this.id
 				})

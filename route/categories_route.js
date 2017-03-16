@@ -454,26 +454,22 @@ define(['express'
 	// Create a category group phase team
 	//==========================================================================
 	router.post('/:category_id/team/:team_id/invite', function(req, res){
-		var data = {}
 		req.body.category_id = req.params.category_id
 		req.body.team_id = req.params.team_id
 		req.body._currentUser = req._currentUser
-		console.log('req.headers',req.headers)
 		req.body._origin = req.headers.origin
 		console.log('POST', req.body)
-		saveCategory_group_phase_team(req.body, res)
+		saveCategoryGroupPhaseTeam(req.body, res)
 	})
 
 	//==========================================================================
 	// Update a category group phase team
 	//==========================================================================
 	router.put('/:category_id/team/:team_id/invite/:id', function(req, res){
-		var data = {}
-		data.id = req.params.id
 		req.body.category_id = req.params.category_id
 		req.body.team_id = req.params.team_id
-		//console.log('PUT', req.body)
-		saveCategory_group_phase_team(req.body, res)
+		console.log('PUT', req.body)
+		saveCategoryGroupPhaseTeam(req.body, res)
 	})
 
 	router.delete('/:category_id/team/:team_id/invite/:id', function(req, res){
@@ -483,36 +479,33 @@ define(['express'
 		data.team_id = req.params.team_id
 		data.active = false
 		console.log('DELETE', data)
-		saveCategory_group_phase_team(data, res)
+		saveCategoryGroupPhaseTeam(data, res)
 	})
 
 	//==========================================================================
 	// Save Category Group Phase Team
 	//==========================================================================
-	var saveCategory_group_phase_team = function(data, res){
+	const buildCategoryGroupPhaseTeamData = (data) => {
+		let spiderData = {}
+		if(data.id != undefined) spiderData.id = data.id
+		if(data.category_id != undefined) spiderData.category_id = data.category_id
+		if(data.team_id != undefined) spiderData.team_id = data.team_id
+		if(data.status_id != undefined) spiderData.status_id = data.status_id
+		if(data.phase_id != undefined) spiderData.phase_id = data.phase_id
+		if(data.group_id != undefined) spiderData.group_id = data.group_id
+		if(data.active != undefined) spiderData.active = data.active
+		if(data.payment != undefined) spiderData.payment = data.payment
+		if(data.document != undefined) spiderData.document = data.document
+		if(data.roster != undefined) spiderData.roster = data.roster
+		return spiderData
+	}
+
+	const saveCategoryGroupPhaseTeam = (data, res) => {
 		// console.log("data: ", data)
 		var _currentUser = data._currentUser
 		var _origin = data._origin
-		var spiderData = {}
-		spiderData.category_id = data.category_id
-		spiderData.team_id     = data.team_id
-		spiderData.active      = (data.active == undefined) ? true : data.active
-		spiderData.payment     = (data.payment == undefined) ? false : data.payment
-		spiderData.document    = (data.document == undefined) ? false : data.document
-		spiderData.roster      = (data.roster == undefined) ? false : data.roster
-		spiderData.status_id   = data.status_id
 
-		if(data.phase_id){
-			spiderData.phase_id = data.phase_id
-		}
-
-		if(data.group_id){
-			spiderData.group_id = data.group_id
-		}
-
-		if(data.id){
-			spiderData.id = data.id
-		}
+		let spiderData = buildCategoryGroupPhaseTeamData(data)
 
 		var innerData = {}
 		innerData.team_id = data.team_id
@@ -521,7 +514,8 @@ define(['express'
 
 		var prev = previous_registration_status(innerData)
 
-		return new Models.category_group_phase_team(spiderData).save()
+		return new Models.category_group_phase_team(spiderData)
+		.save()
 		.then(function(new_invitation){
 
 			var invitation = new_invitation
@@ -556,24 +550,16 @@ define(['express'
 			 	return Models.status_type
 				.where({id:data.next_status, active:true})
 				.fetch()
-				.then((status_type_result) => {
-					// if (result.relations.status_type.attributes.id != status_type_result.attributes.id) {
-							var email_template = email_status_template(status_type_result.attributes.code)
-							data.template = email_template
-							var owner_email = team_owner_email(data)
-					// } else {
-					// 	console.log("Else, status are equals")
-					// 	return
-					// }
-				})
-				.catch((error) => {
-					console.log("Error status: ", error)
-					return
-				})
+			})
+			.then((status_type_result) => {
+				var email_template = email_status_template(status_type_result.attributes.code)
+				data.template = email_template
+				var owner_email = team_owner_email(data)
+				return true
 			})
 			.catch(function(err){
 				console.log("Error request: ", err)
-				return
+				return err
 			})
 	}
 
@@ -636,38 +622,33 @@ define(['express'
 	const team_owner_email = (data) => {
 		//Buscar Id entidad Team_id
 		//entity_relationship -> to (id_entidad_equipo) -> relationship_Type 1 (Owner)
-			return Models.entity
-				.where({object_id:data.team_id, active:true, object_type:'teams'})
-				.fetch()
-				.then(function(result){
-					// console.log("Object_id", result.attributes.object_id)
-					// console.log("Entity_id", result.attributes.id)
-					return Models.entity_relationship
-					.where({ent_ref_to_id:result.attributes.id, relationship_type_id:1, active:true})
-					.fetch({withRelated:['from', 'to']})
-					.then(function(innerResult){
-						// console.log("Father Object_id: " , innerResult.relations.from.attributes.object_id)
-						return Models.user
-						.where({id:innerResult.relations.from.attributes.object_id})
-						.fetch()
-						.then(function(user_result){
-							data.user = user_result
-							// console.log("User Found: ", user_result)
-								//return user_result
-								team_data(data)
-						})
-						.catch(function(user_error){
-							// console.log("No user Found!: ", user_error)
-								return user_error
-						})
+		//FIXME: desanidar los promises
+		return Models.entity
+			.where({object_id:data.team_id, active:true, object_type:'teams'})
+			.fetch()
+			.then(result => {
+				return Models.entity_relationship
+				.where({ent_ref_to_id:result.attributes.id, relationship_type_id:1, active:true})
+				.fetch({withRelated:['from', 'to']})
+				.then(function(innerResult){
+					return Models.user
+					.where({id:innerResult.relations.from.attributes.object_id})
+					.fetch()
+					.then(function(user_result){
+						data.user = user_result
+						return team_data(data)
 					})
-					.catch(function(InnerError){
-						return InnerError
+					.catch(function(user_error){
+						return user_error
 					})
 				})
-				.catch(function(error){
-					return error
-				});
+				.catch(function(InnerError){
+					return InnerError
+				})
+			})
+			.catch(function(error){
+				return error
+			});
 	}
 
 	//==========================================================================
@@ -679,9 +660,7 @@ define(['express'
 			.fetch()
 			.then((result) => {
 				data.team = result
-				// console.log("Team Data: ", data)
-				competition_data(data)
-				//return data
+				return competition_data(data)
 			})
 			.catch((error) => {
 				return {}
@@ -699,9 +678,6 @@ define(['express'
 				data.category = result
 				var status_email = send_status_email(data)
 				return
-				// console.log("Full Data: ", data)
-				// console.log("Season Rel Data: ", JSON.parse(data.category.relations.season.attributes.meta).ciudad)
-				//return data
 			})
 			.catch((error) => {
 				return {}

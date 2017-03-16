@@ -2,17 +2,17 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['express',
-		'util',
-		'../model/index',
-		'../util/request_message_util',
-		'../util/response_message_util',
-		'../util/knex_util',
-		'../util/email_sender_util',
-		'../helpers/auth_helper',
-		'../node_modules/lodash/lodash.min',
-		'../util/logger_util'],
-		function (express
+define(['express'
+		,'util'
+		,'../model/index'
+		,'../util/request_message_util'
+		,'../util/response_message_util'
+		,'../util/knex_util'
+		,'../util/email_sender_util'
+		,'../helpers/auth_helper'
+		,'../node_modules/lodash/lodash.min'
+		,'../util/logger_util']
+		,(express
 			,util
 			,Models
 			,Message
@@ -21,9 +21,9 @@ define(['express',
 			,Email
 			,auth
 			,lodash
-		 	,logger) {
+		 	,logger) => {
 
-	var router = express.Router();
+	let router = express.Router()
 	var send_email_from = Email(process.env.SENDER_EMAIL);
 
 	router.get('/:comp_id/admin_user/', function(req, res, next){
@@ -41,7 +41,6 @@ define(['express',
 		//	 // return new Models.competition_user(JSON.stringify(adminData)).save()
 		//	 return Knex.insert(adminData).into('competitions_users')
 		// })
-
 
 		console.log('Competitions Admins');
 		var comp_id = req.params.comp_id;
@@ -62,15 +61,18 @@ define(['express',
 
 	//List of competitions
 	router.get('/', function (req, res) {
-
 		//req._currentUser is the user recovered from token
 		//to get competitions the user should have these permissions
-		var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
-		//fallo en el chequeo de auth
-		// if (chk.code != 0){
-		// 	Response(res, null, chk)
-		// 	return
-		// }
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'competitions'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
 		return Models.competition
 			.query(function(qb){
@@ -242,39 +244,31 @@ define(['express',
 
 	//Create Competition
 	router.post('/', function (req, res) {
-		var chk = auth.checkPermissions(req._currentUser, [])
-		// fallo en el chequeo de auth
-		if (chk.code != 0){
-			Response(res, null, chk)
+		logger.debug(req.body)
+
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'competitions'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
 			return
 		}
 
 		logger.debug('Competition POST')
-		logger.debug(req.body)
-
-		const competition_post = {
-			name: req.body.name,
-			discipline_id: req.body.discipline_id,
-			subdiscipline_id: req.body.subdiscipline_id,
-			competition_type_id: req.body.competition_type_id,
-			description: req.body.description,
-			img_url: req.body.img_url,
-			is_published: req.body.is_published,
-			created_by_id: req._currentUser.id,
-			meta: req.body.meta
-		}
+		let competitionPost = buildCompetitionData(req.body)
 
 		let newCompetition = null
-
 		//por defecto, al momento de la creacion, se coloca al usuario creador como admin
-		new Models.competition( competition_post )
+		Models.competition.forge(competitionPost)
 		.save()
-		.then((result) => {
+		.then(result => {
 			newCompetition = result
-
 			return new Models.competition_user({
 				competition_id: newCompetition.attributes.id,
-				user_id: competition_post.created_by_id
+				user_id: competitionPost.created_by_id
 			})
 			.save()
 		})
@@ -282,28 +276,42 @@ define(['express',
 		.catch(error => Response(res, null, error))
 	})
 
+	const buildCompetitionData = (data) => {
+		let compData = {}
+		if(data.id != undefined) compData.id = data.id
+		if(data.name != undefined) compData.name = data.name
+		if(data.description != undefined) compData.description = data.description
+		if(data.discipline_id != undefined) compData.discipline_id = data.discipline_id
+		if(data.subdiscipline_id != undefined) compData.subdiscipline_id = data.subdiscipline_id
+		if(data.competition_type_id != undefined) compData.competition_type_id = data.competition_type_id
+		if(data.is_published != undefined) compData.is_published = data.is_published
+		if(data.img_url != undefined) compData.img_url = data.img_url
+		if(data.portrait_url != undefined) compData.portrait_url = data.portrait_url
+		if(data.created_by_id != undefined) compData.created_by_id = data.created_by_id
+		if(data.meta != undefined) compData.meta = data.meta
+		return compData
+	}
+
 	//Competition Update
 	router.put('/:competition_id/', function(req, res) {
+		const competition_id = req.params.competition_id
+		const upd_published = false
+		let thisCompetition = null
+		let competitionUpd = buildCompetitionData(req.body)
 
-		var competition = Models.competition
-		var competition_id = req.params.competition_id
-		var upd_published = false
+		logger.debug(competitionUpd)
 
-		var compData = req.body
-		console.log('Request body', compData)
-
-		var competition_upd = {
-			name: req.body.name,
-			description: req.body.description,
-			discipline_id: req.body.discipline_id,
-			subdiscipline_id: req.body.subdiscipline_id,
-			competition_type_id: req.body.competition_type_id,
-			is_published: req.body.is_published,
-			img_url: req.body.img_url,
-			meta: req.body.meta
-		}
-
-		var thisCompetition = undefined
+		// const permissionCheck = auth.checkPermissions({
+		// 	user: req._currentUser
+		// 	,object_type: 'competitions'
+		// 	,object_id: req.params.competition_id
+		// 	,permissions: ['owner', 'admin']
+		// })
+		//
+		// if (permissionCheck.code != 0){
+		// 	Response(res, null, permissionCheck)
+		// 	return
+		// }
 
 		// Obtengo los datos de la competition antes de actualizar
 		Models.competition
@@ -313,15 +321,15 @@ define(['express',
 			thisCompetition = result
 			return Knex('competitions')
 				.where({id: result.attributes.id})
-				.update(competition_upd, ['id'])
+				.update(competitionUpd, ['id'])
 		})
 		.then((result) => {
 			//should I send emails to admins?
-			var newIsPublished = competition_upd.is_published
-			var oldIsPublished = thisCompetition.attributes.is_published
+			const newIsPublished = competitionUpd.is_published
+			const oldIsPublished = thisCompetition.attributes.is_published
 
 			if(newIsPublished != oldIsPublished) {
-				var fullUrl = `${process.env.COMPETITION_PORTAL_URL}/${competition_id}`
+				const fullUrl = `${process.env.COMPETITION_PORTAL_URL}/${competition_id}`
 				thisCompetition.relations.competition_user.map((u) => {
 					console.log(`Sending mails to ${u.relations.users.attributes.email}`)
 					send_email_from(u.relations.users.attributes.email,

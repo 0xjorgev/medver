@@ -6,6 +6,5 @@ define([], () => {
 	//verifica si el objeto es un array.
 	//retorna boolean
 	utilities.isArray = myObject => (Object.prototype.toString.call( myObject ) === '[object Array]')
-
 	return utilities
 })

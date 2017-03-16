@@ -4,44 +4,38 @@ if (typeof define !== 'function') {
 
 define(['express',
 		'../model/index',
-		'../util/request_message_util',
 		'../util/response_message_util',
 		'../util/knex_util',
+		'../util/logger_util',
 		'../helpers/standing_table_helper'],
 		 (express,
 			Models,
-			Message,
 			Response,
 			Knex,
+			logger,
 			StandingTable) => {
 
-	var router = express.Router();
+	let router = express.Router()
 
 	router.get('/', function (req, res) {
 		return Models.group
-		.query(function(qb){})
 		.where({active:true})
 		.fetchAll({withRelated: ['rounds']})
-		.then(function (result) {
+		.then(result => {
 			Response(res, result)
 		})
-		.catch(function(error){
+		.catch(error =>{
 			Response(res, null, error)
-		});
-	});
+		})
+	})
 
-	router.get('/:group_id', function (req, res) {
+	router.get('/:group_id', (req, res) => {
 		var group_id = req.params.group_id;
-
 		return Models.group
-		.where({id:group_id, active:true})
+		.where({id: group_id, active:true})
 		.fetch({withRelated: ['rounds']})
-		.then(function (result) {
-			Response(res, result)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
+		.then( result => Response(res, result) )
+		.catch( error => Response(res, null, error) )
 	});
 
 	router.get('/:group_id', function (req, res) {
@@ -57,51 +51,37 @@ define(['express',
 		});
 	});
 
-	router.post('/', function (req, res) {
-		//Model Instance
-		var Group = Models.group;
-		var group_post = req.body;
-		var phase_id = group_post.phase_id;
+	router.post('/', (req, res) => {
+		const groupPost = buildGroupData(req.body)
 
-		console.log('Request body', group_post);
-
-		new Group(group_post)
+		Models.group.forge(groupPost)
 		.save()
-		.then(function(new_group){
-			var data = req.body
-			updateFase(data, res, new_group)
-		}).catch(function(error){
-			Response(res, null, error)
-		});
-	});
+		.then(newGroup => {
+			return updatePhase(groupPost)
+		})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
+	})
 
 	router.put('/:group_id', function(req, res, next){
-		//Model Instance
-		var group = new Models.group;
 		//URL Request, Season Id
-		var group_id = req.params.group_id;
-		var group_upd = req.body;
+		const groupId = req.params.group_id;
+		const groupUpd = buildGroupData(req.body)
+		let updateResult = null
 
-		Knex(group.tableName)
-		.where('id','=',group_id)
-		.where('active','=',1)
-		.update(group_upd, ['id'])
-		.then(function(result){
-			if (result.length != 0){
-				console.log('result: ',result[0]);
-				var data = req.body
-				updateFase(data, res, result)
-			} else {
-				Message(res, 'group not found', '404', result);
-			}
+		Knex('groups')
+		.where({ id: groupId, active: true })
+		.update(groupUpd, ['id'])
+		.then(result => {
+			updateResult = result
+			return updatePhase(groupUpd)
 		})
-		.catch(function(err){
-			Response(res, null, error)
-		});
+		.then(result => Response(res, updateResult) )
+		.catch(error => Response(res, null, error) )
 	});
 
 	router.get('/:group_id/standing_table', function(req, res){
-		var group_id = req.params.group_id;
+		const group_id = req.params.group_id;
 		StandingTable.getStandingTableByGroup(group_id, res)
 	})
 
@@ -114,7 +94,7 @@ define(['express',
 			.then(function (result) {
 				Response(res, result)
 			}).catch(function(error){
-				Response(res, null, error)
+				Response(res, [])
 			});
 	})
 
@@ -124,56 +104,52 @@ define(['express',
 		StandingTable.getStandingTableByGroup(group_id, res)
 	})
 
-	//FUNCION PARA ACTUALIZAR LOS VALORES DE LA TABLA FASE CUANDO SE CAMBIEN LOS VALORES DE UN GRUPO
-	var updateFase = (data, res, group_result) => {
-		console.log("data: ", data)
-		var phase_id = data.phase_id
-		console.log("phase_id: ", phase_id)
+	const buildGroupData = data => {
+		let obj = {}
+		if(data.id != undefined) obj.id = data.id
+		if(data.name != undefined) obj.name = data.name
+		if(data.phase_id != undefined) obj.phase_id = data.phase_id
+		if(data.classified_team != undefined) obj.classified_team = data.classified_team
+		if(data.participant_team != undefined) obj.participant_team = data.participant_team
+		if(data.active != undefined) obj.active = data.active
+		logger.debug(data)
+		return obj
+	}
+
+	//la phase y los grupos comparten los campos classified_team y participant teams
+	//Esta funcion actualiza los campos classified_team y participant teams cuando se salva un
+	//grupo; de este modo, la tabla phases siempre está en sincronía con sus grupos
+	const updatePhase = data => {
+		const phaseId = data.phase_id
+
+		if(phaseId === null || phaseId === undefined){
+			return null
+		}
 
 		//Obtenemos todos los grupos de esa fase
-		Models.group
-		.where({phase_id:phase_id, active:true})
+		return Models.group
+		.where({phase_id: phaseId, active: true})
 		.fetchAll()
-		.then( (result) => {
-			var participant_teams = result.models.map((m) => m.attributes.participant_team)
-			var classified_teams = result.models.map((m) => m.attributes.classified_team)
-			console.log("participant_teams ", participant_teams)
-			console.log("classified_teams ", classified_teams)
-			var participant_team = participant_teams.reduce(function(pt, n) {
-									return pt + n; })
+		.then(result => {
+			//se totaliza el numero de equipos participantes y el num. de equipos
+			//que pasan a la siguiente fase
+			const phaseUpd = result.reduce( (obj, group) => {
+				obj.participant_team += group.attributes.participant_team
+				obj.classified_team += group.attributes.classified_team
+				return obj
+			}, { id: phaseId, participant_team: 0, classified_team: 0 })
 
-			console.log("Phase participant_team ", participant_team)
-			var classified_team = classified_teams.reduce(function(ct, n) {
-									return ct + n; })
-			console.log("Phase classified_team ", classified_team)
-			console.log("phase_id: ", phase_id)
-
-			//Se guarda los campos en la fase
-			var phase_upd = {
-				id			  : phase_id,
-				participant_team: participant_team,
-				classified_team : classified_team
-			};
-
-			var Phase = Models.phase;
-			Knex('phases')
-			.where('id','=', phase_id)
-			.update(phase_upd, ['id'])
-			.then((phases_result) => {
-				if (result.length != 0){
-					Response(res, group_result)
-				} else {
-					Response(res, [])
-				}
-			})
-			.catch((err) => {
-				Response(res, null, err)
-			})
+			return Knex('phases')
+			.where({id: phaseId})
+			.update(phaseUpd, ['id'])
 		})
-		.catch((error) => {
-			Response(res, null, error)
+		.then(updateResult => {
+			return updateResult
+		})
+		.catch(error => {
+			return error
 		})
 	}
 
-	return router;
-});
+	return router
+})

@@ -123,7 +123,7 @@ define(['./base_model'
             .then(result => {
                 //return the complete information of the team
                 return DB._models.Team
-                .where({id:teamData.id, active:true})
+                .where({id:teamData.id, active: true})
                 .fetch({withRelated: ['category_type'
                     ,'organization'
                     ,'player_team.player'

@@ -22,7 +22,7 @@
     "md5": "^2.0.0",
     "minimist": "^1.2.0",
     "morgan": "^1.7.0",
-    "newrelic": "^1.28.3",
+    "newrelic": "^1.37.2",
     "njwt": "^0.2.3",
     "node-xlsx": "^0.7.1",
     "nodemon": "^1.8.1",

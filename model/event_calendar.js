@@ -43,7 +43,7 @@ define(['./base_model'
 			let entityParent = null
 			let saveEventCalendar = null
 			let data = {}
-			
+
 			if (_eventCalendar.title != undefined) data.title = _eventCalendar.title
 			if (_eventCalendar.startsAt != undefined) data.start_at = _eventCalendar.startsAt
 			if (_eventCalendar.endsAt != undefined) data.end_at = _eventCalendar.endsAt
@@ -53,7 +53,7 @@ define(['./base_model'
 			if (_eventCalendar.events_calendars_types_id != undefined) data.events_calendars_types_id = _eventCalendar.events_calendar_types_id
 			if (_eventCalendar.id != undefined) data.id = _eventCalendar.id
 			if (_eventCalendar.entityParent != undefined) entityParent = _eventCalendar.entityParent
-			
+
 			//Salvamos el evento del calendario
 			return new DB._models.Event_calendar(data).save()
 			.then(result => {
@@ -68,6 +68,7 @@ define(['./base_model'
 			})
 			.then(result => {
 				var tmp = result.toJSON()
+				logger.debug('tmp', tmp)
 				eventCalendarEntity = tmp.filter(e => e.object_type == 'events_calendars')
 				//si no se obtiene una entidad para el eventCalendar, se crea
 				if(eventCalendarEntity.length == 0){
@@ -106,6 +107,7 @@ define(['./base_model'
 				}
 			})
 			.then(result => {
+				logger.debug('saveEventCalendar.id',saveEventCalendar.id)
 				return DB._models.Event_calendar
 				.where({id:saveEventCalendar.id})
 				.fetch({withRelated: [

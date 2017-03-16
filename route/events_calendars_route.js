@@ -37,7 +37,7 @@ define(['express'
 	});
 
 	var save = function(data, res){
-
+		console.log('Save calendar event', data)
 		return Models.event_calendar.saveEventCalendar(data)
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
@@ -58,18 +58,18 @@ define(['express'
 	});
 
 	//actualizacion de club
-	router.put('/:club_id', function(req, res, next){
+	router.put('/:event_calendar_id', function(req, res, next){
 		//Verificacion de permisos
-        var chk = auth.checkPermissions(req._currentUser, [])
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+        // var chk = auth.checkPermissions(req._currentUser, [])
+        // if(chk.code !== 0){
+        //     Response(res, null, chk)
+        //     return
+        // }
 
 		var data = req.body
 		data._currentUser = req._currentUser
 		//setting the ID on the object to be saved is the way to signal bookshelf to create or update
-		data.id = req.params.club_id
+		data.id = req.params.event_calendar_id
 		save(data, res)
 	});
 	

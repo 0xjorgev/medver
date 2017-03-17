@@ -45,8 +45,8 @@ define(['./base_model'
 			let data = {}
 
 			if (_eventCalendar.title != undefined) data.title = _eventCalendar.title
-			if (_eventCalendar.startsAt != undefined) data.start_at = _eventCalendar.startsAt
-			if (_eventCalendar.endsAt != undefined) data.end_at = _eventCalendar.endsAt
+			if (_eventCalendar.startsAt != undefined) data.startsAt = _eventCalendar.startsAt
+			if (_eventCalendar.endsAt != undefined) data.endsAt = _eventCalendar.endsAt
 			if (_eventCalendar.place != undefined) data.place = _eventCalendar.place
 			if (_eventCalendar.comment != undefined) data.comment = _eventCalendar.comment
 			if (_eventCalendar.active != undefined) data.active = _eventCalendar.active

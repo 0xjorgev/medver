@@ -39,12 +39,16 @@ define(['express'
         //se verifica unicamente que haya un usuario valido en el request
         //no se requiere ningun permiso especial
 
-        var chk = auth.checkPermissions(req._currentUser, [])
+        const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'clubs'
+			,permissions: []
+		})
 
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
         Models.user
         .query(qb => qb.where({id: req._currentUser.id}) )
@@ -137,12 +141,16 @@ define(['express'
 		var clubData = {}
 		//Requiere autorizacion por token
         // console.log('Current User', req._currentUser)
-        var chk = auth.checkPermissions(req._currentUser, [])
+        const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'clubs'
+			,permissions: []
+		})
 
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
 		if (clubId != undefined) clubData.id = clubId
 		
@@ -237,6 +245,48 @@ define(['express'
         })
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))
+    })
+
+
+    //==========================================================================
+	// Get all Event_Calendar of a club
+	//==========================================================================
+	router.get('/:club_id/event_calendar', (req, res) => {
+		let club ={}
+		club.id = req.params.club_id
+        
+        //Obtengo los datos del club y su entidad
+        return Models.club
+			.query(function(qb){})
+			.where({id:club.id})
+			.where({active:true})
+			.fetch({withRelated: [
+	             'entity'
+	        ]})
+		.then(_club => {
+        	club = _club.toJSON()
+			//Con los datos de la entidad del club se obtienes los eventos asociados
+			return Models.entity_relationship
+				.query(function(qb){})
+				.where({ent_ref_to_id:club.entity.id})
+				.where({relationship_type_id:8})
+				.where({active:true})
+				.fetchAll({withRelated: [
+		            'from.object'
+		        ]})
+        })
+        .then(_entRel => {
+        	let eventCalendar = _entRel.toJSON()
+        	logger.debug(eventCalendar)
+        	//Se va a crear un objeto que va a ser el club con todos sus eventos de calendario parametro tipo arreglo con el nombre de eventsCalendars
+        	club.eventsCalendars = []
+
+        	club.eventsCalendars =  eventCalendar.map(eventCalendar => eventCalendar.from.object)
+
+        	return club
+        })
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
     })
 
 

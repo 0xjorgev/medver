@@ -37,7 +37,6 @@ define(['express'
 	* anticipated URL of the image.
 	*/
 	router.get('/s3_signed_url', (req, res) => {
-
 		//se genera un hash con sha256 al nombre de archivo + el tiempo actual en segundos
 		//esto se hace para evitar colisiones con los nombres de archivo al hacer upload
 		const fileName = req.query.file_name + (new Date()).getTime()
@@ -62,11 +61,10 @@ define(['express'
 				return Response(res, null, err)
 			}
 			else{
-				var return_data = {
-					signed_request: data,
-					url: 'https://'+S3_BUCKET+'.s3.amazonaws.com/'+req.query.file_name
-				}
-				return Response(res, return_data)
+				return Response(res, {
+					signed_request: data
+					,url: `https://${S3_BUCKET}.s3.amazonaws.com/${hash}`
+				})
 			}
 		})
 	})

@@ -44,18 +44,12 @@ define(['express'
 			return idx == -1 ? '' : a.substring(idx, a.length)
 		}
 		const tmp = req.query.file_name + (new Date()).getTime()
-
 		const ext = getFileExtension(req.query.file_name)
-		logger.debug(tmp)
-
 		const fileName = createHash('sha256').update(tmp, 'utf8').digest('hex') + ext
-
-		logger.debug(fileName)
 
 		aws.config.update({accessKeyId: AWS_ACCESS_KEY , secretAccessKey: AWS_SECRET_KEY })
 
 		const s3 = new aws.S3()
-
 		const s3_params = {
 			Bucket: S3_BUCKET,
 			Key: fileName,

@@ -10,6 +10,7 @@ define(['express'
 		,'../util/logger_util'
 		,'../util/knex_util'
 		,'../helpers/feed_item_helper'
+		,'sha.js'
 	],(
 		express
 		,Response
@@ -19,6 +20,7 @@ define(['express'
 		,logger
 		,Knex
 		,FeedItemHelper
+		,createHash
 	) => {
 	const router = express.Router()
 
@@ -36,14 +38,21 @@ define(['express'
 	*/
 	router.get('/s3_signed_url', (req, res) => {
 
+		//se genera un hash con sha256 al nombre de archivo + el tiempo actual en segundos
+		//esto se hace para evitar colisiones con los nombres de archivo al hacer upload
+		const fileName = req.query.file_name + (new Date()).getTime()
+		const hash = createHash('sha256').update(fileName, 'utf8').digest('hex')
+
 		aws.config.update({accessKeyId: AWS_ACCESS_KEY , secretAccessKey: AWS_SECRET_KEY })
+
 		const s3 = new aws.S3()
+
 		const s3_params = {
 			Bucket: S3_BUCKET,
-			Key: req.query.file_name,
+			Key: hash,
 			Expires: 60,
 			ContentType: req.query.file_type,
-			//FIXME: esto deberia ser configurado para que no sea público
+			//FIXME: esto debe ser configurado para que sea accesible solo por somosport
 			ACL: 'public-read'
 		}
 

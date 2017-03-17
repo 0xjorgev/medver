@@ -39,8 +39,18 @@ define(['express'
 	router.get('/s3_signed_url', (req, res) => {
 		//se genera un hash con sha256 al nombre de archivo + el tiempo actual en segundos
 		//esto se hace para evitar colisiones con los nombres de archivo al hacer upload
-		const fileName = req.query.file_name + (new Date()).getTime()
-		const hash = createHash('sha256').update(fileName, 'utf8').digest('hex')
+		const getFileExtension = (a) => {
+			const idx = a.lastIndexOf('.')
+			return idx == -1 ? '' : a.substring(idx, a.length)
+		}
+		const tmp = req.query.file_name + (new Date()).getTime()
+
+		const ext = getFileExtension(req.query.file_name)
+		logger.debug(tmp)
+
+		const fileName = createHash('sha256').update(tmp, 'utf8').digest('hex') + ext
+
+		logger.debug(fileName)
 
 		aws.config.update({accessKeyId: AWS_ACCESS_KEY , secretAccessKey: AWS_SECRET_KEY })
 
@@ -48,7 +58,7 @@ define(['express'
 
 		const s3_params = {
 			Bucket: S3_BUCKET,
-			Key: hash,
+			Key: fileName,
 			Expires: 60,
 			ContentType: req.query.file_type,
 			//FIXME: esto debe ser configurado para que sea accesible solo por somosport
@@ -63,7 +73,7 @@ define(['express'
 			else{
 				return Response(res, {
 					signed_request: data
-					,url: `https://${S3_BUCKET}.s3.amazonaws.com/${hash}`
+					,url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
 				})
 			}
 		})

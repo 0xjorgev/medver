@@ -130,7 +130,7 @@ define(['express'
 		if (data.id != undefined) teamData.id = data.id
 
 
-		//let's lookup for the club by id 
+		//let's lookup for the club by id
 		return Models.club.query(qb => {
 			qb.where({id: teamData.club_id})
 		})
@@ -184,7 +184,7 @@ define(['express'
 		var teamId = req.params.team_id
 		var teamData = {}
 		if (teamId != undefined) teamData.id = teamId
-		
+
 		teamData.active = false
 
 		return new Models.team(teamData).save()
@@ -244,7 +244,7 @@ define(['express'
 		//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
 		console.log('POST team - team_id', req.params, 'data', data )
 		savePlayerTeam(data, res)
-	}) 
+	})
 
 	// updates players_teams, the roster of this team
 	router.put('/:team_id/player/:player_id', function(req, res){
@@ -334,7 +334,8 @@ define(['express'
 					ent_ref_from_id: teamEntity[0].id
 					,ent_ref_to_id: categoryEntity[0].id
 					,status_id: status
-				}).save()
+				})
+				.save()
 				.then((result) => Response(res, result))
 				.catch((error) =>  Response(res, null, error))
 			})
@@ -346,46 +347,48 @@ define(['express'
 	//==========================================================================
 	// Get all active teams that are related to the user
 	//==========================================================================
-    router.get('/query/by_user', (req, res) => {
-        //se verifica unicamente que haya un usuario valido en el request
-        //no se requiere ningun permiso especial
+	router.get('/query/by_user', (req, res) => {
+		//se verifica unicamente que haya un usuario valido en el request
+		//no se requiere ningun permiso especial
 
-        var chk = auth.checkPermissions(req._currentUser, [])
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'teams'
+			,permissions: []
+		})
 
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
-        Models.user
-        .query(qb => qb.where({id: req._currentUser.id}) )
-        .fetch({withRelated: [
-             'entity.related_from.relationship_type'
-            ,'entity.related_from.to.entity_type'
-        ]})
-        .then(result => {
-            var user = result.toJSON()
-            //con esto se filtran las relaciones para que solo sean los equipos
-            return user.entity.related_from
-                .filter(rel => {
-                    return rel.to.object_type == 'teams'
-                })
-                //y con este map se extraen los ids de los teams
-                .map(teams => teams.to.object_id)
-        })
-        .then(result => {
-            return Models.team
-                .query(qb => qb.whereIn('id', result))
-                .fetchAll({withRelated: ['category_type'
-					,'gender'
-					,'category_group_phase_team.category.season.competition'
-					,'category_group_phase_team.status_type'
-					,'subdiscipline'
-				]})
-        })
-        .then(result => Response(res, result) )
-        .catch(error => Response(res, null, error))
-    })
+		Models.user
+		.query(qb => qb.where({id: req._currentUser.id}) )
+		.fetch({withRelated: [
+			'entity.related_from.relationship_type'
+			,'entity.related_from.to.entity_type'
+		]})
+		.then(result => {
+			const user = result.toJSON()
+			//con esto se filtran las relaciones para que solo sean los equipos
+			return user.entity.related_from
+			.filter(rel => rel.to.object_type == 'teams')
+			//y con este map se extraen los ids de los teams
+			.map(teams => teams.to.object_id)
+		})
+		.then(result => {
+			return Models.team
+			.query(qb => qb.whereIn('id', result))
+			.fetchAll({withRelated: ['category_type'
+				,'gender'
+				,'category_group_phase_team.category.season.competition'
+				,'category_group_phase_team.status_type'
+				,'subdiscipline']
+			})
+	})
+	.then(result => Response(res, result) )
+	.catch(error => Response(res, null, error))
+})
 
 	//==========================================================================
 	// Get all the matches of a team

@@ -5,7 +5,7 @@ define([], () => {
   //===============================================================
   // Replaces values of the object's key in the string_template
   //===============================================================
-  console.log("String Replacement")
+
   // console.log("obj :", obj)
   // console.log("template :", string_template)
 

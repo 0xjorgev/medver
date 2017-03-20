@@ -14,9 +14,29 @@ define(['express'
   ,'../util/response_message_util'
   ,'../util/object_map_util'
   ,'../util/email_sender_util'
-], function (express, Models, Message, Knex, Response, ReplaceHelper, Email) {
+  ,'../util/logger_util'
+], function (express, Models, Message, Knex, Response, ReplaceHelper, Email, logger) {
 
     var router = express.Router();
+
+	router.get('/update-score', (req, res) => {
+		Models.match.forge({id: 192})
+		.fetch({withRelated: ['events.event']})
+		// .fetch()
+		.then(match => {
+			// logger.debug(match.toJSON())
+			// logger.lme.w(`${match.relations.home_team.attributes.name}-${match.relations.visitor_team.attributes.name}`)
+			// logger.lme.s(`${match.attributes.home_team_score}-${match.attributes.home_team_score}`)
+			logger.lme.w(match.getScore())
+			logger.lme.wline()
+			match.updateScore()
+			.then(result => {
+				logger.lme.sline()
+				logger.lme.s(result.getScore())
+				Response(res, result)
+			})
+		})
+	})
 
     var getTeamByName = function(name1, name2){
 

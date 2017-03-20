@@ -41,7 +41,7 @@ define(['express'
 
 		logger.debug(user_login)
 
-		return Models.user.query((qb) => {
+		return Models.user.query(qb => {
 			qb.where('username', username)
 			qb.orWhere('email', username)
 		})
@@ -50,29 +50,20 @@ define(['express'
 			,'entity.related_from.to.entity_type'
 			,'entity.related_from.to.object'
 		]})
-		.then(result => {
+		.then(foundUser => {
+			if (foundUser !== null
+				&& foundUser.attributes.password == password
+				&& foundUser.attributes.active == true){
+					const userId = foundUser.id
 
-			if (result !== null
-				&& result.attributes.password == password
-				&& result.attributes.active == true){
-					const userId = result.id
+					let user = foundUser.toJSON()
+					user.roles = foundUser.roles()
+					delete user.entity
 
-					//este metodo carga las relaciones del user con otras entidades
-					let user = Models.user.getEntities(result.toJSON())
-
-					const roles = user.related_entities.map(ent => {
-						return {
-							type: ent.object_type
-							,id: ent.id
-							,entity_id: ent.entity_id
-							,role: ent.relationship_type
-						}
-					})
-					delete user.related_entities
 					const claims = {
-						user: userId,
-						roles: roles,
-						lang: 'en',
+						user: userId
+						,roles: user.roles
+						,lang: 'en'
 					}
 
 					const signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
@@ -81,9 +72,6 @@ define(['express'
 					//TODO: does not expire, for now
 					jwt.setExpiration()
 					user['Authorization-Token'] = jwt.compact()
-
-					//TODO: reemplazar por una busqueda de roles adecuada
-					user.roles = roles
 
 					Response(res, user)
 				}
@@ -122,9 +110,8 @@ define(['express'
             var content =  `<td style="padding-left: 21%; color: #000;"><h1>Welcome ${username}</h1><p>To log in just click <a href="${origin}">Login</a> at the top of every page, and then enter your email or username  and password.</p><p class="highlighted-text">Use the following values when prompted to log in:<br/><strong>Username or Email</strong>: ${username} or ${email} <br/></p></td>`
             // send_email_from(email,'Welcome to Somosport', content)
 
-            logger.debug(`Email Value: ${email}`);
+            logger.debug(`Sending welcome email to ${email}`);
 
-            //var content_html = `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0; text-align: justify;">    <!-- header -->    <table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table" align="center" class="container-table"           style="background-color:#F6F6F6; color: #000; font-size:12px">        <tr>            <td width="20%" align="center" >                <img alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png">            </td>            <td width="60%" align="center" >            </td>            <td width="20%" align="right">                <img alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png">            </td>        </tr>        <!-- Content -->        <tr>            <td width="20%" align="center" style>            </td>            <td width="60%" >                <p style="font-size:18px"><b>Bienvenido a Somosport, ${username}.</b></p>                <p style="font-size:18px"><i>Es nuestro placer asistirte en el proceso de registro de tu equipo en las competiciones de Alianza de Futbol <strong>Houston Copa Coca Cola</strong> y en <strong>Ram Copa Alianza</strong></i></p>                <br>                <p>Gracias por darte de alta en Somosport!</p>                <p>Para continuar con el registro de tu equipo en <strong>"Houston Copa Coca Cola"</strong>haz click <a href="http://registroalianza.codefuel.me/#/competition/1">aquí</a> y completa el registro lo antes posible.</p>                <p>Para continuar con el registro de tu equipo en <strong>"RAM Copa Alianza"</strong>haz click <a href="http://registroalianza.codefuel.me/#/competition/2">aquí</a> y completa el registro lo antes posible.</p>                <br>                <p>Gracias!</p>                <p><strong>—- El equipo de Somosport con Alianza</strong></p>            </td>            <td width="20%"  align="right">            </td>        <tr>            <td width="20%" align="left" ></td>             <td width="60%" >             <hr>                <p>Nota: Este correo electrónico fue enviado desde una cuenta que no acepta recepción de correos.</p>                <p>Tu has recibido este correo como parte de nuestro esfuerzo para asistir a Alianza de Futbol con tu solicitud de registrar equipos en sus competiciones. Tome nota por favor que Somosport provee el servicio de registro automático a Alianza de Futbol, y que por lo tanto, al registrar un equipo en una competición de Alianza de Futbol, Ud. también acepta la Política de Privacidad y los términos del servicio de Alianza de Futbol y Somosport.</p>             <p>Alianza de Futbol y Somosport quieren proveerle el mejor servicio posible para sus organizaciones deportivas, y a través de este proceso Ud también tendrá acceso a mas servicios de Somosport.</p>              <br>                <p>© Somosport Inc.</p>            </td>            <td width="20%"  align="right"></td>        </tr>      </table><!-- End wrapper table --></body>`
             var content_html = `<body style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0; text-align: justify;">    <!-- header -->      <table width="100%" cellpadding="20" cellspacing="0" border="0" id="background-table" align="center" class="container-table"            style="background-color:#F6F6F6; color: #000; font-size:12px">        <tr>            <td style="width:2%" align="center">                            </td>            <td style="width:96%">               <img style="float: left;" alt="SomoSport Logo" src="https://somosport-s3.s3.amazonaws.com/logosomosportcompleto1479494176269.png">                <img style="float: right;" alt="Alianza" src="https://somosport-s3.s3.amazonaws.com/logoalianza1479494219199.png">            </td>            <td style="width:2%" align="center">            </td>        </tr>     <!-- Content -->                <tr>                        <td style="width:2%">           </td>           <td style="width:96%">                              <p style="font-size:18px"><b>Bienvenido a Somosport, ${username}.</b></p>                               <p style="font-size:18px"><i>Es nuestro placer asistirte en el proceso de registro de tu equipo en las competiciones de Alianza de Futbol <strong>Houston Copa Coca Cola</strong> y en <strong>Ram Copa Alianza</strong></i></p>                                <br>                                <p>Gracias por darte de alta en Somosport!</p>                              <p>Para continuar con el registro de tu equipo en <strong>"Houston Copa Coca Cola"</strong>haz click <a href="http://registroalianza.codefuel.me/#/competition/1">aquí</a> y completa el registro lo antes posible.</p>                             <p>Para continuar con el registro de tu equipo en <strong>"RAM Copa Alianza"</strong>haz click <a href="http://registroalianza.codefuel.me/#/competition/2">aquí</a> y completa el registro lo antes posible.</p>                               <br>                                <p>Gracias!</p>                             <p><strong>— El equipo de Somosport con Alianza</strong></p>                       </td>           <td style="width:2%">           </td>       </tr>        <tr>            <td style="width:2%"></td>             <td style="width:96%">              <hr>                <p>Nota: Este correo electrónico fue enviado desde una cuenta que no acepta recepción de correos.</p>                <p>Tu has recibido este correo como parte de nuestro esfuerzo para asistir a Alianza de Futbol con tu solicitud de registrar equipos en sus competiciones. Tome nota por favor que Somosport provee el servicio de registro automático a Alianza de Futbol, y que por lo tanto, al registrar un equipo en una competición de Alianza de Futbol, Ud. también acepta la Política de Privacidad y los términos del servicio de Alianza de Futbol y Somosport.</p>             <p>Alianza de Futbol y Somosport quieren proveerle el mejor servicio posible para sus organizaciones deportivas, y a través de este proceso Ud también tendrá acceso a mas servicios de Somosport.</p>              <br>                <p>© Somosport Inc.</p>            </td>            <td style="width:2%"></td>        </tr>      </table><!-- End wrapper table --></body>`
             // send_email_from(email,'Bienvenido a Somosport', content_html)
 
@@ -283,12 +270,15 @@ define(['express'
     })
 
 	router.get('/:user_id/feed', (req, res) => {
-		//se verifica unicamente que haya un usuario válido en el request
-		//no se requiere ningun permiso especial
-		const chk = auth.checkPermissions(req._currentUser, [])
 
-		if(chk.code !== 0){
-			Response(res, null, chk)
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: ''
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
 			return
 		}
 
@@ -320,7 +310,7 @@ define(['express'
 					//filtrar solamente por tipo 3 -> feed item
 					qb.where('relationship_type_id', 3)
 				})
-				.fetchAll({withRelated: ['from.object'], debug: false})
+				.fetchAll({withRelated: ['from.object']})
 				.then(rel => {
 					//proceso el resultado, para retornar solamente los feeds
 					return rel.toJSON().map(r => r.from.object.id)
@@ -335,7 +325,7 @@ define(['express'
 			// logger.debug(feedItemIds)
 			//un arreglo con los ids de los feeds o uno vacio
 			if(feedItemIds.length == 0){
-				logger.debug('no feeds')
+				// logger.debug('no feeds')
 				return []
 			}
 
@@ -387,11 +377,15 @@ define(['express'
 			'entity.related_from.to.object',
 			'entity.related_from.relationship_type']})
 		.then(result => {
-			Response(res, Models.user.getEntities(result.toJSON()))
+			let user = result.toJSON()
+			user.roles = result.roles()
+			delete user.entity
+			Response(res, user)
 		})
 		.catch(error => Response(res, null, error))
 	})
 
+<<<<<<< HEAD
   //==========================================================================
   //  User Update
   //==========================================================================

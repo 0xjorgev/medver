@@ -358,6 +358,7 @@ define(['express'
 	})
 
 	//servicio para almacenar los eventos de un partido; genera feed items
+	//actualiza el score del match
 	router.post('/:match_id/event', (req, res) => {
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
@@ -373,9 +374,13 @@ define(['express'
 		return Promise.all(matchResult.map(mr => {
 			return new Models.event_match_player(mr)
 			.save()
-			// .then(createFeedItemFromEvent)
 			.then(FeedItemHelper.createFeedItemFromEvent)
 		}))
+		.then(result => {
+			return Models.match.forge({id: matchId})
+				.fetch({withRelated: 'events.event'})
+		})
+		.then(match => match.updateScore())
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
@@ -504,9 +509,6 @@ define(['express'
 			return result
 		})
 	}
-
-	//para importarlo desde core route, e utilizarlo para rebuild feed
-	router.createFeedItemFromEvent = createFeedItemFromEvent
 
 	//feed de un match
 	router.get('/:match_id/feed', (req, res) => {

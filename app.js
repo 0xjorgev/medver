@@ -13,6 +13,7 @@ const argv = require('minimist')(process.argv.slice(2));
 const subpath = express();
 const logger = require('./util/logger_util')
 const http = require('http')
+const authHelper = require('./helpers/auth_helper')
 
 //node port
 const port = process.env.PORT;
@@ -155,37 +156,7 @@ app.use(bodyParser.json({type: 'application/vnd.api+json'}));
 // support encoded bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//TODO: colocar en un helper
-const validateToken = function (req, res, next) {
-
-	const token = req.headers['Authorization-Token'] || req.headers['authorization-token']
-
-	if(token === undefined || token === null){
-		next()
-	}
-	else{
-		try{
-			var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
-			var verifiedJwt = nJwt.verify(token, secretKey)
-
-			//si se entrega un token válido, se inyectan los datos del usuario al request
-			//estos valores se obtienen al hacer login
-			req._currentUser = {
-				id: verifiedJwt.body.user,
-				roles: verifiedJwt.body.roles,
-				permissions: verifiedJwt.body.permissions,
-				lang: verifiedJwt.body.lang
-			}
-			next()
-		}
-		catch(error){
-			logger.error(error)
-			Response(res, null, error)
-		}
-	}
-}
-
-app.use(validateToken)
+app.use(authHelper.validateToken)
 
 /******
 * para procesamiento de query strings, como ordenamiento

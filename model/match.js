@@ -43,23 +43,19 @@ define(['./base_model'
 			// })
 
 			this.on('created', match => {
-				// this.set('number', 99)
-				const entity =
-					new DB._models.Entity({
-						object_type: 'matches'
-						,object_id: this.id
-					})
+				const entity = new DB._models.Entity({
+					object_type: 'matches'
+					,object_id: this.id })
 				entity.save()
 			}, this)
 
 			this.on('fetched', () => {
 				const currentRelations = Object.keys(this.relations)
-
-				if(currentRelations.indexOf('home_team') < 0 && currentRelations.indexOf('visitor_team') < 0)
+				if(currentRelations.indexOf('home_team') < 0 && currentRelations.indexOf('visitor_team') < 0){
 					return this.load(['home_team','visitor_team'])
+				}
 			})
 		}
-
 		,validations: {
 			// round_id: ['required', 'numeric','greaterThan:0']
 			// ,number: ['required', 'numeric','greaterThan:0']
@@ -67,7 +63,6 @@ define(['./base_model'
 		,validate: function(model, attrs, options) {
 			return DB.checkit(this.validations).run(this.toJSON());
 		}
-
 		//relations
 		,round: function(){
 			return this.belongsTo('Round', 'round_id');
@@ -92,6 +87,41 @@ define(['./base_model'
 		}
 		,events: function(){
 			return this.hasMany('Event_match_player', 'match_id');
+		}
+		//toma los eventos del partido
+		,getScore: function(){
+			return `${this.relations.home_team.attributes.name}:${this.attributes.home_team_score}  - ${this.relations.visitor_team.attributes.name}:${this.attributes.visitor_team_score}`
+		}
+		,updateScore: function(){
+			//TODO: antes de ejecutar la funcion, deberia verificarse si las
+			//relaciones utilizadas fueron cargadas
+			const homeTeamId = this.attributes.home_team_id
+			const visitorTeamId = this.attributes.visitor_team_id
+
+			//se extraen los eventos pertenecientes a los goles
+			const score = this.relations.events.toJSON()
+			.filter(e => e.event.code == '#GOL' || e.event.code == '#AGOL')
+			.reduce((score,goal) => {
+				if(goal.event.code == '#GOL'){
+					if(goal.team_id == homeTeamId)
+						score.home_team_score += 1
+					else
+						score.visitor_team_score += 1
+				}
+				else{
+					if(goal.team_id == homeTeamId)
+						score.visitor_team_score += 1
+					else
+						score.home_team_score += 1
+				}
+				return score
+			}, {home_team_score: 0, visitor_team_score: 0})
+			// logger.lme.e(score)
+
+			this.attributes.home_team_score = score.home_team_score
+			this.attributes.visitor_team_score = score.visitor_team_score
+			//se salva el score recien calculado
+			return this.save()
 		}
 	},{
 		//metodos estaticos

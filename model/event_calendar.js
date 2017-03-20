@@ -9,8 +9,9 @@ define(['./base_model'
 ,'./index'
 ,'../util/logger_util'
 ,'./entity'
+,'../util/knex_util'
 ]
-, (DB, Models, logger) => {
+, (DB, Models, logger, Knex) => {
     var Event_calendar = DB.Model.extend({
         tableName: 'events_calendars'
         ,hasTimestamps: true
@@ -114,6 +115,58 @@ define(['./base_model'
                     ,'entity.related_from'
                     ,'entity.related_to' 
                     ]})
+			})
+	    }
+	    ,
+	    //Borrado fisico de un evento de calendario, su entidad y  la relacion de esa entidad
+	    deleteEventCalendar: function(_eventCalendar){
+        	// let _currentUser = _eventCalendar._currentUser
+        	logger.debug('Delete event calendar id')
+        	logger.debug(_eventCalendar)
+			//objetos a borrar
+			let eventCalendar_id = _eventCalendar
+			let entity
+			let entityRel	
+			//Obtenemos el id de la entidad
+			return DB._models.Entity
+				.where({object_id: _eventCalendar,
+						object_type: 'events_calendars' })
+				.fetch()
+			.then(_entity => {
+				entity = _entity.toJSON()
+				//Con los datos obtenidos encontramos el id de la relacion entre la el evento calendario y la entidad padre
+				if(!_entity)
+					return // no encontro entidad asociada asi que retorna
+				//Borro la relacion de entidad
+				return DB._models.Entity_relationship
+					.where({ent_ref_from_id: entity.id}
+						, {relationship_type_id: 8}
+						, {comment: 'EVENT CALENDAR OF'})
+					.fetch()
+			})
+			.then(result => {
+				if(!result)
+					return
+				entityRel = result.toJSON()
+				//borro la entidad
+				return new DB._models.Entity_relationship({id: entityRel.id})
+					.destroy()
+			})
+			.then(result => {
+				if(!result)
+					return
+				//borro la entidad
+				return DB._models.Entity
+						.where({id: entity.id})
+						.destroy()
+			})
+			.then(result => {
+				if(!result)
+					return
+				//borro la entidad
+				return DB._models.Event_calendar
+						.where({id: eventCalendar_id })
+						.destroy()
 			})
 	    }
     })

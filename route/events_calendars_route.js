@@ -72,6 +72,19 @@ define(['express'
 		data.id = req.params.event_calendar_id
 		save(data, res)
 	});
+
+	//actualizacion de club
+	router.delete('/:event_calendar_id', function(req, res, next){
+		//Verificacion de permisos
+        // var chk = auth.checkPermissions(req._currentUser, [])
+        // if(chk.code !== 0){
+        //     Response(res, null, chk)
+        //     return
+        // }
+		return Models.event_calendar.deleteEventCalendar(req.params.event_calendar_id)
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	});
 	
 
 	return router;

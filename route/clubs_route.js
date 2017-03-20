@@ -277,7 +277,7 @@ define(['express'
         })
         .then(_entRel => {
         	let eventCalendar = _entRel.toJSON()
-        	logger.debug(eventCalendar)
+        	//logger.debug(eventCalendar)
         	//Se va a crear un objeto que va a ser el club con todos sus eventos de calendario parametro tipo arreglo con el nombre de eventsCalendars
         	club.eventsCalendars = []
 

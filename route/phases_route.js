@@ -63,23 +63,14 @@ define(['express',
 		});
 	});
 
-
-	//Phase, group, round team by Phase_id
-	router.get('/:phase_id/group_round_match', function (req, res) {
+	router.get('/:phase_id/match', (req, res) => {
 		var phase_id = req.params.phase_id;
-		//FIXME: este servicio deberia traer los matches por grupo, no por round.
-		//esto afectaria la pantalla de schedules en competition
 		return Models.group
-		.query(function(qb){})
-		.where({'phase_id':phase_id, active:true})
-		.fetchAll({withRelated: ['rounds.matches.home_team', 'rounds.matches.visitor_team','rounds.matches.referee.user']})
-		.then(function (result) {
-			Response(res, result)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
-	});
+		.where({'phase_id': phase_id, active: true})
+		.fetchAll({withRelated: ['matches.home_team', 'matches.visitor_team','matches.referee.user']})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
 
 	router.get('/', function (req, res) {
 		return Models.phase

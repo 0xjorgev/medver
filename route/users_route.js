@@ -89,6 +89,7 @@ define(['express'
         var username = new_user.username.trim();
         var password = new_user.password.trim();
         var email    = new_user.email.trim();
+        var lang    = new_user.lang.trim();
         var origin = req.headers.origin
 
         var _newUser = null
@@ -96,7 +97,8 @@ define(['express'
         new Models.user({
             username: username,
             email: email,
-            password: password
+            password: password,
+            lang: lang
         })
         .save()
         .then(result => {
@@ -117,7 +119,7 @@ define(['express'
                 user: _newUser.id,
                 roles: ['admin'],
                 permissions: [],
-                lang: 'en'
+                lang: lang
             }
 
             var signingKey = process.env.API_SIGNING_KEY || 's3cr3t'
@@ -383,5 +385,32 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
-	return router;
+  //==========================================================================
+  //  User Update
+  //==========================================================================
+
+  router.put('/language/', (req, res) => {
+
+    var user = new Models.user;
+    var prefLang = req.body.lang;
+    var chk = auth.checkPermissions(req._currentUser, [])
+
+    if(chk.code !== 0){
+        Response(res, null, chk)
+        return
+    }
+
+    Knex_util(user.tableName)
+    .where({'id':req._currentUser.id})
+    .where({'active':1})
+    .update({
+        'lang' : prefLang
+    }, ['id'])
+    .then(result => {
+        Response(res, result)
+    })
+    .catch(error => Response(res, null, error))
+  })
+
+    return router;
 });

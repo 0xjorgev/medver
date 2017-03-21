@@ -1,0 +1,50 @@
+<mjml>
+  <mj-body>
+    <mj-container>
+      <mj-section>
+        <mj-column>
+          <mj-image width="125" src="	https://s3.amazonaws.com/somosport-s3/Logo-Alianza-de-Futbol-3D-flat.jpg"></mj-image>
+          </mj-column>
+          <mj-column>
+          <mj-image width="125" src="	https://s3.amazonaws.com/somosport-s3/Somosport-with_text.png"></mj-image>
+          </mj-column>
+      </mj-section>
+      <!-- Side image -->
+      <mj-divider border-color="black"></mj-divider>
+      <mj-section background-color="white">
+
+      <!-- Left image -->
+        <mj-column>
+        <mj-image width="150"
+              src="https://somosport-s3.s3.amazonaws.com/cocacola_logo1479526869576.png" />
+        </mj-column>
+
+        <!-- right paragraph -->
+        <mj-column>
+          <mj-text font-size="25" font-family="Helvetica-Bold" color="black">Estimado (NOMBRE DE ENTRENADOR),
+          </mj-text>
+
+          <mj-text font-family="Helvetica" color="black" font-size="25"> Hemos recibido el pago correspondiente de su equipo (NOMBRE DE EQUIPO) para participar en el torneo (TORNEO) (CIUDAD) (CATEGORÍA).
+          </mj-text>
+          <mj-text color="#525252">
+            Por favor, ingrese al enlace a continuación para completar el roster de su equipo y consultar el waiver y reglamentos</mj-text>
+          <mj-text color="#525252" font-family="Helvetica-Bold">
+            En el siguiente enlace podrá realizar el pago como así también descargar los documentos requeridos para la participación: </mj-text>
+
+            <mj-button href ="http://www.google.com"> Ingresar aquí </mj-button>
+
+            <mj-text color="#525252">
+            Gracias por ser parte del torneo nacional más grande del fútbol hispano en los Estados Unidos.</mj-text>
+          </mj-column>
+      </mj-section>
+      <mj-section background-color="black">
+        <mj-column>
+        <mj-image
+              src="https://s3.amazonaws.com/somosport-s3/ALIANZA-BARRA-PATROCINADORES-BLANCO.png" />
+              <mj-text color="WHITE" font-size="8">
+            POWERADE AND COCA-COLA ARE REGISTRATED TRADEMARKS OF THE COCA-COLA COMPANY AND USED WITH PERMISSION.</mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-container>
+  </mj-body>
+</mjml>

@@ -1,0 +1,45 @@
+<mjml>
+  <mj-body>
+    <mj-container>
+      <mj-section>
+        <mj-column>
+          <mj-image width="125" src="	https://s3.amazonaws.com/somosport-s3/Logo-Alianza-de-Futbol-3D-flat.jpg"></mj-image>
+          </mj-column>
+          <mj-column>
+          <mj-image width="125" src="	https://s3.amazonaws.com/somosport-s3/Somosport-with_text.png"></mj-image>
+          </mj-column>
+      </mj-section>
+      <!-- Side image -->
+      <mj-divider border-color="black"></mj-divider>
+      <mj-section background-color="white">
+
+      <!-- Left image -->
+        <mj-column>
+        <mj-image width="150"
+              src="https://somosport-s3.s3.amazonaws.com/cocacola_logo1479526869576.png" />
+        </mj-column>
+
+        <!-- right paragraph -->
+        <mj-column>
+          <mj-text font-size="25" font-family="Helvetica-Bold" color="black">Dear (NOMBRE DE ENTRENADOR),
+          </mj-text>
+
+          <mj-text font-family="Helvetica" color="black">We are sorry to inform you that (EQUIPO) has not been selected to participate in the A (TORNEO) (CIUDAD) (CATEGORÍA) event. There was an overwhelming response for submission and the selection committee spent considerable time vetting the teams.
+          </mj-text>
+          <mj-text color="#525252">
+            We appreciate your enthusiasm and appreciate your commitment to Hispanic soccer in the U.S.</mj-text>
+          <mj-text color="#525252">
+            We hope to see you in the near future.</mj-text>
+          </mj-column>
+      </mj-section>
+      <mj-section background-color="black">
+        <mj-column>
+        <mj-image
+              src="https://s3.amazonaws.com/somosport-s3/ALIANZA-BARRA-PATROCINADORES-BLANCO.png" />
+              <mj-text color="WHITE" font-size="8">
+            POWERADE AND COCA-COLA ARE REGISTRATED TRADEMARKS OF THE COCA-COLA COMPANY AND USED WITH PERMISSION.</mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-container>
+  </mj-body>
+</mjml>

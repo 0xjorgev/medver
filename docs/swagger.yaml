@@ -293,6 +293,26 @@ paths:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No user found
+  /user/language/:
+    put:
+      summary: Updates the user prefered language
+      description: Updates the user prefered language
+      tags:
+        - User
+      parameters:
+      - name: lang
+        in: body
+        description: language
+        required: true
+        type: string
+        format: string
+      responses:
+        200:
+          description: User info
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No user found
 
   /competition:
     get:

@@ -439,5 +439,47 @@ define(['express'
         .catch(error => Response(res, null, error))
     })
 
+    //==========================================================================
+	// Get all Event_Calendar of a team
+	//==========================================================================
+	router.get('/:team_id/event_calendar', (req, res) => {
+		let team ={}
+		team.id = req.params.team_id
+        
+        //Obtengo los datos del team y su entidad
+        return Models.team
+			.query(function(qb){})
+			.where({id:team.id})
+			.where({active:true})
+			.fetch({withRelated: [
+	             'entity'
+	        ]})
+		.then(_team => {
+        	team = _team.toJSON()
+			//Con los datos de la entidad del team se obtienes los eventos asociados
+			return Models.entity_relationship
+				.query(function(qb){})
+				.where({ent_ref_to_id:team.entity.id})
+				.where({relationship_type_id:8})
+				.where({active:true})
+				.fetchAll({withRelated: [
+		            'from.object'
+		        ]})
+        })
+        .then(_entRel => {
+        	let eventCalendar = _entRel.toJSON()
+        	//logger.debug(eventCalendar)
+        	//Se va a crear un objeto que va a ser el team con todos sus eventos de calendario parametro tipo arreglo con el nombre de eventsCalendars
+        	team.eventsCalendars = []
+
+        	team.eventsCalendars =  eventCalendar.map(eventCalendar => eventCalendar.from.object)
+
+        	return team
+        })
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+    })
+
+
 	return router;
 });

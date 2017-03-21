@@ -41,7 +41,7 @@ define(['./base_model'
 			//para asociar las entidades
 			let eventCalendarEntity = null
 			let userEntity = null
-			let entityParent = null
+			let entity_parent_id = null
 			let saveEventCalendar = null
 			let data = {}
 
@@ -53,7 +53,7 @@ define(['./base_model'
 			if (_eventCalendar.active != undefined) data.active = _eventCalendar.active
 			if (_eventCalendar.events_calendars_types_id != undefined) data.events_calendars_types_id = _eventCalendar.events_calendar_types_id
 			if (_eventCalendar.id != undefined) data.id = _eventCalendar.id
-			if (_eventCalendar.entityParent != undefined) entityParent = _eventCalendar.entityParent
+			if (_eventCalendar.entity_parent_id != undefined) entity_parent_id = _eventCalendar.entity_parent_id
 
 			//Salvamos el evento del calendario
 			return new DB._models.Event_calendar(data).save()
@@ -69,7 +69,6 @@ define(['./base_model'
 			})
 			.then(result => {
 				var tmp = result.toJSON()
-				logger.debug('tmp', tmp)
 				eventCalendarEntity = tmp.filter(e => e.object_type == 'events_calendars')
 				//si no se obtiene una entidad para el eventCalendar, se crea
 				if(eventCalendarEntity.length == 0){
@@ -101,14 +100,13 @@ define(['./base_model'
 					// con el eventCalendar como owner del mismo
 					return new DB._models.Entity_relationship({
 						ent_ref_from_id: result.id
-						,ent_ref_to_id: entityParent.id
+						,ent_ref_to_id: entity_parent_id
 						,relationship_type_id: 8
 						,comment: 'EVENT CALENDAR OF'
 					}).save()
 				}
 			})
 			.then(result => {
-				logger.debug('saveEventCalendar.id',saveEventCalendar.id)
 				return DB._models.Event_calendar
 				.where({id:saveEventCalendar.id})
 				.fetch({withRelated: [

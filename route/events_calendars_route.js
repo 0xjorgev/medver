@@ -14,7 +14,7 @@ define(['express'
 		return Models.event_calendar
 		.query(function(qb){})
 		.where({active:true})
-		.fetchAll({withRelated: []})
+		.fetchAll({withRelated: ['entity.related_from.to.object']})
 		.then(function (result) {
 			Response(res, result);
 		})
@@ -27,7 +27,7 @@ define(['express'
 		var event_calendar_id = req.params.event_calendar_id;
 		return Models.event_calendar
 		.where({id:event_calendar_id})
-		.fetch({withRelated: []})
+		.fetch({withRelated: ['entity.related_from.to.object']})
 		.then(function (result) {
 			Response(res, result);
 		})

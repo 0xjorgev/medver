@@ -520,9 +520,9 @@ define(['express'
 
 			var invitation = new_invitation
 			//Sent mail of inscription on category
-			if(data.id == undefined){
-				email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
-			}
+			// if(data.id == undefined){
+			// 	email_sender_invitation(_currentUser, _origin, spiderData.category_id, spiderData.team_id)
+			// }
 
 			Response(res, invitation);
 		})
@@ -554,8 +554,8 @@ define(['express'
 			.then((status_type_result) => {
 				var email_template = email_status_template(status_type_result.attributes.code)
 				data.template = email_template
-				var owner_email = team_owner_email(data)
-				return true
+				// var owner_email = team_owner_email(data)
+				return team_owner_email(data) //true
 			})
 			.catch(function(err){
 				console.log("Error request: ", err)
@@ -569,15 +569,15 @@ define(['express'
 	const email_status_template = (status) => {
 		switch (status) {
 			case "pre-registration-in-progress":
-				return './template/email/alianza_status_invited.html'
+				return './template/email/Alianza/register-LANG.html'
 			case "pre-registration-approved":
-				return './template/email/alianza_status_approved.html';
+				return './template/email/Alianza/approved-LANG.html'
 			case "pre-registration-rejected":
-				return './template/email/alianza_status_rejected.html';
+				return './template/email/Alianza/rejected-LANG.html'
 			case "pre-registration-paid":
-				return './template/email/alianza_status_paid.html';
+				return './template/email/Alianza/payed-LANG.html'
 			default:
-				return './template/email/alianza_status_registrated.html';
+				return './template/email/Alianza/register-EN.html'
 		}
 	}
 
@@ -586,19 +586,50 @@ define(['express'
 	//==========================================================================
 
 	const send_status_email = function(data){
-
 		// console.log("Status Email ", data.template)
+		console.log("Data value for Category: ", data);
 		var tag = {
 			COACH_KEY: `${data.user.attributes.username}`
 			,TEAM_KEY: `${data.team.attributes.name}`
 			,TORNEO_KEY: `${data.category.relations.season.relations.competition.attributes.name}`
 			,CATEGORIA_KEY: `${data.category.attributes.name}`
 			,CIUDAD_KEY: `${JSON.parse(data.category.relations.season.attributes.meta).ciudad}`
+			,IMAGE_KEY: `${data.imageUrl}`
 		}
 
-		var template = template_string_replace(data.template
+		const prefLang =  (pref) => {
+			console.log("Inside PrefLang: ", pref)
+			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
+			  if (pref !== null && pref !== undefined ) {
+					// 	console.log("Inside if: ", pref.toUpperCase())
+				 	return pref.toUpperCase()
+			 } else {
+				//  console.log("Inside Else: ")
+				 return "EN"
+			 }
+		}
+
+		const preSubject =  (pref) => {
+			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
+				if (pref !== null && pref !== undefined ) {
+					switch(pref){
+						case "ES":
+							return "Información de registro para Torneos Alianza de Futbol"
+						default:
+							return "Alianza de Futbol tournament register informaction"
+					}
+			 } else {
+				 return "Alianza de Futbol tournament register informaction"
+			 }
+		}
+
+
+	// console.log("User Lang: ", data.user.attributes.lang)
+	//console.log("LANG", prefLang(data.user.lang))
+
+	return template_string_replace(data.template.replace("LANG", prefLang(data.user.attributes.lang) )
 				,tag ,process.env.SENDER_EMAIL
-				,'Información de registro para Torneos Alianza de Futbol'
+				,preSubject(data.user.attributes.lang)
 				// ,'jorgevmendoza@gmail.com')
 				,data.user.attributes.email)
 	}
@@ -676,8 +707,12 @@ define(['express'
 			.fetch({withRelated:'season.competition'})
 			.then((result) => {
 				data.category = result
-				var status_email = send_status_email(data)
-				return
+				// console.log("******************")
+				// console.log("Competition values:", result.relations.season.relations.competition.attributes.img_url)
+				// console.log("******************")
+				data.imageUrl = result.relations.season.relations.competition.attributes.img_url
+				//var status_email = send_status_email(data)
+				return send_status_email(data)
 			})
 			.catch((error) => {
 				return {}

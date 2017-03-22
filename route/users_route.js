@@ -410,7 +410,7 @@ define(['express'
     .then(result => {
         Response(res, result)
     })
-    .catch(error => Response(res, null, error))
+    .catch(error => { Response(res, null, error) })
   })
 
     return router;

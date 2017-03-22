@@ -587,14 +587,14 @@ define(['express'
 
 	const send_status_email = function(data){
 		// console.log("Status Email ", data.template)
-		console.log("Data value for Category: ", data);
+		console.log("TORNEO_KEY: ", data.category.relations.season.relations.competition.attributes.name);
 		var tag = {
-			COACH_KEY: `${data.user.attributes.username}`
-			,TEAM_KEY: `${data.team.attributes.name}`
-			,TORNEO_KEY: `${data.category.relations.season.relations.competition.attributes.name}`
-			,CATEGORIA_KEY: `${data.category.attributes.name}`
-			,CIUDAD_KEY: `${JSON.parse(data.category.relations.season.attributes.meta).ciudad}`
-			,IMAGE_KEY: `${data.imageUrl}`
+			COACH_KEY: data.user.attributes.username
+			,TEAM_KEY: data.team.attributes.name
+			,TORNEO_KEY: data.category.relations.season.relations.competition.attributes.name
+			,CATEGORIA_KEY: data.category.attributes.name
+			,CIUDAD_KEY: JSON.parse(data.category.relations.season.attributes.meta).ciudad
+			,IMAGE_KEY: data.imageUrl
 		}
 
 		const prefLang =  (pref) => {

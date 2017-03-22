@@ -1953,6 +1953,30 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /team/{team_id}/event_calendar:
+    get:
+      summary: Returns the calendar events of one team
+      description: Returns the calendar events of one team
+      parameters:
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Team
+      responses:
+        200:
+          description: the team information with an array of calendar events
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No calendar events found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
   /player/{player_id}:
     get:
@@ -2427,6 +2451,122 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /club/{club_id}/event_calendar:
+    get:
+      summary: Returns the calendar events of one club
+      description: Returns the calendar events of one club
+      parameters:
+        - name: club_id
+          in: path
+          description: Club ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Club
+      responses:
+        200:
+          description: the club information with an array of calendar events
+        403:
+          description: Invalid Authorization-Token or no Authorization-Token received
+        404:
+          description: No calendar events found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /event_calendar:
+    get:
+      summary: Gets the info of all event calendars
+      description: Gets the info of all event calendars
+      tags:
+        - Event Calendar
+      responses:
+        200:
+          description: List of event_calendars
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a event calendar
+      description: Creates a event calendar
+      tags:
+        - Event Calendar
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/EventCalendarRequest'
+      responses:
+        200:
+          description: event_calendar creation OK
+      security: []
+  /event_calendar/{event_calendar_id}:
+    get:
+      summary: Returns the detail of one event calendar
+      description: Returns the detail of one event calendar
+      parameters:
+        - name: event_calendar_id
+          in: path
+          description: Event Calendar ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Event Calendar
+      responses:
+        200:
+          description: An array of event_calendars
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a event calendar
+      description: Updates a event calendar
+      parameters:
+        - name: event_calendar_id
+          in: path
+          description: Event Calendar ID
+          required: true
+          type: integer
+          format: integer
+        - name: event_calendar data
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/EventCalendarRequest'
+      tags:
+        - Event Calendar
+      responses:
+        200:
+          description: Resource updated
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: fisical delete of a event_calendar given the id
+      description: fisical delete of a event_calendar given the id
+      tags:
+        - Event Calendar
+      responses:
+        200:
+          description: object deleted
+      parameters:
+        - name: event_calendar_id
+          in: path
+          description: Event Calendar ID
+          required: true
+          type: integer
+          format: integer
 
 
 
@@ -2933,7 +3073,6 @@ definitions:
       description:
         type: string
 
-
   CreateClubRequest:
     title: Club Creation/Update Request
     type: object
@@ -2951,3 +3090,23 @@ definitions:
         description: If not provided, a new 'club' organization will be created under the same name as the club
     required:
       - nam
+
+  EventCalendarRequest:
+    title: Event Calendar Creation/Update Request
+    type: object
+    properties:
+      title:
+        type: string
+      startsAt:
+        type: string
+      endsAt:
+        type: string
+      place:
+        type: string
+      comment:
+        type: string
+      entity_parent_id:
+        type: integer
+        description: If not provided, a new 'event calendar' will not be associated with any entity
+    required:
+      - entity_parent_id

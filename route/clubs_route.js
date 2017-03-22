@@ -39,12 +39,16 @@ define(['express'
         //se verifica unicamente que haya un usuario valido en el request
         //no se requiere ningun permiso especial
 
-        var chk = auth.checkPermissions(req._currentUser, [])
+        const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'clubs'
+			,permissions: []
+		})
 
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
         Models.user
         .query(qb => qb.where({id: req._currentUser.id}) )
@@ -55,6 +59,9 @@ define(['express'
         .then(result => {
             var user = result.toJSON()
             //con esto se filtran las relaciones para que sean los clubs
+
+            logger.debug(user)
+
             return user.entity.related_from
                 .filter(rel => {
                     return rel.to.object_type == 'clubs'
@@ -93,12 +100,8 @@ define(['express'
 	//==========================================================================
 	var saveClub = function(data, res){
 
-		Models.club.saveClub(data)
-		.then(result => {
-			logger.debug('Respuesta del metodo saveClub')
-			logger.debug(result)
-			Response(res, result)
-		})
+		return Models.club.saveClub(data)
+		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	}
 
@@ -137,13 +140,17 @@ define(['express'
 		var clubId = req.params.club_id
 		var clubData = {}
 		//Requiere autorizacion por token
-        console.log('Current User', req._currentUser)
-        var chk = auth.checkPermissions(req._currentUser, [])
+        // console.log('Current User', req._currentUser)
+        const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'clubs'
+			,permissions: []
+		})
 
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
 		if (clubId != undefined) clubData.id = clubId
 		
@@ -195,7 +202,7 @@ define(['express'
         	var teamsID = teams.toJSON(teams).map(team => {
     			return team.id
     		})
-			logger.debug(teamsID)
+			// logger.debug(teamsID)
 			return Models.match
 		        .query(qb => 
 					qb.whereIn('home_team_id', teamsID)
@@ -221,7 +228,7 @@ define(['express'
 
         	var allmatches = matches.toJSON()
 
-			logger.debug(allmatches)
+			// logger.debug(allmatches)
 			futureMatches = allmatches.filter(function(g){
 							return g.date >= currentDate
 						})
@@ -238,6 +245,48 @@ define(['express'
         })
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))
+    })
+
+
+    //==========================================================================
+	// Get all Event_Calendar of a club
+	//==========================================================================
+	router.get('/:club_id/event_calendar', (req, res) => {
+		let club ={}
+		club.id = req.params.club_id
+        
+        //Obtengo los datos del club y su entidad
+        return Models.club
+			.query(function(qb){})
+			.where({id:club.id})
+			.where({active:true})
+			.fetch({withRelated: [
+	             'entity'
+	        ]})
+		.then(_club => {
+        	club = _club.toJSON()
+			//Con los datos de la entidad del club se obtienes los eventos asociados
+			return Models.entity_relationship
+				.query(function(qb){})
+				.where({ent_ref_to_id:club.entity.id})
+				.where({relationship_type_id:8})
+				.where({active:true})
+				.fetchAll({withRelated: [
+		            'from.object'
+		        ]})
+        })
+        .then(_entRel => {
+        	let eventCalendar = _entRel.toJSON()
+        	//logger.debug(eventCalendar)
+        	//Se va a crear un objeto que va a ser el club con todos sus eventos de calendario parametro tipo arreglo con el nombre de eventsCalendars
+        	club.eventsCalendars = []
+
+        	club.eventsCalendars =  eventCalendar.map(eventCalendar => eventCalendar.from.object)
+
+        	return club
+        })
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
     })
 
 

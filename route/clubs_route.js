@@ -107,12 +107,17 @@ define(['express'
 
 	//creacion de club
 	router.post('/', (req, res) => {
-		//Verificacion de permisos
-        var chk = auth.checkPermissions(req._currentUser, [])
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+		// //Verificacion de permisos
+  		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'clubs'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
 		var data = req.body
 		data._currentUser = req._currentUser
@@ -122,11 +127,16 @@ define(['express'
 	//actualizacion de club
 	router.put('/:club_id', function(req, res, next){
 		//Verificacion de permisos
-        var chk = auth.checkPermissions(req._currentUser, [])
-        if(chk.code !== 0){
-            Response(res, null, chk)
-            return
-        }
+        const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'clubs'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
+			return
+		}
 
 		var data = req.body
 		data._currentUser = req._currentUser
@@ -140,7 +150,7 @@ define(['express'
 		var clubId = req.params.club_id
 		var clubData = {}
 		//Requiere autorizacion por token
-        // console.log('Current User', req._currentUser)
+        logger.debug(clubId)
         const permissionCheck = auth.checkPermissions({
 			user: req._currentUser
 			,object_type: 'clubs'
@@ -277,7 +287,7 @@ define(['express'
         })
         .then(_entRel => {
         	let eventCalendar = _entRel.toJSON()
-        	//logger.debug(eventCalendar)
+        	// logger.debug(eventCalendar)
         	//Se va a crear un objeto que va a ser el club con todos sus eventos de calendario parametro tipo arreglo con el nombre de eventsCalendars
         	club.eventsCalendars = []
 

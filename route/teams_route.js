@@ -152,7 +152,7 @@ define(['express'
 			}
 		})
 		.then(club => {
-			logger.debug(club)
+			// logger.debug(club)
 			clubData.id  = club.attributes.id
 			teamData.club_id = clubData.id
 			teamData._currentUser = data._currentUser
@@ -203,8 +203,8 @@ define(['express'
 	})
 
 	var savePlayerTeam = (playerTeamData, res) => {
-		logger.debug('savePlayerTeam')
-		logger.debug(playerTeamData)
+		// logger.debug('savePlayerTeam')
+		// logger.debug(playerTeamData)
 
 		//chequeo de tipo array
 		if(!(Object.prototype.toString.call( playerTeamData ) === '[object Array]')) {
@@ -349,9 +349,10 @@ define(['express'
 	router.get('/query/by_user', (req, res) => {
 		//se verifica unicamente que haya un usuario valido en el request
 		//no se requiere ningun permiso especial
-
+		let currentUser = req._currentUser
+		// logger.debug(currentUser)
 		const permissionCheck = auth.checkPermissions({
-			user: req._currentUser
+			user: currentUser
 			,object_type: 'teams'
 			,permissions: []
 		})
@@ -362,7 +363,7 @@ define(['express'
 		}
 
 		Models.user
-		.query(qb => qb.where({id: req._currentUser.id}) )
+		.query(qb => qb.where({id: currentUser.id}) )
 		.fetch({withRelated: [
 			'entity.related_from.relationship_type'
 			,'entity.related_from.to.entity_type'
@@ -394,13 +395,13 @@ define(['express'
 	//==========================================================================
     router.get('/:team_id/match', (req, res) => {
     	//Se buscan todos los matches por el team_id
-		logger.debug('Get all the matches of the team ' + req.params.team_id)
+		// logger.debug('Get all the matches of the team ' + req.params.team_id)
 		var team_id = req.params.team_id
 		var currentDate = new Date()
 		var pastMatches
 		var nextMatch
 		var futureMatches
-		logger.debug('currentDate ' + currentDate)
+		// logger.debug('currentDate ' + currentDate)
 		//conseguimos los matches pasados
         return Models.match
         .query(qb => {
@@ -468,7 +469,7 @@ define(['express'
         })
         .then(_entRel => {
         	let eventCalendar = _entRel.toJSON()
-        	//logger.debug(eventCalendar)
+        	logger.debug(eventCalendar)
         	//Se va a crear un objeto que va a ser el team con todos sus eventos de calendario parametro tipo arreglo con el nombre de eventsCalendars
         	team.eventsCalendars = []
 

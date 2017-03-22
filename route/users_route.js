@@ -396,11 +396,11 @@ define(['express'
     //console.log("Current User: ", req._currentUser)
     //var chk = auth.checkPermissions(req._currentUser, [])
 
-    if(req._currentUser.id !== 0){
-      var error = {name:'No user found', code:404}
-        Response(res, null, error)
-        return
-    }
+    // if(req._currentUser.id !== 0){
+    //   var error = {name:'No user found', code:404}
+    //     Response(res, null, error)
+    //     return
+    // }
 
     Knex_util(user.tableName)
     .where({'id':req._currentUser.id})

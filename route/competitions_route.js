@@ -157,94 +157,93 @@ define(['express'
 			.catch((error) => Response(res, null, error));
 	});
 
-	router.post('/:competition_id/contact/', function (req, res) {
+	// router.post('/:competition_id/contact/', function (req, res) {
+	//
+	// 	var Contact = Models.contact;
+	// 	var contact_post = req.body;
+	// 	var competition_id = req.params.competition_id;
+	//
+	// 	console.log('Req values', req.body);
+	//
+	// 	var country = contact_post.country;
+	// 	var state = contact_post.state;
+	// 	var city = contact_post.city;
+	// 	var zip_code = contact_post.zip_code;
+	// 	var phone = contact_post.phone;
+	// 	var email = contact_post.email;
+	// 	var website_url = contact_post.website_url;
+	//
+	// 	new Contact({contact_post})
+	// 	.save()
+	// 	.then(function(new_contact){
+	// 		Response(res, new_contact)
+	// 	})
+	// 	.catch(function(error){
+	// 		Response(res, null, error)
+	// 	});
+	// });
 
-		var Contact = Models.contact;
-		var contact_post = req.body;
-		var competition_id = req.params.competition_id;
-
-		console.log('Req values', req.body);
-
-		var country = contact_post.country;
-		var state = contact_post.state;
-		var city = contact_post.city;
-		var zip_code = contact_post.zip_code;
-		var phone = contact_post.phone;
-		var email = contact_post.email;
-		var website_url = contact_post.website_url;
-
-		new Contact({contact_post})
-		.save()
-		.then(function(new_contact){
-			Response(res, new_contact)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
-	});
-
-	//Competition Contact by competition_id
-	router.get('/:competition_id/contact/', function (req, res) {
-		var competition_id = req.params.competition_id;
-		return Models.contact
-		.where('competition_id','=',competition_id)
-		.fetchAll()
-		.then(function (result) {
-			Response(res, result)
-		}).catch(function(error){
-			Response(res, null, error)
-		});
-	});
+	// //Competition Contact by competition_id
+	// router.get('/:competition_id/contact/', function (req, res) {
+	// 	var competition_id = req.params.competition_id;
+	// 	return Models.contact
+	// 	.where('competition_id','=',competition_id)
+	// 	.fetchAll()
+	// 	.then(function (result) {
+	// 		Response(res, result)
+	// 	}).catch(function(error){
+	// 		Response(res, null, error)
+	// 	});
+	// });
 
 	//Competition Contact by contact_id
-	router.get('/:competition_id/contact/:contact_id', function (req, res) {
-
-		var competition_id = req.params.competition_id;
-		var contact_id = req.params.contact_id;
-
-		console.log('Req values:', req.body);
-
-		return Models.contact
-		.where({competition_id:competition_id, id:contact_id})
-		.fetchAll()
-		.then(function (result) {
-			Response(res, result)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
-	});
+	// router.get('/:competition_id/contact/:contact_id', function (req, res) {
+	//
+	// 	var competition_id = req.params.competition_id;
+	// 	var contact_id = req.params.contact_id;
+	//
+	// 	console.log('Req values:', req.body);
+	//
+	// 	return Models.contact
+	// 	.where({competition_id:competition_id, id:contact_id})
+	// 	.fetchAll()
+	// 	.then(function (result) {
+	// 		Response(res, result)
+	// 	})
+	// 	.catch(function(error){
+	// 		Response(res, null, error)
+	// 	});
+	// });
 
 	//Competition Contact Update
-	router.put('/:competition_id/contact/:contact_id', function(req, res){
-
-		var Contact = Models.contact;
-		var competition_id = req.params.competition_id;
-		var contact_id = req.params.contact_id;
-		var contact_upd = req.body;
-
-		Knex('contacts')
-		.where('id','=',contact_id)
-		.where('competition_id','=',competition_id)
-		.update(contact_upd, ['id'])
-		.then(function(result){
-			if (result.length != 0){
-				console.log(`result`, result);
-				Response(res, result)
-			} else {
-				//TODO: cuando cae en esta condicion? probar
-				Message(res, 'Wrong Competition_id or contact_id', '404', result);
-				// Response(res, null, error)
-			}
-		})
-		.catch(function(err){
-			Response(res, null, error)
-		});
-	});
+	// router.put('/:competition_id/contact/:contact_id', function(req, res){
+	//
+	// 	var Contact = Models.contact;
+	// 	var competition_id = req.params.competition_id;
+	// 	var contact_id = req.params.contact_id;
+	// 	var contact_upd = req.body;
+	//
+	// 	Knex('contacts')
+	// 	.where('id','=',contact_id)
+	// 	.where('competition_id','=',competition_id)
+	// 	.update(contact_upd, ['id'])
+	// 	.then(function(result){
+	// 		if (result.length != 0){
+	// 			console.log(`result`, result);
+	// 			Response(res, result)
+	// 		} else {
+	// 			//TODO: cuando cae en esta condicion? probar
+	// 			Message(res, 'Wrong Competition_id or contact_id', '404', result);
+	// 			// Response(res, null, error)
+	// 		}
+	// 	})
+	// 	.catch(function(err){
+	// 		Response(res, null, error)
+	// 	});
+	// });
 
 	//Create Competition
 	router.post('/', function (req, res) {
-		logger.debug(req.body)
 
 		const permissionCheck = auth.checkPermissions({
 			user: req._currentUser
@@ -266,7 +265,7 @@ define(['express'
 		.save()
 		.then(result => {
 			newCompetition = result
-			return new Models.competition_user({
+			return Models.competition_user.forge({
 				competition_id: newCompetition.attributes.id,
 				user_id: competitionPost.created_by_id
 			})
@@ -289,6 +288,7 @@ define(['express'
 		if(data.portrait_url != undefined) compData.portrait_url = data.portrait_url
 		if(data.created_by_id != undefined) compData.created_by_id = data.created_by_id
 		if(data.meta != undefined) compData.meta = data.meta
+		logger.debug(compData)
 		return compData
 	}
 

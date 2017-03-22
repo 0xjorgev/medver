@@ -109,6 +109,7 @@ define(['express',
 		if(input.name != undefined) data.name = input.name
 		if(input.position != undefined) data.position = input.position
 		if(input.classified_team != undefined) data.classified_team = input.classified_team
+		if(input.participant_team != undefined) data.participant_team = input.participant_team
 		if(input.active != undefined) data.active = input.active
 
 		return data

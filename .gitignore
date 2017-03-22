@@ -9,3 +9,5 @@ newrelic_agent.log
 latest.dump
 npm-debug.log
 .vscode
+*.log
+

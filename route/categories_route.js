@@ -410,8 +410,15 @@ define(['express'
 		Models.category
 		.where({id: req.params.category_id})
 		.fetch({withRelated:
-			['phases.groups.matches.home_team'
+			[
+			,{'phases': function(qb){ qb.where({active: true}) }}
+			,{'phases.groups': function(qb){ qb.where({active: true}) }}
+			,'phases.groups.matches.home_team'
 			,'phases.groups.matches.visitor_team'
+			,'phases.groups.matches.events.event'
+			,'phases.groups.matches.events.team'
+			,'phases.groups.matches.events.player_in.player_team'
+			,'phases.groups.matches.events.player_out.player_team'
 		]})
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error))

@@ -34,8 +34,8 @@ paths:
       summary: Returns the comments of the given feed item
       description: Returns the comments of the given feed item
       tags:
-        - Feed
         - Comment
+        - Feed
       parameters:
         - name: feed_item_id
           in: path
@@ -1223,15 +1223,16 @@ paths:
         200:
           description: List of teams in a phase
       security: []
-  /phase/{phase_id}/group_round_match:
+  /phase/{phase_id}/match:
     get:
-      summary: Given a Phase ID, returns the groups, rounds & matches associated to that phase
-      description: Given a Phase ID, returns the groups, rounds & matches associated to that phase_
+      summary: Given a Phase ID, returns the groups & matches associated to that phase
+      description: Given a Phase ID, returns the groups & matches associated to that phase
       tags:
         - Phase
+        - Match
       responses:
         200:
-          description: Match event stream
+          description: List of groups & matches for the given phase
       parameters:
         - name: phase_id
           in: path

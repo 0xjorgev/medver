@@ -26,7 +26,7 @@ define(['express'
 	,utilities
 	,logger
 	,FeedItemHelper
-  ,bookshelf
+	,bookshelf
 	) => {
 
 	let router = express.Router();
@@ -183,62 +183,59 @@ define(['express'
     //==========================================================================
 
     router.post('/:match_id/team/:team_id/player', (req, res) => {
-        var data = {}
-        // | number | position | team_id | player_id | match_id |
-        var match_id = req.params.match_id;
-        var team_id = req.params.team_id;
+		var data = {}
+		// | number | position | team_id | player_id | match_id |
+		var match_id = req.params.match_id;
+		var team_id = req.params.team_id;
 
-        console.log('POST /:match_id/team/:team_id/player/', data)
+	    console.log('POST /:match_id/team/:team_id/player/', data)
 
-        const body = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
-    		const initial_player = body.map(_initial_player_list => {
-    			let initialPlayer = _initial_player_list
-    			initialPlayer.match_id = match_id//_initial_player_list.match_id
-          initialPlayer.number = _initial_player_list.number
-          initialPlayer.team_id = team_id//_initial_player_list.team_id
-          initialPlayer.player_id = _initial_player_list.player_id
-          initialPlayer.is_initial = _initial_player_list.is_initial
-    			return initialPlayer
-    		})
+		const body = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
+		const initial_player = body.map(_initial_player_list => {
+			let initialPlayer = _initial_player_list
+			initialPlayer.match_id = match_id//_initial_player_list.match_id
+			initialPlayer.number = _initial_player_list.number
+			initialPlayer.team_id = team_id//_initial_player_list.team_id
+			initialPlayer.player_id = _initial_player_list.player_id
+			initialPlayer.is_initial = _initial_player_list.is_initial
+			return initialPlayer
+		})
 
-    		return Promise.all(initial_player.map(ip => {
-    			return new Models.match_team_player(ip)
-    			.save()
-    			// .then(createFeedItemFromEvent)
-    		}))
-    		.then(result => Response(res, result))
-    		.catch(error => Response(res, null, error))
-    	});
+		return Promise.all(initial_player.map(ip => {
+			return new Models.match_team_player(ip)
+			.save()
+			// .then(createFeedItemFromEvent)
+		}))
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
 
-    const saveMatch = (req, res) => {
-        //http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
-        //https://github.com/tgriesser/checkit
-        var data = req.body;
+	const saveMatch = (req, res) => {
+		//http://stackoverflow.com/questions/34969701/knex-js-incorporating-validation-rules-in-create-update-and-delete-queries
+		//https://github.com/tgriesser/checkit
+		const data = req.body;
+		logger.debug(data)
 
-        console.log('saveMatch', data)
-
-        var Match = Models.match
-
-        var matchData = {}
-        if(data.id != undefined)                    matchData.id = data.id
-        if(data.number != undefined)                matchData.number = data.number
-        if(data.location != undefined)              matchData.location = data.location
-        if(data.home_team_id != undefined)          matchData.home_team_id = data.home_team_id
-        if(data.visitor_team_id != undefined)       matchData.visitor_team_id = data.visitor_team_id
-        if(data.home_team_score != undefined)       matchData.home_team_score = data.home_team_score
-        if(data.visitor_team_score != undefined)    matchData.visitor_team_score = data.visitor_team_score
-        if(data.group_id != undefined)              matchData.group_id =  data.group_id
-        if(data.round_id != undefined)              matchData.round_id =  data.round_id
-        if(data.date != undefined)                  matchData.date =  data.date
-        if(data.played != undefined)                matchData.played =  data.played
+		let matchData = {}
+		if(data.id != undefined)                    matchData.id = data.id
+		if(data.number != undefined)                matchData.number = data.number
+		if(data.location != undefined)              matchData.location = data.location
+		if(data.home_team_id != undefined)          matchData.home_team_id = data.home_team_id
+		if(data.visitor_team_id != undefined)       matchData.visitor_team_id = data.visitor_team_id
+		if(data.home_team_score != undefined)       matchData.home_team_score = data.home_team_score
+		if(data.visitor_team_score != undefined)    matchData.visitor_team_score = data.visitor_team_score
+		if(data.group_id != undefined)              matchData.group_id =  data.group_id
+		if(data.round_id != undefined)              matchData.round_id =  data.round_id
+		if(data.date != undefined)                  matchData.date =  data.date
+		if(data.played != undefined)                matchData.played =  data.played
 
 		//datos para los placeholders
 		// si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
 		if(data.home_team_id == undefined || data.home_team_id == null){
 			if(data.placeholder_home && data.placeholder_home.group_id != undefined)
-				matchData.placeholder_home_team_group = data.placeholder_home.group_id
+			matchData.placeholder_home_team_group = data.placeholder_home.group_id
 			if(data.placeholder_home && data.placeholder_home.position != undefined)
-				matchData.placeholder_home_team_position = data.placeholder_home.position
+			matchData.placeholder_home_team_position = data.placeholder_home.position
 		}
 		else {
 			matchData.placeholder_home_team_group = null
@@ -247,101 +244,99 @@ define(['express'
 
 		if(data.visitor_team_id == undefined || data.visitor_team_id == null){
 			if(data.placeholder_visitor && data.placeholder_visitor.group_id != undefined)
-				matchData.placeholder_visitor_team_group = data.placeholder_visitor.group_id
+			matchData.placeholder_visitor_team_group = data.placeholder_visitor.group_id
 			if(data.placeholder_visitor && data.placeholder_visitor.position != undefined)
-				matchData.placeholder_visitor_team_position = data.placeholder_visitor.position
+			matchData.placeholder_visitor_team_position = data.placeholder_visitor.position
 		}
 		else {
 			matchData.placeholder_visitor_team_group = null
 			matchData.placeholder_visitor_team_position = null
 		}
 
-        var categoryData = {}
-        if(data.category_id != undefined)   categoryData.category_id = data.category_id
-        if(data.phase_id != undefined)      categoryData.phase_id = data.phase_id
-        if(data.group_id != undefined)      categoryData.group_id = data.group_id
+		let categoryData = {}
+		if(data.category_id != undefined) categoryData.category_id = data.category_id
+		if(data.phase_id != undefined) categoryData.phase_id = data.phase_id
+		if(data.group_id != undefined) categoryData.group_id = data.group_id
 
-        var refereeData = {}
-        if(data.referee_id != undefined) refereeData.referee_id = data.referee_id
+		let refereeData = {}
+		if(data.referee_id != undefined) refereeData.referee_id = data.referee_id
 
-        var roundData = {}
-        if(data.group_id){
-            var roundData = {
-                group_id: data.group_id,
-                name: `Round of Group ${data.group_id}`
-            }
-        }
+		// //this will die
+		// var roundData = {}
+		// if(data.group_id){
+		// 	var roundData = {
+		// 		group_id: data.group_id,
+		// 		name: `Round of Group ${data.group_id}`
+		// 	}
+		// }
+		//
+		// if(data.round_id) roundData.id = data.round_id
+		// roundData.name = 'Round'
 
-        if(data.round_id) roundData.id = data.round_id
-		roundData.name = 'Round'
+		//dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
+		//en caso de que la ronda exista, solo se hace update
+		// new Models.round(roundData)
+		// .save()
+		// .then(round => {
+		// 	//se salvan los datos del match
+		// 	matchData.round_id = round.attributes.id
+		// 	return Models.match.forge(matchData).save()
+		// })
 
-        //para almacenar el match creado
-        let _match = null
-        //dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
-        //en caso de que la ronda exista, solo se hace update
-        new Models.round(roundData)
+		//para almacenar el match creado
+		let _match = null
+
+		Models.match
+		.forge(matchData)
 		.save()
-        .then((round) => {
-			//se salvan los datos del match
-            matchData.round_id = round.attributes.id
-            return new Match(matchData).save()
-        })
-		.then((match) => {
-            // //TODO: asignacion temporal, mientras elimino round_id de esta tabla
-            // _match.group_id = match.round.group_id
-            return Models.match
-            .query((qb) => {
-                qb.select(Knex.raw('matches.*, matches_referees.id as matches_referee_id'))
-                qb.leftJoin('matches_referees', 'matches.id', 'matches_referees.match_id')
-                qb.where({'matches.id': match.attributes.id})
-            })
-            .fetch()
-        })
-        .then((result) => {
-            _match = result.attributes
-            refereeData.match_id = _match.id
+		.then(match => {
+			// //TODO: asignacion temporal, mientras elimino round_id de esta tabla
+			// _match.group_id = match.round.group_id
+			return Models.match
+			.query(qb => {
+				qb.select(Knex.raw('matches.*, matches_referees.id as matches_referee_id'))
+				qb.leftJoin('matches_referees', 'matches.id', 'matches_referees.match_id')
+				qb.where({'matches.id': match.attributes.id})
+			})
+			.fetch()
+		})
+		.then(result => {
+			_match = result.attributes
+			refereeData.match_id = _match.id
 
-            if( _match.matches_referee_id != null || _match.matches_referee_id != undefined)
-                refereeData.id = _match.matches_referee_id
+			if( _match.matches_referee_id != null || _match.matches_referee_id != undefined)
+			refereeData.id = _match.matches_referee_id
 
 			//TODO: se está duplicando el referi cuando se actaliza el registro;
 			//para evitar eso es necesario devolver el id de la tabla referee_match
-            return new Models.match_referee(refereeData).save()
-        })
-        .then((result) => {
+			return new Models.match_referee(refereeData).save()
+		})
+		.then(result => {
 			//se obtiene el ID del referee para devolverlo en la respuesta del servicio
 			if(result.attributes.referee_id)
 				_match.referee_id = result.attributes.referee_id
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-				console.log(_match);
-				logger.debug(_match);
-
 				StandingTable.calculateByGroup(_match.group_id)
-                .then(r => {
-                    return PlaceholdersHelper
-                        .replacePlaceholders(_match.group_id)
-                })
+				.then(r =>  PlaceholdersHelper.replacePlaceholders(_match.group_id) )
 			}
 			return result
 		})
 		.then(result => Response(res, _match))
-        .catch(error => Response(res, null, error))
-    }
+		.catch(error => Response(res, null, error))
+	}
 
-    //match create
-    router.post('/', (req, res) => {
-        console.log('POST /match', req.body)
-        saveMatch(req, res)
-     })
+	//match create
+	router.post('/', (req, res) => {
+		saveMatch(req, res)
+	})
 
-    //match update
-    router.put('/:match_id', (req, res) => {
-        console.log('PUT /match', req.body)
+	//match update
+	router.put('/:match_id', (req, res) => {
 		req.body.id = req.params.match_id
-        saveMatch(req, res)
-    });
+		saveMatch(req, res)
+	});
 
 	router.get('/:match_id/event', (req, res) => {
 		var match_id = req.params.match_id

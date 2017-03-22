@@ -33,6 +33,9 @@ define(['express'
         });
     });
 
+
+	//este servicio esta siendo utilizado por la app
+	//sera reemplazado por POST match/id/event
 	router.post('/', function (req, res) {
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }

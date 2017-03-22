@@ -393,6 +393,7 @@ define(['express'
 
     var user = new Models.user;
     var prefLang = req.body.lang;
+    console.log("Current User: ", req._currentUser)
     var chk = auth.checkPermissions(req._currentUser, [])
 
     if(chk.code !== 0){

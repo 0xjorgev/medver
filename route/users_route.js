@@ -397,7 +397,8 @@ define(['express'
     //var chk = auth.checkPermissions(req._currentUser, [])
 
     if(req._currentUser.id !== 0){
-        Response(res, null, 'No user found')
+      var error = {name:'No user found'; code:404}
+        Response(res, null, error)
         return
     }
 

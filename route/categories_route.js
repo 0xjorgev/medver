@@ -630,7 +630,6 @@ define(['express'
 			 }
 		}
 
-
 	// console.log("User Lang: ", data.user.attributes.lang)
 	//console.log("LANG", prefLang(data.user.lang))
 

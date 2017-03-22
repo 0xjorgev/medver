@@ -89,7 +89,7 @@ define(['express'
         var username = new_user.username.trim();
         var password = new_user.password.trim();
         var email    = new_user.email.trim();
-        var lang    = new_user.lang.trim();
+        var lang    = (new_user.lang !== undefined && new_user.lang !== null)? new_user.lang.trim() : "EN";
         var origin = req.headers.origin
 
         var _newUser = null

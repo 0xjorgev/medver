@@ -33,19 +33,44 @@ var numPartidos = (n) => (1/2)*n*(n-1)
 // https://github.com/dankogai/js-combinatorics
 
 var teams = {
-	 'Group A':[ 'AZTECAS (DALLAS)','FC THAL','KATY YOUTH' ]
-	,'Group B':[ 'DALLAS ELITE FC','BAY AREA OILERS FC','MUSTANG HMSL' ]
-	,'Group C':[ 'HORIZON','SHOOTOUT','SAN ANTONIO GENERALS' ]
-	,'Group D':[ 'DALLAS UNITED','ATLETICO UNITED','GREEN EAGLES' ]
-	,'Group E':[ 'JAGUARS', 'PORTUGAL', 'SW FC'  ]
-	,'Group F':[ 'RGV','PUEBLA BLUE', 'AJAX SELECT' ]
-	,'Group G':[ 'TAPATIOS','ISLANDERS FC', 'TYLER FC' ]
-	,'Group H':[ 'ASC NEWSTARS', 'ORIZABA', 'CORSICANA FC' ]
+	 'A':[ 'AZTECAS (DALLAS)','FC THAL','KATY YOUTH' ]
+	,'B':[ 'DALLAS ELITE FC','BAY AREA OILERS FC','MUSTANG HMSL' ]
+	,'C':[ 'HORIZON','SHOOTOUT','SAN ANTONIO GENERALS' ]
+	,'D':[ 'DALLAS UNITED','ATLETICO UNITED','GREEN EAGLES' ]
+	,'E':[ 'JAGUARS', 'PORTUGAL', 'SW FC'  ]
+	,'F':[ 'RGV','PUEBLA BLUE', 'AJAX SELECT' ]
+	,'G':[ 'TAPATIOS','ISLANDERS FC', 'TYLER FC' ]
+	,'H':[ 'ASC NEWSTARS', 'ORIZABA', 'CORSICANA FC' ]
 }
 
-var locations = [ 'FIELD 1','FIELD 5','FIELD 6','FIELD 9']
 
-cmb = Combinatorics.combination([ 'AZTECAS (DALLAS)','FC THAL','KATY YOUTH', 'DALLAS ELITE FC' ], 2);
-while(a = cmb.next()) console.log(a);
+
+const cmb = Combinatorics.combination([
+	'AZTECAS (DALLAS)'
+	,'FC THAL'
+	,'KATY YOUTH'
+	,'DALLAS ELITE FC'], 2);
+// while(a = cmb.next()) console.log(a);
 
 //alternar home y visitor en el partido n-1
+
+//1 - crear combinaciones por grupo, para determinar los partidos a jugar
+//2 - asignar ubicaciones a cada uno de los partidos
+
+const teamCollection = Object.keys(teams).reduce((_teams, groupId, idx) => {
+	let groupTeams = _teams[groupId] ? _teams[groupId] : []
+
+	// console.log(groupTeams)
+
+	let ts = teams[groupId].map(team => {
+		return {
+			id: idx, name: team
+		}
+	})
+
+	groupTeams.push(ts)
+
+	return groupTeams
+},[])
+
+console.log(teamCollection);

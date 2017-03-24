@@ -109,7 +109,7 @@ define([
         ,organization:Organization
         ,position:Position
         ,category_team_player:Category_team_player
-		    ,standing_table: StandingTable
+    ,standing_table: StandingTable
         ,entity: Entity
         ,entity_relationship: Entity_relationship
         ,status_type: Status_type

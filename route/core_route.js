@@ -112,11 +112,11 @@ define(['express'
 
 	//crea las entidades de todos los objetos que lo requieran
 	router.post('/entities/build', (req, res) => {
-		const chk = auth.checkPermissions(req._currentUser, [])
-		if(chk.code !== 0){
-			Response(res, null, chk)
-			return
-		}
+		// const chk = auth.checkPermissions(req._currentUser, [])
+		// if(chk.code !== 0){
+		// 	Response(res, null, chk)
+		// 	return
+		// }
 
 		//construir entidades
 		// ,'Event'
@@ -141,7 +141,21 @@ define(['express'
 		//ubicar entidades de las competiciones y de los usuarios
 
 		//crear relacion (user)-[owner]->(competition)
-		
+
+		Models.entity.getOrphanEntities('competitions')
+		.then(result => {
+			//ids de objetos sin entidad
+			const ids = result.map(e => e.id)
+			return Models.competition.query(qb => {
+				qb.whereIn('id', ids)
+			})
+			.fetchAll()
+		})
+		.then(competitions => {
+			return Promise.all(competitions.map(competition => competition.createEntity()))
+		})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	})
 
 	router.get('/classification_type', (req, res) => {

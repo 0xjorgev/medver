@@ -1,3 +1,4 @@
+.Rhistory
 .DS_Store
 */.DS_Store
 node_modules
@@ -10,4 +11,3 @@ latest.dump
 npm-debug.log
 .vscode
 *.log
-

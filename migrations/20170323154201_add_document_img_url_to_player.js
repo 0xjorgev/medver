@@ -9,7 +9,7 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
 	return Promise.all([
 		knex.schema.alterTable('players', (table) => {
-			// table.dropColumn('document_img_url')
+			table.dropColumn('document_img_url')
 		})
 	])
 }

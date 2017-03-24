@@ -132,6 +132,16 @@ define(['express'
 
 		//construir relaciones
 
+		//competition_user
+		//user -[OWNER]-> competition
+
+		//ubicar competiciones que NO tengan relaciones de owner y que existean
+		//en la tabla comp_user
+
+		//ubicar entidades de las competiciones y de los usuarios
+
+		//crear relacion (user)-[owner]->(competition)
+		
 	})
 
 	router.get('/classification_type', (req, res) => {

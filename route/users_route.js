@@ -393,12 +393,14 @@ define(['express'
 
     var user = new Models.user;
     var prefLang = req.body.lang;
-    var chk = auth.checkPermissions(req._currentUser, [])
+    //console.log("Current User: ", req._currentUser)
+    //var chk = auth.checkPermissions(req._currentUser, [])
 
-    if(chk.code !== 0){
-        Response(res, null, chk)
-        return
-    }
+    // if(req._currentUser.id !== 0){
+    //   var error = {name:'No user found', code:404}
+    //     Response(res, null, error)
+    //     return
+    // }
 
     Knex_util(user.tableName)
     .where({'id':req._currentUser.id})
@@ -409,7 +411,7 @@ define(['express'
     .then(result => {
         Response(res, result)
     })
-    .catch(error => Response(res, null, error))
+    .catch(error => { Response(res, null, error) })
   })
 
     return router;

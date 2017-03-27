@@ -16,47 +16,46 @@ define(['./base_model'
 		,Entity_type
 		,FeedItem
 		,Entity_relationship
-		,knex
-		) => {
-			var Entity = DB.Model.extend({
-			tableName: 'entities'
-			,hasTimestamps: true
-			,entity_type: function(){
-				return this.belongsTo('Entity_type', 'entity_type_id');
+		,knex) => {
+			let Entity = DB.Model.extend({
+				tableName: 'entities'
+				,hasTimestamps: true
+				,entity_type: function(){
+					return this.belongsTo('Entity_type', 'entity_type_id');
+				}
+				,object: function() {
+					return this.morphTo('object'
+						//listado de objetos que tienen entidades asociadas
+						,'Event'
+						,'User'
+						,'Team'
+						,'Category'
+						,'Feed_item'
+						,'Player'
+						,'Comment'
+						,'Competition'
+						,'Match'
+						,'Club')
+				}
+				,related_from: function() {
+					return this.hasMany('Entity_relationship', 'ent_ref_from_id');
+				}
+				,related_to: function(){
+					return this.hasMany('Entity_relationship', 'ent_ref_to_id');
+				}
+			})
+
+			//Ubica las entidades de objectType que no tienen registros en la tabla
+			//entities
+			//objectType: string con el nombre de la tabla/modelo/object_type
+			Entity.getOrphanEntities = objectType => {
+				return knex
+					.select(`${objectType}.id`)
+					.from(objectType)
+					.joinRaw(`left join entities on ${objectType}.id = entities.object_id and entities.object_type = '${objectType}'`)
+					.where('entities.id', null)
 			}
-			,object: function() {
-				return this.morphTo('object'
-					//listado de objetos que tienen entidades asociadas
-					,'Event'
-					,'User'
-					,'Team'
-					,'Category'
-					,'Feed_item'
-					,'Player'
-					,'Comment'
-					,'Competition'
-					,'Match'
-					,'Club')
-			}
-			,related_from: function() {
-				return this.hasMany('Entity_relationship', 'ent_ref_from_id');
-			}
-			,related_to: function(){
-				return this.hasMany('Entity_relationship', 'ent_ref_to_id');
-			}
+
+			return DB.model('Entity', Entity);
 		}
-	)
-
-	//Ubica las entidades de objectType que no tienen registros en la tabla
-	//entities
-	//objectType: string con el nombre de la tabla/modelo/object_type
-	Entity.getOrphanEntities = (objectType => {
-		return knex
-			.select(`${objectType}.id`)
-			.from(objectType)
-			.joinRaw(`left join entities on ${objectType}.id = entities.object_id and entities.object_type = '${objectType}'`)
-			.where('entities.id', null)
-	})
-
-	return DB.model('Entity', Entity);
-});
+)

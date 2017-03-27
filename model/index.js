@@ -40,6 +40,9 @@ define([
     ,'./comment'
     ,'./club'
     ,'./terms_conditions'
+    ,'./event_calendar'
+    ,'./event_calendar_comment'
+    ,'./event_calendar_type'
 ], function (Util
 	, Discipline
 	, Subdiscipline
@@ -77,7 +80,10 @@ define([
 	, Feed_item
     , Comment
     , Club
-    ,Term_Condition
+    , Term_Condition
+    , Event_calendar
+    , Event_calendar_comment
+    , Event_calendar_type
 	){
     return {
     	util:Util
@@ -109,7 +115,7 @@ define([
         ,organization:Organization
         ,position:Position
         ,category_team_player:Category_team_player
-    ,standing_table: StandingTable
+		,standing_table: StandingTable
         ,entity: Entity
         ,entity_relationship: Entity_relationship
         ,status_type: Status_type
@@ -118,5 +124,8 @@ define([
         ,comment: Comment
         ,club: Club
         ,term_condition: Term_Condition
+        ,event_calendar: Event_calendar
+        ,event_calendar_comment: Event_calendar_comment
+        ,event_calendar_type: Event_calendar_type
     };
 });

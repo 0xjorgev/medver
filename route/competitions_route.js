@@ -407,12 +407,15 @@ define(['express'
 	});
 
 	router.get('/query/by_city', (req, res) => {
-		//req._currentUser is the user recovered from token
-		//to get competitions the user should have these permissions
-		var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
 
-		if (chk.code != 0){
-			Response(res, null, chk)
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'competitions'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
 			return
 		}
 

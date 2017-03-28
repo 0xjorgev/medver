@@ -43,6 +43,7 @@ define([
     ,'./event_calendar'
     ,'./event_calendar_comment'
     ,'./event_calendar_type'
+    ,'./person'
 ], function (Util
 	, Discipline
 	, Subdiscipline
@@ -84,6 +85,7 @@ define([
     , Event_calendar
     , Event_calendar_comment
     , Event_calendar_type
+    , Person
 	){
     return {
     	util:Util
@@ -127,5 +129,6 @@ define([
         ,event_calendar: Event_calendar
         ,event_calendar_comment: Event_calendar_comment
         ,event_calendar_type: Event_calendar_type
+        ,person: Person
     };
 });

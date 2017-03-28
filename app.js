@@ -1,19 +1,19 @@
 //skips newrelic if not in heroku
 if(process.env.NODE_ENV == 'production') require('newrelic')
 
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const morgan = require('morgan'); //nodejs logger
-const nJwt = require('njwt') //jwt token generator
-const Message = require('./util/request_message_util') //in-house message handler
-const Response = require('./util/response_message_util') //in-house message handler
-const compression = require('compression');
-const argv = require('minimist')(process.argv.slice(2));
-const subpath = express();
-const logger = require('./util/logger_util')
-const http = require('http')
-const authHelper = require('./helpers/auth_helper')
+const express 		= require('express');
+const app 			= express();
+const bodyParser 	= require('body-parser');
+const morgan 		= require('morgan'); //nodejs logger
+const nJwt 			= require('njwt') //jwt token generator
+const Message 		= require('./util/request_message_util') //in-house message handler
+const Response 		= require('./util/response_message_util') //in-house message handler
+const compression 	= require('compression');
+const argv 			= require('minimist')(process.argv.slice(2));
+const subpath 		= express();
+const logger 		= require('./util/logger_util')
+const http 			= require('http')
+const authHelper 	= require('./helpers/auth_helper')
 
 //node port
 const port = process.env.PORT;
@@ -70,34 +70,36 @@ swagger.configure(applicationUrl, '1.0.0');
 // end swagger stuff
 //==========================================================================
 
-const discipline_ws = require('./route/disciplines_route');
-const user_ws = require('./route/users_route');
-const competition_ws = require('./route/competitions_route');
-const season_ws = require('./route/seasons_route');
-const category_ws = require('./route/categories_route');
-const gender_ws = require('./route/genders_route');
-const phase_ws = require('./route/phases_route');
-const group_ws = require('./route/groups_route');
-const round_ws = require('./route/rounds_route');
-const match_ws = require('./route/matches_route');
-const team_ws = require('./route/teams_route');
-const event_ws = require('./route/results_route');
-const referee_ws = require('./route/referees_route');
-const category_type_ws = require('./route/categories_types_route');
-const player_ws = require('./route/players_route');
-const rule_ws = require('./route/rules_route');
-const match_event_ws = require('./route/events_route');
-const subdiscipline_ws = require('./route/subdisciplines_route');
-const test_ws =  require('./route/tests_route');
-const position_ws =  require('./route/positions_route');
-const status_type_ws =  require('./route/status_types_route');
-const request_ws =  require('./route/requests_route');
-const feed_item_ws = require('./route/feed_items_route')
-const club_ws = require('./route/clubs_route')
-const paypal_ws = require('./route/paypal_route')
-const event_calendar_type_ws = require('./route/events_calendars_types_route')
-const event_calendar_ws = require('./route/events_calendars_route')
-const event_calendar_comment_ws = require('./route/events_calendars_comments_route')
+const discipline_ws 			= require('./route/disciplines_route')
+const user_ws 					= require('./route/users_route')
+const competition_ws 			= require('./route/competitions_route')
+const season_ws 				= require('./route/seasons_route')
+const category_ws 				= require('./route/categories_route')
+const gender_ws 				= require('./route/genders_route')
+const phase_ws 					= require('./route/phases_route')
+const group_ws 					= require('./route/groups_route')
+const round_ws 					= require('./route/rounds_route')
+const match_ws 					= require('./route/matches_route')
+const team_ws 					= require('./route/teams_route')
+const event_ws 					= require('./route/results_route')
+const referee_ws 				= require('./route/referees_route')
+const category_type_ws 			= require('./route/categories_types_route')
+const player_ws 				= require('./route/players_route')
+const rule_ws 					= require('./route/rules_route')
+const match_event_ws 			= require('./route/events_route')
+const subdiscipline_ws 			= require('./route/subdisciplines_route')
+const test_ws 					= require('./route/tests_route')
+const position_ws 				= require('./route/positions_route')
+const status_type_ws 			= require('./route/status_types_route')
+const request_ws 				= require('./route/requests_route')
+const feed_item_ws 				= require('./route/feed_items_route')
+const club_ws 					= require('./route/clubs_route')
+const paypal_ws 				= require('./route/paypal_route')
+const event_calendar_type_ws 	= require('./route/events_calendars_types_route')
+const event_calendar_ws 		= require('./route/events_calendars_route')
+const event_calendar_comment_ws	= require('./route/events_calendars_comments_route')
+const person_ws 				= require('./route/persons_route')
+
 //put here all non business-related services
 const core_ws =  require('./route/core_route');
 const apiVersion = 'v1.0';
@@ -106,38 +108,39 @@ const api_prefix = `/${prefix}/${apiVersion}/`; //'template literal syntax' is o
 
 //routes names
 const routes = {
-	discipline		: 'discipline'
-	,competition	: 'competition'
-	,season			: 'season'
-	,category		: 'category'
-	,gender			: 'gender'
-	,contact		: 'contact'
-	,organization	: 'organization'
-	,phase			: 'phase'
-	,group			: 'group'
-	,round			: 'round'
-	,round			: 'round'
-	,team			: 'team'
-	,match			: 'match'
-	,rule			: 'rule'
-	,ruleset		: 'ruleset'
-	,event			: 'event'
-	,referee		: 'referee'
-	,category_type	: 'category_type'
-	,feed_item		: 'feed_item'
-	,player			: 'player'
-	,rule			: 'rule'
-	,match_event	: 'matchevent'
-	,subdiscipline	: 'subdiscipline'
-	,test			: 'test'
-	,position		: 'position'
-	,status_type	: 'status_type'
-	,request		: 'request'
-	,club			: 'club'
-  	,paypal 		: 'paypal'
-  	,event_calendar_type : 'event_calendar_type'
-  	,event_calendar : 'event_calendar'
+	discipline				: 'discipline'
+	,competition			: 'competition'
+	,season					: 'season'
+	,category				: 'category'
+	,gender					: 'gender'
+	,contact				: 'contact'
+	,organization			: 'organization'
+	,phase					: 'phase'
+	,group					: 'group'
+	,round					: 'round'
+	,round					: 'round'
+	,team					: 'team'
+	,match					: 'match'
+	,rule					: 'rule'
+	,ruleset				: 'ruleset'
+	,event					: 'event'
+	,referee				: 'referee'
+	,category_type			: 'category_type'
+	,feed_item				: 'feed_item'
+	,player					: 'player'
+	,rule					: 'rule'
+	,match_event			: 'matchevent'
+	,subdiscipline			: 'subdiscipline'
+	,test					: 'test'
+	,position				: 'position'
+	,status_type			: 'status_type'
+	,request				: 'request'
+	,club					: 'club'
+  	,paypal 				: 'paypal'
+  	,event_calendar_type 	: 'event_calendar_type'
+  	,event_calendar 		: 'event_calendar'
   	,event_calendar_comment : 'event_calendar_comment'
+  	,person 				: 'person'
 }
 
 //Middleware
@@ -232,6 +235,7 @@ app.use(`${api_prefix}${routes.paypal}`, paypal_ws);
 app.use(`${api_prefix}${routes.event_calendar_type}`, event_calendar_type_ws);
 app.use(`${api_prefix}${routes.event_calendar}`, event_calendar_ws);
 app.use(`${api_prefix}${routes.event_calendar_comment}`, event_calendar_comment_ws);
+app.use(`${api_prefix}${routes.person}`, person_ws);
 
 app.get(api_prefix, function(request, response){
 	// app._router.stack.forEach(function(r){

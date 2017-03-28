@@ -2568,7 +2568,37 @@ paths:
           type: integer
           format: integer
 
-
+  /person:
+    get:
+      summary: Gets the info of all persons
+      description: Gets the info of all persons
+      tags:
+        - Person
+      responses:
+        200:
+          description: List of persons
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a person
+      description: Creates a person
+      tags:
+        - Person
+      produces:
+      - application/json
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/PersonRequest'
+      responses:
+        200:
+          description: person creation OK
+      security: []
 
 #######################################################################
 #      _       __ _       _ _   _
@@ -3110,3 +3140,35 @@ definitions:
         description: If not provided, a new 'event calendar' will not be associated with any entity
     required:
       - entity_parent_id
+
+  PersonRequest:
+    title: Person Creation/Update Request
+    type: object
+    properties:
+      name:
+        type: string
+      last_name:
+        type: string
+      email:
+        type: string
+      birthday:
+        type: string
+      height:
+        type: string
+      weight:
+        type: string
+      img_url:
+        type: string
+      document_number:
+        type: string
+      document_img_url:
+        type: string
+      country:
+        type: string
+      claimed:
+        type: string
+      active:
+        type: boolean
+      gender_id:
+        type: integer
+

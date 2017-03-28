@@ -63,6 +63,9 @@ define(['./base_model'
 		,competition_user: function(){
 			return this.hasMany('Competition_user','competition_id');
 		}
+		,created_by: function(){
+			return this.belongsTo('User','created_by_id');
+		}
 	});
 
 	// uses Registry plugin

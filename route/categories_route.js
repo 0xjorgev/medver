@@ -90,28 +90,21 @@ define(['express'
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result
 	router.get('/', function (req, res) {
 		return Models.category
-		.query(function(qb){})
-		.where({active:true})
+		.where({active: true})
 		.fetchAll({withRelated: ['gender', 'phases', 'classification']})
-		.then(function (result) {
-			Response(res, result)
-		}).catch(function(error){
-			Response(res, null, error)
-		});
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error));
 	});
 
 	//Categories by Id -> Returns 1 result
 	router.get('/:category_id', function (req, res) {
 		var category_id = req.params.category_id;
 		return Models.category
-			.where({id:category_id})
-			.where({active:true})
+			.where({id: category_id})
+			.where({active: true})
 			.fetch({withRelated: ['gender','phases', 'classification']})
-			.then(function (result) {
-				Response(res, result)
-			}).catch(function(error){
-				Response(res, null, error)
-			});
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error));
 	});
 
 	router.post('/', function (req, res) {

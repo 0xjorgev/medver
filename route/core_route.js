@@ -112,11 +112,11 @@ define(['express'
 
 	//crea las entidades de todos los objetos que lo requieran
 	router.post('/entities/build', (req, res) => {
-		const chk = auth.checkPermissions(req._currentUser, [])
-		if(chk.code !== 0){
-			Response(res, null, chk)
-			return
-		}
+		// const chk = auth.checkPermissions(req._currentUser, [])
+		// if(chk.code !== 0){
+		// 	Response(res, null, chk)
+		// 	return
+		// }
 
 		//construir entidades
 		// ,'Event'
@@ -132,6 +132,64 @@ define(['express'
 
 		//construir relaciones
 
+		//competition_user
+		//user -[OWNER]-> competition
+
+		//ubicar competiciones que NO tengan relaciones de owner y que existean
+		//en la tabla comp_user
+
+		//ubicar entidades de las competiciones y de los usuarios
+
+		//crear relacion (user)-[owner]->(competition)
+
+		Models.entity.getOrphanEntities('competitions')
+		.then(result => {
+			//ids de objetos sin entidad
+			const ids = result.map(e => e.id)
+			return Models.competition.query(qb => {
+				qb.whereIn('id', ids)
+			})
+			.fetchAll()
+		})
+		.then(competitions => {
+			return Promise.all(competitions.map(competition => competition.createEntity()))
+		})
+		.then(result => {
+			//busqueda de entidades de competicion sin owners
+			return Models.entity.query(qb => {
+				qb.joinRaw('left join entities_relationships on (entities.id = entities_relationships.ent_ref_to_id and entities_relationships.relationship_type_id = 1)')
+				qb.whereRaw(`object_type = 'competitions' and ent_ref_from_id is null`)
+			})
+			//esto devuelve las competitions como relacion de las entidades
+			.fetchAll({withRelated: 'object.created_by.entity'})
+		})
+		.then(entities => {
+			//se filtran las competiciones que no tienen un creador
+			return entities.toJSON()
+				.filter(ent => ent.object.created_by_id != null)
+		})
+		.then(entities => {
+			// se preparan los datos para salvar la relacion
+			return entities.map(ent => {
+				return {competition_entity_id: ent.id
+					,competition_id: ent.object.id
+					,creator_id: ent.object.created_by_id
+					,creator_entity_id: ent.object.created_by.entity.id
+				}
+			})
+		})
+		.then(entities => {
+			return Promise.all(entities.map(ent => {
+				return Models.entity_relationship.forge({
+					ent_ref_from_id: ent.creator_entity_id
+					,ent_ref_to_id: ent.competition_entity_id
+					,relationship_type_id: 1
+					,comment: 'OWNER - created by script'
+				}).save()
+			}))
+		})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	})
 
 	router.get('/classification_type', (req, res) => {

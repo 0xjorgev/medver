@@ -114,8 +114,8 @@ define(['express'
 	//==========================================================================
 	var saveTeam = function(data, res){
 
-		var teamData = {}
-		var clubData = {}
+		let teamData = {}
+		let clubData = {}
 
 		if (data.name != undefined) teamData.name = data.name.trim()
 		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
@@ -129,8 +129,7 @@ define(['express'
 		if (data.club_id != undefined) teamData.club_id = data.club_id
 		if (data.id != undefined) teamData.id = data.id
 
-
-		//let's lookup for the club by id
+		//let's lookup for the club by id 
 		return Models.club.query(qb => {
 			qb.where({id: teamData.club_id})
 		})
@@ -153,7 +152,7 @@ define(['express'
 			}
 		})
 		.then(club => {
-			logger.debug(club)
+			// logger.debug(club)
 			clubData.id  = club.attributes.id
 			teamData.club_id = clubData.id
 			teamData._currentUser = data._currentUser
@@ -204,8 +203,8 @@ define(['express'
 	})
 
 	var savePlayerTeam = (playerTeamData, res) => {
-		logger.debug('savePlayerTeam')
-		logger.debug(playerTeamData)
+		// logger.debug('savePlayerTeam')
+		// logger.debug(playerTeamData)
 
 		//chequeo de tipo array
 		if(!(Object.prototype.toString.call( playerTeamData ) === '[object Array]')) {
@@ -350,9 +349,10 @@ define(['express'
 	router.get('/query/by_user', (req, res) => {
 		//se verifica unicamente que haya un usuario valido en el request
 		//no se requiere ningun permiso especial
-
+		let currentUser = req._currentUser
+		// logger.debug(currentUser)
 		const permissionCheck = auth.checkPermissions({
-			user: req._currentUser
+			user: currentUser
 			,object_type: 'teams'
 			,permissions: []
 		})
@@ -363,7 +363,7 @@ define(['express'
 		}
 
 		Models.user
-		.query(qb => qb.where({id: req._currentUser.id}) )
+		.query(qb => qb.where({id: currentUser.id}) )
 		.fetch({withRelated: [
 			'entity.related_from.relationship_type'
 			,'entity.related_from.to.entity_type'
@@ -395,13 +395,13 @@ define(['express'
 	//==========================================================================
     router.get('/:team_id/match', (req, res) => {
     	//Se buscan todos los matches por el team_id
-		logger.debug('Get all the matches of the team ' + req.params.team_id)
+		// logger.debug('Get all the matches of the team ' + req.params.team_id)
 		var team_id = req.params.team_id
 		var currentDate = new Date()
 		var pastMatches
 		var nextMatch
 		var futureMatches
-		logger.debug('currentDate ' + currentDate)
+		// logger.debug('currentDate ' + currentDate)
 		//conseguimos los matches pasados
         return Models.match
         .query(qb => {
@@ -439,6 +439,48 @@ define(['express'
         .then(result => Response(res, result) )
         .catch(error => Response(res, null, error))
     })
+
+    //==========================================================================
+	// Get all Event_Calendar of a team
+	//==========================================================================
+	router.get('/:team_id/event_calendar', (req, res) => {
+		let team ={}
+		team.id = req.params.team_id
+        
+        //Obtengo los datos del team y su entidad
+        return Models.team
+			.query(function(qb){})
+			.where({id:team.id})
+			.where({active:true})
+			.fetch({withRelated: [
+	             'entity'
+	        ]})
+		.then(_team => {
+        	team = _team.toJSON()
+			//Con los datos de la entidad del team se obtienes los eventos asociados
+			return Models.entity_relationship
+				.query(function(qb){})
+				.where({ent_ref_to_id:team.entity.id})
+				.where({relationship_type_id:8})
+				.where({active:true})
+				.fetchAll({withRelated: [
+		            'from.object'
+		        ]})
+        })
+        .then(_entRel => {
+        	let eventCalendar = _entRel.toJSON()
+        	logger.debug(eventCalendar)
+        	//Se va a crear un objeto que va a ser el team con todos sus eventos de calendario parametro tipo arreglo con el nombre de eventsCalendars
+        	team.eventsCalendars = []
+
+        	team.eventsCalendars =  eventCalendar.map(eventCalendar => eventCalendar.from.object)
+
+        	return team
+        })
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+    })
+
 
 	return router;
 });

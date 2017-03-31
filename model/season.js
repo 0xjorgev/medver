@@ -18,6 +18,13 @@ define(['./base_model','./competition', './category'], function (DB) {
         categories: function(){
             return this.hasMany('Category');
         }
+		,getCategoryTeamStatusCount: function(){
+			return DB._models.Category_group_phase_team
+			.query(qb => {
+				qb.select('category_id, status_id, count(*)')
+				qb.groupBy('1,2')
+			})
+		}
     });
     // uses Registry plugin
     return DB.model('Season', Season);

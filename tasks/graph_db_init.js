@@ -1,29 +1,24 @@
-const neo4j = require('neo4j');
-const db = new neo4j.GraphDatabase('http://neo4j:root@localhost:7474');
+const request = require('request');
+const sendQuery = (query) => {
+	const postData = JSON.stringify(query)
+	const options = {
+		method: 'POST',
+		url: 'http://localhost:7474/db/data/cypher',
+		headers: { 'cache-control': 'no-cache', authorization: 'bmVvNGo6cm9vdA==' },
+		body: postData
+	}
+	request(options, (error, response, body) => {
+		if (error) throw new Error(error);
+		console.log(body);
+	})
+}
 
-console.log(Object.keys(db));
+let query = {
+	query: `CREATE (n:User :Person {name: {name}, lastname: {lastname}}) RETURN n`
+	,params: {
+		name: 'Francisco'
+		,lastname: 'De La Blanca'
+	}
+}
 
-db.cypher({
-    query: 'MATCH (u:User {email: {email}}) RETURN u',
-    params: {
-        email: 'alice@example.com',
-    },
-}, function (err, results) {
-    if (err) throw err;
-    var result = results[0];
-    if (!result) {
-        console.log('No user found.');
-    } else {
-        var user = result['u'];
-        console.log(JSON.stringify(user, null, 4));
-    }
-});
-
-var node = db.createNode({hello: 'world'});     // instantaneous, but...
-node.save(function (err, node) {    // ...this is what actually persists.
-    if (err) {
-        console.error('Error saving new node to database:', err);
-    } else {
-        console.log('Node saved to database with id:', node.id);
-    }
-});
+sendQuery(query)

@@ -39,7 +39,7 @@ define(['express'
 		const username = user_login.username.trim();
 		const password = user_login.password.trim();
 
-		logger.debug(user_login)
+		// logger.debug(user_login)
 
 		return Models.user.query(qb => {
 			qb.where('username', username)

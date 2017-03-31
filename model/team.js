@@ -45,9 +45,6 @@ define(['./base_model'
         //metodos
         //saveTeam un team y sus relaciones con un usuario
         saveTeam: function(_team){
-            logger.debug('saveTeam from model')
-            logger.debug(_team)
-
             var teamData = {}
             if (_team.name != undefined) teamData.name = _team.name.trim()
             if (_team.logo_url != undefined) teamData.logo_url = _team.logo_url
@@ -94,7 +91,8 @@ define(['./base_model'
                             ,object_type: 'teams'})
                             .save()
                 }
-                return result
+                else
+                    return result
             })
             .then(result => {
                 if (_team.id) {
@@ -132,7 +130,8 @@ define(['./base_model'
                     ,'subdiscipline'
                     ,'gender'
                     ,'entity'
-                    ,'player_team.position']})
+                    ,'player_team.position'
+                    ,'club']})
             })
         }
     })

@@ -11,8 +11,7 @@ exports.seed = function(knex, Promise) {
 	,knex('relationships_types').insert({name: 'FAN'}) //4
     ,knex('relationships_types').insert({name: 'COMMENT OF'}) //5
     ,knex('relationships_types').insert({name: 'PLAYER'})//6
-    ,knex('relationships_types').insert({name: 'PARTICIPANT'})
-    ,knex('relationships_types').insert({name: 'AFFILIATE'})
-    ,knex('relationships_types').insert({name: 'SUMMONED'})
+    ,knex('relationships_types').insert({name: 'MEMBER'})//7
+    ,knex('relationships_types').insert({name: 'EVENT CALENDAR OF'})//8
   );
 };

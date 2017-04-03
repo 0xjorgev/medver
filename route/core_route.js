@@ -165,7 +165,8 @@ define(['express'
 		})
 		.then(entities => {
 			//se filtran las competiciones que no tienen un creador
-			return entities.toJSON()
+			return entities
+				.toJSON()
 				.filter(ent => ent.object.created_by_id != null)
 		})
 		.then(entities => {

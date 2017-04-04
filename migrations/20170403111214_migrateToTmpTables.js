@@ -18,7 +18,7 @@ exports.up = function(knex, Promise) {
 			table.string('document_number')
 			table.string('document_img_url')
 			table.string('country')
-			table.string('player_id')
+			table.integer('player_id')
 			table.timestamp('claimed')
 			table.boolean('active').notNullable().defaultTo(true)
 			table.timestamp('created_at').defaultTo(knex.fn.now())
@@ -39,15 +39,14 @@ exports.up = function(knex, Promise) {
 				table.boolean('active').notNullable().defaultTo(true)
 				//Fixed related data
 				table.integer('number')
-				table.string('position')
 				table.date('registered_at')
 				table.date('unregistered_at')
 				table.integer('player_id')
 				table.integer('team_player_id')
 				table.integer('person_id')
 				//Relationships
-				table.integer('team_id')
-				table.integer('position_id')
+				table.integer('team_id').references('teams.id').index()
+				table.integer('position_id').references('positions.id').index()
 				//Audit Log
 				table.timestamp('created_at').defaultTo(knex.fn.now());
 				table.timestamp('updated_at').defaultTo(knex.fn.now());
@@ -57,7 +56,7 @@ exports.up = function(knex, Promise) {
 	.then(function(){
 		//Se actualiza el valor de person id con el valor del player id
 		return Promise.all([
-			knex.raw("INSERT INTO tmp_players_teams (active, position, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, team_player_id) SELECT active, position, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, id from players_teams")
+			knex.raw("INSERT INTO tmp_players_teams (active, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, team_player_id) SELECT active, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, id from players_teams")
 		])
 	})
 	.then(function(){
@@ -67,10 +66,10 @@ exports.up = function(knex, Promise) {
 				table.increments('id').primary()
 				table.integer('team_player_id')
 				table.boolean('present_in_field')
-				table.integer('team_id')
+				table.integer('team_id').references('teams.id').index()
 				table.integer('player_id')
 				//Relationships
-				table.integer('category_id')
+				table.integer('category_id').references('categories.id').index()
 				table.boolean('active')
 				table.timestamp('created_at').defaultTo(knex.fn.now())
 				table.timestamp('updated_at').defaultTo(knex.fn.now())
@@ -89,13 +88,12 @@ exports.up = function(knex, Promise) {
 			knex.schema.createTable('tmp_matches_players', function(table){
 				table.increments('id').primary()
 	      		table.integer('number')
-	      		table.string('position')
-				table.integer('position_id')
+				table.integer('position_id').references('positions.id').index()
 				table.integer('team_player_id')
 				table.boolean('is_initial').notNullable().defaultTo(true)
 				table.boolean('active').notNullable().defaultTo(true)
-	      		table.integer('match_id')
-				table.integer('team_id')
+	      		table.integer('match_id').references('matches.id').index()
+				table.integer('team_id').references('teams.id').index()
 				table.integer('player_id')
 				table.integer('matches_players_id')
 	      		//
@@ -107,7 +105,7 @@ exports.up = function(knex, Promise) {
 	.then(function(){
 		//Se actualiza el valor de person id con el valor del player id
 		return Promise.all([
-			knex.raw("INSERT INTO tmp_matches_players (number, position, is_initial, team_id, player_id, match_id, active, created_at, updated_at, matches_players_id ) SELECT number, position, is_initial, team_id, player_id, id, active, created_at, updated_at, id from matches_teams_players")
+			knex.raw("INSERT INTO tmp_matches_players (number, is_initial, team_id, player_id, match_id, active, created_at, updated_at, matches_players_id ) SELECT number, is_initial, team_id, player_id, match_id, active, created_at, updated_at, id from matches_teams_players")
 		])
 	})
 	.then(function(){
@@ -120,8 +118,8 @@ exports.up = function(knex, Promise) {
 				//Relationships
 				table.integer('player_in')
 				table.integer('player_out')
-				table.integer('match_id')
-				table.integer('event_id')
+				table.integer('match_id').references('matches.id').index()
+				table.integer('event_id').references('events.id').index()
 				table.integer('events_matches_players_id')
 				table.integer('team_id').references('teams.id').index()
 				table.timestamp('created_at')
@@ -150,7 +148,7 @@ exports.down = function(knex, Promise) {
 	.then(function(){
 		//Se actualiza el valor de person id con el valor del player id
 		return Promise.all([
-			knex.schema.dropTableIfExists('tmp_players_teams')
+			knex.schema.dropTableIfExists('tmp_categories_players')
 		])
 	})
 	.then(function(){

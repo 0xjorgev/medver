@@ -164,11 +164,13 @@ define(['express'
 			.fetchAll({withRelated: 'object.created_by.entity'})
 		})
 		.then(entities => {
-			//filtrar las comps que no tienen un creator_id
-			return entities.toJSON()
+			//se filtran las competiciones que no tienen un creador
+			return entities
+				.toJSON()
 				.filter(ent => ent.object.created_by_id != null)
 		})
 		.then(entities => {
+			// se preparan los datos para salvar la relacion
 			return entities.map(ent => {
 				return {competition_entity_id: ent.id
 					,competition_id: ent.object.id

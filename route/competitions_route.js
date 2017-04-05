@@ -26,39 +26,6 @@ define(['express'
 	let router = express.Router()
 	var send_email_from = Email(process.env.SENDER_EMAIL);
 
-	router.get('/:comp_id/admin_user/', function(req, res, next){
-
-		// .then((result) => {
-		//	 var adminData = compData.competition_user.map((u) => {
-		//		 return {competition_id: compData.id, user_id: u.users.id}
-		//	 })
-		//	 console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', adminData)
-		//	 // var adminData = [
-		//	 //	 {competition_id: competition_id, user_id: 12, active: true },
-		//	 //	 {competition_id: competition_id, user_id: 10, active: true },
-		//	 //	 {competition_id: competition_id, user_id: 11, active: true },
-		//	 //	 ]
-		//	 // return new Models.competition_user(JSON.stringify(adminData)).save()
-		//	 return Knex.insert(adminData).into('competitions_users')
-		// })
-
-		console.log('Competitions Admins');
-		var comp_id = req.params.comp_id;
-		// console.log('Model: ' , Models.competition_user.tableName);
-		return Models.competition_user
-		.where({competition_id :comp_id})
-		.where({active:true})
-		.fetchAll({withRelated: ['users']})
-		.then(function(result){
-			//console.log('Res: ', result);
-			Message(res,'Success', ' 0', result);
-		})
-		.catch(function(err){
-			console.log('err: ', err);
-			Message(res, err.detail, err.code, null);
-		});
-	});
-
 	//List of competitions
 	router.get('/', function (req, res) {
 		//req._currentUser is the user recovered from token
@@ -73,6 +40,8 @@ define(['express'
 			Response(res, null, permissionCheck)
 			return
 		}
+
+		let competitionList = null
 
 		return Models.competition
 			.query(function(qb){
@@ -104,30 +73,80 @@ define(['express'
 					,'seasons.categories.category_type'
 					,'seasons.categories.gender'
 					,'seasons.categories.classification'
-					// ,'seasons.categories.phases.groups'
 					,'competition_user.users']
 			})
 			.then(result => {
-				//se elimina el password de los users
-				result = result.map(comp => {
-					comp.relations.competition_user
-					.map(user => {
-						delete user.relations.users.attributes.password
-						return user
+				competitionList = result.toJSON()
+				const competitionIds = competitionList.map(c => c.id )
+				// logger.debug(competitionIds)
+				return Models.category_group_phase_team
+				.query( qb => {
+						let fields = ['category_id', 'status_id', 'description_en','description_es']
+						qb.select(fields)
+						qb.count('*')
+						qb.innerJoin('categories', 'categories.id','categories_groups_phases_teams.category_id')
+						qb.innerJoin('seasons', 'seasons.id','categories.season_id')
+						qb.innerJoin('competitions', 'competitions.id','seasons.competition_id')
+						//cambiar esta linea por leftJoin si se quiere mostrar los equipos que tienen status
+						qb.innerJoin('status_types', 'status_types.id','categories_groups_phases_teams.status_id')
+						qb.groupBy(fields)
+						qb.whereIn('competitions.id', competitionIds)
+					}
+				)
+				.fetchAll()
+			})
+			//bloque para contar el # de status de los equipos dentro de la cateogria
+			.then(statusCount => {
+				let count = statusCount.toJSON()
+				competitionList.map(comp => {
+					let compStatusCount = []
+					comp.seasons.forEach(season => {
+						season.categories.map(cat => {
+							cat.status_count = count.filter(c => c.category_id == cat.id)
+							if(cat.status_count.length > 0) compStatusCount.push(cat.status_count)
+							return cat
+						})
 					})
 					return comp
 				})
-				Response(res, result)}
-			)
-			.catch(error => Response(res, null, error) )
+				return true
+			})
+			// para calcular el # de statuses de teams x competicion
+			.then(result => {
+				const competitionIds = competitionList.map(c => c.id )
+				return Models.category_group_phase_team
+				.query( qb => {
+						let fields = ['competition_id','status_id', 'description_en','description_es']
+						qb.select(fields)
+						qb.count('*')
+						qb.innerJoin('categories', 'categories.id','categories_groups_phases_teams.category_id')
+						qb.innerJoin('seasons', 'seasons.id','categories.season_id')
+						qb.innerJoin('competitions', 'competitions.id','seasons.competition_id')
+						//cambiar esta linea por leftJoin si se quiere mostrar los equipos que tienen status null
+						qb.innerJoin('status_types', 'status_types.id','categories_groups_phases_teams.status_id')
+						qb.groupBy(fields)
+						qb.whereIn('competitions.id', competitionIds)
+					}
+				)
+				.fetchAll()
+			})
+			.then(statusCount => {
+				let count = statusCount.toJSON()
+				return competitionList.map(comp => {
+					comp.status_count = count.filter( c => c.competition_id == comp.id)
+					return comp
+				})
+			})
+			.then(result => Response(res, competitionList))
+			.catch(error => Response(res, null, error))
 	});
 
 	//Competitions Types List -> Array of results [Competition_type]
 	router.get('/competition_type', function(req, res){
 		return Models.competition_type
 			.fetchAll()
-			.then((result) => Response(res, result) )
-			.catch((error) => Response(res, null, error) );
+			.then(result => Response(res, result) )
+			.catch(error => Response(res, null, error) );
 	});
 
 	//Competition by Id
@@ -136,15 +155,8 @@ define(['express'
 		return Models.competition
 			.where({'id': comp_id })
 			.fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'competition_user.users']} )
-			.then((result) => {
-				//se elimina el password de los users para no retornarlo en el request
-				result.relations.competition_user.map((user) => {
-					delete user.relations.users.attributes.password
-					return user
-				})
-				Response(res, result)}
-			)
-			.catch((error) => Response(res, null, error) )
+			.then(result => Response(res, result) )
+			.catch(error => Response(res, null, error) )
 	});
 
 	//Seasons by Competition_Id -> Returns array of result
@@ -156,91 +168,6 @@ define(['express'
 			.then((result) => Response(res, result))
 			.catch((error) => Response(res, null, error));
 	});
-
-	// router.post('/:competition_id/contact/', function (req, res) {
-	//
-	// 	var Contact = Models.contact;
-	// 	var contact_post = req.body;
-	// 	var competition_id = req.params.competition_id;
-	//
-	// 	console.log('Req values', req.body);
-	//
-	// 	var country = contact_post.country;
-	// 	var state = contact_post.state;
-	// 	var city = contact_post.city;
-	// 	var zip_code = contact_post.zip_code;
-	// 	var phone = contact_post.phone;
-	// 	var email = contact_post.email;
-	// 	var website_url = contact_post.website_url;
-	//
-	// 	new Contact({contact_post})
-	// 	.save()
-	// 	.then(function(new_contact){
-	// 		Response(res, new_contact)
-	// 	})
-	// 	.catch(function(error){
-	// 		Response(res, null, error)
-	// 	});
-	// });
-
-	// //Competition Contact by competition_id
-	// router.get('/:competition_id/contact/', function (req, res) {
-	// 	var competition_id = req.params.competition_id;
-	// 	return Models.contact
-	// 	.where('competition_id','=',competition_id)
-	// 	.fetchAll()
-	// 	.then(function (result) {
-	// 		Response(res, result)
-	// 	}).catch(function(error){
-	// 		Response(res, null, error)
-	// 	});
-	// });
-
-	//Competition Contact by contact_id
-	// router.get('/:competition_id/contact/:contact_id', function (req, res) {
-	//
-	// 	var competition_id = req.params.competition_id;
-	// 	var contact_id = req.params.contact_id;
-	//
-	// 	console.log('Req values:', req.body);
-	//
-	// 	return Models.contact
-	// 	.where({competition_id:competition_id, id:contact_id})
-	// 	.fetchAll()
-	// 	.then(function (result) {
-	// 		Response(res, result)
-	// 	})
-	// 	.catch(function(error){
-	// 		Response(res, null, error)
-	// 	});
-	// });
-
-	//Competition Contact Update
-	// router.put('/:competition_id/contact/:contact_id', function(req, res){
-	//
-	// 	var Contact = Models.contact;
-	// 	var competition_id = req.params.competition_id;
-	// 	var contact_id = req.params.contact_id;
-	// 	var contact_upd = req.body;
-	//
-	// 	Knex('contacts')
-	// 	.where('id','=',contact_id)
-	// 	.where('competition_id','=',competition_id)
-	// 	.update(contact_upd, ['id'])
-	// 	.then(function(result){
-	// 		if (result.length != 0){
-	// 			console.log(`result`, result);
-	// 			Response(res, result)
-	// 		} else {
-	// 			//TODO: cuando cae en esta condicion? probar
-	// 			Message(res, 'Wrong Competition_id or contact_id', '404', result);
-	// 			// Response(res, null, error)
-	// 		}
-	// 	})
-	// 	.catch(function(err){
-	// 		Response(res, null, error)
-	// 	});
-	// });
 
 	//Create Competition
 	router.post('/', function (req, res) {
@@ -407,12 +334,15 @@ define(['express'
 	});
 
 	router.get('/query/by_city', (req, res) => {
-		//req._currentUser is the user recovered from token
-		//to get competitions the user should have these permissions
-		var chk = auth.checkPermissions(req._currentUser, ['admin-competition', 'admin'])
 
-		if (chk.code != 0){
-			Response(res, null, chk)
+		const permissionCheck = auth.checkPermissions({
+			user: req._currentUser
+			,object_type: 'competitions'
+			,permissions: []
+		})
+
+		if (permissionCheck.code != 0){
+			Response(res, null, permissionCheck)
 			return
 		}
 

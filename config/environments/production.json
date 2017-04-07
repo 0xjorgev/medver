@@ -1,10 +1,10 @@
 {
 	"PORT": 3000,
-	"DB_USER":"root",
+	"DB_USER":"postgres",
 	"DB":"medver",
-	"DB_PORT":"3306",
+	"DB_PORT":"5432",
 	"DB_HOST":"localhost",
-	"BD_PWD":"root",
+	"BD_PWD":"postgres",
 	"DATABASE_URL":"postgres://tolocgcxmivdaf:OlikTEmeH4rIe6IKCHDoTpjAZW@ec2-54-225-151-64.compute-1.amazonaws.com:5432/d6bdusqa89c19t",
 	"SENDGRID_USERNAME":"app48540416@heroku.com",
 	"SENDGRID_PASSWORD":"xsa6i5x19832",

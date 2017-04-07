@@ -1,15 +1,23 @@
 // Update with your config settings.
 module.exports = {
   development: {
-    client: 'mysql',
+    client: 'pg',
     ssl: false,
     connection: {
-      user: "root",
-      password: "root",
-      database: "medver",
-      port: 3306,
-      host: "localhost",
-      ssl: false
+      user: "tolocgcxmivdaf",
+      password: "OlikTEmeH4rIe6IKCHDoTpjAZW",
+      database: "d6bdusqa89c19t",
+      port: 5432,
+      host: "ec2-54-225-151-64.compute-1.amazonaws.com",
+      ssl: true
+
+      /*
+      "DB_USER":"tolocgcxmivdaf",
+      "DB":"d6bdusqa89c19t",
+      "DB_PORT":"5432",
+      "DB_HOST":"ec2-54-225-151-64.compute-1.amazonaws.com",
+      "BD_PWD":"OlikTEmeH4rIe6IKCHDoTpjAZW",
+      */
     },
     migrations: { tableName: 'schema_info'},
     pool: { min:1, max:5},

@@ -59,20 +59,6 @@ define(['express',
 			var cedula = pac_post.cedula;
 			var fecha_nacimiento = pac_post.fecha_nacimiento;
 
-			//--------------------------------------
-            	// table.increments('id');
-            	// table.string('nombre').notNullable();
-            	// table.string('apellido').notNullable();
-            	// table.string('alergia');
-            	// table.string('email');
-            	// table.string('telefono-principal');
-            	// table.string('sexo');
-            	// table.string('cedula');
-            	// table.boolean('active').notNullable().defaultTo(true);
-            	// table.timestamp('fecha_nacimiento');
-            	// table.integer('historia_id').references('historias.id').index();
-			//--------------------------------------
-
 			new Historia({
 				historia_anterior: historia_anterior,
 				evolucion: "",

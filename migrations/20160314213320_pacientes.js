@@ -9,11 +9,11 @@ exports.up = function(knex, Promise) {
 			table.string('email');
 			table.string('telefono_principal');
 			table.string('sexo');
-			table.string('cedula');
+			table.string('cedula').notNullable().unique();
 			table.boolean('active').notNullable().defaultTo(true);
 			table.timestamp('fecha_nacimiento');
 			table.integer('historia_id').references('historias.id').index();
-      table.dateTtimestampime('created_at').defaultTo(knex.fn.now());
+      table.timestamp('created_at').defaultTo(knex.fn.now());
 			table.timestamp('updated_at').defaultTo(knex.fn.now());
 		})
 	]);

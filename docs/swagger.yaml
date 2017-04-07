@@ -114,6 +114,20 @@ paths:
       responses:
         200:
           description: OK message
+  /core/entities/build:
+    post:
+      summary: Builds missing competition entities
+      description: Builds missing competition entities
+      tags:
+        - Core
+    #   parameters:
+    #   - name: Authorization-Token
+    #     in: header
+    #     type: string
+    #     required: true
+      responses:
+        200:
+          description: OK message
   /user:
     get:
       summary: Returns the list of active users

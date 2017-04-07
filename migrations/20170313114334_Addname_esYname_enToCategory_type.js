@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
 		})
 		.then(function(){
 			return Promise.all([
-				 knex.raw("update categories_types set name_en = 'Professional', name_es='Profesional', name='PROFESIONAL', description='Professional Futball' where name = 'Professional'")
+				 knex.raw("update categories_types set name_en = 'Professional', name_es='Profesional', name='PROFESIONAL', description='Professional Football' where name = 'Professional'")
 				,knex.raw("update categories_types set name_en = 'U-23', name_es='Sub-23', name = 'U-23' where name = 'Sub 23'")
 				,knex.raw("update categories_types set name_en = 'U-22', name_es='Sub-22', name = 'U-22' where name = 'Sub 22'")
 				,knex.raw("update categories_types set name_en = 'U-21', name_es='Sub-21', name = 'U-21' where name = 'Sub 21'")
@@ -29,7 +29,7 @@ exports.up = function(knex, Promise) {
 				,knex.raw("update categories_types set name_en = 'U-5', name_es='Sub-5', name = 'U-5' where name = 'Sub 5'")
 				,knex.raw("update categories_types set name_en = 'U-6', name_es='Sub-6', name = 'U-6' where name = 'Sub 6'")
 				,knex.raw("update categories_types set name_en = 'U-5', name_es='Sub-5', name = 'U-5' where name = 'Sub 5'")
-				,knex.raw("insert into categories_types (name_en, name_es, name, minimum_value, maximum_value,  description) values ('Open', 'Abierto', 'OPEN', 0, 99, 'Open Futball' )")
+				,knex.raw("insert into categories_types (name_en, name_es, name, minimum_value, maximum_value,  description) values ('Open', 'Abierta', 'OPEN', 0, 99, 'Open Football' )")
 				,knex.raw("insert into categories_types (name_en, name_es, name, minimum_value, maximum_value,  description) values ('N/A', 'N/A', 'N/A', 0, 99, 'N/A' )")
 			])
 		})

@@ -11,3 +11,4 @@ latest.dump
 npm-debug.log
 .vscode
 *.log
+locBackup.sql

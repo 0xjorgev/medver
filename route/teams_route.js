@@ -412,7 +412,11 @@ define(['express'
 			.orderBy('date')
 		})
         .fetchAll({withRelated: ['home_team'
-        	, 'visitor_team'
+		    , 'home_team.category_type'
+		    , 'home_team.gender'
+		    , 'visitor_team'
+		    , 'visitor_team.category_type'
+		    , 'visitor_team.gender'
         	, 'group.phase.category'
         	, 'result.event'
         	, 'result.player_in'

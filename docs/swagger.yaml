@@ -2582,7 +2582,32 @@ paths:
           type: integer
           format: integer
 
-
+  /category/{category_id}/register_tryouts:
+    post:
+      summary: Recive the information of one person and create a player that will participate in the category 
+      description: Recive the information of one person and create a player that will participate in the category
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+        - name: player data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlayerData'
+      tags:
+        - Category
+        - Player
+      responses:
+        200:
+          description: result
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 #######################################################################
 #      _       __ _       _ _   _
@@ -3079,14 +3104,12 @@ definitions:
             type: integer
           team_id:
             type: integer
-
   Error:
     title: error
     type: object
     properties:
       description:
         type: string
-
   CreateClubRequest:
     title: Club Creation/Update Request
     type: object
@@ -3104,7 +3127,6 @@ definitions:
         description: If not provided, a new 'club' organization will be created under the same name as the club
     required:
       - nam
-
   EventCalendarRequest:
     title: Event Calendar Creation/Update Request
     type: object
@@ -3124,3 +3146,56 @@ definitions:
         description: If not provided, a new 'event calendar' will not be associated with any entity
     required:
       - entity_parent_id
+
+
+
+  PlayerData:
+    title: person
+    type: object
+    description: player data
+    properties:
+      first_name:
+        type: string
+        description: First name of the player
+        required: true
+      last_name:
+        type: string
+        description: Last name of the player
+        required: true
+      birthday:
+        type: string
+        description: Player's date of birth. ex. 2001-02-12T00:00:00-04:00
+        required: true
+      nickname:
+        type: string
+        description: Player's nickname or familiar name
+        required: false
+      email:
+        type: string
+        description: Player's email
+        required: true
+      gender_id:
+        type: integer
+        description: Player gender Id
+        required: false
+      document_number:
+        type: string
+        description: Identification number of the player, if available
+        required: false
+      img_url:
+        type: string
+        description: Player's photo
+        required: false
+      document_img_url:
+        type: string
+        description: Photo of the domcument number, if available
+        required: false
+      meta:
+        type: string
+        description: meta data of the player
+        required: false 
+
+
+
+
+

@@ -51,6 +51,10 @@ define(['express'
 			error.name = (error.name == 'Error' && error.message && error.message.includes('invalid values')) ? 'ValidationError' : error.name
 
 			switch(error.name){
+				case 'Custom':
+					code = error.code
+					mess = error.message				
+					break
 				case 'InsufficientPermissionsError':
 				//thrown by auth_helper.js, when user doesnt have the required permissions to access a resource
 				case 'JwtParseError':
@@ -98,7 +102,7 @@ define(['express'
 				res.status(code).json({ message: 'Success', code: '0', data: result})
 				break
 			case 400:
-				res.status(code).json({ message: 'Validation failure', code: code, validation_errors: result})
+				res.status(code).json({ message: 'Validation failure: '+mess, code: code, validation_errors: result})
 				break
 			case 403:
 				res.status(code).json({ message: 'Unauthorized', code: code})

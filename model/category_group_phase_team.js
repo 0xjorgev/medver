@@ -33,7 +33,7 @@ define(['./base_model']
         }
 
         ,entity: function(){
-            return this.morphOne('Entity', 'object');
+            return this.belongsTo('Entity', 'entity_id');
         }
 
     },{

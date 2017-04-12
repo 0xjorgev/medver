@@ -40,8 +40,6 @@ define(['./base_model','./entity','./gender', './player_team', './event_match_pl
 	}
 	,{
 		findOrCreate: function(_p){
-        	// console.log('Create player')
-        	// console.log(_p)
         	let player = {}
         	let newPlayer = {}
 			//Creamos el player

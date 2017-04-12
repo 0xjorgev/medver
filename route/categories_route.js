@@ -1058,10 +1058,11 @@ define(['express'
         if(req.body.meta !== undefined && req.body.meta !== null) player.meta = req.body.meta.trim()
 
         //Creamos el usuario a guardar
-        user.username = req.body.nickname.trim() + '_' + req.body.last_name.trim()
+        user.username = req.body.email.trim()
         user.password = md5(password)
         user.email    = req.body.email.trim()
         user.lang     =  "EN";
+
         //Verificamos si ya existe un usuario con ese correo
         return Models.user.findOrCreate(user)
         .then(_user => {
@@ -1092,14 +1093,40 @@ define(['express'
 			let tmp = _user_player_relationship.toJSON()
      
             //Se crea el objeto de inscripcion del usuario a la competition unitario o categoria
-            let category_fase_group_team = {}
-            category_fase_group_team.category_id = category_id
-            category_fase_group_team.status_id = 9
-            category_fase_group_team.entity_id = savePlayer.entity.id
-            return Models.category_group_phase_team.findOrCreate(category_fase_group_team)
+            return Models.category_group_phase_team
+                .query(qb => {
+                    qb.where({category_id: category_id
+                            ,entity_id: savePlayer.entity.id
+                        })
+                })
+                // .fetchAll({withRelated: ['entity']})
+                .fetch({withRelated: ['entity.object']})
+            // return Models.category_group_phase_team.findOrCreate(category_fase_group_team)
+		})
+		.then(cgptFind => {
+			let tmpdata = cgptFind.toJSON()
+			logger.debug(tmpdata)
+			if(cgptFind.length == 0)
+			{
+				let category_fase_group_team = {}
+            	category_fase_group_team.category_id = category_id
+            	category_fase_group_team.status_id = 9
+            	category_fase_group_team.entity_id = savePlayer.entity.id
+            	return new Models.category_group_phase_team(category_fase_group_team).save()
+            }
+            else
+            {
+            	//Se devuelve un error indicando que ya existe un player registrado con el correo indicado
+            	throw {
+            		name: 'Custom'
+            		,message: "A Player with the email " + tmpdata.entity.object.email + " has been already registered on this category"
+            		,code: 400
+            		,data: tmpdata
+            	} 
+            }
 		})
 		.then(result => Response(res, result))
-        .catch(error => Response(res, null, error))
+        .catch(error => Response(res, error.data, error))
     })
 
 	return router;

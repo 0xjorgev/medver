@@ -97,8 +97,6 @@ define(['./base_model'
 	},{
         //Método para registrar un jugador en una competition tipo tryout
         findOrCreate: function(_user){
-        	console.log('Create user')
-        	// console.log(_user)
         	let user = {}
 			//crear usuario
 			if(_user.username !== undefined && _user.username !== null) user.username = _user.username.trim()

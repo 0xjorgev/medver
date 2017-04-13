@@ -1648,6 +1648,25 @@ paths:
       description: Gets the info of all teams
       tags:
         - Team
+      parameters:
+        - name: category_type_id
+          in: query
+          description: Category Type ID
+          required: false
+          type: integer
+          format: integer
+        - name: gender_id
+          in: query
+          description: Gender ID
+          required: false
+          type: integer
+          format: integer
+        - name: subdiscipline_id
+          in: query
+          description: Subdiscipline ID
+          required: false
+          type: integer
+          format: integer
       responses:
         200:
           description: List of teams
@@ -2584,7 +2603,7 @@ paths:
 
   /category/{category_id}/register_tryouts:
     post:
-      summary: Recive the information of one person and create a player that will participate in the category 
+      summary: Recive the information of one person and create a player that will participate in the category
       description: Recive the information of one person and create a player that will participate in the category
       parameters:
         - name: category_id
@@ -3193,9 +3212,4 @@ definitions:
       meta:
         type: string
         description: meta data of the player
-        required: false 
-
-
-
-
-
+        required: false

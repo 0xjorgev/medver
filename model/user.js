@@ -94,7 +94,49 @@ define(['./base_model'
 				return []
 			}
 		}
-	});
+	},{
+        //Método para registrar un jugador en una competition tipo tryout
+        findOrCreate: function(_user){
+        	let user = {}
+			//crear usuario
+			if(_user.username !== undefined && _user.username !== null) user.username = _user.username.trim()
+			if(_user.password !== undefined && _user.password !== null) user.password = _user.password.trim()
+			if(_user.email !== undefined && _user.email !== null) user.email = _user.email.trim();
+			if(_user.lang !== undefined && _user.lang !== null) user.lang = "EN";
+			let _newUser = {}
+
+        	return DB._models.User
+	            .where({email: user.email})
+	            .fetch()
+	        .then(_result => {
+	            //Si el usuario retornamos el usuario
+	            if(_result != undefined)
+	            {
+	                return _result
+	            }
+	            //Si no existe lo creamos
+	            else
+	            {
+	            	// console.log(user)
+			        return new DB._models.User(user)
+			        .save()
+	            }
+	        })
+	        .then(result => {
+	            _newUser = result.toJSON()
+	            //Se crea un objeto entidad
+	            let entity = {}
+		        entity.object_id = _newUser.id
+		        entity.object_type = 'users'
+				return DB._models.Entity.findOrCreate(entity)
+	        })
+	        .then(_result => {
+	        	return DB._models.User
+					.where({id: _newUser.id})
+					.fetch({withRelated: ['entity']})
+	        })
+	    }
+    });
 
 	//obtiene las entidades asociadas a este usuario
 	User.getEntities = (user) => {

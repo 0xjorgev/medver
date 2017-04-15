@@ -44,6 +44,34 @@ define(['./base_model'
 				,related_to: function(){
 					return this.hasMany('Entity_relationship', 'ent_ref_to_id');
 				}
+			},
+			{
+				//Método para registrar un jugador en una competition tipo tryout
+		        findOrCreate: function(_entity){
+		        	// console.log('Create entity')
+		        	// console.log(_entity)
+		        	let entity = {}
+		        	entity.object_id = _entity.object_id
+		        	entity.object_type = _entity.object_type
+					//Se verifica si tiene una entidad asociada o la creamos
+					return DB._models.Entity
+						.query(qb => {
+							qb.where({object_id: entity.object_id,
+									  object_type: entity.object_type })
+						})
+						.fetchAll()
+					.then(result => {
+						if(result.length == 0){
+							//si no se encuentra una entidad asociada al equipo, se crea una nueva
+							return new DB._models.Entity({
+									object_id: entity.object_id
+									,object_type: entity.object_type})
+									.save()
+						}
+						else
+							return result
+					})
+			    }
 			})
 
 			//Ubica las entidades de objectType que no tienen registros en la tabla

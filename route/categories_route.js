@@ -1051,9 +1051,9 @@ define(['express'
         if(req.body.email !== undefined && req.body.email !== null) player.email = req.body.email.trim()
         if(req.body.img_url !== undefined && req.body.img_url !== null) player.img_url = req.body.img_url.trim()
         if(req.body.birthday !== undefined && req.body.birthday !== null) player.birthday = req.body.birthday
-        if(req.body.document_number !== undefined && req.body.document_number !== null) 
+        if(req.body.document_number !== undefined && req.body.document_number !== null)
         	player.document_number = req.body.document_number.trim()
-        if(req.body.document_img_url !== undefined && req.body.document_img_url !== null) 
+        if(req.body.document_img_url !== undefined && req.body.document_img_url !== null)
         	player.document_img_url = req.body.document_img_url.trim()
         if(req.body.meta !== undefined && req.body.meta !== null) player.meta = req.body.meta.trim()
 
@@ -1091,7 +1091,7 @@ define(['express'
 		})
 		.then(_user_player_relationship => {
 			let tmp = _user_player_relationship.toJSON()
-     
+
             //Se crea el objeto de inscripcion del usuario a la competition unitario o categoria
             return Models.category_group_phase_team
                 .query(qb => {
@@ -1104,9 +1104,7 @@ define(['express'
             // return Models.category_group_phase_team.findOrCreate(category_fase_group_team)
 		})
 		.then(cgptFind => {
-			let tmpdata = cgptFind.toJSON()
-			logger.debug(tmpdata)
-			if(cgptFind.length == 0)
+			if(cgptFind == null || cgptFind.length == 0)
 			{
 				let category_fase_group_team = {}
             	category_fase_group_team.category_id = category_id
@@ -1116,13 +1114,15 @@ define(['express'
             }
             else
             {
+              let tmpdata = cgptFind.toJSON()
+        			logger.debug(tmpdata)
             	//Se devuelve un error indicando que ya existe un player registrado con el correo indicado
             	throw {
             		name: 'Custom'
             		,message: "A Player with the email " + tmpdata.entity.object.email + " has been already registered on this category"
             		,code: 400
             		,data: tmpdata
-            	} 
+            	}
             }
 		})
 		.then(result => Response(res, result))

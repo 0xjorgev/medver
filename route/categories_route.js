@@ -611,23 +611,23 @@ define(['express'
 
 		const preSubject =  (pref) => {
 			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
-				if (pref !== null && pref !== undefined ) {
-					switch(pref){
-						case "ES":
-							return "Información de registro para Torneos Alianza de Futbol"
-						default:
-							return "Alianza de Futbol tournament register informaction"
-					}
-			 } else {
-				 return "Alianza de Futbol tournament register informaction"
-			 }
+			// 	if (pref !== null && pref !== undefined ) {
+			// 		switch(pref){
+			// 			case "ES":
+			// 				return "Alianza de Futbol"
+			// 			default:
+			// 				return "Alianza de Futbol"
+			// 		}
+			//  } else {
+				 return "Alianza de Futbol"
+			//  }
 		}
 
 	// console.log("User Lang: ", data.user.attributes.lang)
 	//console.log("LANG", prefLang(data.user.lang))
 
 	return template_string_replace(data.template.replace("LANG", prefLang(data.user.attributes.lang) )
-				,tag ,process.env.SENDER_EMAIL
+				,tag ,process.env.ALIANZA_SENDER
 				,preSubject(data.user.attributes.lang)
 				// ,'jorgevmendoza@gmail.com')
 				,data.user.attributes.email)

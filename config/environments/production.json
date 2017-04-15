@@ -6,5 +6,6 @@
 	"DB_HOST":"127.0.0.1",
 	"SENDGRID_USERNAME":"app46243864@heroku.com",
 	"SENDGRID_PASSWORD":"h8167juz0757",
-	"SENDER_EMAIL":"info@somosport.com"
+	"SENDER_EMAIL":"info@somosport.com",
+	"ALIANZA_SENDER":"info@brcgrp.com"
 }

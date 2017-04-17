@@ -43,7 +43,7 @@ define(['./base_model']
             return DB._models.Category_group_phase_team
                 .query(qb => {
                     qb.where({category_id: _register.category_id
-                            ,entity_id: _register.entity_id 
+                            ,entity_id: _register.entity_id
                         })
                 })
                 .fetchAll()

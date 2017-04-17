@@ -74,12 +74,18 @@ define(['express'
 		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
 			.where({category_id:category_id, active:true})
-			.fetchAll({withRelated:['team.player_team','category','group','phase','status_type']})
+			.fetchAll({withRelated:['team.player_team'
+				,'category'
+				,'group'
+				,'phase'
+				,'status_type'
+				,'entity.object']})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
 	});
 
 	//Feed by Category
+	//FIXME: restringir x categoria
 	router.get('/:category_id/feed', (req, res) => {
 		var category_id = req.params.category_id;
 		return Models.feed_item.query( qb => {
@@ -87,7 +93,7 @@ define(['express'
 			qb.orderBy('id', 'desc')
 		})
 		.fetchAll({withRelated:['entity.object']})
-		.then(result => Response(res, result))
+		.then(result => Response(res, []))
 		.catch(error => Response(res, null, error));
 	});
 
@@ -467,6 +473,22 @@ define(['express'
 	})
 
 	//==========================================================================
+	// Updates a category participant status;
+	// Escribe en la tabla spider (category_group_phase_team)
+	//==========================================================================
+	router.put('/:category_id/participant/:participant_id', function(req, res){
+		req.body.category_id = req.params.category_id
+
+		//id en la tabla spider
+		req.body.id = req.params.participant_id
+		logger.debug(req.body)
+
+		const data = buildCategoryGroupPhaseTeamData(req.body)
+
+		saveCategoryGroupPhaseTeam(data, res)
+	})
+
+	//==========================================================================
 	// Update a category group phase team
 	//==========================================================================
 	router.put('/:category_id/team/:team_id/invite/:id', function(req, res){
@@ -602,7 +624,6 @@ define(['express'
 		}
 
 		const prefLang =  (pref) => {
-			console.log("Inside PrefLang: ", pref)
 			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
 			  if (pref !== null && pref !== undefined ) {
 					// 	console.log("Inside if: ", pref.toUpperCase())
@@ -710,11 +731,7 @@ define(['express'
 			.fetch({withRelated:'season.competition'})
 			.then((result) => {
 				data.category = result
-				// console.log("******************")
-				// console.log("Competition values:", result.relations.season.relations.competition.attributes.img_url)
-				// console.log("******************")
 				data.imageUrl = result.relations.season.relations.competition.attributes.img_url
-				//var status_email = send_status_email(data)
 				return send_status_email(data)
 			})
 			.catch((error) => {
@@ -722,20 +739,6 @@ define(['express'
 			})
 	}
 
-	//==========================================================================
-	// Get Season Full Data
-	//==========================================================================
-	// const season_data = (competition_id) => {
-	// 	return Models.category
-	// 		.where({id:competition_id, active:true})
-	// 		.fetch()
-	// 		.then((result) => {
-	// 			return result
-	// 		})
-	// 		.catch((error) => {
-	// 			return {}
-	// 		})
-	// }
 	//==========================================================================
 	// Get all players of one category and one team
 	//==========================================================================
@@ -925,8 +928,9 @@ define(['express'
 		.then((result) => {
 			var tmp = undefined
 			return result.map((phase) => {
-				if(phase.position == 1)
+				if(phase.position == 1){
 					tmp = phase.groups
+				}
 				else {
 					var tmp2 = phase.groups
 					phase.groups = tmp
@@ -935,15 +939,9 @@ define(['express'
 				return phase
 			})
 		})
-		.then((result) => {
-			return result.slice(1)
-		})
-		.then((result) => {
-			Response(res, result)
-		})
-		.catch((error) => {
-			Response(res, null, error)
-		})
+		.then(result => result.slice(1) )
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
 	})
 
 	//==========================================================================

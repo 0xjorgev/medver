@@ -79,18 +79,14 @@ define(['express'
 			,'events.player_out'
 			,'group']
 		})
-		.then((result) => {
-			Response(res, result);
-		})
-		.catch((error) => {
-			Response(res, null, error);
-		});
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) );
 	});
 
 	router.get('/:match_id/team', (req, res) => {
 		var match_id = req.params.match_id;
 		return Models.match
-		.where({'id': match_id})
+		.where({'id': match_id, active: true})
 		.fetch({withRelated: [
 			'events.event',
 			'events.player_in',
@@ -228,6 +224,7 @@ define(['express'
 		if(data.round_id != undefined)              matchData.round_id =  data.round_id
 		if(data.date != undefined)                  matchData.date =  data.date
 		if(data.played != undefined)                matchData.played =  data.played
+		if(data.active != undefined)                matchData.active =  data.active
 
 		//datos para los placeholders
 		// si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
@@ -253,35 +250,8 @@ define(['express'
 			matchData.placeholder_visitor_team_position = null
 		}
 
-		let categoryData = {}
-		if(data.category_id != undefined) categoryData.category_id = data.category_id
-		if(data.phase_id != undefined) categoryData.phase_id = data.phase_id
-		if(data.group_id != undefined) categoryData.group_id = data.group_id
-
 		let refereeData = {}
 		if(data.referee_id != undefined) refereeData.referee_id = data.referee_id
-
-		// //this will die
-		// var roundData = {}
-		// if(data.group_id){
-		// 	var roundData = {
-		// 		group_id: data.group_id,
-		// 		name: `Round of Group ${data.group_id}`
-		// 	}
-		// }
-		//
-		// if(data.round_id) roundData.id = data.round_id
-		// roundData.name = 'Round'
-
-		//dado que no se están utilizando las rondas, se crea una ronda si el grupo recibido no tiene una creada
-		//en caso de que la ronda exista, solo se hace update
-		// new Models.round(roundData)
-		// .save()
-		// .then(round => {
-		// 	//se salvan los datos del match
-		// 	matchData.round_id = round.attributes.id
-		// 	return Models.match.forge(matchData).save()
-		// })
 
 		//para almacenar el match creado
 		let _match = null
@@ -307,7 +277,7 @@ define(['express'
 			if( _match.matches_referee_id != null || _match.matches_referee_id != undefined)
 			refereeData.id = _match.matches_referee_id
 
-			//TODO: se está duplicando el referi cuando se actaliza el registro;
+			//TODO: se está duplicando el referee cuando se actaliza el registro;
 			//para evitar eso es necesario devolver el id de la tabla referee_match
 			return new Models.match_referee(refereeData).save()
 		})
@@ -344,12 +314,14 @@ define(['express'
 		.where({match_id: match_id, active: true})
 		.fetchAll({withRelated: ['match_id'
 			,'event_id'
+			,'event'
+			,'eventsCount'
 			,'player_in.player_team'
 			,'player_out.player_team'
 			,'team']
 			, debug: false})
 		.then(result => Response(res, result))
-		.catch((error) => Response(res, null, error))
+		.catch(error => Response(res, null, error))
 	})
 
 	//servicio para almacenar los eventos de un partido; genera feed items

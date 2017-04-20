@@ -358,6 +358,7 @@ define(['express'
         }
     });
 
+	// crea los partidos de una categoria
 	router.post('/:category_id/match', (req, res) => {
 		return Models.category
 			.where({id: req.params.category_id})
@@ -416,13 +417,17 @@ define(['express'
 			[
 			,{'phases': function(qb){ qb.where({active: true}) }}
 			,{'phases.groups': function(qb){ qb.where({active: true}) }}
+			,{'phases.groups.matches': function(qb){ qb.where({active: true}) }}
 			,'phases.groups.matches.home_team'
 			,'phases.groups.matches.visitor_team'
-			,'phases.groups.matches.events.event'
-			,'phases.groups.matches.events.team'
-			,'phases.groups.matches.events.player_in.player_team'
-			,'phases.groups.matches.events.player_out.player_team'
-		]})
+			// la informacion de eventos es demasiado extensa
+			// para traerla a nivel de categoria
+			// ,'phases.groups.matches.events.event'
+			// ,'phases.groups.matches.events.team'
+			// ,'phases.groups.matches.events.player_in.player_team'
+			// ,'phases.groups.matches.events.player_out.player_team'
+			,'phases.groups.matches.referee.user'
+		], debug: false})
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error))
 	})

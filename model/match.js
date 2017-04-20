@@ -49,6 +49,11 @@ define(['./base_model'
 				entity.save()
 			}, this)
 
+			// this.on('fetching', (model, attributes, options) => {
+			// 	const eventCountWrapped = DB.raw(this.eventsCount()).wrap('(', ') as event_count')
+			// 	options.query.select('*', eventCountWrapped)
+			// })
+
 			this.on('fetched', () => {
 				const currentRelations = Object.keys(this.relations)
 				if(currentRelations.indexOf('home_team') < 0 && currentRelations.indexOf('visitor_team') < 0){
@@ -87,6 +92,10 @@ define(['./base_model'
 		}
 		,events: function(){
 			return this.hasMany('Event_match_player', 'match_id');
+		}
+		,eventsCount: function(){
+			console.log('eventsCount -----------------------');
+			return 667
 		}
 		//toma los eventos del partido
 		,getScore: function(){

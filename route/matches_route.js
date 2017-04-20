@@ -315,7 +315,6 @@ define(['express'
 		.fetchAll({withRelated: ['match_id'
 			,'event_id'
 			,'event'
-			,'eventsCount'
 			,'player_in.player_team'
 			,'player_out.player_team'
 			,'team']

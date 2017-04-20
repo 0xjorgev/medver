@@ -25,8 +25,10 @@ define(['express'
 		//codigo para estadisticas de servicios
 		if(process.env.SERVICE_STATS){
 			const path = res.req.route.path
-			const client = redis.createClient(
-				'redis://h:pf91v0pvlljcdpbktgg4823ajpn@ec2-54-243-224-12.compute-1.amazonaws.com:7639')
+			// redis en heroku dev
+			// const client = redis.createClient('redis://h:pf91v0pvlljcdpbktgg4823ajpn@ec2-54-243-224-12.compute-1.amazonaws.com:7639')
+			// redis en localhost - direccion por defecto
+			const client = redis.createClient('redis://127.0.0.1:6379')
 			const key = `${path}`
 			client.get(key, (error, result) => {
 				if(error){
@@ -53,7 +55,7 @@ define(['express'
 			switch(error.name){
 				case 'Custom':
 					code = error.code
-					mess = error.message				
+					mess = error.message
 					break
 				case 'InsufficientPermissionsError':
 				//thrown by auth_helper.js, when user doesnt have the required permissions to access a resource

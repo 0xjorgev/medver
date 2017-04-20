@@ -78,6 +78,15 @@ paths:
         200:
           description: OK Message
 
+  /core/services/stats:
+    get:
+      summary: Reports usage of core services
+      description: Reports usage of core services
+      tags:
+        - Core
+      responses:
+        200:
+          description: List of services and call count
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport

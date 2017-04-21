@@ -50,11 +50,11 @@ define(['./base_model','./entity','./gender', './player_team', './event_match_pl
 	        if(_p.email !== undefined && _p.email !== null) player.email = _p.email.trim()
 	        if(_p.img_url !== undefined && _p.img_url !== null) player.img_url = _p.img_url.trim()
 	        if(_p.birthday !== undefined && _p.birthday !== null) player.birthday = _p.birthday
-	        if(_p.document_number !== undefined && _p.document_number !== null) 
+	        if(_p.document_number !== undefined && _p.document_number !== null)
 	        	player.document_number = _p.document_number.trim()
-	        if(_p.document_img_url !== undefined && _p.document_img_url !== null) 
+	        if(_p.document_img_url !== undefined && _p.document_img_url !== null)
 	        	player.document_img_url = _p.document_img_url.trim()
-	        if(_p.meta !== undefined && _p.meta !== null) player.meta = _p.meta.trim()
+	        if(_p.meta !== undefined && _p.meta !== null) player.meta = _p.meta
 
         	return DB._models.Player
 	            .where({email: player.email})

@@ -1058,7 +1058,7 @@ define(['express'
         if(req.body.nickname !== undefined && req.body.nickname !== null) player.nickname  = req.body.nickname.trim()
         if(req.body.gender_id !== undefined && req.body.gender_id !== null) player.gender_id = req.body.gender_id
         if(req.body.email !== undefined && req.body.email !== null) player.email = req.body.email.trim()
-        if(req.body.img_url !== undefined && req.body.img_url !== null) player.img_url = req.body.img_url.trim()
+        if(req.body.img_url !== undefined && req.body.img_url !== null) player.img_url = req.body.img_url
         if(req.body.birthday !== undefined && req.body.birthday !== null) player.birthday = req.body.birthday
         if(req.body.document_number !== undefined && req.body.document_number !== null)
         	player.document_number = req.body.document_number.trim()

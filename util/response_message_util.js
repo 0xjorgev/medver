@@ -24,14 +24,9 @@ define(['express'
 
 		//codigo para estadisticas de servicios
 		if(process.env.SERVICE_STATS && process.env.SERVICE_STATS == 1){
-			const path = res.req.route.path
-			// redis en heroku dev
-			// const client = redis.createClient('redis://h:pf91v0pvlljcdpbktgg4823ajpn@ec2-54-243-224-12.compute-1.amazonaws.com:7639')
-			// redis en localhost - direccion por defecto
 			const redisUrl = (process.env.NODE_ENV == 'development') ? 'redis://127.0.0.1:6379' : process.env.REDIS_URL
-
+			const path = res.req.route.path
 			const client = redis.createClient(redisUrl)
-
 			const key = `${path}`
 			client.get(key, (error, result) => {
 				if(error){

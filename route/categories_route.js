@@ -80,12 +80,18 @@ define(['express'
 		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
 			.where({category_id:category_id, active:true})
-			.fetchAll({withRelated:['team.player_team','category','group','phase','status_type']})
+			.fetchAll({withRelated:['team.player_team'
+				,'category'
+				,'group'
+				,'phase'
+				,'status_type'
+				,'entity.object']})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
 	});
 
 	//Feed by Category
+	//FIXME: restringir x categoria
 	router.get('/:category_id/feed', (req, res) => {
 		var category_id = req.params.category_id;
 		return Models.feed_item.query( qb => {
@@ -93,7 +99,7 @@ define(['express'
 			qb.orderBy('id', 'desc')
 		})
 		.fetchAll({withRelated:['entity.object']})
-		.then(result => Response(res, result))
+		.then(result => Response(res, []))
 		.catch(error => Response(res, null, error));
 	});
 
@@ -358,6 +364,7 @@ define(['express'
         }
     });
 
+	// crea los partidos de una categoria
 	router.post('/:category_id/match', (req, res) => {
 		return Models.category
 			.where({id: req.params.category_id})
@@ -416,13 +423,17 @@ define(['express'
 			[
 			,{'phases': function(qb){ qb.where({active: true}) }}
 			,{'phases.groups': function(qb){ qb.where({active: true}) }}
+			,{'phases.groups.matches': function(qb){ qb.where({active: true}) }}
 			,'phases.groups.matches.home_team'
 			,'phases.groups.matches.visitor_team'
-			,'phases.groups.matches.events.event'
-			,'phases.groups.matches.events.team'
-			,'phases.groups.matches.events.player_in.player_team'
-			,'phases.groups.matches.events.player_out.player_team'
-		]})
+			// la informacion de eventos es demasiado extensa
+			// para traerla a nivel de categoria
+			// ,'phases.groups.matches.events.event'
+			// ,'phases.groups.matches.events.team'
+			// ,'phases.groups.matches.events.player_in.player_team'
+			// ,'phases.groups.matches.events.player_out.player_team'
+			,'phases.groups.matches.referee.user'
+		], debug: false})
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error))
 	})
@@ -470,6 +481,22 @@ define(['express'
 		req.body._origin = req.headers.origin
 		console.log('POST', req.body)
 		saveCategoryGroupPhaseTeam(req.body, res)
+	})
+
+	//==========================================================================
+	// Updates a category participant status;
+	// Escribe en la tabla spider (category_group_phase_team)
+	//==========================================================================
+	router.put('/:category_id/participant/:participant_id', function(req, res){
+		req.body.category_id = req.params.category_id
+
+		//id en la tabla spider
+		req.body.id = req.params.participant_id
+		logger.debug(req.body)
+
+		const data = buildCategoryGroupPhaseTeamData(req.body)
+
+		saveCategoryGroupPhaseTeam(data, res)
 	})
 
 	//==========================================================================
@@ -608,7 +635,6 @@ define(['express'
 		}
 
 		const prefLang =  (pref) => {
-			console.log("Inside PrefLang: ", pref)
 			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
 			  if (pref !== null && pref !== undefined ) {
 					// 	console.log("Inside if: ", pref.toUpperCase())
@@ -716,11 +742,7 @@ define(['express'
 			.fetch({withRelated:'season.competition'})
 			.then((result) => {
 				data.category = result
-				// console.log("******************")
-				// console.log("Competition values:", result.relations.season.relations.competition.attributes.img_url)
-				// console.log("******************")
 				data.imageUrl = result.relations.season.relations.competition.attributes.img_url
-				//var status_email = send_status_email(data)
 				return send_status_email(data)
 			})
 			.catch((error) => {
@@ -728,20 +750,6 @@ define(['express'
 			})
 	}
 
-	//==========================================================================
-	// Get Season Full Data
-	//==========================================================================
-	// const season_data = (competition_id) => {
-	// 	return Models.category
-	// 		.where({id:competition_id, active:true})
-	// 		.fetch()
-	// 		.then((result) => {
-	// 			return result
-	// 		})
-	// 		.catch((error) => {
-	// 			return {}
-	// 		})
-	// }
 	//==========================================================================
 	// Get all players of one category and one team
 	//==========================================================================
@@ -931,8 +939,9 @@ define(['express'
 		.then((result) => {
 			var tmp = undefined
 			return result.map((phase) => {
-				if(phase.position == 1)
+				if(phase.position == 1){
 					tmp = phase.groups
+				}
 				else {
 					var tmp2 = phase.groups
 					phase.groups = tmp
@@ -941,15 +950,9 @@ define(['express'
 				return phase
 			})
 		})
-		.then((result) => {
-			return result.slice(1)
-		})
-		.then((result) => {
-			Response(res, result)
-		})
-		.catch((error) => {
-			Response(res, null, error)
-		})
+		.then(result => result.slice(1) )
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
 	})
 
 	//==========================================================================
@@ -1110,9 +1113,7 @@ define(['express'
             // return Models.category_group_phase_team.findOrCreate(category_fase_group_team)
 		})
 		.then(cgptFind => {
-			let tmpdata = cgptFind.toJSON()
-			logger.debug(tmpdata)
-			if(cgptFind.length == 0)
+			if(cgptFind == null || cgptFind.length == 0)
 			{
 				let category_fase_group_team = {}
             	category_fase_group_team.category_id = category_id
@@ -1122,6 +1123,8 @@ define(['express'
             }
             else
             {
+              let tmpdata = cgptFind.toJSON()
+        			logger.debug(tmpdata)
             	//Se devuelve un error indicando que ya existe un player registrado con el correo indicado
             	throw {
             		name: 'Custom'

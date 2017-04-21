@@ -11,6 +11,8 @@ define(['express'
 		,'../util/knex_util'
 		,'../helpers/feed_item_helper'
 		,'sha.js'
+		,'redis'
+		,'bluebird'
 	],(
 		express
 		,Response
@@ -21,7 +23,13 @@ define(['express'
 		,Knex
 		,FeedItemHelper
 		,createHash
+		,redis
+		,bluebird
 	) => {
+
+	bluebird.promisifyAll(redis.RedisClient.prototype);
+	bluebird.promisifyAll(redis.Multi.prototype);
+
 	const router = express.Router()
 
 	/*
@@ -71,6 +79,13 @@ define(['express'
 				})
 			}
 		})
+	})
+
+	router.get('/classification_type', (req, res) => {
+		Models.classification
+		.fetchAll()
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	})
 
 	// Reconstruye los feeds basado en los eventos
@@ -193,11 +208,23 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
-	router.get('/classification_type', (req, res) => {
-		Models.classification
-		.fetchAll()
-		.then(result => Response(res, result))
-		.catch(error => Response(res, null, error))
+	router.get('/services/stats', (req, res) => {
+		const redisUrl = (process.env.NODE_ENV == 'development') ? 'redis://127.0.0.1:6379' : process.env.REDIS_URL
+
+		const client = redis.createClient(redisUrl)
+		//obtiene todos los keys en redis
+		client.keysAsync("*")
+		.then(keys => Promise.all(keys.map(key => {
+			return client.getAsync(key).then(value => [key, value])
+		})))
+		.then(result => {
+			const tmp = result.reduce((stats, stat) => {
+				stats[ stat[0] ] = stat[1]
+				return stats
+			}, {})
+			client.quit()
+			Response(res, tmp)
+		})
 	})
 
 	return router

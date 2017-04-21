@@ -16,6 +16,7 @@ produces:
   - application/json
 
 ##################################################
+#
 #  _____                 _
 # /  ___|               (_)
 # \ `--.  ___ _ ____   ___  ___ ___  ___
@@ -23,12 +24,10 @@ produces:
 # /\__/ /  __/ |   \ V /| | (_|  __/\__ \
 # \____/ \___|_|    \_/ |_|\___\___||___/
 #
-# e10adc3949ba59abbe56e057f20f883e
 #
 ###################################################
 
 paths:
-
   /feed_item/{feed_item_id}/comment:
     get:
       summary: Returns the comments of the given feed item
@@ -79,6 +78,15 @@ paths:
         200:
           description: OK Message
 
+  /core/services/stats:
+    get:
+      summary: Reports usage of core services
+      description: Reports usage of core services
+      tags:
+        - Core
+      responses:
+        200:
+          description: List of services and call count
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport
@@ -994,6 +1002,38 @@ paths:
         200:
           description: Created Category Team Invite
       security: []
+
+  /category/{category_id}/participant/{participant_id}:
+    put:
+      description: updates a participant of a category
+      summary: updates a participant of a category
+      operationId: category_participant_update
+      tags:
+        - Category
+      produces:
+      - application/json
+      parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: participant_id
+        in: path
+        required: true
+        type: integer
+        format: integer
+      - name: Body
+        in: body
+        required: true
+        x-is-map: false
+        schema:
+          $ref: '#/definitions/UpdateCategoryTeamInviteRequest'
+      responses:
+        200:
+          description: Resource updated
+      security: []
+
   /category/{category_id}/team/{team_id}/invite/{id}:
     put:
       summary: update Category Team Invite
@@ -1352,6 +1392,25 @@ paths:
       responses:
         200:
           description: list of teams currently on this group
+      security: []
+  /group/{group_id}/match:
+    get:
+      description: Get matches of this group
+      tags:
+        - Group
+        - Match
+      produces:
+      - application/json
+      parameters:
+        - name: group_id
+          in: path
+          description: Group ID
+          required: true
+          type: integer
+          format: integer
+      responses:
+        200:
+          description: list of matches currently on this group
       security: []
 
   /match:
@@ -2870,14 +2929,8 @@ definitions:
         type: integer
       visitor_team_score:
         type: integer
-      round_id:
-        type: integer
       date:
         type: string
-      category_id:
-        type: integer
-      phase_id:
-        type: integer
       group_id:
         type: integer
       referee_id:
@@ -2899,7 +2952,7 @@ definitions:
     - visitor_team_id
     - date
     - location
-    - round_id
+    - group_id
   CreateGroupRequest:
     title: Match Creation Request
     type: object

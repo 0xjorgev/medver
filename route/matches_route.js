@@ -55,13 +55,31 @@ define(['express'
 		var match_id = req.params.match_id;
 		return Models.match
 		.where({'id':match_id})
-		.fetch({withRelated: ['home_team', 'visitor_team', 'round.group']})
-		.then( (result) => {
-			Response(res, result)
-		})
-		.catch((error) => {
-			Response(res, null, error)
-		});
+		.fetch({withRelated: [
+			 {'home_team.summoned': function(qb){
+				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.home_team_id')
+ 				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
+ 				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
+ 				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+ 				qb.where('matches.id',  match_id)
+ 				qb.where('categories_teams_players.active',  true)
+			 }}
+			,{'visitor_team.summoned': function(qb){
+				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.visitor_team_id')
+ 				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
+ 				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
+ 				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+ 				qb.where('matches.id',  match_id)
+				qb.where('categories_teams_players.active',  true)
+			}}
+			,'home_team.summoned.player'
+			,'visitor_team.summoned.player'
+			,'group'
+			,'events.event'
+			,'events.team'
+		]})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	});
 
 	//=========================================================================

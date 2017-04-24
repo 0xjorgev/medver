@@ -97,7 +97,7 @@ gulp.task('nodemon', function() {
     file: configFile,
     vars: {
       //this overrides configFile file
-      //'PORT': 3003
+      // 'PORT': 3003
     }
   });
 

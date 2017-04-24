@@ -1,7 +1,13 @@
 if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
-
+//phpmyadmin
+//phpDBPwd*
+//root
+//DbPwd2017*
+//fc Wordpress
+//root_fc
+//rpEeD8!5&qmK4F6p@X
 define(['express'
 		,'../model/index'
 		,'../util/request_message_util'
@@ -14,8 +20,10 @@ define(['express'
 		,'../util/logger_util'
 		,'js-combinatorics'
 		,'../util/object_map_util'
-		],
-	function (express
+        ,'../util/password_gen_util'
+        ,'../util/md5_gen_util'
+		]
+		,(express
 		,Models
 		,Message
 		,Knex
@@ -27,7 +35,9 @@ define(['express'
 		,logger
 		,Combinatorics
 		,ReplaceHelper
-	){
+		,pass_gen
+		,md5
+	) => {
 
 	var router = express.Router();
 	var send_email_from = Email(process.env.SENDER_EMAIL);
@@ -70,12 +80,18 @@ define(['express'
 		var category_id = req.params.category_id;
 		return Models.category_group_phase_team
 			.where({category_id:category_id, active:true})
-			.fetchAll({withRelated:['team.player_team','category','group','phase','status_type']})
+			.fetchAll({withRelated:['team.player_team'
+				,'category'
+				,'group'
+				,'phase'
+				,'status_type'
+				,'entity.object']})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
 	});
 
 	//Feed by Category
+	//FIXME: restringir x categoria
 	router.get('/:category_id/feed', (req, res) => {
 		var category_id = req.params.category_id;
 		return Models.feed_item.query( qb => {
@@ -83,35 +99,28 @@ define(['express'
 			qb.orderBy('id', 'desc')
 		})
 		.fetchAll({withRelated:['entity.object']})
-		.then(result => Response(res, result))
+		.then(result => Response(res, []))
 		.catch(error => Response(res, null, error));
 	});
 
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result
 	router.get('/', function (req, res) {
 		return Models.category
-		.query(function(qb){})
-		.where({active:true})
+		.where({active: true})
 		.fetchAll({withRelated: ['gender', 'phases', 'classification']})
-		.then(function (result) {
-			Response(res, result)
-		}).catch(function(error){
-			Response(res, null, error)
-		});
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error));
 	});
 
 	//Categories by Id -> Returns 1 result
 	router.get('/:category_id', function (req, res) {
 		var category_id = req.params.category_id;
 		return Models.category
-			.where({id:category_id})
-			.where({active:true})
+			.where({id: category_id})
+			.where({active: true})
 			.fetch({withRelated: ['gender','phases', 'classification']})
-			.then(function (result) {
-				Response(res, result)
-			}).catch(function(error){
-				Response(res, null, error)
-			});
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error));
 	});
 
 	router.post('/', function (req, res) {
@@ -355,6 +364,7 @@ define(['express'
         }
     });
 
+	// crea los partidos de una categoria
 	router.post('/:category_id/match', (req, res) => {
 		return Models.category
 			.where({id: req.params.category_id})
@@ -413,13 +423,17 @@ define(['express'
 			[
 			,{'phases': function(qb){ qb.where({active: true}) }}
 			,{'phases.groups': function(qb){ qb.where({active: true}) }}
+			,{'phases.groups.matches': function(qb){ qb.where({active: true}) }}
 			,'phases.groups.matches.home_team'
 			,'phases.groups.matches.visitor_team'
-			,'phases.groups.matches.events.event'
-			,'phases.groups.matches.events.team'
-			,'phases.groups.matches.events.player_in.player_team'
-			,'phases.groups.matches.events.player_out.player_team'
-		]})
+			// la informacion de eventos es demasiado extensa
+			// para traerla a nivel de categoria
+			// ,'phases.groups.matches.events.event'
+			// ,'phases.groups.matches.events.team'
+			// ,'phases.groups.matches.events.player_in.player_team'
+			// ,'phases.groups.matches.events.player_out.player_team'
+			,'phases.groups.matches.referee.user'
+		], debug: false})
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error))
 	})
@@ -467,6 +481,22 @@ define(['express'
 		req.body._origin = req.headers.origin
 		console.log('POST', req.body)
 		saveCategoryGroupPhaseTeam(req.body, res)
+	})
+
+	//==========================================================================
+	// Updates a category participant status;
+	// Escribe en la tabla spider (category_group_phase_team)
+	//==========================================================================
+	router.put('/:category_id/participant/:participant_id', function(req, res){
+		req.body.category_id = req.params.category_id
+
+		//id en la tabla spider
+		req.body.id = req.params.participant_id
+		logger.debug(req.body)
+
+		const data = buildCategoryGroupPhaseTeamData(req.body)
+
+		saveCategoryGroupPhaseTeam(data, res)
 	})
 
 	//==========================================================================
@@ -605,7 +635,6 @@ define(['express'
 		}
 
 		const prefLang =  (pref) => {
-			console.log("Inside PrefLang: ", pref)
 			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
 			  if (pref !== null && pref !== undefined ) {
 					// 	console.log("Inside if: ", pref.toUpperCase())
@@ -618,23 +647,23 @@ define(['express'
 
 		const preSubject =  (pref) => {
 			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
-				if (pref !== null && pref !== undefined ) {
-					switch(pref){
-						case "ES":
-							return "Información de registro para Torneos Alianza de Futbol"
-						default:
-							return "Alianza de Futbol tournament register informaction"
-					}
-			 } else {
-				 return "Alianza de Futbol tournament register informaction"
-			 }
+			// 	if (pref !== null && pref !== undefined ) {
+			// 		switch(pref){
+			// 			case "ES":
+			// 				return "Alianza de Futbol"
+			// 			default:
+			// 				return "Alianza de Futbol"
+			// 		}
+			//  } else {
+				 return "Alianza de Futbol"
+			//  }
 		}
 
 	// console.log("User Lang: ", data.user.attributes.lang)
 	//console.log("LANG", prefLang(data.user.lang))
 
 	return template_string_replace(data.template.replace("LANG", prefLang(data.user.attributes.lang) )
-				,tag ,process.env.SENDER_EMAIL
+				,tag ,process.env.ALIANZA_SENDER
 				,preSubject(data.user.attributes.lang)
 				// ,'jorgevmendoza@gmail.com')
 				,data.user.attributes.email)
@@ -713,11 +742,7 @@ define(['express'
 			.fetch({withRelated:'season.competition'})
 			.then((result) => {
 				data.category = result
-				// console.log("******************")
-				// console.log("Competition values:", result.relations.season.relations.competition.attributes.img_url)
-				// console.log("******************")
 				data.imageUrl = result.relations.season.relations.competition.attributes.img_url
-				//var status_email = send_status_email(data)
 				return send_status_email(data)
 			})
 			.catch((error) => {
@@ -725,20 +750,6 @@ define(['express'
 			})
 	}
 
-	//==========================================================================
-	// Get Season Full Data
-	//==========================================================================
-	// const season_data = (competition_id) => {
-	// 	return Models.category
-	// 		.where({id:competition_id, active:true})
-	// 		.fetch()
-	// 		.then((result) => {
-	// 			return result
-	// 		})
-	// 		.catch((error) => {
-	// 			return {}
-	// 		})
-	// }
 	//==========================================================================
 	// Get all players of one category and one team
 	//==========================================================================
@@ -928,8 +939,9 @@ define(['express'
 		.then((result) => {
 			var tmp = undefined
 			return result.map((phase) => {
-				if(phase.position == 1)
+				if(phase.position == 1){
 					tmp = phase.groups
+				}
 				else {
 					var tmp2 = phase.groups
 					phase.groups = tmp
@@ -938,15 +950,9 @@ define(['express'
 				return phase
 			})
 		})
-		.then((result) => {
-			return result.slice(1)
-		})
-		.then((result) => {
-			Response(res, result)
-		})
-		.catch((error) => {
-			Response(res, null, error)
-		})
+		.then(result => result.slice(1) )
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
 	})
 
 	//==========================================================================
@@ -1034,6 +1040,103 @@ define(['express'
 			console.error(error)
 		})
 	}
+
+	//==========================================================================
+	// Create player to participate on a category type tryout
+	//==========================================================================
+	router.post('/:category_id/register_tryouts', function(req, res){
+		let category_id = req.params.category_id
+        let user = {}
+        let password  = pass_gen
+        let playerEntRel
+        let player = {}
+        let savePlayer = {}
+
+        //Creamos el player
+		if(req.body.first_name !== undefined && req.body.first_name !== null) player.first_name = req.body.first_name.trim()
+        if(req.body.last_name !== undefined && req.body.last_name !== null) player.last_name = req.body.last_name.trim()
+        if(req.body.nickname !== undefined && req.body.nickname !== null) player.nickname  = req.body.nickname.trim()
+        if(req.body.gender_id !== undefined && req.body.gender_id !== null) player.gender_id = req.body.gender_id
+        if(req.body.email !== undefined && req.body.email !== null) player.email = req.body.email.trim()
+        if(req.body.img_url !== undefined && req.body.img_url !== null) player.img_url = req.body.img_url
+        if(req.body.birthday !== undefined && req.body.birthday !== null) player.birthday = req.body.birthday
+        if(req.body.document_number !== undefined && req.body.document_number !== null)
+        	player.document_number = req.body.document_number.trim()
+        if(req.body.document_img_url !== undefined && req.body.document_img_url !== null)
+        	player.document_img_url = req.body.document_img_url.trim()
+        if(req.body.meta !== undefined && req.body.meta !== null) player.meta = req.body.meta.trim()
+
+        //Creamos el usuario a guardar
+        user.username = req.body.email.trim()
+        user.password = md5(password)
+        user.email    = req.body.email.trim()
+        user.lang     =  "EN";
+
+        //Verificamos si ya existe un usuario con ese correo
+        return Models.user.findOrCreate(user)
+        .then(_user => {
+        	user = _user.toJSON()
+        	//llamamos al findorcreate player (crea al player y su entidad)
+            	return Models.player.findOrCreate(player)
+
+            //Busco las relaciones con el usuario
+            return Models.entity_relationship
+				.query(qb => {
+					qb.where({ent_ref_from_id: _user.id
+							, relationship_type_id: 1})//1 es OWNER
+				})
+				.fetchAll({withRelated: ['to.object']})
+		})
+		.then(_player => {
+			savePlayer = _player.toJSON()
+			//creo la relacion del player con el usuario
+			let playerUserEntRel = {}
+			playerUserEntRel.ent_ref_from_id = user.id
+			playerUserEntRel.ent_ref_to_id = savePlayer.id
+			playerUserEntRel.relationship_type_id = 1
+			playerUserEntRel.comment = "OWNER"
+			//Busco o creo la relacion entre el player y el usuario
+			return Models.entity_relationship.findOrCreate(playerUserEntRel)
+		})
+		.then(_user_player_relationship => {
+			let tmp = _user_player_relationship.toJSON()
+
+            //Se crea el objeto de inscripcion del usuario a la competition unitario o categoria
+            return Models.category_group_phase_team
+                .query(qb => {
+                    qb.where({category_id: category_id
+                            ,entity_id: savePlayer.entity.id
+                        })
+                })
+                // .fetchAll({withRelated: ['entity']})
+                .fetch({withRelated: ['entity.object']})
+            // return Models.category_group_phase_team.findOrCreate(category_fase_group_team)
+		})
+		.then(cgptFind => {
+			if(cgptFind == null || cgptFind.length == 0)
+			{
+				let category_fase_group_team = {}
+            	category_fase_group_team.category_id = category_id
+            	category_fase_group_team.status_id = 9
+            	category_fase_group_team.entity_id = savePlayer.entity.id
+            	return new Models.category_group_phase_team(category_fase_group_team).save()
+            }
+            else
+            {
+              let tmpdata = cgptFind.toJSON()
+        			logger.debug(tmpdata)
+            	//Se devuelve un error indicando que ya existe un player registrado con el correo indicado
+            	throw {
+            		name: 'Custom'
+            		,message: "A Player with the email " + tmpdata.entity.object.email + " has been already registered on this category"
+            		,code: 400
+            		,data: tmpdata
+            	}
+            }
+		})
+		.then(result => Response(res, result))
+        .catch(error => Response(res, error.data, error))
+    })
 
 	return router;
 

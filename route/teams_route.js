@@ -22,8 +22,25 @@ define(['express'
 
 	//List of teams
 	router.get('/', function (req, res) {
+
+		logger.debug(req.query)
+
+		const category_type_id = req.query.category_type_id
+		const gender_id = req.query.gender_id
+		const subdiscipline_id = req.query.subdiscipline_id
+
+		const queryData = {}
+		if(req.query.category_type_id != undefined)
+			queryData['category_type_id'] = req.query.category_type_id
+		if(req.query.gender_id != undefined)
+			queryData['gender_id'] = req.query.gender_id
+		if(req.query.subdiscipline_id != undefined)
+			queryData['subdiscipline_id'] = req.query.subdiscipline_id
+
 		return Models.team
-		.query(function(qb){})
+		.query(function(qb){
+			qb.where(queryData)
+		})
 		.where({active:true})
 		.fetchAll({withRelated: ['category_type'
 			,'organization'
@@ -129,7 +146,7 @@ define(['express'
 		if (data.club_id != undefined) teamData.club_id = data.club_id
 		if (data.id != undefined) teamData.id = data.id
 
-		//let's lookup for the club by id 
+		//let's lookup for the club by id
 		return Models.club.query(qb => {
 			qb.where({id: teamData.club_id})
 		})
@@ -214,7 +231,23 @@ define(['express'
 		//TODO: check player existance
 		Promise.all(playerTeamData.map(data => {
 			//se escribe la tabla de jugador
-			return new Models.player(data.player)
+			const playerData = {}
+			if(data.player.id != undefined) playerData.id = data.player.id
+			if(data.player.first_name != undefined) playerData.first_name = data.player.first_name
+			if(data.player.last_name != undefined) playerData.last_name = data.player.last_name
+			if(data.player.img_url != undefined) playerData.img_url = data.player.img_url
+			if(data.player.portrait_url != undefined) playerData.portrait_url = data.player.portrait_url
+			if(data.player.document_number != undefined) playerData.document_number = data.player.document_number
+			if(data.player.nickname != undefined) playerData.nickname = data.player.nickname
+			if(data.player.birthday != undefined) playerData.birthday = data.player.birthday
+			if(data.player.status_id != undefined) playerData.status_id = data.player.status_id
+			if(data.player.email != undefined) playerData.email = data.player.email
+			if(data.player.active != undefined) playerData.active = data.player.active
+			if(data.player.gender_id != undefined) playerData.gender_id = data.player.gender_id
+			if(data.player.document_img_url != undefined) playerData.document_img_url = data.player.document_img_url
+			if(data.player.meta != undefined) playerData.meta = data.player.meta
+
+			return new Models.player(playerData)
 			.save()
 			.then( savedPlayer => {
 				//se escribe el roster del equipo
@@ -412,7 +445,11 @@ define(['express'
 			.orderBy('date')
 		})
         .fetchAll({withRelated: ['home_team'
-        	, 'visitor_team'
+		    , 'home_team.category_type'
+		    , 'home_team.gender'
+		    , 'visitor_team'
+		    , 'visitor_team.category_type'
+		    , 'visitor_team.gender'
         	, 'group.phase.category'
         	, 'result.event'
         	, 'result.player_in'
@@ -446,7 +483,7 @@ define(['express'
 	router.get('/:team_id/event_calendar', (req, res) => {
 		let team ={}
 		team.id = req.params.team_id
-        
+
         //Obtengo los datos del team y su entidad
         return Models.team
 			.query(function(qb){})

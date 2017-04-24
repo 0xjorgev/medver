@@ -36,7 +36,7 @@ define(['express'
         .fetchAll({withRelated: [
             'match.home_team.category_type',
             'match.visitor_team.category_type',
-            'match.round.group.phase.category.season.competition'],
+            'match.group.phase.category.season.competition'],
             debug: false} )
         .then(function (result) {
             Message(res,'Success', '0', result);

@@ -23,10 +23,10 @@ define(['express'
 		var mess = 'Undefined response message'
 
 		//codigo para estadisticas de servicios
-		if(process.env.SERVICE_STATS){
+		if(process.env.SERVICE_STATS && process.env.SERVICE_STATS == 1){
+			const redisUrl = (process.env.NODE_ENV == 'development') ? 'redis://127.0.0.1:6379' : process.env.REDIS_URL
 			const path = res.req.route.path
-			const client = redis.createClient(
-				'redis://h:pf91v0pvlljcdpbktgg4823ajpn@ec2-54-243-224-12.compute-1.amazonaws.com:7639')
+			const client = redis.createClient(redisUrl)
 			const key = `${path}`
 			client.get(key, (error, result) => {
 				if(error){
@@ -51,6 +51,10 @@ define(['express'
 			error.name = (error.name == 'Error' && error.message && error.message.includes('invalid values')) ? 'ValidationError' : error.name
 
 			switch(error.name){
+				case 'Custom':
+					code = error.code
+					mess = error.message
+					break
 				case 'InsufficientPermissionsError':
 				//thrown by auth_helper.js, when user doesnt have the required permissions to access a resource
 				case 'JwtParseError':
@@ -98,7 +102,7 @@ define(['express'
 				res.status(code).json({ message: 'Success', code: '0', data: result})
 				break
 			case 400:
-				res.status(code).json({ message: 'Validation failure', code: code, validation_errors: result})
+				res.status(code).json({ message: 'Validation failure: '+mess, code: code, validation_errors: result})
 				break
 			case 403:
 				res.status(code).json({ message: 'Unauthorized', code: code})

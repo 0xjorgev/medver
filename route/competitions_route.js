@@ -11,6 +11,7 @@ define(['express'
 		,'../util/email_sender_util'
 		,'../helpers/auth_helper'
 		,'../node_modules/lodash/lodash.min'
+		,'lodash'
 		,'../util/logger_util']
 		,(express
 			,util
@@ -21,6 +22,7 @@ define(['express'
 			,Email
 			,auth
 			,lodash
+			,_
 		 	,logger) => {
 
 	let router = express.Router()
@@ -391,6 +393,19 @@ define(['express'
 			.then((result) => {
 				Response(res, result)
 			})
+
+	})
+
+	router.get('/:competition_id/team', (req, res) => {
+
+		return Models.competition
+		.where({id: req.params.competition_id})
+		.fetchAll({withRelated: [
+			'seasons.categories.participants.team'
+			,'seasons.categories.participants.entity.object'
+		]})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
 
 	})
 

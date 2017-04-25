@@ -35,6 +35,11 @@ define(['./base_model','./gender','./season', './phase', './classification', './
         ,category_group_phase_team: function(){
             return this.hasMany('Category_group_phase_team', 'category_id');
         }
+		
+		//alias de category_group_phase_team
+		,participants: function(){
+			return this.hasMany('Category_group_phase_team', 'category_id');
+		}
 	})
 
     // uses Registry plugin

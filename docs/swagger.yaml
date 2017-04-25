@@ -87,6 +87,7 @@ paths:
       responses:
         200:
           description: List of services and call count
+
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport
@@ -539,6 +540,23 @@ paths:
           description: Competition object
       security: []
 
+  /competition/{competition_id}/team:
+    get:
+      summary: returns the list of participants in a competition
+      description: returns the list of participants in a competition
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: competition_id
+        in: path
+        required: true
+        type: integer
+      responses:
+        200:
+          description: result
+      security: []
   /season:
     get:
       description: returns all seasons

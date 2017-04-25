@@ -204,8 +204,28 @@ define(['express'
 				}).save()
 			}))
 		})
+		.catch(error => Response(res, null, error))
+
+		//para normalizar los equipos que no tienen entidad en la spider
+		Models.category_group_phase_team
+		.where({entity_id: null})
+		.fetchAll({withRelated: ['team.entity']})
+		//filtro los equipos que tienen una entidad creada
+		.then(result => result.toJSON().filter(t => t.team.entity != null))
+		//se salva el id de entidad para cada equipo
+		.then(result => {
+			return Promise.all( result.map(t => {
+				const data = {
+					id: t.id
+					,entity_id: t.team.entity.id
+				}
+				return Models.category_group_phase_team.forge(data).save()
+			}))
+		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
+
+
 	})
 
 	router.get('/services/stats', (req, res) => {

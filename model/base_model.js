@@ -23,6 +23,8 @@ define(['knex'
 	bookshelf.plugin('virtuals');
 	//para ocultar por defecto algunos campos, por ejemplo, el password del user
 	bookshelf.plugin('visibility');
+	//agrega el metodo fetchPage, para paginar
+	bookshelf.plugin('pagination');
 
 	bookshelf.checkit = CheckIt
 

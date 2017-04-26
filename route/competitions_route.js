@@ -396,8 +396,33 @@ define(['express'
 
 	})
 
-	router.get('/:competition_id/team', (req, res) => {
+	router.get('/query/team', (req, res) => {
 
+		const pageSize = req.params.page_size;
+		const page = req.params.page;
+
+		return Models.competition
+		// .query(qb => {
+		// 	qb.where({id: 3})
+		// })
+		// .where({id: req.params.competition_id})
+		.fetchPage({
+			page: page
+			,pageSize: pageSize
+			,withRelated: [
+				'seasons.categories.participants.team'
+				,'seasons.categories.participants.entity.object']
+		})
+		.then(result => {
+			// logger.debug(result.toJSON())
+			return result
+		})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
+	})
+
+
+	router.get('/:competition_id/team', (req, res) => {
 		return Models.competition
 		.where({id: req.params.competition_id})
 		.fetchAll({withRelated: [
@@ -406,7 +431,6 @@ define(['express'
 		]})
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error) )
-
 	})
 
 	return router;

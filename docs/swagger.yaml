@@ -540,6 +540,29 @@ paths:
           description: Competition object
       security: []
 
+  /competition/query/team:
+    get:
+      summary: returns the list of participants in a competition
+      description: returns the list of participants in a competition
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: page
+        in: query
+        type: integer
+      - name: page_size
+        in: query
+        type: integer
+      - name: competition_id
+        in: path
+        required: true
+        type: integer
+      responses:
+        200:
+          description: result
+      security: []
   /competition/{competition_id}/team:
     get:
       summary: returns the list of participants in a competition

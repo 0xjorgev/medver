@@ -34,12 +34,10 @@ define(['express'
 					logger.error(error)
 				}
 				else{
-					if(result !== null){
+					if(result !== null)
 						client.incr(key)
-					}
-					else {
+					else
 						client.set(key, 1)
-					}
 				}
 			})
 		}
@@ -99,10 +97,16 @@ define(['express'
 
 		switch(code){
 			case 200:
+				if(result.pagination != undefined){
+					res.header('X-Pagination-Page', result.pagination.page )
+					res.header('X-Pagination-Page-Size', result.pagination.pageSize )
+					res.header('X-Pagination-Row-Count', result.pagination.rowCount )
+					res.header('X-Pagination-Page-Count', result.pagination.pageCount )
+				}
 				res.status(code).json({ message: 'Success', code: '0', data: result})
 				break
 			case 400:
-				res.status(code).json({ message: 'Validation failure: '+mess, code: code, validation_errors: result})
+				res.status(code).json({ message: `Validation failure: ${mess}`, code: code, validation_errors: result})
 				break
 			case 403:
 				res.status(code).json({ message: 'Unauthorized', code: code})
@@ -125,7 +129,7 @@ define(['express'
 				if(error) logger.debug(error.stack)
 				res.status(500).json({ message: 'Unhandled error: ' + mess, code: 500, data: result, error: error});
 		}
-    }
+	}
 
-    return message;
+	return message;
 });

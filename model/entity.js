@@ -44,15 +44,12 @@ define(['./base_model'
 				,related_to: function(){
 					return this.hasMany('Entity_relationship', 'ent_ref_to_id');
 				}
-			},
-			{
+			},{
 				//Método para registrar un jugador en una competition tipo tryout
-		        findOrCreate: function(_entity){
-		        	// console.log('Create entity')
-		        	// console.log(_entity)
-		        	let entity = {}
-		        	entity.object_id = _entity.object_id
-		        	entity.object_type = _entity.object_type
+				findOrCreate: function(_entity){
+					let entity = {}
+					entity.object_id = _entity.object_id
+					entity.object_type = _entity.object_type
 					//Se verifica si tiene una entidad asociada o la creamos
 					return DB._models.Entity
 						.query(qb => {

@@ -399,7 +399,7 @@ define(['express'
 		.query(qb => qb.where({id: currentUser.id}) )
 		.fetch({withRelated: [
 			'entity.related_from.relationship_type'
-			,'entity.related_from.to.entity_type'
+			// ,'entity.related_from.to.entity_type'
 		]})
 		.then(result => {
 			const user = result.toJSON()

@@ -174,7 +174,7 @@ app.use(authHelper.validateToken)
 * sin embargo, es responsabilidad de la implementacion del servicio realizar
 * los ajustes necesarios a la consulta
 *******/
-const processSortBy = (req, res, next) => {
+const processPagination = (req, res, next) => {
 	if(!req.query.sort){
 		next()
 		return
@@ -194,7 +194,7 @@ const processSortBy = (req, res, next) => {
 	next()
 }
 
-app.use(processSortBy)
+app.use(processPagination)
 
 app.use(api_prefix+'core', core_ws);
 app.use(api_prefix+'user', user_ws);

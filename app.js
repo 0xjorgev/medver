@@ -175,33 +175,26 @@ app.use(authHelper.validateToken)
 * los ajustes necesarios a la consulta
 *******/
 const processSortBy = (req, res, next) => {
-	if(!req.query['sort']){
+	if(!req.query.sort){
 		next()
 		return
 	}
 
-	const sort = req.query['sort']
-	req._sortBy = sort.split(',').map((s) => {
-		return (s.indexOf('-') >= 0)
-			? [s.replace('-',''),'desc']
-			: [s.replace('+',''),'asc']
+	const sort = req.query.sort
+
+	req._pagination = {}
+	req._pagination['page'] = req.query.page
+	req._pagination['pageSize'] = req.query.page_size
+	req._pagination['sort'] = sort.split(',').map((s) => {
+		const _dir = s.indexOf('-') >= 0 ? 'desc' : 'asc'
+		const _field = s.replace('-','').replace('+','')
+		return { field: _field, direction: _dir }
 	})
+
 	next()
 }
 
 app.use(processSortBy)
-
-const processLimit = (req, res, next) => {
-	if(req.query.limit == undefined){
-		next()
-		return
-	}
-	req._limit = req.query['limit']
-
-	//offset no tiene sentido sin limit
-	if(req.query.offset != undefined) req._offset = req.query['offset']
-		next()
-}
 
 app.use(api_prefix+'core', core_ws);
 app.use(api_prefix+'user', user_ws);

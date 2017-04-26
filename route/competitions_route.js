@@ -56,16 +56,8 @@ define(['express'
 					qb.orWhere({'competitions.created_by_id': req._currentUser.id})
 				}
 
-				if(req._sortBy){
-					req._sortBy.map((sort) => {
-						qb.orderBy(sort[0], sort[1])
-					})
-				}
-
-				if(req._limit){
-					qb.limit(req._limit)
-					if(req._offset) qb.offset(req._offset)
-				}
+				if(req._sortBy)
+					req._sortBy.map((sort) => qb.orderBy(sort[0], sort[1]))
 			})
 			.fetchAll({
 				withRelated: [
@@ -398,20 +390,20 @@ define(['express'
 
 	router.get('/query/team', (req, res) => {
 
-		const pageSize = req.params.page_size;
-		const page = req.params.page;
+		const pageSize = req.query.page_size;
+		const page = req.query.page;
+		const sortBy = req._sortBy;
+
+		logger.debug(sortBy)
 
 		return Models.competition
-		// .query(qb => {
-		// 	qb.where({id: 3})
-		// })
-		// .where({id: req.params.competition_id})
+		.query(qb => {
+			if(req._sortBy) req._sortBy.forEach(sort => qb.orderBy(sort[0], sort[1]))
+		})
 		.fetchPage({
 			page: page
 			,pageSize: pageSize
-			,withRelated: [
-				'seasons.categories.participants.team'
-				,'seasons.categories.participants.entity.object']
+			// ,withRelated: ['seasons.categories.participants.team','seasons.categories.participants.entity.object']
 		})
 		.then(result => {
 			// logger.debug(result.toJSON())

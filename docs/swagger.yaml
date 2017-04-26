@@ -555,6 +555,9 @@ paths:
       - name: page_size
         in: query
         type: integer
+      - name: sort
+        in: query
+        type: string
       - name: competition_id
         in: path
         required: true

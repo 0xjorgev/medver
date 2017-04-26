@@ -34,8 +34,8 @@ gulp.task('jshint', function () {
 
 gulp.task('nodemon', () => {
 
-	const configFile = null;
-	const environmentType = process.env.NODE_ENV || 'development';
+	var configFile = null;
+	var environmentType = process.env.NODE_ENV || 'development';
 
 	//let's set NODE_ENV, just in case its undefined
 	process.env.NODE_ENV = environmentType;
@@ -43,13 +43,13 @@ gulp.task('nodemon', () => {
 	switch(environmentType){
 		case 'development':
 			configFile = './config/environments/development.json'
-			break
+		break;
 		case 'test':
 			configFile = './config/environments/test.json'
-			break
+		break;
 		case 'production':
 			configFile = './config/environments/production.json'
-			break
+		break;
 	}
 
 	env({

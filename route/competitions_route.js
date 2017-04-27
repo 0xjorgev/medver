@@ -12,6 +12,8 @@ define(['express'
 		,'../helpers/auth_helper'
 		,'../node_modules/lodash/lodash.min'
 		,'lodash'
+		,'csv'
+		,'moment'
 		,'../util/logger_util']
 		,(express
 			,util
@@ -23,6 +25,8 @@ define(['express'
 			,auth
 			,lodash
 			,_
+			,csv
+			,moment
 		 	,logger) => {
 
 	let router = express.Router()
@@ -184,7 +188,6 @@ define(['express'
 		.catch(error => Response(res, null, error) )
 	})
 
-
 	//Competitions Types List -> Array of results [Competition_type]
 	router.get('/competition_type', function(req, res){
 		return Models.competition_type
@@ -290,7 +293,24 @@ define(['express'
 			}
 			return tmp
 		})
-		.then(results => Response(res, results))
+		.then(results => {
+			//TODO: estos son los headers que deberia setear en la respuesta
+			//https://www.npmjs.com/package/express-csv
+
+			//si se quieren los resultados via CSV
+			if(req.query.csv && req.query.csv == 1){
+				csv.stringify(results, function(err, data){
+					if(err){
+						Response(res, null, err)
+					}
+					res.attachment(`report${moment().format('YYYYMMDD_HHmmss')}.csv`);
+ 					res.end(data);
+				})
+			}
+			else{
+				Response(res, results)
+			}
+		})
 		.catch(error => Response(res, null, error) )
 	})
 

@@ -16,6 +16,6 @@ exports.down = function(knex, Promise) {
 		,knex.raw("ALTER TABLE matches_teams_players_old RENAME TO matches_teams_players")
 		,knex.raw("ALTER TABLE events_matches_players_old RENAME TO events_matches_players")
 		,knex.raw("ALTER TABLE players_teams_old RENAME TO players_teams")
-		,knex.raw("ALTER TABLE players_old RENAME TO player")
+		,knex.raw("ALTER TABLE players_old RENAME TO players")
 	])
 };

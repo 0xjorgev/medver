@@ -19,6 +19,7 @@ exports.up = function(knex, Promise) {
 			table.string('document_img_url')
 			table.string('country')
 			table.integer('player_id')
+			table.string('meta')
 			table.timestamp('claimed')
 			table.boolean('active').notNullable().defaultTo(true)
 			table.timestamp('created_at').defaultTo(knex.fn.now())

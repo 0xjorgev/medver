@@ -175,22 +175,27 @@ app.use(authHelper.validateToken)
 * los ajustes necesarios a la consulta
 *******/
 const processPagination = (req, res, next) => {
-	if(!req.query.sort){
+	req._pagination = {}
+
+	if(!req.query.sort && !req.query.page && !req.query.pageSize){
 		next()
 		return
 	}
 
 	const sort = req.query.sort
-
 	req._pagination = {}
 	req._pagination['page'] = req.query.page
 	req._pagination['pageSize'] = req.query.page_size
-	req._pagination['sort'] = sort.split(',').map((s) => {
-		const _dir = s.indexOf('-') >= 0 ? 'desc' : 'asc'
-		const _field = s.replace('-','').replace('+','')
-		return { field: _field, direction: _dir }
-	})
-
+	if(req.query.sort){
+		req._pagination['sort'] = sort.split(',').map((s) => {
+			const _dir = s.indexOf('-') >= 0 ? 'desc' : 'asc'
+			const _field = s.replace('-','').replace('+','')
+			return { field: _field, direction: _dir }
+		})
+	}
+	else{
+		req._pagination['sort'] = []
+	}
 	next()
 }
 

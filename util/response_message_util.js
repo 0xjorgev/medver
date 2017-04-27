@@ -87,12 +87,11 @@ define(['express'
 			//checks if the result is a valid response
 			var isCode200 = result && ((result.length && result.length > 0) || result.attributes || Object.keys(result).length > 0)
 
-			// _log(result)
-			// console.log('404?', !isCode200 )
-
 			//if it's not an error, but the response is empty, then it's a 404 error
 			//if the response is an array, checks it's size. If it's greater than 0, then is a valid response
-			code = (isCode200) ? 200 : 404
+			// code = (isCode200) ? 200 : 404
+			//el codigo 204 significa 'No content',
+			code = (isCode200) ? 200 : 204
 		}
 
 		switch(code){
@@ -103,12 +102,18 @@ define(['express'
 					res.header('X-Pagination-Row-Count', result.pagination.rowCount )
 					res.header('X-Pagination-Page-Count', result.pagination.pageCount )
 				}
+				res.status(code).json({message: 'Success', code: '0', data: result})
+				break
+			case 204:
+				//respuestas validas pero vacias
 				res.status(code).json({ message: 'Success', code: '0', data: result})
 				break
 			case 400:
+				//fallo en las reglas de negocio
 				res.status(code).json({ message: `Validation failure: ${mess}`, code: code, validation_errors: result})
 				break
 			case 403:
+				//no autorizado
 				res.status(code).json({ message: 'Unauthorized', code: code})
 				break
 			case 404:

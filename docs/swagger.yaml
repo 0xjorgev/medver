@@ -540,7 +540,7 @@ paths:
           description: Competition object
       security: []
 
-  /competition/query/team:
+  /competition/query:
     get:
       summary: returns the list of participants in a competition
       description: returns the list of participants in a competition
@@ -552,21 +552,39 @@ paths:
       - name: page
         in: query
         type: integer
+        description: Current page. Defaults to 1
       - name: page_size
         in: query
         type: integer
+        description: Number of registers to return. Defaults to 10
       - name: sort
         in: query
         type: string
+        description: Database name of the field to order by. Multiple fields allowed, separated by comma. Add a minus sign (-) to set order to desc. Defaults to 'asc'. Ex. 'created_at,-name'
       - name: competition_id
-        in: path
-        required: true
+        in: query
+        type: integer
+        description: Filters competition by id
+      - name: season_id
+        in: query
+        type: integer
+        description: Filters competition's season by id. If found, returns only seasons with the given season_id
+      - name: season_year
+        in: query
+        type: integer
+        description: Filters seasons by init_at and end_at, from jan 1st <year> to dec 31th <year>
+      - name: category_id
+        in: query
+        type: integer
+        description: Filters seasons' categories by id. If found, returns only categories with the given category_id
+      - name: team_status_id
+        in: query
         type: integer
       responses:
         200:
           description: result
       security: []
-  /competition/{competition_id}/team:
+  /competition/team:
     get:
       summary: returns the list of participants in a competition
       description: returns the list of participants in a competition
@@ -575,9 +593,36 @@ paths:
       produces:
       - application/json
       parameters:
+      - name: page
+        in: query
+        type: integer
+        description: Current page. Defaults to 1
+      - name: page_size
+        in: query
+        type: integer
+        description: Number of registers to return. Defaults to 10
+      - name: sort
+        in: query
+        type: string
+        description: Database name of the field to order by. Multiple fields allowed, separated by comma. Add a minus sign (-) to set order to desc. Defaults to 'asc'. Ex. 'created_at,-name'
       - name: competition_id
-        in: path
-        required: true
+        in: query
+        type: integer
+        description: Filters competition by id
+      - name: season_id
+        in: query
+        type: integer
+        description: Filters competition's season by id. If found, returns only seasons with the given season_id
+      - name: season_year
+        in: query
+        type: integer
+        description: Filters seasons by init_at and end_at, from jan 1st <year> to dec 31th <year>
+      - name: category_id
+        in: query
+        type: integer
+        description: Filters seasons' categories by id. If found, returns only categories with the given category_id
+      - name: team_status_id
+        in: query
         type: integer
       responses:
         200:

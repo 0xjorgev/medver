@@ -17,7 +17,7 @@ exports.up = function(knex, Promise) {
 			table.string('img_url')
 			table.string('document_number')
 			table.string('document_img_url')
-			table.string('country')
+			table.string('nationality')
 			table.integer('player_id')
 			table.string('meta')
 			table.timestamp('claimed')

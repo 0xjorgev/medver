@@ -42,7 +42,7 @@ exports.down = function(knex, Promise) {
 		//Se crea la columna player_id con referencia al id del player nuevo
 		return Promise.all([
 			knex.schema.alterTable('match_players', (table) => {
-				table.dropForeign('player_id').references('players.id')
+				table.dropForeign('player_id')
 				table.integer('team_player_id')
 				table.integer('matches_players_id')
 			})

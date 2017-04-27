@@ -44,6 +44,8 @@ define([
     ,'./event_calendar_comment'
     ,'./event_calendar_type'
     ,'./person'
+    ,'./category_summoned'
+    ,'./match_player'
 ], function (Util
 	, Discipline
 	, Subdiscipline
@@ -86,6 +88,8 @@ define([
     , Event_calendar_comment
     , Event_calendar_type
     , Person
+    ,'Category_summoned'
+    ,'Match_player'
 	){
     return {
     	util:Util
@@ -130,5 +134,7 @@ define([
         ,event_calendar_comment: Event_calendar_comment
         ,event_calendar_type: Event_calendar_type
         ,person: Person
+        ,category_summoned: Category_summoned
+        ,match_player: Match_player
     };
 });

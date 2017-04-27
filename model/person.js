@@ -5,42 +5,69 @@ define(['./base_model','./gender'], function (DB) {
 	var Person = DB.Model.extend({
 		tableName: 'persons'
 		,hasTimestamps: true
-
 		//relations
 		,gender: function(){
 			return this.belongsTo('Gender', 'gender_id');
 		}
-		// ,player: function(){
-		// 	return this.hasMany('Player', 'person_id');
-		// }
-	},{
-        //metodos
-        //savePerson permite salvar a una persona
-        savePerson: function(_person){
-            let personData = {}
-            if (_person.name != undefined) personData.name = _person.name.trim()
-            if (_person.last_name != undefined) personData.last_name = _person.last_name.trim()
-            if (_person.birthday != undefined) personData.birthday = _person.birthday
-            if (_person.email != undefined) personData.email = _person.email
-            if (_person.height != undefined) personData.height = _person.height
-            if (_person.weight != undefined) personData.weight = _person.weight
-            if (_person.gender_id != undefined) personData.gender_id = _person.gender_id
-            if (_person.img_url != undefined) personData.img_url = _person.img_url
-            if (_person.document_number != undefined) personData.document_number = _person.document_number
-            if (_person.document_img_url != undefined) personData.document_img_url = _person.document_img_url
-            if (_person.country != undefined) personData.country = _person.country
-            if (_person.claimed != undefined) personData.claimed = _person.claimed
-            if (_person.active != undefined) personData.active = _person.active
-            if (_person.id != undefined) personData.id = _person.id
 
-            //Se salva la persona
-        	return new DB._models.Person(personData).save()	
+        ,status: function(){
+            return this.belongsTo('Status_type', 'status_type_id');
+        }
+	},
+    {
+        findOrCreate: function(_p){
+            let person = {}
+            let newPerson = {}
+
+            //Creamos el person
+            if(_p.name !== undefined && _p.name !== null) person.name = _p.name.trim()
+            if(_p.last_name !== undefined && _p.last_name !== null) person.last_name = _p.last_name.trim()
+            if(_p.nickname !== undefined && _p.nickname !== null) person.nickname  = _p.nickname.trim()
+            if(_p.birthday !== undefined && _p.birthday !== null) person.birthday = _p.birthday
+            if(_p.email !== undefined && _p.email !== null) person.email = _p.email.trim()
+            if(_p.gender_id !== undefined && _p.gender_id !== null) person.gender_id = _p.gender_id
+            if(_p.height !== undefined && _p.height !== null) person.height = _p.height
+            if(_p.weight !== undefined && _p.weight !== null) person.weight = _p.weight
+            if(_p.status_type_id !== undefined && _p.status_type_id !== null) 
+                person.status_type_id = _p.status_type_id
+            if(_p.img_url !== undefined && _p.img_url !== null) person.img_url = _p.img_url.trim()
+            if(_p.document_number !== undefined && _p.document_number !== null)
+                person.document_number = _p.document_number.trim()
+            if(_p.document_img_url !== undefined && _p.document_img_url !== null)
+                person.document_img_url = _p.document_img_url.trim()
+            if(_p.nationality !== undefined && _p.nationality !== null) person.nationality = _p.nationality
+            if(_p.meta !== undefined && _p.meta !== null) person.meta = _p.meta
+            if(_p.claimed !== undefined && _p.claimed !== null) person.claimed = _p.claimed
+            if(_p.active !== undefined && _p.active !== null) person.active = _p.active
+
+            return DB._models.Person
+                .where({email: person.email})
+                .fetch()
+            .then(_result => {
+                //Si encontramos una persona que corresponda con el mismo correo
+                if(_result != undefined)
+                {
+                    return _result
+                }
+                //Si no existe  el jugador lo creamos
+                else
+                {
+                    return new DB._models.Person(person)
+                    .save()
+                }
+            })
             .then(result => {
-            	personData.id = result.attributes.id
-                //return the complete information of the person
+                newPerson = result.toJSON()
+                //Se crea un objeto entidad
+                let entity = {}
+                entity.object_id = newPerson.id
+                entity.object_type = 'persons'
+                return DB._models.Entity.findOrCreate(entity)
+            })
+            .then(_result => {
                 return DB._models.Person
-                .where({id:personData.id})
-                .fetch({withRelated: ['gender']})
+                    .where({id: newPerson.id})
+                    .fetch({withRelated: ['entity']})
             })
         }
     })

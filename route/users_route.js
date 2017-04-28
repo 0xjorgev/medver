@@ -2,7 +2,7 @@ if (typeof define !== 'function')
     var define = require('amdefine')(module);
 
 define(['express'
-		,'uuid'
+		// ,'uuid'
 		,'njwt'
 		,'../model/index'
 		,'../util/password_gen_util'
@@ -17,7 +17,7 @@ define(['express'
 		,'fs'
 		],
 		function (express
-		,uuid
+		// ,uuid
 		,nJwt
 		,Models
 		,Pwd_gen

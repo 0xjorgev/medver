@@ -299,7 +299,7 @@ define(['express'
 
 			//si se quieren los resultados via CSV
 			if(req.query.csv && req.query.csv == 1){
-				csv.stringify(results, function(err, data){
+				csv.stringify(results, {header: true}, function(err, data){
 					if(err){
 						Response(res, null, err)
 					}

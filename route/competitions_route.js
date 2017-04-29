@@ -332,15 +332,19 @@ define(['express'
 
 		let limit = ' limit $LIMIT offset $OFFSET'
 
+		let finalQuery = query.replace('$FIELDS$', fields)
+
 		//paginacion. no se aplica paginacion si se solicita el csv
 		if(!req.query.csv && req._pagination.pageSize && req._pagination.page){
 			const offset = req._pagination.page * req._pagination.pageSize
 			limit = limit
 				.replace('$LIMIT', req._pagination.pageSize)
 				.replace('$OFFSET', offset)
+
+			finalQuery += limit 
 		}
 
-		const finalQuery = query.replace('$FIELDS$', fields) + limit
+
 		let queryResult = null
 
 		Knex.raw(finalQuery)

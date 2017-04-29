@@ -96,13 +96,23 @@ define(['express'
 
 		switch(code){
 			case 200:
+				let pageInfo = {}
+
 				if(result.pagination != undefined){
 					res.header('X-Pagination-Page', result.pagination.page )
 					res.header('X-Pagination-Page-Size', result.pagination.pageSize )
 					res.header('X-Pagination-Row-Count', result.pagination.rowCount )
 					res.header('X-Pagination-Page-Count', result.pagination.pageCount )
+
+					pageInfo = {
+						page: result.pagination.page
+						,page_size: result.pagination.pageSize
+						,row_count: result.pagination.rowCount
+						,page_count: result.pagination.pageCount
+					}
 				}
-				res.status(code).json({message: 'Success', code: '0', data: result})
+
+				res.status(code).json({message: 'Success', code: '0', data: result, pagination: pageInfo})
 				break
 			case 204:
 				//respuestas validas pero vacias

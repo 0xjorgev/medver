@@ -3186,6 +3186,18 @@ definitions:
         format: int32
       active:
         type: boolean
+      status_id:
+        type: integer
+        format: int32
+      payment:
+        type: integer
+        format: int32
+      document:
+        type: integer
+        format: int32
+      roster:
+        type: integer
+        format: int32
 
   UpdateCategyTeamPlayer:
     title: UpdateCategyTeamPlayer

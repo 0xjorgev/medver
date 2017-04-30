@@ -246,50 +246,6 @@ define(['express'
 
 
 		let query = 'select $FIELDS$' +
-			// 	' competitions.id as competition_id' +
-			// ' ,competitions.name as competition_name' +
-			// ' ,seasons.id as season_id' +
-			// ' ,seasons.name as season_name' +
-			// ' ,seasons.init_at as season_init_at' +
-			// ' ,seasons.ends_at as season_ends_at' +
-			// ' ,seasons.meta as season_meta' +
-			// ' ,categories.id as category_id' +
-			// ' ,categories.name as category_name' +
-			// ' ,entities.id as entity_id' +
-			// ' ,entities.object_id as entity_object_id' +
-			// ' ,entities.object_type as entity_object_type' +
-			// ' ,players.id as players_id' +
-			// ' ,players.first_name as players_first_name' +
-			// ' ,players.last_name as players_last_name' +
-			// ' ,players.img_url as players_img_url' +
-			// ' ,players.portrait_url as players_portrait_url' +
-			// ' ,players.document_number as players_document_number' +
-			// ' ,players.nickname as players_nickname' +
-			// ' ,players.birthday as players_birthday' +
-			// ' ,players.status_id as players_status_id' +
-			// ' ,players.email as players_email' +
-			// ' ,players.active as players_active' +
-			// ' ,players.created_at as players_created_at' +
-			// ' ,players.updated_at as players_updated_at' +
-			// ' ,players.gender_id as players_gender_id' +
-			// ' ,players.document_img_url as players_document_img_url' +
-			// ' ,players.meta as players_meta' +
-			// ' ,teams.id as teams_id' +
-			// ' ,teams.name as teams_name' +
-			// ' ,teams.logo_url as teams_logo_url' +
-			// ' ,teams.short_name as teams_short_name' +
-			// ' ,teams.description as teams_description' +
-			// ' ,teams.category_type_id as teams_category_type_id' +
-			// ' ,teams.organization_id as teams_organization_id' +
-			// ' ,teams.subdiscipline_id as teams_subdiscipline_id' +
-			// ' ,teams.gender_id as teams_gender_id' +
-			// ' ,teams.active as teams_active' +
-			// ' ,teams.created_at as teams_created_at' +
-			// ' ,teams.updated_at as teams_updated_at' +
-			// ' ,teams.meta as teams_meta' +
-			// ' ,teams.portrait_url as teams_portrait_url' +
-			// ' ,teams.club_id as teams_club_id' +
-			// ' ,categories_groups_phases_teams.*' +
 		' from categories_groups_phases_teams' +
 		' inner join categories on categories.id = categories_groups_phases_teams.category_id' +
 		' inner join seasons on seasons.id = categories.season_id' +
@@ -336,14 +292,12 @@ define(['express'
 
 		//paginacion. no se aplica paginacion si se solicita el csv
 		if(!req.query.csv && req._pagination.pageSize && req._pagination.page){
-			const offset = req._pagination.page * req._pagination.pageSize
+			const offset = (req._pagination.page - 1) * req._pagination.pageSize
 			limit = limit
 				.replace('$LIMIT', req._pagination.pageSize)
 				.replace('$OFFSET', offset)
-
-			finalQuery += limit 
+			finalQuery += limit
 		}
-
 
 		let queryResult = null
 

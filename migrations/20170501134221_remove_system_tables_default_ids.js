@@ -10,6 +10,7 @@ exports.up = function(knex, Promise) {
 		,knex.raw('alter table genders alter column id drop default')
 		,knex.raw('alter table positions alter column id drop default')
 		,knex.raw('alter table status_types alter column id drop default')
+		,knex.raw('alter table relationships_types alter column id drop default')
 	])
 };
 
@@ -24,5 +25,6 @@ exports.down = function(knex, Promise) {
 		,knex.raw('alter table genders alter column id set default nextval(\'genders_id_seq\'::regclass)')
 		,knex.raw('alter table positions alter column id set default nextval(\'positions_id_seq\'::regclass)')
 		,knex.raw('alter table status_types alter column id set default nextval(\'status_types_id_seq\'::regclass)')
+		,knex.raw('alter table relationships_types alter column id set default nextval(\'relationships_types_id_seq\'::regclass)')
 	])
 };

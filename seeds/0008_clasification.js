@@ -18,8 +18,8 @@ exports.seed = function(knex, Promise) {
 
     knex('classifications_types')
     .insert([
-        {name:'Simple Elimination',description:'Simple elimination model'},
-        {name:'Custom Elimination',description:'Custom elimination model'}
+        {id: 1, name:'Simple Elimination',description:'Simple elimination model'},
+        {id: 2, name:'Custom Elimination',description:'Custom elimination model'}
         ])
     ).then(function(){
 		//Add query

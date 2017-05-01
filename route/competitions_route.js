@@ -244,7 +244,7 @@ define(['express'
 		' ,teams.club_id as teams_club_id' +
 		' ,categories_groups_phases_teams.*'
 
-
+		//query sin los campos
 		let query = 'select $FIELDS$' +
 		' from categories_groups_phases_teams' +
 		' inner join categories on categories.id = categories_groups_phases_teams.category_id' +

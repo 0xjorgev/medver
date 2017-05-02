@@ -135,11 +135,16 @@ define(['express'
 
 		const preSubject =  (pref) => {
 			if (pref !== null && pref !== undefined ) {
+				const subject = null
 				switch(pref){
 					case "ES":
-						return 'Información de registro para Torneos Alianza de Futbol'
+						subject = 'Información de registro para Torneos Alianza de Futbol'
+						break;
 					default:
-						return 'Alianza de Futbol: Tournament registration information'
+						subject = 'Alianza de Futbol: Tournament registration information'
+						break;
+				}
+				return subject
 			}
 			else {
 				return 'Alianza de Futbol: Tournament registration information'

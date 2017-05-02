@@ -155,6 +155,13 @@ define(['express'
 		const emailTemplate = data.template.replace('$LANG', prefLang(data.user.attributes.lang))
 		const emailSubject = prefSubject(data.user.attributes.lang)
 
+		logger.debug('idioma preferido >')
+		logger.debug(prefLang(data.user.attributes.lang))
+		logger.debug('template >')
+		logger.debug(emailTemplate)
+		logger.debug('subject >')
+		logger.debug(emailSubject)
+
 		var template = template_string_replace(emailTemplate
 			,tag
 			,process.env.SENDER_EMAIL

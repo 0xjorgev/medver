@@ -34,11 +34,11 @@ define(['express'
 		return Models.status_type
 		.where({'description': status})
 		.fetch()
-		.then(function(result){
+		.then(result => {
 			updateCompetitionCategory(res, cat_id, team_id, result.id);
 		})
-		.catch(function(err){
-			console.log("Error on status Fetch");
+		.catch(err => {
+			throw err
 		});
 	}
 
@@ -54,14 +54,14 @@ define(['express'
 		.where('team_id','=', team_id)
 		.update({'payment' : true, 'status_id':status_id}, ['id'])
 		.then(function(result){
-
 			// var email_template = email_status_template("pre-registration-paid")
 			//el unico template que importa al actualizar el pago es este
 			data.template = './template/email/Alianza/payed-$LANG.html'
-			var owner_email = team_owner_email(data)
+			return team_owner_email(data)
 		})
-		.catch(function(err){
-			Response(res, 'Paypal');
+		.catch(err => {
+			// Response(res, null, err);
+			throw err
 		});
 	}
 
@@ -99,7 +99,7 @@ define(['express'
 		// };
 
 		console.log('IPN FROM PAYPAL');
-		logger.debug(body)
+		logger.debug(body) // <- esto se deberia almacenar como info del pago
 
 		if (payment_status == "Completed") {
 			console.log('Status is completed');
@@ -121,7 +121,7 @@ define(['express'
 	//==========================================================================
 
 	const send_status_email = function(data){
-		// console.log("Status Email ", data.template)
+		console.log("Status Email ", data.template)
 		var tag = {
 			COACH_KEY: `${data.user.attributes.username}`
 			,TEAM_KEY: `${data.team.attributes.name}`
@@ -134,9 +134,9 @@ define(['express'
 			return (pref !== null && pref !== undefined) ? pref.toUpperCase() : 'EN'
 		}
 
-		const preSubject =  (pref) => {
+		const prefSubject = (pref) => {
 			if (pref !== null && pref !== undefined ) {
-				const subject = null
+				let subject = null
 				switch(pref){
 					case "ES":
 						subject = 'Información de registro para Torneos Alianza de Futbol'
@@ -154,13 +154,6 @@ define(['express'
 
 		const emailTemplate = data.template.replace('$LANG', prefLang(data.user.attributes.lang))
 		const emailSubject = prefSubject(data.user.attributes.lang)
-
-		logger.debug('idioma preferido >')
-		logger.debug(prefLang(data.user.attributes.lang))
-		logger.debug('template >')
-		logger.debug(emailTemplate)
-		logger.debug('subject >')
-		logger.debug(emailSubject)
 
 		var template = template_string_replace(emailTemplate
 			,tag
@@ -195,28 +188,21 @@ define(['express'
 			return Models.entity_relationship
 			.where({ent_ref_to_id:result.attributes.id, relationship_type_id:1, active:true})
 			.fetch({withRelated:['from', 'to']})
-			.then(function(innerResult){
-				// console.log("Father Object_id: " , innerResult.relations.from.attributes.object_id)
-				return Models.user
-				.where({id:innerResult.relations.from.attributes.object_id})
-				.fetch()
-				.then(function(user_result){
-					data.user = user_result
-					// console.log("User Found: ", user_result)
-					//return user_result
-					team_data(data)
-				})
-				.catch(function(user_error){
-					// console.log("No user Found!: ", user_error)
-					return user_error
-				})
-			})
-			.catch(function(InnerError){
-				return InnerError
-			})
+		})
+		.then(function(innerResult){
+			// console.log("Father Object_id: " , innerResult.relations.from.attributes.object_id)
+			return Models.user
+			.where({id:innerResult.relations.from.attributes.object_id})
+			.fetch()
+		})
+		.then(function(user_result){
+			data.user = user_result
+			// console.log("User Found: ", user_result)
+			//return user_result
+			return team_data(data)
 		})
 		.catch(function(error){
-			return error
+			throw error
 		});
 	}
 
@@ -230,11 +216,10 @@ define(['express'
 		.then((result) => {
 			data.team = result
 			// console.log("Team Data: ", data)
-			competition_data(data)
-			//return data
+			return competition_data(data)
 		})
-		.catch((error) => {
-			return {}
+		.catch(error => {
+			throw error
 		})
 	}
 
@@ -247,14 +232,10 @@ define(['express'
 		.fetch({withRelated:'season.competition'})
 		.then((result) => {
 			data.category = result
-			var status_email = send_status_email(data)
-			return
-			// console.log("Full Data: ", data)
-			// console.log("Season Rel Data: ", JSON.parse(data.category.relations.season.attributes.meta).ciudad)
-			//return data
+			return send_status_email(data)
 		})
-		.catch((error) => {
-			return {}
+		.catch(error => {
+			throw error
 		})
 	}
 

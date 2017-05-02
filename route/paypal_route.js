@@ -99,6 +99,7 @@ define(['express'
 		// };
 
 		console.log('IPN FROM PAYPAL');
+		logger.debug(body)
 
 		if (payment_status == "Completed") {
 			console.log('Status is completed');

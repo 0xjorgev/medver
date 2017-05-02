@@ -205,7 +205,7 @@ define(['express'
 		' ,seasons.name as season_name' +
 		' ,seasons.init_at as season_init_at' +
 		' ,seasons.ends_at as season_ends_at' +
-		' ,seasons.meta as season_meta' +
+		// ' ,seasons.meta as season_meta' +
 		' ,categories.id as category_id' +
 		' ,categories.name as category_name' +
 		' ,entities.id as entity_id' +
@@ -222,11 +222,11 @@ define(['express'
 		' ,players.status_id as players_status_id' +
 		' ,players.email as players_email' +
 		' ,players.active as players_active' +
-		' ,players.created_at as players_created_at' +
-		' ,players.updated_at as players_updated_at' +
+		// ' ,players.created_at as players_created_at' +
+		// ' ,players.updated_at as players_updated_at' +
 		' ,players.gender_id as players_gender_id' +
 		' ,players.document_img_url as players_document_img_url' +
-		' ,players.meta as players_meta' +
+		// ' ,players.meta as players_meta' +
 		' ,teams.id as teams_id' +
 		' ,teams.name as teams_name' +
 		' ,teams.logo_url as teams_logo_url' +
@@ -237,9 +237,9 @@ define(['express'
 		' ,teams.subdiscipline_id as teams_subdiscipline_id' +
 		' ,teams.gender_id as teams_gender_id' +
 		' ,teams.active as teams_active' +
-		' ,teams.created_at as teams_created_at' +
-		' ,teams.updated_at as teams_updated_at' +
-		' ,teams.meta as teams_meta' +
+		// ' ,teams.created_at as teams_created_at' +
+		// ' ,teams.updated_at as teams_updated_at' +
+		// ' ,teams.meta as teams_meta' +
 		' ,teams.portrait_url as teams_portrait_url' +
 		' ,teams.club_id as teams_club_id' +
 		' ,categories_groups_phases_teams.*'
@@ -313,13 +313,71 @@ define(['express'
 			//https://www.npmjs.com/package/express-csv
 			//si se quieren los resultados via CSV
 			if(req.query.csv && req.query.csv == 1){
-				csv.stringify(resultingRows, {header: true}, function(err, data){
+
+				csv.transform(queryResult, data => {
+
+					const tmp = data
+					tmp.season_init_at = moment(data.season_init_at).format('YYYY-MM-DD')
+					tmp.season_ends_at = moment(data.season_ends_at).format('YYYY-MM-DD')
+
+					// if(data.seasons_meta){
+					// 	const seasonMeta = JSON.parse(data.seasons_meta)
+					// 	tmp.city = seasonMeta.ciudad ? seasonMeta.ciudad : ''
+					// }
+					// delete tmp.seasons_meta
+
+					// if(data.players_meta){
+					// 	const playersMeta = JSON.parse(data.players_meta)
+					// 	tmp.city = playersMeta.ciudad ? playersMeta.ciudad : ''
+					// }
+					// delete tmp.players_meta
+
+					return tmp
+				},
+				(err, data) => {
+
 					if(err){
 						Response(res, null, err)
 					}
-					res.attachment(`report${moment().format('YYYYMMDD_HHmmss')}.csv`);
-					res.end(data);
+
+					csv.stringify(queryResult, {header: true}, function(err, data){
+						if(err){
+							Response(res, null, err)
+						}
+						res.attachment(`report${moment().format('YYYYMMDD_HHmmss')}.csv`);
+						res.end(data);
+					})
 				})
+
+
+
+				// var transform = require('stream-transform');
+				//
+				// transform(resultingRows, function(data, callback){
+				//   setImmediate(function(){
+				//     data.push(data.shift());
+				//     callback(null, data.join(',')+'\n');
+				//   });
+				// }, {parallel: 20})
+				// .pipe(process.stdout);
+
+
+				// csv.generate({seed: 1, columns: 2, length: 20})
+				// .pipe(csv.parse())
+				// .pipe(csv.transform(function(record){
+				// 	return record.map(function(value){
+				// 		return value.toUpperCase()
+				// 	})
+				// }))
+				// .pipe(csv.stringify ())
+				// .pipe(process.stdout)
+				// .pipe(test => {
+				// 	console.log('>>>>>>');
+				// 	console.log(test);
+				// 	console.log('>>>>>>');
+				// 	res.attachment(`report${moment().format('YYYYMMDD_HHmmss')}.csv`);
+				// 	res.end(test);
+				// })
 			}
 			else{
 				queryResult.pagination = {

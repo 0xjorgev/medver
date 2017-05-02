@@ -205,7 +205,9 @@ define(['express'
     //==========================================================================
     // Get previous status send Email by Status
     //==========================================================================
-    const email_status_template = (status) => {
+
+	//FIXME: estos templates
+	const email_status_template = (status) => {
       switch (status) {
         case "pre-registration-in-progress":
           return './template/email/alianza_status_invited.html'

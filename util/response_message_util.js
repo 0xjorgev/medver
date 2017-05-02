@@ -34,12 +34,10 @@ define(['express'
 					logger.error(error)
 				}
 				else{
-					if(result !== null){
+					if(result !== null)
 						client.incr(key)
-					}
-					else {
+					else
 						client.set(key, 1)
-					}
 				}
 			})
 		}
@@ -89,22 +87,43 @@ define(['express'
 			//checks if the result is a valid response
 			var isCode200 = result && ((result.length && result.length > 0) || result.attributes || Object.keys(result).length > 0)
 
-			// _log(result)
-			// console.log('404?', !isCode200 )
-
 			//if it's not an error, but the response is empty, then it's a 404 error
 			//if the response is an array, checks it's size. If it's greater than 0, then is a valid response
-			code = (isCode200) ? 200 : 404
+			// code = (isCode200) ? 200 : 404
+			//el codigo 204 significa 'No content',
+			code = (isCode200) ? 200 : 204
 		}
 
 		switch(code){
 			case 200:
+				let pageInfo = {}
+
+				if(result.pagination != undefined){
+					res.header('X-Pagination-Page', result.pagination.page )
+					res.header('X-Pagination-Page-Size', result.pagination.pageSize )
+					res.header('X-Pagination-Row-Count', result.pagination.rowCount )
+					res.header('X-Pagination-Page-Count', result.pagination.pageCount )
+
+					pageInfo = {
+						page: result.pagination.page
+						,page_size: result.pagination.pageSize
+						,row_count: result.pagination.rowCount
+						,page_count: result.pagination.pageCount
+					}
+				}
+
+				res.status(code).json({message: 'Success', code: '0', data: result, pagination: pageInfo})
+				break
+			case 204:
+				//respuestas validas pero vacias
 				res.status(code).json({ message: 'Success', code: '0', data: result})
 				break
 			case 400:
-				res.status(code).json({ message: 'Validation failure: '+mess, code: code, validation_errors: result})
+				//fallo en las reglas de negocio
+				res.status(code).json({ message: `Validation failure: ${mess}`, code: code, validation_errors: result})
 				break
 			case 403:
+				//no autorizado
 				res.status(code).json({ message: 'Unauthorized', code: code})
 				break
 			case 404:
@@ -125,7 +144,7 @@ define(['express'
 				if(error) logger.debug(error.stack)
 				res.status(500).json({ message: 'Unhandled error: ' + mess, code: 500, data: result, error: error});
 		}
-    }
+	}
 
-    return message;
+	return message;
 });

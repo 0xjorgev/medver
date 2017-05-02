@@ -146,9 +146,16 @@ define(['express'
 		if (data.club_id != undefined) teamData.club_id = data.club_id
 		if (data.id != undefined) teamData.id = data.id
 
+
 		//let's lookup for the club by id
 		return Models.club.query(qb => {
-			qb.where({id: teamData.club_id})
+			if(teamData.club_id){
+				qb.where({id: teamData.club_id})
+			}
+			else{
+				//le paso null para que NO encuentre un club, y hacer que se cree
+				qb.where({id: null})
+			}
 		})
 		.fetch()
 		.then(found => {
@@ -399,7 +406,8 @@ define(['express'
 		.query(qb => qb.where({id: currentUser.id}) )
 		.fetch({withRelated: [
 			'entity.related_from.relationship_type'
-			,'entity.related_from.to.entity_type'
+			// ,'entity.related_from.to.entity_type'
+			,'entity.related_from.to'
 		]})
 		.then(result => {
 			const user = result.toJSON()

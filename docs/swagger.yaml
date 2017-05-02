@@ -87,6 +87,7 @@ paths:
       responses:
         200:
           description: List of services and call count
+
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport
@@ -539,6 +540,94 @@ paths:
           description: Competition object
       security: []
 
+  /competition/query:
+    get:
+      summary: returns the list of participants in a competition
+      description: returns the list of participants in a competition
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: page
+        in: query
+        type: integer
+        description: Current page. Defaults to 1
+      - name: page_size
+        in: query
+        type: integer
+        description: Number of registers to return. Defaults to 10
+      - name: sort
+        in: query
+        type: string
+        description: Database name of the field to order by. Multiple fields allowed, separated by comma. Add a minus sign (-) to set order to desc. Defaults to 'asc'. Ex. 'created_at,-name'
+      - name: competition_id
+        in: query
+        type: integer
+        description: Filters competition by id
+      - name: season_id
+        in: query
+        type: integer
+        description: Filters competition's season by id. If found, returns only seasons with the given season_id
+      - name: season_year
+        in: query
+        type: integer
+        description: Filters seasons by init_at and end_at, from jan 1st <year> to dec 31th <year>
+      - name: category_id
+        in: query
+        type: integer
+        description: Filters seasons' categories by id. If found, returns only categories with the given category_id
+      - name: team_status_id
+        in: query
+        type: integer
+      responses:
+        200:
+          description: result
+      security: []
+  /competition/team:
+    get:
+      summary: returns the list of participants in a competition
+      description: returns the list of participants in a competition
+      tags:
+        - Competition
+      produces:
+      - application/json
+      parameters:
+      - name: page
+        in: query
+        type: integer
+        description: Current page. Defaults to 1
+      - name: page_size
+        in: query
+        type: integer
+        description: Number of registers to return. Defaults to 10
+      - name: sort
+        in: query
+        type: string
+        description: Database name of the field to order by. Multiple fields allowed, separated by comma. Add a minus sign (-) to set order to desc. Defaults to 'asc'. Ex. 'created_at,-name'
+      - name: competition_id
+        in: query
+        type: integer
+        description: Filters competition by id
+      - name: season_id
+        in: query
+        type: integer
+        description: Filters competition's season by id. If found, returns only seasons with the given season_id
+      - name: season_year
+        in: query
+        type: integer
+        description: Filters seasons by init_at and end_at, from jan 1st <year> to dec 31th <year>
+      - name: category_id
+        in: query
+        type: integer
+        description: Filters seasons' categories by id. If found, returns only categories with the given category_id
+      - name: team_status_id
+        in: query
+        type: integer
+      responses:
+        200:
+          description: result
+      security: []
   /season:
     get:
       description: returns all seasons
@@ -3125,6 +3214,18 @@ definitions:
         format: int32
       active:
         type: boolean
+      status_id:
+        type: integer
+        format: int32
+      payment:
+        type: integer
+        format: int32
+      document:
+        type: integer
+        format: int32
+      roster:
+        type: integer
+        format: int32
 
   UpdateCategyTeamPlayer:
     title: UpdateCategyTeamPlayer

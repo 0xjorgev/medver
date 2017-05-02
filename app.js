@@ -150,7 +150,7 @@ const allowCrossDomain = function(req, res, next) {
 	res.header('Access-Control-Allow-Credentials', 'true');
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
 	res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization-Token');
-	res.header( 'X-Powered-By', 'SomoSport' )
+	res.header('X-Powered-By', 'SomoSport' )
 	next();
 };
 
@@ -177,34 +177,32 @@ app.use(authHelper.validateToken)
 * sin embargo, es responsabilidad de la implementacion del servicio realizar
 * los ajustes necesarios a la consulta
 *******/
-const processSortBy = (req, res, next) => {
-	if(!req.query['sort']){
+const processPagination = (req, res, next) => {
+	req._pagination = {}
+
+	if(!req.query.sort && !req.query.page && !req.query.pageSize){
 		next()
 		return
 	}
 
-	const sort = req.query['sort']
-	req._sortBy = sort.split(',').map((s) => {
-		return (s.indexOf('-') >= 0)
-			? [s.replace('-',''),'desc']
-			: [s.replace('+',''),'asc']
-	})
+	const sort = req.query.sort
+	req._pagination = {}
+	req._pagination['page'] = req.query.page
+	req._pagination['pageSize'] = req.query.page_size
+	if(req.query.sort){
+		req._pagination['sort'] = sort.split(',').map((s) => {
+			const _dir = s.indexOf('-') >= 0 ? 'desc' : 'asc'
+			const _field = s.replace('-','').replace('+','')
+			return { field: _field, direction: _dir }
+		})
+	}
+	else{
+		req._pagination['sort'] = []
+	}
 	next()
 }
 
-app.use(processSortBy)
-
-const processLimit = (req, res, next) => {
-	if(req.query.limit == undefined){
-		next()
-		return
-	}
-	req._limit = req.query['limit']
-
-	//offset no tiene sentido sin limit
-	if(req.query.offset != undefined) req._offset = req.query['offset']
-		next()
-}
+app.use(processPagination)
 
 app.use(api_prefix+'core', core_ws);
 app.use(api_prefix+'user', user_ws);

@@ -2,7 +2,7 @@ if (typeof define !== 'function')
     var define = require('amdefine')(module);
 
 define(['express'
-		,'uuid'
+		// ,'uuid'
 		,'njwt'
 		,'../model/index'
 		,'../util/password_gen_util'
@@ -17,7 +17,7 @@ define(['express'
 		,'fs'
 		],
 		function (express
-		,uuid
+		// ,uuid
 		,nJwt
 		,Models
 		,Pwd_gen
@@ -47,7 +47,7 @@ define(['express'
 		})
 		.fetch({withRelated: [
 			'entity.related_from.relationship_type'
-			,'entity.related_from.to.entity_type'
+			// ,'entity.related_from.to.entity_type'
 			,'entity.related_from.to.object'
 		]})
 		.then(foundUser => {
@@ -243,7 +243,8 @@ define(['express'
         .query(qb => qb.where({id: req._currentUser.id}) )
         .fetch({withRelated: [
              'entity.related_from.relationship_type'
-            ,'entity.related_from.to.entity_type'
+            // ,'entity.related_from.to.entity_type'
+            ,'entity.related_from.to'
         ]})
         .then(result => {
             var user = result.toJSON()

@@ -31,7 +31,7 @@ define(['express'
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
-	
+
 	//==========================================================================
 	// Get all active clubs that are related to the user
 	//==========================================================================
@@ -54,14 +54,13 @@ define(['express'
         .query(qb => qb.where({id: req._currentUser.id}) )
         .fetch({withRelated: [
              'entity.related_from.relationship_type'
-            ,'entity.related_from.to.entity_type'
+            // ,'entity.related_from.to.entity_type'
+            ,'entity.related_from.to'
         ]})
         .then(result => {
             var user = result.toJSON()
             //con esto se filtran las relaciones para que sean los clubs
-
-            logger.debug(user)
-
+            // logger.debug(user)
             return user.entity.related_from
                 .filter(rel => {
                     return rel.to.object_type == 'clubs'
@@ -82,7 +81,7 @@ define(['express'
 	// Get a club by his id
 	//==========================================================================
 	router.get('/:club_id', function (req, res) {
-		
+
 		var clubId = req.params.club_id
 		return Models.club
 		.query(function(qb){})
@@ -163,7 +162,7 @@ define(['express'
 		}
 
 		if (clubId != undefined) clubData.id = clubId
-		
+
 		clubData.active = false
 
 		return new Models.club(clubData).save()
@@ -214,7 +213,7 @@ define(['express'
     		})
 			// logger.debug(teamsID)
 			return Models.match
-		        .query(qb => 
+		        .query(qb =>
 					qb.whereIn('home_team_id', teamsID)
 					.orWhereIn('visitor_team_id', teamsID)
 					.whereNot({date: null})
@@ -268,7 +267,7 @@ define(['express'
 	router.get('/:club_id/event_calendar', (req, res) => {
 		let club ={}
 		club.id = req.params.club_id
-        
+
         //Obtengo los datos del club y su entidad
         return Models.club
 			.query(function(qb){})

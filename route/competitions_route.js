@@ -11,6 +11,9 @@ define(['express'
 		,'../util/email_sender_util'
 		,'../helpers/auth_helper'
 		,'../node_modules/lodash/lodash.min'
+		,'lodash'
+		,'csv'
+		,'moment'
 		,'../util/logger_util']
 		,(express
 			,util
@@ -21,6 +24,9 @@ define(['express'
 			,Email
 			,auth
 			,lodash
+			,_
+			,csv
+			,moment
 		 	,logger) => {
 
 	let router = express.Router()
@@ -54,16 +60,9 @@ define(['express'
 					qb.orWhere({'competitions.created_by_id': req._currentUser.id})
 				}
 
-				if(req._sortBy){
-					req._sortBy.map((sort) => {
-						qb.orderBy(sort[0], sort[1])
-					})
-				}
-
-				if(req._limit){
-					qb.limit(req._limit)
-					if(req._offset) qb.offset(req._offset)
-				}
+				if(req._pagination.sort) req._pagination.sort.forEach(s => qb.orderBy(s.field, s.direction))
+				// if(req._sortBy)
+				// 	req._sortBy.map((sort) => qb.orderBy(sort[0], sort[1]))
 			})
 			.fetchAll({
 				withRelated: [
@@ -141,6 +140,54 @@ define(['express'
 			.catch(error => Response(res, null, error))
 	});
 
+	//servicio para obtener competiciones en general
+	router.get('/query', (req, res) => {
+
+		const competitionId = req.query.competition_id
+		const seasonId = req.query.season_id
+		const seasonYear = req.query.season_year
+		const categoryId = req.query.category_id
+		const teamStatusId = req.query.team_status_id
+
+		return Models.competition
+		.query(qb => {
+			if(req._pagination.sort) req._pagination.sort.forEach(s => qb.orderBy(s.field, s.direction))
+			if(competitionId != undefined) qb.where('competitions.id', '=', competitionId)
+		})
+		.fetchPage({
+			page: req._pagination.page
+			,pageSize: req._pagination.pageSize
+			,withRelated: [
+				//THIS IS MADNESS!
+				{'seasons': (qb) => {
+					if(seasonId != undefined) qb.where('seasons.id', '=', seasonId)
+					if(seasonYear != undefined){
+						const yearStart = new Date(seasonYear, 0, 1)
+						const yearEnd = new Date(seasonYear, 11, 31)
+						qb.whereBetween('seasons.init_at', [yearStart, yearEnd])
+						qb.whereBetween('seasons.ends_at', [yearStart, yearEnd])
+					}
+				}}
+				//NO.
+				,{'seasons.categories': qb => {
+					if(categoryId != undefined) qb.where('categories.id', '=', categoryId)
+				}}
+				//THIS
+				,{'seasons.categories.participants': qb => {
+					if(teamStatusId != undefined){
+						qb.where('status_id', teamStatusId)
+					}
+				}}
+				//IS
+				,'seasons.categories.participants.team'
+				//JS!!!!!!!!!!!
+				,'seasons.categories.participants.entity.object'
+		]
+		})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
+	})
+
 	//Competitions Types List -> Array of results [Competition_type]
 	router.get('/competition_type', function(req, res){
 		return Models.competition_type
@@ -148,6 +195,177 @@ define(['express'
 			.then(result => Response(res, result) )
 			.catch(error => Response(res, null, error) );
 	});
+
+	router.get('/team', (req, res) => {
+
+		const fields =  ' competitions.id as competition_id' +
+		' ,competitions.name as competition_name' +
+		' ,seasons.id as season_id' +
+		' ,seasons.name as season_name' +
+		' ,seasons.init_at as season_init_at' +
+		' ,seasons.ends_at as season_ends_at' +
+		// ' ,seasons.meta as season_meta' +
+		' ,categories.id as category_id' +
+		' ,categories.name as category_name' +
+		' ,categories.player_minimum_summoned as summoned_players_min' +
+		' ,categories.player_maximum_summoned as summoned_players_max' +
+		' ,entities.id as entity_id' +
+		' ,entities.object_id as entity_object_id' +
+		' ,entities.object_type as entity_object_type' +
+		' ,players.id as players_id' +
+		' ,players.first_name as players_first_name' +
+		' ,players.last_name as players_last_name' +
+		' ,players.img_url as players_img_url' +
+		' ,players.portrait_url as players_portrait_url' +
+		' ,players.document_number as players_document_number' +
+		' ,players.nickname as players_nickname' +
+		' ,players.birthday as players_birthday' +
+		' ,players.status_id as players_status_id' +
+		' ,players.email as players_email' +
+		' ,players.active as players_active' +
+		// ' ,players.created_at as players_created_at' +
+		// ' ,players.updated_at as players_updated_at' +
+		' ,players.gender_id as players_gender_id' +
+		' ,players.document_img_url as players_document_img_url' +
+		// ' ,players.meta as players_meta' +
+		' ,teams.id as teams_id' +
+		' ,teams.name as teams_name' +
+		' ,teams.logo_url as teams_logo_url' +
+		' ,teams.short_name as teams_short_name' +
+		' ,teams.description as teams_description' +
+		' ,teams.category_type_id as teams_category_type_id' +
+		' ,teams.organization_id as teams_organization_id' +
+		' ,teams.subdiscipline_id as teams_subdiscipline_id' +
+		' ,teams.gender_id as teams_gender_id' +
+		' ,teams.active as teams_active' +
+		// ' ,teams.created_at as teams_created_at' +
+		// ' ,teams.updated_at as teams_updated_at' +
+		// ' ,teams.meta as teams_meta' +
+		' ,teams.portrait_url as teams_portrait_url' +
+		' ,teams.club_id as teams_club_id' +
+		' ,categories_groups_phases_teams.*' +
+		' ,player_count.player_count'
+		//query sin los campos
+		let query = 'select $FIELDS$' +
+		' from categories_groups_phases_teams' +
+		' inner join categories on categories.id = categories_groups_phases_teams.category_id' +
+		' inner join seasons on seasons.id = categories.season_id' +
+		' inner join competitions on competitions.id = seasons.competition_id' +
+		' inner join entities on categories_groups_phases_teams.entity_id = entities.id' +
+		' left join players on entities.object_id = players.id and entities.object_type = \'players\'' +
+		' left join teams on entities.object_id = teams.id and entities.object_type = \'teams\'' +
+		' left join (select category_id, team_id, count(*) as player_count from categories_teams_players group by 1,2)' +
+		' player_count on player_count.team_id = teams.id and player_count.category_id = categories.id'
+
+		//filtros
+		if(req.query.competition_id || req.query.season_id ||
+			req.query.season_year || req.query.category_id ||
+			req.query.team_status_id){
+
+			let params = []
+
+			if(req.query.competition_id != null && req.query.competition_id != undefined)
+				params.push(` competition_id = ${req.query.competition_id}`)
+
+			if(req.query.season_id != null && req.query.season_id != undefined){
+				params.push(` seasons.id = ${req.query.season_id}`)
+			}
+
+			if(req.query.category_id != null && req.query.category_id != undefined){
+				params.push(` categories.id = ${req.query.category_id}`)
+			}
+
+			if(req.query.team_status_id != null && req.query.team_status_id != undefined){
+				params.push(` categories_groups_phases_teams.status_id = ${req.query.team_status_id}`)
+			}
+
+			if(req.query.season_year != null && req.query.season_year != undefined){
+				let seasonQuery = ` (seasons.init_at between '${req.query.season_year}-01-01' and '${req.query.season_year}-12-31'`
+				seasonQuery += ` or seasons.ends_at between '${req.query.season_year}-01-01' and '${req.query.season_year}-12-31')`
+				params.push(seasonQuery)
+			}
+
+			//se adjuntan las condiciones al query
+			query += ` where ${params.join(' and ')}`
+		}
+
+		let limit = ' limit $LIMIT offset $OFFSET'
+
+		let finalQuery = query.replace('$FIELDS$', fields)
+
+		//paginacion. no se aplica paginacion si se solicita el csv
+		if(!req.query.csv && req._pagination.pageSize && req._pagination.page){
+			const offset = (req._pagination.page - 1) * req._pagination.pageSize
+			limit = limit
+				.replace('$LIMIT', req._pagination.pageSize)
+				.replace('$OFFSET', offset)
+			finalQuery += limit
+		}
+
+		let queryResult = null
+
+		Knex.raw(finalQuery)
+		.then(results => {
+			queryResult = results.rows
+			return Knex.raw(query.replace('$FIELDS$', 'count(*)'))
+		})
+		.then(results => {
+			const count = results.rows[0].count
+
+			//TODO: estos son los headers que deberia setear en la respuesta
+			//https://www.npmjs.com/package/express-csv
+			//si se quieren los resultados via CSV
+			if(req.query.csv && req.query.csv == 1){
+
+				//conversion de datos... altamente costosa
+				csv.transform(queryResult, data => {
+					const tmp = data
+					tmp.season_init_at = moment(data.season_init_at).format('YYYY-MM-DD')
+					tmp.season_ends_at = moment(data.season_ends_at).format('YYYY-MM-DD')
+					tmp.player_count = data.player_count == null ? 0 : data.player_count
+
+					// if(data.seasons_meta){
+					// 	const seasonMeta = JSON.parse(data.seasons_meta)
+					// 	tmp.city = seasonMeta.ciudad ? seasonMeta.ciudad : ''
+					// }
+					// delete tmp.seasons_meta
+
+					// if(data.players_meta){
+					// 	const playersMeta = JSON.parse(data.players_meta)
+					// 	tmp.city = playersMeta.ciudad ? playersMeta.ciudad : ''
+					// }
+					// delete tmp.players_meta
+
+					return tmp
+				},
+				(err, data) => {
+
+					if(err){
+						Response(res, null, err)
+					}
+
+					csv.stringify(queryResult, {header: true}, function(err, data){
+						if(err){
+							Response(res, null, err)
+						}
+						res.attachment(`report${moment().format('YYYYMMDD_HHmmss')}.csv`);
+						res.end(data);
+					})
+				})
+			}
+			else{
+				queryResult.pagination = {
+					page: req._pagination.page
+					,pageSize: req._pagination.pageSize
+					,pageCount: Math.ceil(count / req._pagination.pageSize)
+					,rowCount: count
+				}
+
+				Response(res, queryResult)
+			}
+		})
+		.catch(error => Response(res, null, error) )
+	})
 
 	//Competition by Id
 	router.get('/:competition_id', function (req, res) {
@@ -392,6 +610,17 @@ define(['express'
 				Response(res, result)
 			})
 
+	})
+
+	router.get('/:competition_id/team', (req, res) => {
+		return Models.category_group_phase_team
+		.where({id: req.params.competition_id})
+		.fetchAll({withRelated: [
+			'seasons.categories.participants.team'
+			,'seasons.categories.participants.entity.object'
+		]})
+		.then(result => Response(res, result) )
+		.catch(error => Response(res, null, error) )
 	})
 
 	return router;

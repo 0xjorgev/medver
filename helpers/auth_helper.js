@@ -5,10 +5,12 @@ define(['../node_modules/lodash/lodash.min'
 	,'../util/logger_util'
 	,'njwt'
 	,'../model/index'
+	,'../util/response_message_util'
 	],( _
 		,logger
 		,nJwt
 		,Models
+		,Response
 	) => {
 
 	let authHelper = {}

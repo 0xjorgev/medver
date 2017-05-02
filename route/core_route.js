@@ -133,30 +133,14 @@ define(['express'
 		// 	return
 		// }
 
-		//construir entidades
-		// ,'Event'
-		// ,'User'
-		// ,'Team'
-		// ,'Category'
-		// ,'Feed_item'
-		// ,'Player'
-		// ,'Comment'
-		// ,'Competition'
-		// ,'Match'
-		// ,'Club'
-
-		//construir relaciones
-
-		//competition_user
-		//user -[OWNER]-> competition
-
-		//ubicar competiciones que NO tengan relaciones de owner y que existean
-		//en la tabla comp_user
-
-		//ubicar entidades de las competiciones y de los usuarios
-
-		//crear relacion (user)-[owner]->(competition)
-
+		//---------------------------------------------------------------
+		// competition_user
+		// user -[OWNER]-> competition
+		// ubicar competiciones que NO tengan relaciones de owner y que existean
+		// en la tabla comp_user
+		// ubicar entidades de las competiciones y de los usuarios
+		// crear relacion (user)-[owner]->(competition)
+		//---------------------------------------------------------------
 		Models.entity.getOrphanEntities('competitions')
 		.then(result => {
 			//ids de objetos sin entidad
@@ -204,8 +188,30 @@ define(['express'
 				}).save()
 			}))
 		})
+		.catch(error => Response(res, null, error))
+
+		//---------------------------------------------------------------
+		//para normalizar los equipos que no tienen entidad en la spider
+		//---------------------------------------------------------------
+		Models.category_group_phase_team
+		.where({entity_id: null})
+		.fetchAll({withRelated: ['team.entity']})
+		//filtro los equipos que tienen una entidad creada
+		.then(result => result.toJSON().filter(t => t.team.entity != null))
+		//se salva el id de entidad para cada equipo
+		.then(result => {
+			return Promise.all( result.map(t => {
+				const data = {
+					id: t.id
+					,entity_id: t.team.entity.id
+				}
+				return Models.category_group_phase_team.forge(data).save()
+			}))
+		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
+
+
 	})
 
 	router.get('/services/stats', (req, res) => {

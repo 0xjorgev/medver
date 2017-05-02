@@ -130,7 +130,7 @@ define(['express'
 		}
 
 		const prefLang =  (pref) => {
-			return (pref !== null && pref !== undefined) pref.toUpperCase() : 'EN'
+			return (pref !== null && pref !== undefined) ? pref.toUpperCase() : 'EN'
 		}
 
 		const preSubject =  (pref) => {

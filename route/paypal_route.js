@@ -10,9 +10,9 @@ define(['express'
 	,'../util/response_message_util'
 	,'../util/generic_util'
 	,'../util/logger_util'
-  ,'https'
-  ,'../util/object_map_util'
-  ,'../util/email_sender_util'
+	,'https'
+	,'../util/object_map_util'
+	,'../util/email_sender_util'
 	],
 	(express
 	,Models
@@ -29,12 +29,6 @@ define(['express'
 
     let router = express.Router();
 
-	//papotico test
-	router.post('/papotico', (req,res) => {
-		logger.debug('papoticooooooo')
-		return Response(res, 'uuuu que fino')
-		// return Response(res, null,{message: 'uuuu que malo'})
-	})
 
     const fetchPaymentStatus = (res, status, cat_id, team_id) => {
 
@@ -208,19 +202,24 @@ define(['express'
 
 	//FIXME: estos templates
 	const email_status_template = (status) => {
-      switch (status) {
-        case "pre-registration-in-progress":
-          return './template/email/alianza_status_invited.html'
-        case "pre-registration-approved":
-          return './template/email/alianza_status_approved.html';
-        case "pre-registration-rejected":
-          return './template/email/alianza_status_rejected.html';
-        case "pre-registration-paid":
-          return './template/email/alianza_status_paid.html';
-        default:
-          return './template/email/alianza_status_registrated.html';
-      }
-    }
+		switch (status) {
+			case "pre-registration-in-progress":
+
+				return './template/email/alianza_status_invited.html'
+			case "pre-registration-approved":
+			// return './template/email/alianza_status_approved.html';
+				return './template/email/Alianza/approved-EN.html'
+			case "pre-registration-rejected":
+				// return './template/email/alianza_status_rejected.html';
+				return './template/email/Alianza/rejected-EN.html'
+			case "pre-registration-paid":
+				// return './template/email/alianza_status_paid.html';
+				return './template/email/Alianza/payed-EN.html'
+			default:
+				// return './template/email/alianza_status_registrated.html';
+				return './template/email/Alianza/register-EN.html'
+		}
+	}
 
     //==========================================================================
   	// Get previous status send Email by Status

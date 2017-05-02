@@ -8,7 +8,7 @@ if (typeof define !== 'function') {
 define(['./base_model' ], function (DB) {
 
     var Category_summoned = DB.Model.extend({
-        tableName: 'category_summond'
+        tableName: 'category_summoned'
         ,hasTimestamps: true
         ,player: function(){ return this.belongsTo('Player', 'player_id'); }
         ,category: function(){ return this.belongsTo('Category', 'category_id'); }

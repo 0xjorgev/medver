@@ -394,7 +394,7 @@ define(['express'
 			Response(res, null, permissionCheck)
 			return
 		}
-
+		logger.debug(currentUser)
 		Models.user
 		.query(qb => qb.where({id: currentUser.id}) )
 		.fetch({withRelated: [

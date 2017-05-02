@@ -2660,7 +2660,7 @@ paths:
           type: integer
           format: integer
 
-/category/{category_id}/register_tryouts:
+  /category/{category_id}/register_tryouts:
     post:
       summary: Recive the information of one person and create a player that will participate in the category
       description: Recive the information of one person and create a player that will participate in the category
@@ -3255,6 +3255,8 @@ definitions:
         type: string
       last_name:
         type: string
+      nick_name:
+        type: string
       email:
         type: string
       birthday:
@@ -3269,13 +3271,17 @@ definitions:
         type: string
       document_img_url:
         type: string
-      country:
+      nationality:
         type: string
       claimed:
         type: string
       active:
         type: boolean
       gender_id:
+        type: integer
+      status_type_id:
+        type: integer
+      meta:
         type: integer
 
   PlayerData:

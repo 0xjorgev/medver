@@ -88,8 +88,8 @@ define([
     , Event_calendar_comment
     , Event_calendar_type
     , Person
-    ,'Category_summoned'
-    ,'Match_player'
+    , Category_summoned
+    , Match_player
 	){
     return {
     	util:Util

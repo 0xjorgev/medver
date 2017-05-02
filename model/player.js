@@ -30,6 +30,9 @@ define(['./base_model','./entity','./gender', './player_team', './event_match_pl
 		,entity : function(){
 			return this.morphOne('Entity', 'object');
 		}
+		,person : function(){
+			return this.belongsTo('person', 'person_id');
+		}
 		,createEntity: function(){
 			console.log('creating player entity');
 			return DB._models.Entity.forge({

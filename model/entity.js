@@ -36,7 +36,8 @@ define(['./base_model'
 						,'Competition'
 						,'Match'
 						,'Club'
-						,'Event_calendar')
+						,'Event_calendar'
+						,'Person')
 				}
 				,related_from: function() {
 					return this.hasMany('Entity_relationship', 'ent_ref_from_id');

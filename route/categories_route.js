@@ -635,14 +635,12 @@ define(['express'
 		}
 
 		const prefLang =  (pref) => {
-			//  if (pref.valueOf() !== undefined && pref.valueOf() !== null) {
-			  if (pref !== null && pref !== undefined ) {
-					// 	console.log("Inside if: ", pref.toUpperCase())
-				 	return pref.toUpperCase()
-			 } else {
-				//  console.log("Inside Else: ")
+			if (pref !== null && pref !== undefined ) {
+				return pref.toUpperCase()
+			}
+			else {
 				 return "EN"
-			 }
+			}
 		}
 
 		const preSubject =  (pref) => {
@@ -655,14 +653,15 @@ define(['express'
 			// 				return "Alianza de Futbol"
 			// 		}
 			//  } else {
-				 return "Alianza de Futbol"
+			// 		return "Alianza de Futbol"
 			//  }
+			return "Alianza de Futbol"
 		}
 
-	// console.log("User Lang: ", data.user.attributes.lang)
-	//console.log("LANG", prefLang(data.user.lang))
+		// console.log("User Lang: ", data.user.attributes.lang)
+		//console.log("LANG", prefLang(data.user.lang))
 
-	return template_string_replace(data.template.replace("LANG", prefLang(data.user.attributes.lang) )
+		return template_string_replace(data.template.replace("LANG", prefLang(data.user.attributes.lang) )
 				,tag ,process.env.ALIANZA_SENDER
 				,preSubject(data.user.attributes.lang)
 				// ,'jorgevmendoza@gmail.com')
@@ -674,7 +673,7 @@ define(['express'
 	//==========================================================================
 
 	const template_string_replace = function(file, tag, sender, subject, to){
-	var fs = require('fs');
+		var fs = require('fs');
 		fs.readFile(file, 'utf8', function(err, contents) {
 			contents = ReplaceHelper(tag, contents)
 			var send = Email(process.env.SENDER_EMAIL)
@@ -1003,8 +1002,7 @@ define(['express'
 		.catch(error => Response(res, null, error))
 	})
 
-	var email_sender_invitation = function(user, origin, category_id, team_id)
-	{
+	var email_sender_invitation = function(user, origin, category_id, team_id){
 		var _origin = origin
 		var category
 		console.log('USER: ', user)

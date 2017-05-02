@@ -198,7 +198,6 @@ define(['express'
 
 	router.get('/team', (req, res) => {
 
-
 		const fields =  ' competitions.id as competition_id' +
 		' ,competitions.name as competition_name' +
 		' ,seasons.id as season_id' +
@@ -208,6 +207,8 @@ define(['express'
 		// ' ,seasons.meta as season_meta' +
 		' ,categories.id as category_id' +
 		' ,categories.name as category_name' +
+		' ,categories.player_minimum_summoned as summoned_players_min' +
+		' ,categories.player_maximum_summoned as summoned_players_max' +
 		' ,entities.id as entity_id' +
 		' ,entities.object_id as entity_object_id' +
 		' ,entities.object_type as entity_object_type' +
@@ -242,8 +243,8 @@ define(['express'
 		// ' ,teams.meta as teams_meta' +
 		' ,teams.portrait_url as teams_portrait_url' +
 		' ,teams.club_id as teams_club_id' +
-		' ,categories_groups_phases_teams.*'
-
+		' ,categories_groups_phases_teams.*' +
+		' ,player_count.player_count'
 		//query sin los campos
 		let query = 'select $FIELDS$' +
 		' from categories_groups_phases_teams' +
@@ -252,7 +253,9 @@ define(['express'
 		' inner join competitions on competitions.id = seasons.competition_id' +
 		' inner join entities on categories_groups_phases_teams.entity_id = entities.id' +
 		' left join players on entities.object_id = players.id and entities.object_type = \'players\'' +
-		' left join teams on entities.object_id = teams.id and entities.object_type = \'teams\''
+		' left join teams on entities.object_id = teams.id and entities.object_type = \'teams\'' +
+		' left join (select category_id, team_id, count(*) as player_count from categories_teams_players group by 1,2)' +
+		' player_count on player_count.team_id = teams.id and player_count.category_id = categories.id'
 
 		//filtros
 		if(req.query.competition_id || req.query.season_id ||
@@ -314,11 +317,12 @@ define(['express'
 			//si se quieren los resultados via CSV
 			if(req.query.csv && req.query.csv == 1){
 
+				//conversion de datos... altamente costosa
 				csv.transform(queryResult, data => {
-
 					const tmp = data
 					tmp.season_init_at = moment(data.season_init_at).format('YYYY-MM-DD')
 					tmp.season_ends_at = moment(data.season_ends_at).format('YYYY-MM-DD')
+					tmp.player_count = data.player_count == null ? 0 : data.player_count
 
 					// if(data.seasons_meta){
 					// 	const seasonMeta = JSON.parse(data.seasons_meta)
@@ -348,36 +352,6 @@ define(['express'
 						res.end(data);
 					})
 				})
-
-
-
-				// var transform = require('stream-transform');
-				//
-				// transform(resultingRows, function(data, callback){
-				//   setImmediate(function(){
-				//     data.push(data.shift());
-				//     callback(null, data.join(',')+'\n');
-				//   });
-				// }, {parallel: 20})
-				// .pipe(process.stdout);
-
-
-				// csv.generate({seed: 1, columns: 2, length: 20})
-				// .pipe(csv.parse())
-				// .pipe(csv.transform(function(record){
-				// 	return record.map(function(value){
-				// 		return value.toUpperCase()
-				// 	})
-				// }))
-				// .pipe(csv.stringify ())
-				// .pipe(process.stdout)
-				// .pipe(test => {
-				// 	console.log('>>>>>>');
-				// 	console.log(test);
-				// 	console.log('>>>>>>');
-				// 	res.attachment(`report${moment().format('YYYYMMDD_HHmmss')}.csv`);
-				// 	res.end(test);
-				// })
 			}
 			else{
 				queryResult.pagination = {

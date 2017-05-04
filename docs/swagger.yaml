@@ -77,7 +77,6 @@ paths:
       responses:
         200:
           description: OK Message
-
   /core/services/stats:
     get:
       summary: Reports usage of core services
@@ -87,7 +86,6 @@ paths:
       responses:
         200:
           description: List of services and call count
-
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport
@@ -336,7 +334,6 @@ paths:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No user found
-
   /competition:
     get:
       summary: List of competitions managed by the user_id received in auth-token
@@ -539,7 +536,6 @@ paths:
         200:
           description: Competition object
       security: []
-
   /competition/query:
     get:
       summary: returns the list of participants in a competition
@@ -1091,7 +1087,6 @@ paths:
         200:
           description: Created Category Team Invite
       security: []
-
   /category/{category_id}/participant/{participant_id}:
     put:
       description: updates a participant of a category
@@ -1122,7 +1117,6 @@ paths:
         200:
           description: Resource updated
       security: []
-
   /category/{category_id}/team/{team_id}/invite/{id}:
     put:
       summary: update Category Team Invite
@@ -1244,7 +1238,32 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-
+  /category/{category_id}/register_tryouts:
+    post:
+      summary: Recive the information of one person and create a player that will participate in the category
+      description: Recive the information of one person and create a player that will participate in the category
+      parameters:
+        - name: category_id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+          format: integer
+        - name: player data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlayerData'
+      tags:
+        - Category
+        - Player
+      responses:
+        200:
+          description: result
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /phase:
     get:
       summary: Complete list of phases
@@ -1400,7 +1419,6 @@ paths:
         200:
           description: result
       security: []
-
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -1501,7 +1519,6 @@ paths:
         200:
           description: list of matches currently on this group
       security: []
-
   /match:
     get:
       summary: Gets all matches
@@ -1728,7 +1745,6 @@ paths:
       responses:
         200:
           description: (documentation pending)
-
   /match/:match_id/team/:team_id/player:
     post:
       summary: registers the starter eleven players for a match for each team
@@ -1772,7 +1788,6 @@ paths:
         200:
           description: list of rounds
       security: []
-
   /event/{match_id}:
     get:
       summary: Gets the events of a match, given its category_id
@@ -1789,7 +1804,6 @@ paths:
           required: true
           type: integer
           format: integer
-
   /team:
     get:
       summary: Gets the info of all teams
@@ -1975,83 +1989,83 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /team/{team_id}/player/{player_id}:
-    get:
-      summary: Get the team's player
-      description: Get the team's player
-      parameters:
-        - name: team_id
-          in: path
-          description: Team ID
-          required: true
-          type: integer
-          format: integer
-        - name: player_id
-          in: path
-          description: PLAYER ID
-          required: true
-          type: integer
-          format: integer
-      tags:
-        - Team
-        - Player
-      responses:
-        200:
-          description: An team players
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    put:
-      summary: Updates a player and inserts it in the team roster
-      description: Updates a player and inserts it in the team roster
-      parameters:
-        - name: team_id
-          in: path
-          description: Team ID
-          required: true
-          type: integer
-          format: integer
-        - name: player and team data
-          in: body
-          required: true
-          x-is-map: false
-          schema:
-            $ref: '#/definitions/PlayerTeamRequest'
-      tags:
-        - Team
-        - Player
-      responses:
-        200:
-          description: result
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      summary: Sets a player of the roster as inactive. It does *not* deactivates the player
-      description: Sets a player of the roster as inactive. It does *not* deactivates the player
-      parameters:
-        - name: team_id
-          in: path
-          description: Team ID
-          required: true
-          type: integer
-          format: integer
-        - name: player_id
-          in: path
-          required: true
-          type: integer
-      tags:
-        - Team
-        - Player
-      responses:
-        200:
-          description: result
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+  # /team/{team_id}/player/{player_id}:
+  #   get:
+  #     summary: Get the team's player
+  #     description: Get the team's player
+  #     parameters:
+  #       - name: team_id
+  #         in: path
+  #         description: Team ID
+  #         required: true
+  #         type: integer
+  #         format: integer
+  #       - name: player_id
+  #         in: path
+  #         description: PLAYER ID
+  #         required: true
+  #         type: integer
+  #         format: integer
+  #     tags:
+  #       - Team
+  #       - Player
+  #     responses:
+  #       200:
+  #         description: An team players
+  #       default:
+  #         description: Unexpected error
+  #         schema:
+  #           $ref: '#/definitions/Error'
+  #   put:
+  #     summary: Updates a player and inserts it in the team roster
+  #     description: Updates a player and inserts it in the team roster
+  #     parameters:
+  #       - name: team_id
+  #         in: path
+  #         description: Team ID
+  #         required: true
+  #         type: integer
+  #         format: integer
+  #       - name: player and team data
+  #         in: body
+  #         required: true
+  #         x-is-map: false
+  #         schema:
+  #           $ref: '#/definitions/PlayerTeamRequest'
+  #     tags:
+  #       - Team
+  #       - Player
+  #     responses:
+  #       200:
+  #         description: result
+  #       default:
+  #         description: Unexpected error
+  #         schema:
+  #           $ref: '#/definitions/Error'
+  #   delete:
+  #     summary: Sets a player of the roster as inactive. It does *not* deactivates the player
+  #     description: Sets a player of the roster as inactive. It does *not* deactivates the player
+  #     parameters:
+  #       - name: team_id
+  #         in: path
+  #         description: Team ID
+  #         required: true
+  #         type: integer
+  #         format: integer
+  #       - name: player_id
+  #         in: path
+  #         required: true
+  #         type: integer
+  #     tags:
+  #       - Team
+  #       - Player
+  #     responses:
+  #       200:
+  #         description: result
+  #       default:
+  #         description: Unexpected error
+  #         schema:
+  #           $ref: '#/definitions/Error'
   /team/{team_id}/category/{category_id}/request:
     post:
       summary: Create one request for participated in the category from the team to participated
@@ -2158,7 +2172,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
   /player/{player_id}:
     get:
       summary: Gets player's info
@@ -2201,7 +2214,6 @@ paths:
       responses:
         200:
           description: List of events
-
   /gender:
     get:
       description: get gender list
@@ -2231,7 +2243,6 @@ paths:
         200:
           description: results
       security: []
-
   /discipline/:
     get:
       summary: Lists all disciplines
@@ -2296,7 +2307,6 @@ paths:
         200:
           description: '?'
       security: []
-
   /subdiscipline:
     get:
       summary: Returns the list of subdisciplines
@@ -2321,7 +2331,6 @@ paths:
       responses:
         200:
           description: Active subdiscipline Available Events
-
   /status_type:
     get:
       summary: Returns the list of Status Types active
@@ -2442,7 +2451,6 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-
   /request/{id}/type/{type}:
     get:
       summary: Return the list of request for the id of the type
@@ -2486,7 +2494,6 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: falsee
-
   /club:
     get:
       summary: Gets the info of all clubs
@@ -2656,7 +2663,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
   /event_calendar:
     get:
       summary: Gets the info of all event calendars
@@ -2748,34 +2754,6 @@ paths:
           required: true
           type: integer
           format: integer
-
-  /category/{category_id}/register_tryouts:
-    post:
-      summary: Recive the information of one person and create a player that will participate in the category
-      description: Recive the information of one person and create a player that will participate in the category
-      parameters:
-        - name: category_id
-          in: path
-          description: Category ID
-          required: true
-          type: integer
-          format: integer
-        - name: player data
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/PlayerData'
-      tags:
-        - Category
-        - Player
-      responses:
-        200:
-          description: result
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
   /person:
     get:
       summary: Gets the info of all persons
@@ -2803,6 +2781,56 @@ paths:
         200:
           description: person creation OK
       security: []
+  /person/{person_id}:
+    get:
+      summary: Returns the detail of one person
+      description: Returns the detail of one person
+      parameters:
+        - name: person_id
+          in: path
+          description: Person ID
+          required: true
+          type: integer
+          format: integer
+      tags:
+        - Person
+      responses:
+        200:
+          description: An array of persons
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a person
+      description: Updates a person
+      parameters:
+        - name: Authorization-Token
+          in: header
+          type: string
+          required: true
+        - name: person_id
+          in: path
+          description: Person ID
+          required: true
+          type: integer
+          format: integer
+        - name: person data
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/PersonRequest'
+      tags:
+        - Person
+      responses:
+        200:
+          description: Resource updated
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
 
 #######################################################################
 #      _       __ _       _ _   _
@@ -3356,12 +3384,13 @@ definitions:
         type: string
       last_name:
         type: string
-      nick_name:
+      nickname:
         type: string
       email:
         type: string
       birthday:
         type: string
+        description: Ex. 2001-02-12T00:00:00-04:00
       height:
         type: string
       weight:
@@ -3383,7 +3412,7 @@ definitions:
       status_type_id:
         type: integer
       meta:
-        type: integer
+        type: string
 
   PlayerData:
     title: person

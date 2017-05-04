@@ -8,7 +8,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 
 	router.get('/', (req, res) => {
 		return Models.player
-		.fetchAll()
+		.fetchAll({withRelated: ['person' ,'person.gender', 'team.organization'], debug: false})
 		.then( (result) => {
 			Message(res,'Success', '0', result);
 		})
@@ -25,7 +25,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		return Models.player
 		.where({id:player_id})
 		.where({active:true})
-		.fetchAll({withRelated: ['player_team.team.organization', 'gender'], debug: false})
+		.fetchAll({withRelated: ['team.organization', 'person' ,'person.gender'], debug: false})
 		.then(function (result) {
 			Message(res,'Success', '0', result);
 		}).catch(function(error){

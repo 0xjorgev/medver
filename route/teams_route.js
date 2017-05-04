@@ -44,22 +44,22 @@ define(['express'
 		.where({active:true})
 		.fetchAll({withRelated: ['category_type'
 			,'organization'
-			,'player_team.player'
+			,'player.person'
 			,'subdiscipline'
-			,'gender'
+			,'player.person.gender'
+			,'player.position'
 			,'entity'
 			,'club']})
-		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
 
 	router.get('/:team_id/player', function (req, res) {
 		var team_id = req.params.team_id;
 
-		return Models.player_team
+		return Models.player
 		.where({team_id:team_id})
 		.where({active:true})
-		.fetchAll({withRelated: ['player', 'position'], debug: false})
+		.fetchAll({withRelated: ['person', 'position'], debug: false})
 		.then(function (result) {
 			//calculo la edad de cada jugador
 			//var players = result.map(s)
@@ -76,35 +76,35 @@ define(['express'
 		.where({id:team_id, active:true})
 		.fetch({withRelated: ['category_type'
 			,'organization'
-			,'player_team.player'
+			,'player.person'
 			,'subdiscipline'
-			,'gender'
+			,'player.person.gender'
 			,'entity'
-			,'player_team.position'
+			,'player.position'
 			,'club']})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error));
 
 	});
 
-	router.get('/:team_id/player/:player_id', function (req, res) {
-		var team_id = req.params.team_id;
-		var player_id = req.params.player_id;
+	// router.get('/:team_id/player/:player_id', function (req, res) {
+	// 	var team_id = req.params.team_id;
+	// 	var player_id = req.params.player_id;
 
-		return Models.player_team
-		.where({team_id:team_id})
-		.where({player_id:player_id})
-		.where({active:true})
-		.fetch({withRelated: ['player', 'position'], debug: false})
-		.then(function (result) {
-			//calculo la edad de cada jugador
-			//var players = result.map(s)
-			Response(res, result)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
-	});
+	// 	return Models.player
+	// 	.where({team_id:team_id})
+	// 	.where({player_id:player_id})
+	// 	.where({active:true})
+	// 	.fetch({withRelated: ['player', 'player.position'], debug: false})
+	// 	.then(function (result) {
+	// 		//calculo la edad de cada jugador
+	// 		//var players = result.map(s)
+	// 		Response(res, result)
+	// 	})
+	// 	.catch(function(error){
+	// 		Response(res, null, error)
+	// 	});
+	// });
 	//TODO: Esto parece no estar en uso, deberia arrojar error al probar
 	router.post('/organization/:org_id/category/:cat_id', function (req, res) {
 
@@ -216,104 +216,104 @@ define(['express'
 			.where({id:teamId})
 			.fetch({withRelated: ['category_type'
 				,'organization'
-				,'player_team.player'
+				,'player.person'
 				,'subdiscipline'
-				,'gender'
+				,'player.person.gender'
 				,'entity'
-				,'player_team.position']})
+				,'player.position']})
 		})
 		.then((result) => Response(res, result))
 		.catch((error) => Response(res, null, error))
 	})
 
-	var savePlayerTeam = (playerTeamData, res) => {
-		// logger.debug('savePlayerTeam')
-		// logger.debug(playerTeamData)
+	// var savePlayerTeam = (playerTeamData, res) => {
+	// 	// logger.debug('savePlayerTeam')
+	// 	// logger.debug(playerTeamData)
 
-		//chequeo de tipo array
-		if(!(Object.prototype.toString.call( playerTeamData ) === '[object Array]')) {
-			playerTeamData = [playerTeamData]
-		}
+	// 	//chequeo de tipo array
+	// 	if(!(Object.prototype.toString.call( playerTeamData ) === '[object Array]')) {
+	// 		playerTeamData = [playerTeamData]
+	// 	}
 
-		//TODO: check player existance
-		Promise.all(playerTeamData.map(data => {
-			//se escribe la tabla de jugador
-			const playerData = {}
-			if(data.player.id != undefined) playerData.id = data.player.id
-			if(data.player.first_name != undefined) playerData.first_name = data.player.first_name
-			if(data.player.last_name != undefined) playerData.last_name = data.player.last_name
-			if(data.player.img_url != undefined) playerData.img_url = data.player.img_url
-			if(data.player.portrait_url != undefined) playerData.portrait_url = data.player.portrait_url
-			if(data.player.document_number != undefined) playerData.document_number = data.player.document_number
-			if(data.player.nickname != undefined) playerData.nickname = data.player.nickname
-			if(data.player.birthday != undefined) playerData.birthday = data.player.birthday
-			if(data.player.status_id != undefined) playerData.status_id = data.player.status_id
-			if(data.player.email != undefined) playerData.email = data.player.email
-			if(data.player.active != undefined) playerData.active = data.player.active
-			if(data.player.gender_id != undefined) playerData.gender_id = data.player.gender_id
-			if(data.player.document_img_url != undefined) playerData.document_img_url = data.player.document_img_url
-			if(data.player.meta != undefined) playerData.meta = data.player.meta
+	// 	//TODO: check player existance
+	// 	Promise.all(playerTeamData.map(data => {
+	// 		//se escribe la tabla de jugador
+	// 		const playerData = {}
+	// 		if(data.player.id != undefined) playerData.id = data.player.id
+	// 		if(data.player.first_name != undefined) playerData.first_name = data.player.first_name
+	// 		if(data.player.last_name != undefined) playerData.last_name = data.player.last_name
+	// 		if(data.player.img_url != undefined) playerData.img_url = data.player.img_url
+	// 		if(data.player.portrait_url != undefined) playerData.portrait_url = data.player.portrait_url
+	// 		if(data.player.document_number != undefined) playerData.document_number = data.player.document_number
+	// 		if(data.player.nickname != undefined) playerData.nickname = data.player.nickname
+	// 		if(data.player.birthday != undefined) playerData.birthday = data.player.birthday
+	// 		if(data.player.status_id != undefined) playerData.status_id = data.player.status_id
+	// 		if(data.player.email != undefined) playerData.email = data.player.email
+	// 		if(data.player.active != undefined) playerData.active = data.player.active
+	// 		if(data.player.gender_id != undefined) playerData.gender_id = data.player.gender_id
+	// 		if(data.player.document_img_url != undefined) playerData.document_img_url = data.player.document_img_url
+	// 		if(data.player.meta != undefined) playerData.meta = data.player.meta
 
-			return new Models.player(playerData)
-			.save()
-			.then( savedPlayer => {
-				//se escribe el roster del equipo
-				var ptData = {
-					number	: data.team_player.number
-					,player_id : savedPlayer.attributes.id
-					,position_id : data.team_player.position_id
-					,team_id : data.team_player.team_id
-				}
+	// 		return new Models.player(playerData)
+	// 		.save()
+	// 		.then( savedPlayer => {
+	// 			//se escribe el roster del equipo
+	// 			var ptData = {
+	// 				number	: data.team_player.number
+	// 				,player_id : savedPlayer.attributes.id
+	// 				,position_id : data.team_player.position_id
+	// 				,team_id : data.team_player.team_id
+	// 			}
 
-				if(data.team_player.id !== undefined && data.team_player.id !== null){
-					ptData.id = data.team_player.id
-				}
+	// 			if(data.team_player.id !== undefined && data.team_player.id !== null){
+	// 				ptData.id = data.team_player.id
+	// 			}
 
-				return new Models.player_team(ptData)
-				.save()
-			})
-		}))
-		.then(result => Response(res, result))
-		.catch(error => Response(res, null, error) )
-	}
+	// 			return new Models.player(ptData)
+	// 			.save()
+	// 		})
+	// 	}))
+	// 	.then(result => Response(res, result))
+	// 	.catch(error => Response(res, null, error) )
+	// }
 
-	// Saves into players_teams, the roster of this team
-	router.post('/:team_id/player', function(req, res){
-		var data = req.body
-		//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
-		console.log('POST team - team_id', req.params, 'data', data )
-		savePlayerTeam(data, res)
-	})
+	// // Saves into players_teams, the roster of this team
+	// router.post('/:team_id/player', function(req, res){
+	// 	var data = req.body
+	// 	//TODO: validar que en el objeto de entrada no se estén enviando IDs de player y o de player team ... esto haría un update ne lugar de un create
+	// 	console.log('POST team - team_id', req.params, 'data', data )
+	// 	savePlayerTeam(data, res)
+	// })
 
-	// updates players_teams, the roster of this team
-	router.put('/:team_id/player/:player_id', function(req, res){
-		var data = req.body
-		data.id = req.params.team_id
-		data.player.id = parseInt(req.params.player_id)
-		console.log('PUT team - team_id', req.params, 'data', data )
-		savePlayerTeam(data, res)
-	})
+	// // updates players_teams, the roster of this team
+	// router.put('/:team_id/player/:player_id', function(req, res){
+	// 	var data = req.body
+	// 	data.id = req.params.team_id
+	// 	data.player.id = parseInt(req.params.player_id)
+	// 	console.log('PUT team - team_id', req.params, 'data', data )
+	// 	savePlayerTeam(data, res)
+	// })
 
 	//inactivates the player from the roster
-	router.delete('/:team_id/player/:player_id', function(req, res){
-		var PlayerTeam = new Models.player_team()
-		var playerId = req.params.player_id
-		var teamId = req.params.team_id
+	// router.delete('/:team_id/player/:player_id', function(req, res){
+	// 	var PlayerTeam = new Models.player()
+	// 	var playerId = req.params.player_id
+	// 	var teamId = req.params.team_id
 
-		console.log('DELETE team - team_id', req.params )
+	// 	console.log('DELETE team - team_id', req.params )
 
-		var _found = undefined
+	// 	var _found = undefined
 
-		PlayerTeam.where({team_id: teamId, player_id: playerId})
-		.fetch()
-		.then((result) => {
-			return new Models
-				.player_team({id: result.attributes.id, active: false})
-				.save()
-		})
-		.then((result) => Response(res, result))
-		.catch((error) => Response(res, null, error))
-	})
+	// 	PlayerTeam.where({team_id: teamId, player_id: playerId})
+	// 	.fetch()
+	// 	.then((result) => {
+	// 		return new Models
+	// 			.player({id: result.attributes.id, active: false})
+	// 			.save()
+	// 	})
+	// 	.then((result) => Response(res, result))
+	// 	.catch((error) => Response(res, null, error))
+	// })
 
 	//TODO: es necesario filtrar las competiciones recibidas por organizacion
 	router.get('/:team_id/competition', (req, res) => {
@@ -331,7 +331,7 @@ define(['express'
 		.where({category_type_id:req.params.category_type_id})
 		.where({gender_id:req.params.gender_id})
 		.where({active:true})
-		.fetchAll({withRelated: ['category_type', 'organization', 'player_team.player', 'subdiscipline', 'gender', 'entity']})
+		.fetchAll({withRelated: ['category_type', 'organization', 'player.person', 'subdiscipline', 'player.person.gender', 'entity']})
 		.then((result) => Response(res, result))
 		.catch((error) =>  Response(res, null, error))
 	});
@@ -421,7 +421,7 @@ define(['express'
 			return Models.team
 			.query(qb => qb.whereIn('id', result))
 			.fetchAll({withRelated: ['category_type'
-				,'gender'
+				,'player.person.gender'
 				,'category_group_phase_team.category.season.competition'
 				,'category_group_phase_team.status_type'
 				,'subdiscipline']

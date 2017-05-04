@@ -36,56 +36,26 @@ define(['express'
 		});
 	});
 
-	var save = function(data, res){
-		console.log('Save calendar event', data)
-		return Models.person.savePerson(data)
-		.then(result => Response(res, result))
-		.catch(error => Response(res, null, error))
-	}
-
-	//creacion de club
+	//creacion de una persona
 	router.post('/', (req, res) => {
-		//Verificacion de permisos
-        // var chk = auth.checkPermissions(req._currentUser, [])
-        // if(chk.code !== 0){
-        //     Response(res, null, chk)
-        //     return
-        // }
-
 		var data = req.body
 		data._currentUser = req._currentUser
-		save(data, res)
+		return Models.person.findOrCreate(data)
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	});
 
-	//actualizacion de club
+	//actualizacion de una persona
 	router.put('/:person_id', function(req, res, next){
-		//Verificacion de permisos
-        // var chk = auth.checkPermissions(req._currentUser, [])
-        // if(chk.code !== 0){
-        //     Response(res, null, chk)
-        //     return
-        // }
-
 		var data = req.body
 		data._currentUser = req._currentUser
 		//setting the ID on the object to be saved is the way to signal bookshelf to create or update
 		data.id = req.params.person_id
-		save(data, res)
-	});
-
-	//actualizacion de club
-	router.delete('/:person_id', function(req, res, next){
-		//Verificacion de permisos
-        // var chk = auth.checkPermissions(req._currentUser, [])
-        // if(chk.code !== 0){
-        //     Response(res, null, chk)
-        //     return
-        // }
-		return Models.person.deleteEventCalendar(req.params.person_id)
+		return Models.person.updatePerson(data)
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
-	
+
 
 	return router;
 });

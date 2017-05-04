@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
   	return Promise.all([
 		knex.schema.createTable('tmp_persons', function(table){
 			table.increments('id').primary()
-			table.string('name')
+			table.string('first_name')
 			table.string('last_name')
 			table.string('nickname')
 			table.date('birthday')
@@ -20,7 +20,7 @@ exports.up = function(knex, Promise) {
 			table.string('nationality')
 			table.integer('player_id')
 			table.string('meta')
-			table.timestamp('claimed')
+			table.boolean('claimed')
 			table.boolean('active').notNullable().defaultTo(true)
 			table.timestamp('created_at').defaultTo(knex.fn.now())
 			table.timestamp('updated_at').defaultTo(knex.fn.now())
@@ -29,7 +29,7 @@ exports.up = function(knex, Promise) {
 	.then(function(){
 		//Migro la informacion de player a la tabla temporal person colocando el id del player como player_id
 		return Promise.all([
-			knex.raw("INSERT INTO tmp_persons (name, last_name, nickname, img_url, birthday, email, gender_id, document_number, document_img_url, created_at, updated_at, player_id) SELECT first_name, last_name, nickname, img_url, birthday, email, gender_id, document_number, document_img_url, created_at, updated_at, id from players")
+			knex.raw("INSERT INTO tmp_persons (first_name, last_name, nickname, img_url, birthday, email, gender_id, document_number, document_img_url, created_at, updated_at, player_id) SELECT first_name, last_name, nickname, img_url, birthday, email, gender_id, document_number, document_img_url, created_at, updated_at, id from players")
 		])
 	})
 	.then(function(){
@@ -57,7 +57,7 @@ exports.up = function(knex, Promise) {
 	.then(function(){
 		//Se actualiza el valor de person id con el valor del player id
 		return Promise.all([
-			knex.raw("INSERT INTO tmp_players_teams (active, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, team_player_id) SELECT active, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, id from players_teams")
+			knex.raw("INSERT INTO tmp_players_teams (active, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, team_player_id, number) SELECT active, registered_at, unregistered_at, team_id, position_id, created_at, updated_at, player_id, id, number from players_teams")
 		])
 	})
 	.then(function(){

@@ -17,23 +17,29 @@ define(['./base_model'
 		,subdiscipline: function(){
             return this.belongsTo('Subdiscipline', 'subdiscipline_id');
         }
-		,gender: function(){
-            return this.belongsTo('Gender', 'gender_id');
-        }
+		// ,gender: function(){
+  //           return this.belongsTo('Gender', 'gender_id');
+  //       }
 		,organization: function(){
             return this.belongsTo('Organization', 'organization_id');
         }
-		,player_team: function(){
-            return this.hasMany('Player_team', 'team_id');
+        // ,player_team: function(){
+        //     return this.hasMany('Player_team', 'team_id');
+        // }
+        ,player: function(){
+            return this.hasMany('Player', 'team_id');
         }
 		,category_group_phase_team: function(){
             return this.hasMany('Category_group_phase_team', 'team_id');
         }
-		,match_player_team: function(){
-            return this.hasMany('Match_team_player', 'team_id');
+        // ,match_player_team: function(){
+        //     return this.hasMany('Match_team_player', 'team_id');
+        // }
+        ,match_player: function(){
+            return this.hasMany('Match_player', 'team_id');
         }
 		,summoned: function(){
-            return this.hasMany('Category_team_player', 'team_id');
+            return this.hasMany('Category_summoned', 'team_id');
         }
         ,entity : function(){
           return this.morphOne('Entity', 'object');
@@ -126,11 +132,11 @@ define(['./base_model'
                 .where({id:teamData.id, active: true})
                 .fetch({withRelated: ['category_type'
                     ,'organization'
-                    ,'player_team.player'
+                    ,'player.person'
                     ,'subdiscipline'
-                    ,'gender'
+                    ,'player.person.gender'
                     ,'entity'
-                    ,'player_team.position'
+                    ,'player.position'
                     ,'club']})
             })
         }

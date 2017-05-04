@@ -57,20 +57,20 @@ define(['express'
 		.where({'id':match_id})
 		.fetch({withRelated: [
 			 {'home_team.summoned': function(qb){
-				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.home_team_id')
+				qb.innerJoin('matches', 'category_summoned.team_id', 'matches.home_team_id')
  				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
  				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
- 				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+ 				qb.where(Knex.raw('category_summoned.category_id = phases.category_id'))
  				qb.where('matches.id',  match_id)
- 				qb.where('categories_teams_players.active',  true)
+ 				qb.where('category_summoned.active',  true)
 			 }}
 			,{'visitor_team.summoned': function(qb){
-				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.visitor_team_id')
+				qb.innerJoin('matches', 'category_summoned.team_id', 'matches.visitor_team_id')
  				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
  				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
- 				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+ 				qb.where(Knex.raw('category_summoned.category_id = phases.category_id'))
  				qb.where('matches.id',  match_id)
-				qb.where('categories_teams_players.active',  true)
+				qb.where('category_summoned.active',  true)
 			}}
 			,'home_team.summoned.player'
 			,'visitor_team.summoned.player'
@@ -90,8 +90,8 @@ define(['express'
 		return Models.match
 		.where({'id': match_id})
 		.fetch({withRelated: [
-			'home_team.match_player_team.player.player_team.position'
-			,'visitor_team.match_player_team.player.player_team.position'
+			'home_team.match_player.player.player.position'
+			,'visitor_team.match_player.player.player.position'
 			,'events.event'
 			,'events.player_in'
 			,'events.player_out'
@@ -109,30 +109,30 @@ define(['express'
 			'events.event',
 			'events.player_in',
 			'events.player_out',
-			{ 'home_team.match_player_team': function(qb) {
+			{ 'home_team.match_player': function(qb) {
 				qb.where('match_id',  match_id)
 			}},
-			{ 'visitor_team.match_player_team': function(qb) {
+			{ 'visitor_team.match_player': function(qb) {
 				qb.where('match_id',  match_id)
 			}},
 			'round.group.phase.category.category_type',
 			'round.group.phase.category.season.competition',
 			'home_team.summoned.player.gender',
-			'home_team.summoned.player.player_team.position',
+			'home_team.summoned.player.player.position',
 			{ 'home_team.summoned': function(qb) {
-				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.home_team_id')
+				qb.innerJoin('matches', 'category_summoned.team_id', 'matches.home_team_id')
 				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
 				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
-				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+				qb.where(Knex.raw('category_summoned.category_id = phases.category_id'))
 				qb.where('matches.id',  match_id)
 			}},
 			'visitor_team.summoned.player.gender',
-			'visitor_team.summoned.player.player_team.position',
+			'visitor_team.summoned.player.player.position',
 			{ 'visitor_team.summoned': function(qb) {
-				qb.innerJoin('matches', 'categories_teams_players.team_id', 'matches.visitor_team_id')
+				qb.innerJoin('matches', 'category_summoned.team_id', 'matches.visitor_team_id')
 				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
 				qb.innerJoin('phases', 'groups.phase_id', 'phases.id')
-				qb.where(Knex.raw('categories_teams_players.category_id = phases.category_id'))
+				qb.where(Knex.raw('category_summoned.category_id = phases.category_id'))
 				qb.where('matches.id',  match_id)
 			}},
 		], debug: false})
@@ -333,8 +333,8 @@ define(['express'
 		.fetchAll({withRelated: ['match_id'
 			,'event_id'
 			,'event'
-			,'player_in.player_team'
-			,'player_out.player_team'
+			,'player_in.player'
+			,'player_out.player'
 			,'team']
 			, debug: false})
 		.then(result => Response(res, result))

@@ -1046,23 +1046,22 @@ define(['express'
 		let category_id = req.params.category_id
         let user = {}
         let password  = pass_gen
-        let playerEntRel
-        let player = {}
-        let savePlayer = {}
+        let person = {}
+        let savePerson = {}
 
-        //Creamos el player
-		if(req.body.first_name !== undefined && req.body.first_name !== null) player.first_name = req.body.first_name.trim()
-        if(req.body.last_name !== undefined && req.body.last_name !== null) player.last_name = req.body.last_name.trim()
-        if(req.body.nickname !== undefined && req.body.nickname !== null) player.nickname  = req.body.nickname.trim()
-        if(req.body.gender_id !== undefined && req.body.gender_id !== null) player.gender_id = req.body.gender_id
-        if(req.body.email !== undefined && req.body.email !== null) player.email = req.body.email.trim()
-        if(req.body.img_url !== undefined && req.body.img_url !== null) player.img_url = req.body.img_url
-        if(req.body.birthday !== undefined && req.body.birthday !== null) player.birthday = req.body.birthday
+        //Creamos el person
+		if(req.body.first_name !== undefined && req.body.first_name !== null) person.first_name = req.body.first_name.trim()
+        if(req.body.last_name !== undefined && req.body.last_name !== null) person.last_name = req.body.last_name.trim()
+        if(req.body.nickname !== undefined && req.body.nickname !== null) person.nickname  = req.body.nickname.trim()
+        if(req.body.gender_id !== undefined && req.body.gender_id !== null) person.gender_id = req.body.gender_id
+        if(req.body.email !== undefined && req.body.email !== null) person.email = req.body.email.trim()
+        if(req.body.img_url !== undefined && req.body.img_url !== null) person.img_url = req.body.img_url
+        if(req.body.birthday !== undefined && req.body.birthday !== null) person.birthday = req.body.birthday
         if(req.body.document_number !== undefined && req.body.document_number !== null)
-        	player.document_number = req.body.document_number.trim()
+        	person.document_number = req.body.document_number.trim()
         if(req.body.document_img_url !== undefined && req.body.document_img_url !== null)
-        	player.document_img_url = req.body.document_img_url.trim()
-        if(req.body.meta !== undefined && req.body.meta !== null) player.meta = req.body.meta.trim()
+        	person.document_img_url = req.body.document_img_url.trim()
+        if(req.body.meta !== undefined && req.body.meta !== null) person.meta = req.body.meta.trim()
 
         //Creamos el usuario a guardar
         user.username = req.body.email.trim()
@@ -1070,60 +1069,50 @@ define(['express'
         user.email    = req.body.email.trim()
         user.lang     =  "EN";
 
-        //Verificamos si ya existe un usuario con ese correo
+        //Verificamos si ya existe un usuario con ese correo sino se crea el usuario
         return Models.user.findOrCreate(user)
         .then(_user => {
         	user = _user.toJSON()
-        	//llamamos al findorcreate player (crea al player y su entidad)
-            	return Models.player.findOrCreate(player)
-
-            //Busco las relaciones con el usuario
-            return Models.entity_relationship
-				.query(qb => {
-					qb.where({ent_ref_from_id: _user.id
-							, relationship_type_id: 1})//1 es OWNER
-				})
-				.fetchAll({withRelated: ['to.object']})
+        	//llamamos al findorcreate person (crea al person y su entidad)
+            return Models.person.findOrCreate(person)
 		})
-		.then(_player => {
-			savePlayer = _player.toJSON()
-			//creo la relacion del player con el usuario
-			let playerUserEntRel = {}
-			playerUserEntRel.ent_ref_from_id = user.id
-			playerUserEntRel.ent_ref_to_id = savePlayer.id
-			playerUserEntRel.relationship_type_id = 1
-			playerUserEntRel.comment = "OWNER"
+		.then(_person => {
+			savePerson = _person.toJSON()
+			//creo la relacion de persona con el usuario
+			let personUserEntRel = {}
+			personUserEntRel.ent_ref_from_id = user.entity.id
+			personUserEntRel.ent_ref_to_id = savePerson.entity.id
+			personUserEntRel.relationship_type_id = 1
+			personUserEntRel.comment = "OWNER"
 			//Busco o creo la relacion entre el player y el usuario
-			return Models.entity_relationship.findOrCreate(playerUserEntRel)
+			return Models.entity_relationship.findOrCreate(personUserEntRel)
 		})
-		.then(_user_player_relationship => {
-			let tmp = _user_player_relationship.toJSON()
-
-            //Se crea el objeto de inscripcion del usuario a la competition unitario o categoria
+		.then(_user_person_relationship => {
+			let tmp = _user_person_relationship.toJSON()
+            //Se busca a ver si la persona ya esta registrada para la categoria
             return Models.category_group_phase_team
                 .query(qb => {
                     qb.where({category_id: category_id
-                            ,entity_id: savePlayer.entity.id
+                            ,entity_id: savePerson.entity.id
                         })
                 })
-                // .fetchAll({withRelated: ['entity']})
                 .fetch({withRelated: ['entity.object']})
-            // return Models.category_group_phase_team.findOrCreate(category_fase_group_team)
 		})
 		.then(cgptFind => {
 			if(cgptFind == null || cgptFind.length == 0)
 			{
+				//Se crea el objeto de inscripcion del usuario a la competition unitario o categoria
 				let category_fase_group_team = {}
             	category_fase_group_team.category_id = category_id
             	category_fase_group_team.status_id = 9
-            	category_fase_group_team.entity_id = savePlayer.entity.id
+            	category_fase_group_team.entity_id = savePerson.entity.id
             	return new Models.category_group_phase_team(category_fase_group_team).save()
             }
             else
             {
               let tmpdata = cgptFind.toJSON()
         			logger.debug(tmpdata)
-            	//Se devuelve un error indicando que ya existe un player registrado con el correo indicado
+            	//Se devuelve un error indicando que ya existe una persona registrada con el correo indicado
             	throw {
             		name: 'Custom'
             		,message: "A Player with the email " + tmpdata.entity.object.email + " has been already registered on this category"

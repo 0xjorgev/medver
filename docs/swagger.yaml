@@ -314,6 +314,30 @@ paths:
           description: Invalid Authorization-Token or no Authorization-Token received
         404:
           description: No user found
+  /user/{user_id}/organization:
+    get:
+      summary: Returns the organizations of a user
+      description: Returns the organizations of a user
+      tags:
+        - User
+      parameters:
+    #   - name: Authorization-Token
+    #     in: header
+    #     type: string
+    #     required: true
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        type: integer
+        format: integer
+      responses:
+        200:
+          description: User info
+        # 403:
+        #   description: Invalid Authorization-Token or no Authorization-Token received
+        204:
+          description: No user found
   /user/language/:
     put:
       summary: Updates the user prefered language
@@ -696,6 +720,24 @@ paths:
       responses:
         200:
           description: results
+      security: []
+
+  /season/{season_id}/standing_table:
+    get:
+      description: returns the standings of a given season
+      parameters:
+        - name: season_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Season
+        - Standing table
+      produces:
+      - application/json
+      responses:
+        200:
+          description: list of standing tables for this season
       security: []
   /category/{category_id}/match:
     get:

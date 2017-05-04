@@ -17,8 +17,7 @@ define(['../node_modules/lodash/lodash.min'
 
 	authHelper.checkPermissions = (options) => {
 
-		if(!options)
-			return false
+		if(!options) return false
 
 		//user que viene en el token
 		const user = options.user

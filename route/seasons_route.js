@@ -160,5 +160,12 @@ define(['express',
 			});
 		});
 
+		router.get('/:season_id/standing_table', (req, res) => {
+			Models.season.forge({id: req.params.season_id})
+			.fetch({withRelated: 'categories.phases.groups.standing_table'})
+			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error))
+		})
+
 		return router;
 	});

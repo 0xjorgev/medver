@@ -2,7 +2,6 @@ if (typeof define !== 'function')
     var define = require('amdefine')(module);
 
 define(['express'
-		// ,'uuid'
 		,'njwt'
 		,'../model/index'
 		,'../util/password_gen_util'
@@ -16,8 +15,7 @@ define(['express'
 		,'lodash'
 		,'fs'
 		],
-		function (express
-		// ,uuid
+		(express
 		,nJwt
 		,Models
 		,Pwd_gen
@@ -29,7 +27,7 @@ define(['express'
 		,logger
 		,auth
 		,_
-		,fs){
+		,fs) => {
 
 	let router = express.Router();
 	const send_email_from = Email(process.env.SENDER_EMAIL);
@@ -383,6 +381,37 @@ define(['express'
 			delete user.entity
 			Response(res, user)
 		})
+		.catch(error => Response(res, null, error))
+	})
+
+	router.get('/:user_id/organization', (req, res) => {
+		//se verifica unicamente que haya un usuario valido en el request
+		//no se requiere ningun permiso especial
+		const chk = auth.checkPermissions(req._currentUser, [])
+		if(chk.code !== 0){
+			Response(res, null, chk)
+			return
+		}
+
+		// copa tal -> equipo cual -> player -> pos, nick, etc
+		Models.user
+		.query(qb => qb.where({id: req._currentUser.id}))
+		.fetch({withRelated: [
+			 'entity.related_from.relationship_type'
+			,'entity.related_from.to'
+		]})
+		.then(result => {
+			var user = result.toJSON()
+			return user
+				.entity.related_from
+				.filter(rel => {
+					var name = (rel.relationship_type.name == undefined) ? '' : rel.relationship_type.name.toUpperCase()
+					return ['COACH', 'OWNER', 'PLAYER', 'MEMBER', 'ADMIN'].includes(name)
+				})
+				//y con este map se extraen los ids de los teams
+				.map(teams => teams.to.object_id)
+		})
+		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error))
 	})
 

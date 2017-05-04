@@ -725,6 +725,24 @@ paths:
         200:
           description: results
       security: []
+
+  /season/{season_id}/standing_table:
+    get:
+      description: returns the standings of a given season
+      parameters:
+        - name: season_id
+          in: path
+          required: true
+          type: integer
+      tags:
+        - Season
+        - Standing table
+      produces:
+      - application/json
+      responses:
+        200:
+          description: list of standing tables for this season
+      security: []
   /category/{category_id}/match:
     get:
       summary: Returns the matches associated to to this category

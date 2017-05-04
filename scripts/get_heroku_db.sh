@@ -6,7 +6,7 @@ else
 	if [ $1 = 'prod' ] ; then
 		herokuenv=''
 	else
-		herokuenv=`-$1`
+		herokuenv=-$1
 	fi
 fi
 

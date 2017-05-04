@@ -198,6 +198,17 @@ define(['express'
 
 	router.get('/team', (req, res) => {
 
+		// const permissionCheck = auth.checkPermissions({
+		// 	user: req._currentUser
+		// 	,object_type: 'competitions'
+		// 	,permissions: ['OWNER', 'ADMIN']
+		// })
+		//
+		// if (permissionCheck.code != 0){
+		// 	Response(res, null, permissionCheck)
+		// 	return
+		// }
+
 		const fields =  ' competitions.id as competition_id' +
 		' ,competitions.name as competition_name' +
 		' ,seasons.id as season_id' +

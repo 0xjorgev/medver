@@ -1,5 +1,5 @@
 if (typeof define !== 'function') {
-	var define = require('amdefine')(module);
+	var define = require('amdefine')(module)
 }
 //phpmyadmin
 //phpDBPwd*
@@ -20,8 +20,8 @@ define(['express'
 		,'../util/logger_util'
 		,'js-combinatorics'
 		,'../util/object_map_util'
-        ,'../util/password_gen_util'
-        ,'../util/md5_gen_util'
+		,'../util/password_gen_util'
+		,'../util/md5_gen_util'
 		]
 		,(express
 		,Models
@@ -39,45 +39,45 @@ define(['express'
 		,md5
 	) => {
 
-	var router = express.Router();
-	var send_email_from = Email(process.env.SENDER_EMAIL);
+	var router = express.Router()
+	// var send_email_from = Email(process.env.SENDER_EMAIL)
 
 	var mapper = function(phase) {
 		// console.log('Phase:', phase.attributes);
 		phase.relations.groups.models.map(groupMapper);
-		phaseDelete(phase.attributes.id);
+		phaseDelete(phase.attributes.id)
 	}
 
 	var groupMapper = function(group){
-		groupDelete(group);
+		groupDelete(group)
 	}
 
 	var groupDelete = function(group){
-		console.log('Group Delete');
+		console.log('Group Delete')
 		Knex(group.tableName)
 		.where({id:group.id})
 		.del().then(function(del_group){
-		console.log('del_group', del_group);
+		console.log('del_group', del_group)
 		}).catch(function(error){
-		console.log('del_group error:', error);
+		console.log('del_group error:', error)
 		})
 	}
 
 	var phaseDelete = function(phase){
-		console.log('Phase Delete');
-		//console.log('Phase id:', phase.attributes);
+		console.log('Phase Delete')
+		//console.log('Phase id:', phase.attributes)
 		Knex('phases')
 		.where({id:phase}, ['id'])
 		.del().then(function(del_phase){
-		console.log('del_phase', del_phase);
+		console.log('del_phase', del_phase)
 		}).catch(function(error){
-		console.log('del_phase error:', error);
+		console.log('del_phase error:', error)
 		})
 	}
 
 	//Teams by Category
 	router.get('/:category_id/team', (req, res) => {
-		var category_id = req.params.category_id;
+		var category_id = req.params.category_id
 		return Models.category_group_phase_team
 			.where({category_id:category_id, active:true})
 			.fetchAll({withRelated:['team.player_team'
@@ -87,21 +87,21 @@ define(['express'
 				,'status_type'
 				,'entity.object']})
 			.then(result => Response(res, result))
-			.catch(error => Response(res, null, error));
-	});
+			.catch(error => Response(res, null, error))
+	})
 
 	//Feed by Category
 	//FIXME: restringir x categoria
 	router.get('/:category_id/feed', (req, res) => {
-		var category_id = req.params.category_id;
+		var category_id = req.params.category_id
 		return Models.feed_item.query( qb => {
 			qb.limit(10)
 			qb.orderBy('id', 'desc')
 		})
 		.fetchAll({withRelated:['entity.object']})
 		.then(result => Response(res, []))
-		.catch(error => Response(res, null, error));
-	});
+		.catch(error => Response(res, null, error))
+	})
 
 	//List of seasons (doesn't seems to be needed) -> Returns Array of result
 	router.get('/', function (req, res) {
@@ -147,7 +147,7 @@ define(['express'
 		var category_id = req.params.category_id;
 		var category_upd = req.body;
 
-		console.log('Req body', category_upd);
+		logger.debug(category_upd)
 
 		var data = {}
 

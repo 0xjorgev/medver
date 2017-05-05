@@ -162,8 +162,34 @@ define(['express',
 
 		router.get('/:season_id/standing_table', (req, res) => {
 			Models.season.forge({id: req.params.season_id})
-			.fetch({withRelated: 'categories.phases.groups.standing_table'})
+			.fetch({withRelated: 'categories.phases.groups.standing_table.team'})
 			.then(result => Response(res, result))
+			.catch(error => Response(res, null, error))
+		})
+
+		router.get('/:season_id/match', (req, res) => {
+			Models.season
+			.query(qb => {
+				qb.select(['id','name'])
+				qb.where({id: req.params.season_id})
+			})
+			.fetch({withRelated:
+				[
+				{'categories': function(qb){
+					qb.where({active: true})
+				}}
+				,{'categories.phases': function(qb){
+					qb.where({active: true})
+				}}
+				,{'categories.phases.groups': function(qb){
+					qb.where({active: true})
+				}}
+				,{'categories.phases.groups.matches': function(qb){ qb.where({active: true}) }}
+				,'categories.phases.groups.matches.home_team'
+				,'categories.phases.groups.matches.visitor_team'
+				,'categories.phases.groups.matches.referee.user'
+			]})
+			.then(result => Response(res, result) )
 			.catch(error => Response(res, null, error))
 		})
 

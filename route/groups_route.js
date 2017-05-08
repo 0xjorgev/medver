@@ -116,6 +116,15 @@ define(['express',
 			.catch( error => Response(res, null, error) );
 	})
 
+	router.post('/:group_id/match', (req, res) => {
+
+		Models.group.forge({id: req.params.group_id})
+		.fetch()
+		.then(group => group.createMatches())
+		.then(result => Response(res, result))
+
+	})
+
 	router.post('/:group_id/standing_table', function(req, res){
 		var group_id = req.params.group_id
 		StandingTable.calculateByGroup(group_id)

@@ -1,13 +1,7 @@
 if (typeof define !== 'function') {
 	var define = require('amdefine')(module)
 }
-//phpmyadmin
-//phpDBPwd*
-//root
-//DbPwd2017*
-//fc Wordpress
-//root_fc
-//rpEeD8!5&qmK4F6p@X
+
 define(['express'
 		,'../model/index'
 		,'../util/request_message_util'
@@ -395,11 +389,14 @@ define(['express'
 			.then(result => {
 				return result.map(group => {
 					//por cada grupo, voy a generar los partidos posibles
-					var matches = Combinatorics.combination(group, 2)
+					const matches = Combinatorics.combination(group, 2)
 					let match = null
+					let matchNumber = 0
 					while(match = matches.next()){
+						matchNumber += 1
 						new Models.match({
-							group_id: match[0].group_id
+							number: matchNumber
+							,group_id: match[0].group_id
 							,placeholder_home_team_group: match[0].group_id
 							,placeholder_home_team_position: match[0].position
 							,placeholder_visitor_team_group: match[1].group_id

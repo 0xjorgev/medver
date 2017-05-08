@@ -3422,7 +3422,7 @@ definitions:
     title: Person Creation/Update Request
     type: object
     properties:
-      name:
+      first_name:
         type: string
       last_name:
         type: string

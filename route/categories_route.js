@@ -80,7 +80,8 @@ define(['express'
 		var category_id = req.params.category_id
 		return Models.category_group_phase_team
 			.where({category_id:category_id, active:true})
-			.fetchAll({withRelated:['team.player_team'
+			.fetchAll({withRelated:['team.player.person.gender'
+				,'team.player.position'
 				,'category'
 				,'group'
 				,'phase'
@@ -757,13 +758,11 @@ define(['express'
 		var category_id = req.params.category_id;
 		var team_id = req.params.team_id;
 
-		return Models.category_team_player
+		return Models.category_summoned
 			.where({category_id:category_id, team_id:team_id, active: true})
 			.fetchAll({withRelated: [
-				{'player.player_team': function(qb){
-					qb.where('team_id', team_id)
-				}}
-				,'player.player_team.position'
+				'player.person.gender'
+				,'player.position'
 			]})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
@@ -777,9 +776,9 @@ define(['express'
 		var category_id = req.params.category_id;
 		var team_id = req.params.team_id;
 
-		return Models.category_team_player
+		return Models.category_summoned
 			.where({category_id: category_id, active: true})
-			.fetchAll({withRelated:['player']})
+			.fetchAll({withRelated:['player.person.gender', 'player.position']})
 			.then(result => Response(res, result) )
 			.catch(error => Response(res, null, error) )
 	});
@@ -792,7 +791,7 @@ define(['express'
 		var team_id = req.params.team_id;
 		var player_id = req.params.player_id;
 
-		return Models.category_team_player
+		return Models.category_summoned
 			.where({
 				category_id:category_id
 				,team_id:team_id
@@ -852,7 +851,7 @@ define(['express'
 			summonedData.id = data.body.id
 		}
 
-		return new Models.category_team_player(summonedData)
+		return new Models.category_summoned(summonedData)
 			.save()
 			.then(summoned => Response(res, summoned) )
 			.catch(error => Response(res, null, error) )

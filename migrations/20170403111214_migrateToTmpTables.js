@@ -40,6 +40,7 @@ exports.up = function(knex, Promise) {
 				table.boolean('active').notNullable().defaultTo(true)
 				//Fixed related data
 				table.integer('number')
+				table.string('img_url')
 				table.date('registered_at')
 				table.date('unregistered_at')
 				table.integer('player_id')

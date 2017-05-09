@@ -17,9 +17,9 @@ define(['./base_model'
 		,subdiscipline: function(){
             return this.belongsTo('Subdiscipline', 'subdiscipline_id');
         }
-		// ,gender: function(){
-  //           return this.belongsTo('Gender', 'gender_id');
-  //       }
+		,gender: function(){
+            return this.belongsTo('Gender', 'gender_id');
+        }
 		,organization: function(){
             return this.belongsTo('Organization', 'organization_id');
         }

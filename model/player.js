@@ -15,9 +15,9 @@ define(['./base_model','./entity','./gender', './player_team', './event_match_pl
 			})
 		}
 		//relations
-		,gender: function(){
-			return this.belongsTo('Gender', 'gender_id');
-		}
+		// ,gender: function(){
+		// 	return this.belongsTo('Gender', 'gender_id');
+		// }
 		// ,player_team: function(){
 		// 	return this.hasMany('Player_team');
 		// }
@@ -36,7 +36,7 @@ define(['./base_model','./entity','./gender', './player_team', './event_match_pl
 		,position : function(){
 			return this.belongsTo('Position', 'position_id');
 		}
-		, team: function(){
+		,team: function(){
 			return this.belongsTo('Team', 'team_id');
 		}
 		,createEntity: function(){

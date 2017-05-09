@@ -72,8 +72,10 @@ define(['express'
  				qb.where('matches.id',  match_id)
 				qb.where('category_summoned.active',  true)
 			}}
-			,'home_team.summoned.player'
-			,'visitor_team.summoned.player'
+			,'home_team.summoned.player.person.gender'
+			,'home_team.summoned.player.position'
+			,'visitor_team.summoned.player.person.gender'
+			,'visitor_team.summoned.player.position'
 			,'group'
 			,'events.event'
 			,'events.team'
@@ -90,8 +92,10 @@ define(['express'
 		return Models.match
 		.where({'id': match_id})
 		.fetch({withRelated: [
-			'home_team.match_player.player.player.position'
-			,'visitor_team.match_player.player.player.position'
+			'home_team.match_player.player.position'
+			,'home_team.match_player.player.person.gender'
+			,'visitor_team.match_player.player.position'
+			,'visitor_team.match_player.player.person.gender'
 			,'events.event'
 			,'events.player_in'
 			,'events.player_out'
@@ -115,10 +119,8 @@ define(['express'
 			{ 'visitor_team.match_player': function(qb) {
 				qb.where('match_id',  match_id)
 			}},
-			'round.group.phase.category.category_type',
-			'round.group.phase.category.season.competition',
-			'home_team.summoned.player.gender',
-			'home_team.summoned.player.player.position',
+			// 'round.group.phase.category.category_type',
+			// 'round.group.phase.category.season.competition',
 			{ 'home_team.summoned': function(qb) {
 				qb.innerJoin('matches', 'category_summoned.team_id', 'matches.home_team_id')
 				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
@@ -126,8 +128,10 @@ define(['express'
 				qb.where(Knex.raw('category_summoned.category_id = phases.category_id'))
 				qb.where('matches.id',  match_id)
 			}},
-			'visitor_team.summoned.player.gender',
-			'visitor_team.summoned.player.player.position',
+			'home_team.summoned.player.person.gender',
+			'home_team.summoned.player.position',
+			'visitor_team.summoned.player.person.gender',
+			'visitor_team.summoned.player.position',
 			{ 'visitor_team.summoned': function(qb) {
 				qb.innerJoin('matches', 'category_summoned.team_id', 'matches.visitor_team_id')
 				qb.innerJoin('groups', 'matches.group_id', 'groups.id')
@@ -148,8 +152,7 @@ define(['express'
 
         var data = {
             match_id: req.params.match_id,
-            team_id: req.params.team_id,
-            player_id: req.params.player_id
+            team_id: req.params.team_id
         }
 
         console.log('GET /:match_id/team/:team_id/player', data)

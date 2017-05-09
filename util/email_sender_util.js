@@ -50,8 +50,9 @@ define(['sendgrid', './logger_util'], function (Email, logger) {
 		return (email, subject, content) => {
 			const headers = `From: ${sender}, To: ${email}, Subject: ${subject}`
 			logger.lme.sline()
-			logger.lme.i(`Dummy email sent: ${headers}`)
-			logger.lme.d(content)
+			//descomentar si se quiere revisar el email enviado
+			// logger.lme.i(`Dummy email sent: ${headers}`)
+			// logger.lme.d(content)
 			logger.lme.i(`Dummy email sent: ${headers}`)
 			logger.lme.sline()
 		}

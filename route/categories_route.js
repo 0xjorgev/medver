@@ -594,7 +594,7 @@ define(['express'
 			})
 			.catch(function(err){
 				console.log("Error request: ", err)
-				return err
+				throw err
 			})
 	}
 
@@ -622,7 +622,6 @@ define(['express'
 
 	const send_status_email = function(data){
 		// console.log("Status Email ", data.template)
-		console.log("TORNEO_KEY: ", data.category.relations.season.relations.competition.attributes.name);
 		var tag = {
 			COACH_KEY: data.user.attributes.username
 			,TEAM_KEY: data.team.attributes.name
@@ -685,7 +684,6 @@ define(['express'
 	const team_owner_email = (data) => {
 		//Buscar Id entidad Team_id
 		//entity_relationship -> to (id_entidad_equipo) -> relationship_Type 1 (Owner)
-		//FIXME: desanidar los promises
 		return Models.entity
 			.where({object_id:data.team_id, active:true, object_type:'teams'})
 			.fetch()
@@ -693,25 +691,19 @@ define(['express'
 				return Models.entity_relationship
 				.where({ent_ref_to_id:result.attributes.id, relationship_type_id:1, active:true})
 				.fetch({withRelated:['from', 'to']})
-				.then(function(innerResult){
-					return Models.user
-					.where({id:innerResult.relations.from.attributes.object_id})
-					.fetch()
-					.then(function(user_result){
-						data.user = user_result
-						return team_data(data)
-					})
-					.catch(function(user_error){
-						return user_error
-					})
-				})
-				.catch(function(InnerError){
-					return InnerError
-				})
+			})
+			.then(function(innerResult){
+				return Models.user
+				.where({id:innerResult.relations.from.attributes.object_id})
+				.fetch()
+			})
+			.then(function(user_result){
+				data.user = user_result
+				return team_data(data)
 			})
 			.catch(function(error){
 				return error
-			});
+			})
 	}
 
 	//==========================================================================
@@ -725,8 +717,8 @@ define(['express'
 				data.team = result
 				return competition_data(data)
 			})
-			.catch((error) => {
-				return {}
+			.catch(error => {
+				throw error
 			})
 	}
 
@@ -742,8 +734,8 @@ define(['express'
 				data.imageUrl = result.relations.season.relations.competition.attributes.img_url
 				return send_status_email(data)
 			})
-			.catch((error) => {
-				return {}
+			.catch(error => {
+				throw error
 			})
 	}
 

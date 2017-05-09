@@ -120,8 +120,9 @@ define(['express',
 		Models.group
 		.forge({id: req.params.group_id})
 		.fetch()
-		.then(group => group.createMatches())
+		.then(group => (group == null) ? null : group.createMatches() )
 		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	})
 
 	router.post('/:group_id/standing_table', function(req, res){

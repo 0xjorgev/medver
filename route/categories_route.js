@@ -531,6 +531,7 @@ define(['express'
 		if(data.payment != undefined) spiderData.payment = data.payment
 		if(data.document != undefined) spiderData.document = data.document
 		if(data.roster != undefined) spiderData.roster = data.roster
+		if(data.position_in_group != undefined) spiderData.position_in_group = data.position_in_group
 		return spiderData
 	}
 

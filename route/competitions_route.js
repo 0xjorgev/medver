@@ -383,7 +383,11 @@ define(['express'
 		var comp_id = req.params.competition_id;
 		return Models.competition
 			.where({'id': comp_id })
-			.fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'competition_user.users']} )
+			.fetch( {withRelated: ['discipline'
+			,'subdiscipline'
+			,'competition_type'
+			,'seasons.categories'
+			,'competition_user.users']} )
 			.then(result => Response(res, result) )
 			.catch(error => Response(res, null, error) )
 	});

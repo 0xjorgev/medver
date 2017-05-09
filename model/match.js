@@ -46,7 +46,7 @@ define(['./base_model'
 				const entity = new DB._models.Entity({
 					object_type: 'matches'
 					,object_id: this.id })
-				entity.save()
+				return entity.save()
 			}, this)
 
 			this.on('fetched', () => {

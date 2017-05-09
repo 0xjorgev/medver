@@ -1,6 +1,3 @@
-/**
-* Created by george on 08/03/16.
-*/
 if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
@@ -170,7 +167,7 @@ define(['express',
 		router.get('/:season_id/match', (req, res) => {
 			Models.season
 			.query(qb => {
-				qb.select(['id','name'])
+				// qb.select(['id','name'])
 				qb.where({id: req.params.season_id})
 			})
 			.fetch({withRelated:

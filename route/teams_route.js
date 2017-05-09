@@ -38,18 +38,19 @@ define(['express'
 			queryData['subdiscipline_id'] = req.query.subdiscipline_id
 
 		return Models.team
-		.query(function(qb){
-			qb.where(queryData)
-		})
-		.where({active:true})
-		.fetchAll({withRelated: ['category_type'
-			,'organization'
-			,'subdiscipline'
-			,'player.person'
-			,'player.person.gender'
-			,'player.position'
-			,'entity'
-			,'club']})
+			.query(function(qb){
+				qb.where(queryData)
+			})
+			.where({active:true})
+			.fetchAll({withRelated: ['category_type'
+				,'organization'
+				,'subdiscipline'
+				,'player.person'
+				,'player.person.gender'
+				,'player.position'
+				,'entity'
+				,'club']})
+		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	});
 

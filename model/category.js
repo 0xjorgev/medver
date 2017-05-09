@@ -40,7 +40,32 @@ define(['./base_model','./gender','./season', './phase', './classification', './
 		,participants: function(){
 			return this.hasMany('Category_group_phase_team', 'category_id');
 		}
-	})
+        
+        ,entity : function(){
+          return this.morphOne('Entity', 'object');
+        }
+	},
+    {
+        createCategory: function(_c){
+            let category = {}
+            let newCategory = {}
+
+            return new DB._models.Category(_c).save()
+            .then(result => {
+                newCategory = result.toJSON()
+                //Se crea un objeto entidad
+                let entity = {}
+                entity.object_id = newCategory.id
+                entity.object_type = 'categories'
+                return DB._models.Entity.findOrCreate(entity)
+            })
+            .then(_result => {
+                return DB._models.Category
+                    .where({id: newCategory.id})
+                    .fetch({withRelated: ['entity']})
+            })
+        }
+    })
 
     // uses Registry plugin
     return DB.model('Category', Category);

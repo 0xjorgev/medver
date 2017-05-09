@@ -157,9 +157,13 @@ define(['express'
 
         console.log('GET /:match_id/team/:team_id/player', data)
 
-        return Models.match_team_player
+        return Models.match_player
             .where({match_id: data.match_id, team_id: data.team_id})
-            .fetchAll()
+            .fetchAll({withRelated: [
+            		'team'
+		            ,'player.person.gender'
+		            ,'player.position'
+		        	]})
             .then((result) => {
                 Response(res, result)
             })
@@ -185,7 +189,7 @@ define(['express'
 
         console.log('PUT /:match_id/team/:team_id/player/', data)
 
-        return new Models.match_team_player(data).save()
+        return new Models.match_player(data).save()
             .then( (result) => {
                 Response(res, result)
             })
@@ -219,7 +223,7 @@ define(['express'
 		})
 
 		return Promise.all(initial_player.map(ip => {
-			return new Models.match_team_player(ip)
+			return new Models.match_player(ip)
 			.save()
 			// .then(createFeedItemFromEvent)
 		}))
@@ -336,8 +340,8 @@ define(['express'
 		.fetchAll({withRelated: ['match_id'
 			,'event_id'
 			,'event'
-			,'player_in.player'
-			,'player_out.player'
+			,'player_in.person.gender'
+			,'player_out.person.gender'
 			,'team']
 			, debug: false})
 		.then(result => Response(res, result))

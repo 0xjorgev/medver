@@ -3278,12 +3278,54 @@ definitions:
     properties:
       name:
         type: string
-      is_published:
-        type: boolean
+        required: true
       active:
         type: boolean
-      number:
+      image_url:
+        type: string 
+      inscription_init_at:
+        type: string 
+        description: Ex. 2001-02-12T00:00:00-04:00
+      inscription_ends_at:
+        type: string
+        description: Ex. 2001-02-12T00:00:00-04:00
+      other_minimum_participant:
         type: integer
+      other_maximum_participant:
+        type: integer
+      player_minimum_participant:
+        type: integer
+      player_maximum_participant:
+        type: integer
+      coach_minimum_participant:
+        type: integer
+      coach_maximum_participant:
+        type: integer
+      team_quantity:
+        type: integer
+      participant_minimum:
+        type: integer
+      participant_maximum:
+        type: integer
+      gender_id:
+        type: integer
+      season_id:
+        type: integer
+        required: true
+      category_type_id:
+        type: integer
+        required: true
+      classification_type_id:
+        type: integer
+        required: true
+      is_published:
+        type: boolean
+      player_minimum_summoned:
+        type: integer
+      player_maximum_summoned:
+        type: integer
+      meta:
+        type: string
   MatchEvents:
     title: MatchEvents
     type: array

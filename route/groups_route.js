@@ -7,12 +7,14 @@ define(['express',
 		'../util/response_message_util',
 		'../util/knex_util',
 		'../util/logger_util',
+		'../helpers/team_placeholders_helper',
 		'../helpers/standing_table_helper'],
 		 (express,
 			Models,
 			Response,
 			Knex,
 			logger,
+			MatchPlaceholder,
 			StandingTable) => {
 
 	let router = express.Router()
@@ -122,6 +124,18 @@ define(['express',
 		.fetch()
 		.then(group => (group == null) ? null : group.createMatches() )
 		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
+
+	router.post('/:group_id/match_placeholder', (req, res) => {
+		Models.group.forge({id: 27})
+		.fetch({withRelated: 'category_group_phase_team'})
+		.then(group => {
+			return group.category_group_phase_team().map(participant => {
+				group.updateMatchPlaceholders(participant.team_id, participant.position)
+			})
+		})
+		.then(result => Response(res, 'update complete'))
 		.catch(error => Response(res, null, error))
 	})
 

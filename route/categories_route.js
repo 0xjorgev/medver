@@ -445,8 +445,7 @@ define(['express'
 		var teamId = req.params.team_id
 
 		return Models.match.query(function(qb){
-				qb.innerJoin('rounds', 'rounds.id', 'matches.round_id')
-				qb.innerJoin('groups', 'groups.id', 'rounds.group_id')
+				qb.innerJoin('groups', 'groups.id', 'matches.group_id')
 				qb.innerJoin('phases', 'phases.id', 'groups.phase_id')
 				qb.innerJoin('categories', 'categories.id', 'phases.category_id')
 				qb.where('categories.id', '=', categoryId)
@@ -454,18 +453,12 @@ define(['express'
 				qb.where('matches.home_team_id', '=', teamId)
 				qb.orWhere('matches.visitor_team_id', '=', teamId)
 			})
-			.fetchAll({withRelated:['round',
-				'round.group',
-				'round.group.phase',
-				'round.group.phase.category',
+			.fetchAll({withRelated:[
+				'group.phase.category',
 				'home_team',
 				'visitor_team']})
-			.then(function(result){
-				Response(res, result)
-			})
-			.catch(function(err){
-				Response(res, null, err)
-			})
+			.then(result => Response(res, result))
+			.catch(err => Response(res, null, err))
 	})
 
 	//==========================================================================

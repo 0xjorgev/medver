@@ -99,30 +99,37 @@ define(['./base_model'
 				const homeTeamId = this.attributes.home_team_id
 				const visitorTeamId = this.attributes.visitor_team_id
 
-				//se extraen los eventos pertenecientes a los goles
-				const score = this.relations.events.toJSON()
-				//TODO: reemplazar los codigos por los ids
-				.filter(e => e.event.code == '#GOL' || e.event.code == '#AGOL')
-				.reduce((score,goal) => {
-					if(goal.event.code == '#GOL'){
-						if(goal.team_id == homeTeamId)
-						score.home_team_score += 1
-						else
-						score.visitor_team_score += 1
-					}
-					else{
-						if(goal.team_id == homeTeamId)
-						score.visitor_team_score += 1
-						else
-						score.home_team_score += 1
-					}
-					return score
-				}, {home_team_score: 0, visitor_team_score: 0})
+				//si no se ha jugado el partido, no se hace nada 
+				if(!this.played) return
 
-				this.attributes.home_team_score = score.home_team_score
-				this.attributes.visitor_team_score = score.visitor_team_score
-				//se salva el score recien calculado
-				return this.save()
+				return this.load('events.event')
+				.then(match => {
+					let matchEvents = match.related('events').toJSON()
+					//se extraen los eventos pertenecientes a los goles y autogoles
+					const score = matchEvents
+					// .filter(e => e.event.code == '#GOL' || e.event.code == '#AGOL')
+					//gol y autogol
+					.filter(e => e.event_id == 1 || e.event_id == 4)
+					.reduce((score,goal) => {
+						if(goal.event_id == 1){
+							if(goal.team_id == homeTeamId) score.home_team_score += goal.event.increments_by
+							else score.visitor_team_score += goal.event.increments_by
+						}
+						else{
+							if(goal.team_id == homeTeamId) score.visitor_team_score += goal.event.increments_by
+							else score.home_team_score += goal.event.increments_by
+						}
+						return score
+					}, {home_team_score: 0, visitor_team_score: 0})
+
+					this.attributes.home_team_score = score.home_team_score
+					this.attributes.visitor_team_score = score.visitor_team_score
+					//se salva el score recien calculado
+					return this.save()
+				})
+				.catch(e => {
+					throw e
+				})
 			}
 		}
 		,{

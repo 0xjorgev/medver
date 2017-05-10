@@ -5,10 +5,12 @@ if (typeof define !== 'function') {
 define(['../util/knex_util'
 	,'../node_modules/lodash/lodash.min'
 	,'../model/index'
+	,'../util/logger_util'
 	,'../util/response_message_util'],
 	(Knex
 	,_
 	,Models
+	,logger
 	,Response
 	) => {
 		let StandingTable = {}
@@ -187,9 +189,17 @@ define(['../util/knex_util'
 			let matches = null
 			let standingTable = null
 
-			// se obtienen los matches que pertenecen a la categoria o grupo
-			// la diferencia viene del query 'matchSql'; es ahi donde se diferencia si buscamos los matches de una cat o group
-			Knex.raw(matchSql)
+			//TODO: el calculo de los score podria eliminarse una vez que el sistema este estable. Se recalcula para asegurar que los standings estan acordes a los eventos tipo gol.
+			return Models.match.where({group_id: groupId})
+			.fetchAll()
+			.then(matches => {
+				return matches.map(m => {
+					return m.updateScore()
+				})
+			})
+			.then(updatedMatches => {
+				return Knex.raw(matchSql)
+			})
 			.then(result => {
 				//Se extraen los matches de la estructura y se almacenan en matches para uso posterior
 				matches = result.rows
@@ -313,7 +323,7 @@ define(['../util/knex_util'
 		*/
 		StandingTable.getStandingTableByGroup = (groupId, res) => {
 			Models.standing_table
-			.query((qb) => {
+			.query(qb => {
 				qb.where({category_id: groupId})
 				.groupBy(['team_id', 'category_id', 'phase_id', 'group_id'])
 				.select(['team_id', 'category_id', 'phase_id', 'group_id'])
@@ -336,8 +346,8 @@ define(['../util/knex_util'
 			return new Promise((resolve, reject) => {
 				try{
 					//query que obtiene los matches del grupo dado
-					var matchSql = 'select categories.id as category_id, phases.id as phase_id,  groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches' +
-					' inner join groups on groups.id = rounds.group_id ' +
+					var matchSql = 'select categories.id as category_id, phases.id as phase_id, groups.id as group_id, matches.id as match_id, matches.home_team_id as home_team_id , matches.visitor_team_id as visitor_team_id from matches' +
+					' inner join groups on groups.id = matches.group_id ' +
 					' inner join phases on phases.id = groups.phase_id ' +
 					' inner join categories on categories.id = phases.category_id ' +
 					' where matches.played = true and groups.id = ' + group_id

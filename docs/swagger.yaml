@@ -1912,7 +1912,7 @@ paths:
         required: true
         x-is-map: false
         schema:
-          $ref: '#/definitions/CreateTeamRequest'
+          $ref: '#/definitions/TeamRequest'
       responses:
         200:
           description: team creation OK
@@ -1956,7 +1956,7 @@ paths:
           required: true
           x-is-map: false
           schema:
-            $ref: '#/definitions/CreateTeamRequest'
+            $ref: '#/definitions/TeamRequest'
       tags:
         - Team
       responses:
@@ -3107,7 +3107,7 @@ definitions:
         type: integer
     required:
     - player_id
-  CreateTeamRequest:
+  TeamRequest:
     title: Team Creation/Update Request
     type: object
     properties:
@@ -3131,6 +3131,14 @@ definitions:
       subdiscipline_id:
         type: integer
         description: Sport associated with this team
+      meta:
+        type: string
+      club_id:
+        type: integer
+        description: Club associated with this team
+      active:
+        type: boolean
+        description: 
     required:
       - name
       - category_type_id
@@ -3151,7 +3159,7 @@ definitions:
     type: object
     properties:
       player:
-        $ref: '#/definitions/CreateTeamRequest'
+        $ref: '#/definitions/TeamRequest'
       team:
         $ref: '#/definitions/CreateGroupRequest'
 

@@ -50,23 +50,12 @@ define(['./base_model'
     },{
         //metodos
         //saveTeam un team y sus relaciones con un usuario
-        saveTeam: function(_team){
-            var teamData = {}
-            if (_team.name != undefined) teamData.name = _team.name.trim()
-            if (_team.logo_url != undefined) teamData.logo_url = _team.logo_url
-            if (_team.portrait_url != undefined) teamData.portrait_url = _team.portrait_url
-            if (_team.category_type_id != undefined) teamData.category_type_id = _team.category_type_id
-            if (_team.subdiscipline_id != undefined) teamData.subdiscipline_id = _team.subdiscipline_id
-            if (_team.gender_id != undefined) teamData.gender_id = _team.gender_id
-            if (_team.meta != undefined) teamData.meta = _team.meta
-            if (_team.short_name != undefined) teamData.short_name = _team.short_name
-            if (_team.description != undefined) teamData.description = _team.description
-            if (_team.club_id != undefined) teamData.club_id = _team.club_id
-            if (_team.id != undefined) teamData.id = _team.id
-
+        saveTeam: function(_team, _currentUser){
+            let teamData = _team
+            let user = _currentUser
             //para asociar las entidades
-            var teamEntity = null
-            var userEntity = null
+            let teamEntity = null
+            let userEntity = null
 			let savedTeam = null
 
             return new DB._models.Team(teamData).save()
@@ -78,13 +67,13 @@ define(['./base_model'
                 .query(qb => {
                     qb.where({object_id: result.attributes.id,
                         object_type: 'teams' })
-                    qb.orWhere({object_id: _team._currentUser.id})
+                    qb.orWhere({object_id: user.id})
                     qb.where({object_type: 'users'})
                 })
                 .fetchAll()
             })
             .then(result => {
-                var tmp = result.toJSON()
+                let tmp = result.toJSON()
                 teamEntity = tmp.filter(e => e.object_type == 'teams')
                 userEntity = tmp.filter(e => e.object_type == 'users')
                 //la entidad usuario *debe* estar creada para este punto,

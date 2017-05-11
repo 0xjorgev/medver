@@ -264,7 +264,7 @@ define(['express'
 		' inner join competitions on competitions.id = seasons.competition_id' +
 		' inner join entities on categories_groups_phases_teams.entity_id = entities.id' +
 		' left join players on entities.object_id = players.id and entities.object_type = \'players\'' +
-		' inner join persons on persons.id = players.person_id' +
+		//' inner join persons on persons.id = players.person_id' +
 		' left join teams on entities.object_id = teams.id and entities.object_type = \'teams\'' +
 		' left join (select category_id, team_id, count(*) as player_count from category_summoned group by 1,2)' +
 		' player_count on player_count.team_id = teams.id and player_count.category_id = categories.id'

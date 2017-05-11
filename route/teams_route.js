@@ -74,7 +74,7 @@ define(['express'
 	router.get('/:team_id', function (req, res) {
 		var team_id = req.params.team_id;
 		return Models.team
-		.where({id:team_id, active:true})
+		.where({id:team_id})
 		.fetch({withRelated: ['category_type'
 			,'organization'
 			,'player.person'
@@ -88,24 +88,6 @@ define(['express'
 
 	});
 
-	// router.get('/:team_id/player/:player_id', function (req, res) {
-	// 	var team_id = req.params.team_id;
-	// 	var player_id = req.params.player_id;
-
-	// 	return Models.player
-	// 	.where({team_id:team_id})
-	// 	.where({player_id:player_id})
-	// 	.where({active:true})
-	// 	.fetch({withRelated: ['player', 'player.position'], debug: false})
-	// 	.then(function (result) {
-	// 		//calculo la edad de cada jugador
-	// 		//var players = result.map(s)
-	// 		Response(res, result)
-	// 	})
-	// 	.catch(function(error){
-	// 		Response(res, null, error)
-	// 	});
-	// });
 	//TODO: Esto parece no estar en uso, deberia arrojar error al probar
 	router.post('/organization/:org_id/category/:cat_id', function (req, res) {
 
@@ -137,13 +119,15 @@ define(['express'
 
 		if (data.name != undefined) teamData.name = data.name.trim()
 		if (data.logo_url != undefined) teamData.logo_url = data.logo_url
-		if (data.portrait_url != undefined) teamData.portrait_url = data.portrait_url
-		if (data.category_type_id != undefined) teamData.category_type_id = data.category_type_id
-		if (data.subdiscipline_id != undefined) teamData.subdiscipline_id = data.subdiscipline_id
-		if (data.gender_id != undefined) teamData.gender_id = data.gender_id
-		if (data.meta != undefined) teamData.meta = data.meta
 		if (data.short_name != undefined) teamData.short_name = data.short_name
 		if (data.description != undefined) teamData.description = data.description
+		if (data.category_type_id != undefined) teamData.category_type_id = data.category_type_id
+		if (data.organization_id != undefined) teamData.organization_id = data.organization_id
+		if (data.subdiscipline_id != undefined) teamData.subdiscipline_id = data.subdiscipline_id
+		if (data.gender_id != undefined) teamData.gender_id = data.gender_id
+		if (data.active != undefined) teamData.active = data.active
+		if (data.meta != undefined) teamData.meta = data.meta
+		if (data.portrait_url != undefined) teamData.portrait_url = data.portrait_url
 		if (data.club_id != undefined) teamData.club_id = data.club_id
 		if (data.id != undefined) teamData.id = data.id
 
@@ -180,8 +164,7 @@ define(['express'
 			// logger.debug(club)
 			clubData.id  = club.attributes.id
 			teamData.club_id = clubData.id
-			teamData._currentUser = data._currentUser
-			return Models.team.saveTeam(teamData)
+			return Models.team.saveTeam(teamData, data._currentUser)
 		})
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))

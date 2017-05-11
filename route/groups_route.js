@@ -7,12 +7,14 @@ define(['express',
 		'../util/response_message_util',
 		'../util/knex_util',
 		'../util/logger_util',
+		'../helpers/team_placeholders_helper',
 		'../helpers/standing_table_helper'],
 		 (express,
 			Models,
 			Response,
 			Knex,
 			logger,
+			MatchPlaceholder,
 			StandingTable) => {
 
 	let router = express.Router()
@@ -125,10 +127,25 @@ define(['express',
 		.catch(error => Response(res, null, error))
 	})
 
+	router.post('/:group_id/match_placeholder', (req, res) => {
+		Models.group.forge({id: 27})
+		.fetch({withRelated: 'category_group_phase_team'})
+		.then(group => {
+			return group.category_group_phase_team().map(participant => {
+				group.updateMatchPlaceholders(participant.team_id, participant.position)
+			})
+		})
+		.then(result => Response(res, 'update complete'))
+		.catch(error => Response(res, null, error))
+	})
+
 	router.post('/:group_id/standing_table', function(req, res){
 		var group_id = req.params.group_id
 		StandingTable.calculateByGroup(group_id)
-		StandingTable.getStandingTableByGroup(group_id, res)
+		.then(result => {
+			return StandingTable.getStandingTableByGroup(group_id, res)
+		})
+		.catch(e => Response(res, null, e))
 	})
 
 	const buildGroupData = data => {

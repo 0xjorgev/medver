@@ -159,7 +159,10 @@ define(['express',
 
 		router.get('/:season_id/standing_table', (req, res) => {
 			Models.season.forge({id: req.params.season_id})
-			.fetch({withRelated: 'categories.phases.groups.standing_table.team'})
+			.fetch({withRelated: [
+        'categories.phases.groups.standing_table.team'
+        ,'categories.category_type'
+      ]})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error))
 		})

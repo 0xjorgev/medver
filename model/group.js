@@ -61,7 +61,7 @@ define(['./base_model'
 				)
 			})
 		}
-		,updateMatchPlaceholders: function(teamId, position){
+		,updateMatchPlaceholders: function(){
 
 			const template = 'update matches set $TEAM_team_id = team_id '
 			+ ' from categories_groups_phases_teams '
@@ -71,48 +71,12 @@ define(['./base_model'
 
 			const homeQuery = template.replace(/\$TEAM/g, 'home')
 			const awayQuery = template.replace(/\$TEAM/g, 'visitor')
-			
+
 			return Knex.raw(homeQuery, [this.id])
 			.then(() => Knex.raw(awayQuery, [this.id]))
 			.catch(e => {
 				throw e
 			})
-
-			// update matches set visitor_team_id = team_id
-			// from categories_groups_phases_teams
-			// where matches.group_id = 104
-			// and categories_groups_phases_teams.group_id = matches.placeholder_visitor_team_group
-			// and categories_groups_phases_teams.position_in_group = matches.placeholder_visitor_team_position
-			//
-			//
-			// return DB._models.Match
-			// .where({placeholder_home_team_group: this.id
-			// 	,placeholder_home_team_position: position})
-			// .fetchAll()
-			// .then(matches => {
-			// 	return Promise.all(matches.map(m =>
-			// 		m.save({home_team_id: teamId
-			// 				// ,placeholder_home_team_group: null
-			// 				// ,placeholder_home_team_position: null
-			// 			})))
-			// })
-			// //actualizacion de visitor team
-			// .then(matches => {
-			// 	return DB._models.Match
-			// 	.where({placeholder_visitor_team_group: this.id
-			// 		,placeholder_visitor_team_position: position})
-			// 	.fetchAll()
-			// })
-			// .then(matches => {
-			// 	return Promise.all(matches.map(m =>
-			// 		m.save({visitor_team_id: teamId
-			// 				// ,placeholder_visitor_team_group: null
-			// 				// ,placeholder_visitor_team_position: null
-			// 			})))
-			// })
-			// .catch(e => {
-			// 	throw e
-			// })
 		}
 	})
 

@@ -129,17 +129,9 @@ define(['express',
 
 	router.post('/:group_id/match_placeholder', (req, res) => {
 		Models.group.forge({id: req.params.group_id})
-		.fetch({withRelated: 'category_group_phase_team'})
-		.then(group => {
-			return group.related('category_group_phase_team')
-			.map(participant => {
-				return group.updateMatchPlaceholders(
-					participant.get('team_id')
-					,participant.get('position_in_group')
-				)
-			})
-		})
-		.then(result => Response(res, 'update complete'))
+		.fetch()
+		.then(group => group.updateMatchPlaceholders())
+		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	})
 

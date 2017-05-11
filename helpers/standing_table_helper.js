@@ -65,10 +65,7 @@ define(['../util/knex_util'
 			return match
 		}
 
-		//filtro que obtiene los eventos dado un match
-		// const filterByMatch = match => event => event.match_id == match.id
-
-		//TODO: point value should be taken from db;
+		//TODO: El valor de los puntos ganados debe tomarse de la config de la categoria
 		const assignPointsByMatch = m => {
 			if(m.home_team_goals == m.visitor_team_goals){
 				m.home_team_points = 1
@@ -80,11 +77,6 @@ define(['../util/knex_util'
 			}
 			return m
 		}
-
-		//sacar todos los ids de equipo, en home y visitor, then uniq
-		// const buildStandingTable = (table, match) => {
-		// 	table.find(team => team.team_id == match.home_team_id )
-		// }
 
 		const setTeamResults = (team, match) => {
 			let result = {
@@ -192,14 +184,10 @@ define(['../util/knex_util'
 			//TODO: el calculo de los score podria eliminarse una vez que el sistema este estable. Se recalcula para asegurar que los standings estan acordes a los eventos tipo gol.
 			return Models.match.where({group_id: groupId})
 			.fetchAll()
-			.then(matches => {
-				return matches.map(m => {
-					return m.updateScore()
-				})
-			})
-			.then(updatedMatches => {
-				return Knex.raw(matchSql)
-			})
+			//se actualizan los scores de los partidos en base a los eventos
+			.then(matches => matches.map(m => m.updateScore()))
+			//TODO: es posible que no sea necesario este query raw
+			.then(() => Knex.raw(matchSql))
 			.then(result => {
 				//Se extraen los matches de la estructura y se almacenan en matches para uso posterior
 				matches = result.rows
@@ -245,15 +233,13 @@ define(['../util/knex_util'
 				return standingTable
 			})
 			.then(result => {
-				//bloque para almacenar la standingTable en base de datos
 				standingTable = result
-
 				//se vacía la standing del grupo actual
 				return Knex('standing_tables')
 					.where({group_id: groupId})
 					.del()
 			})
-			.then(result => {
+			.then(() => {
 				return Promise.all(standingTable.map(row => {
 					//TODO: cambiar por un bulk insert
 					//se salva cada uno de los resultados calculados
@@ -276,8 +262,7 @@ define(['../util/knex_util'
 			//actualizacion de tabla spider con las nuevas posiciones de los equipos
 			//de acuerdo al calculo de la standing table.
 			//Estas posiciones son utilizadas por el algoritmo de replaceMatchPlaceholders
-			.then()
-			.then(result => result.map(r => r.toJSON()) )
+			.then(() => Models.category_group_phase_team.updatePositionsInGroup(groupId))
 			.catch(error => {
 				throw error
 			})

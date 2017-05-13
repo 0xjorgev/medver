@@ -181,8 +181,6 @@ competitionBuilder.go = () => {
 
 	return Promise.all(_cats)
 	.then(res => {
-		// logger(res)
-		// lme.line()
 		cats = res //for later use
 		//se filtran las categorias inciales existentes
 		// return res.filter(c => c.phases && c.phases.length == 1)
@@ -253,7 +251,6 @@ competitionBuilder.go = () => {
 	})
 	.catch(e => logger(e))
 }
-
 
 competitionBuilder.go()
 exports.competitionBuilder = competitionBuilder

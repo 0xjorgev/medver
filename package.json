@@ -26,7 +26,8 @@
     "morgan": "^1.7.0",
     "newrelic": "^1.37.2",
     "njwt": "^0.4.0",
-    "node-xlsx": "^0.7.1",
+    "node-fetch": "^1.6.3",
+    "node-xlsx": "^0.7.4",
     "nodemon": "^1.8.1",
     "pg": "6.1.5",
     "randomstring": "^1.1.4",
@@ -45,6 +46,7 @@
     "gulp-env": "^0.4.0",
     "gulp-jshint": "^2.0.0",
     "gulp-node-inspector": "^0.1.0",
-    "jshint-stylish": "^2.1.0"
+    "jshint-stylish": "^2.1.0",
+    "node-rest-client": "^3.1.0"
   }
 }

@@ -363,50 +363,12 @@ define(['express'
 		return Models.category
 			.where({id: req.params.category_id})
 			.fetch({withRelated: ['phases.groups']})
-			.then(result => {
-				var cat = result.toJSON()
-
-				var groupsWithTeams = []
-				var teamCount = 1
-				cat.phases.filter(ph => ph.position == 1)
+			.then(cat => {
+				return cat.related('phases')
 				.map(phase => {
-					phase.groups.map((group, index) => {
-						var teams = []
-						for (var i = 1; i <= group.participant_team; i++) {
-							//genero un equipo x participant_team
-							teams.push({
-								phase_id: phase.id
-								,group_id: group.id
-								,position: i
-								,name: `Team ${teamCount++}`
-							})
-						}
-						groupsWithTeams.push(teams)
-					})
-				})
-				return groupsWithTeams
-			})
-			.then(result => {
-				return result.map(group => {
-					//por cada grupo, voy a generar los partidos posibles
-					const matches = Combinatorics.combination(group, 2)
-					let match = null
-					let matchNumber = 0
-					while(match = matches.next()){
-						matchNumber += 1
-						new Models.match({
-							number: matchNumber
-							,group_id: match[0].group_id
-							,placeholder_home_team_group: match[0].group_id
-							,placeholder_home_team_position: match[0].position
-							,placeholder_visitor_team_group: match[1].group_id
-							,placeholder_visitor_team_position: match[1].position
-							,location: 'TBA'
-						})
-						.save()
-						.then(r => logger.debug(r.toJSON()) )
-						.catch(e => console.log(e))
-					}
+					logger.debug(`phase.groups ${phase.groups.length}`)
+					return phase.related('groups')
+						.map(group => group.createMatches())
 				})
 			})
 			.then(result => Response(res, result))

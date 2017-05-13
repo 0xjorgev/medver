@@ -55,13 +55,14 @@ define(['express',
 
 	router.post('/', (req, res) => {
 		const groupPost = buildGroupData(req.body)
-
+		let newGroup = null
 		Models.group.forge(groupPost)
 		.save()
-		.then(newGroup => {
+		.then(_newGroup => {
+			newGroup = _newGroup
 			return updatePhase(groupPost)
 		})
-		.then(result => Response(res, result) )
+		.then(result => Response(res, newGroup) )
 		.catch(error => Response(res, null, error) )
 	})
 

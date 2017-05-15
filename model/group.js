@@ -31,16 +31,21 @@ define(['./base_model'
 		,matches: function(){
 			return this.hasMany('Match', 'group_id')
 		}
+
 		//crea los partidos asociados a este grupo
 		,createMatches: function(){
-
 			if(!this.get('participant_team') > 0){
 				logger.error(`Group ${this.id} has no value in 'participant_team' field`)
 				return
 			}
 
+			//Este algoritmo aplica para la 1era fase unicamente. El resto de las
+			//fase no se calcula con la combinatoria
+			
 			//se genera un array con los numeros de 1 a <participant_team>
 			const positions = [...Array(this.get('participant_team')).keys()].map(x => x+1)
+			//Esta combinatoria aplica para la fase 1. Las fases > 1 deben ser ajustadas
+			//manualmente
 			const matches = Combinatorics.combination(positions, 2)
 
 			return this.load(['phase.category.season'])

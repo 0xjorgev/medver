@@ -368,9 +368,10 @@ define(['express'
 				cats = cat
 				return cat.related('phases')
 				.map(phase => {
-					return phase
-						.related('groups')
-						.map(group => group.createMatches())
+					// return phase
+					// 	.related('groups')
+					// 	.map(group => group.createMatches())
+					return phase.createMatches()
 				})
 			})
 			.then(result => Response(res, cats))

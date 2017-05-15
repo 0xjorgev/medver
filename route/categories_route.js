@@ -360,18 +360,20 @@ define(['express'
 
 	// crea los partidos de una categoria
 	router.post('/:category_id/match', (req, res) => {
+		let cats = null
 		return Models.category
 			.where({id: req.params.category_id})
 			.fetch({withRelated: ['phases.groups']})
 			.then(cat => {
+				cats = cat
 				return cat.related('phases')
 				.map(phase => {
-					logger.debug(`phase.groups ${phase.groups.length}`)
-					return phase.related('groups')
+					return phase
+						.related('groups')
 						.map(group => group.createMatches())
 				})
 			})
-			.then(result => Response(res, result))
+			.then(result => Response(res, cats))
 			.catch(error => Response(res, null, error))
 	})
 

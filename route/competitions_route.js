@@ -475,15 +475,15 @@ define(['express'
 
 		// Obtengo los datos de la competition antes de actualizar
 		Models.competition
-		.where( {'id': competition_id, 'active': true})
+		.where( {'id': competition_id})
 		.fetch({withRelated: ['competition_user.users']})
-		.then((result) => {
+		.then(result => {
 			thisCompetition = result
 			return Knex('competitions')
 				.where({id: result.attributes.id})
 				.update(competitionUpd, ['id'])
 		})
-		.then((result) => {
+		.then(result => {
 			//should I send emails to admins?
 			const newIsPublished = competitionUpd.is_published
 			const oldIsPublished = thisCompetition.attributes.is_published

@@ -33,8 +33,14 @@ define(['./base_model'
 		}
 		//crea los partidos asociados a este grupo
 		,createMatches: function(){
+
+			if(!this.get('participant_team') > 0){
+				logger.error(`Group ${this.id} has no value in 'participant_team' field`)
+				return
+			}
+
 			//se genera un array con los numeros de 1 a <participant_team>
-			const positions = [...Array(4).keys()].map(x => x+1)
+			const positions = [...Array(this.get('participant_team')).keys()].map(x => x+1)
 			const matches = Combinatorics.combination(positions, 2)
 
 			return this.load(['phase.category.season'])

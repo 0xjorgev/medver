@@ -4,36 +4,6 @@ var lme = require('lme')
 var util = require('util')
 var logger = obj => lme.d(util.inspect(obj, {colors: true, depth: Infinity }))
 
-//Para leer el xlsx de tito
-// var data = xlsx.parse(`${__dirname}/NCA AF JCA 3vV & CCC PHO.xlsx`)
-// var parseDate = dateNumber => new Date((new Date(1900,0,1)).getTime() + 86400000*(dateNumber - 2))
-//
-// const phases = data
-// 	.filter(sheet => sheet.name.indexOf('Table 5') >= 0)
-// 	.forEach(sheet => {
-// 		// logger(sheet.name)
-// 		lme.line()
-// 		sheet.data.forEach(row => {
-// 			if(row.length == 1){
-// 				const date = parseDate(row[0])
-// 				// if(date) logger(date)
-// 				// else logger(row[0])
-// 			 }
-// 		})
-// 	})
-//
-// const groups = data
-// 	.filter(sheet => sheet.name.toLowerCase().indexOf('table 1') >= 0)
-// 	.map(sheet => {
-// 		logger(sheet.name)
-// 		lme.line()
-// 		return sheet.data.map(row => {
-// 			logger(row)
-// 		})
-// 		lme.eline()
-// 		lme.eline()
-// 	})
-
 const structure = [
 	//ccc b
 	{ category_id: 33
@@ -154,6 +124,7 @@ const fetch = require('node-fetch')
 const competitionBuilder = {}
 
 const api = 'http://localhost:3000/api/v1.0'
+// const api = 'http://ss-core.herokuapp.com/api/v1.0'
 
 const getRQ = (data, method) => {
 	return {
@@ -228,29 +199,45 @@ competitionBuilder.go = () => {
 							,participant_team: info.teams
 							,phase_id: phase.id
 						}
+
 						promises.push(fetch(`${api}/group`, getRQ(groupData, 'POST'))
-							.then(res => res.json())
-							.then(res => res.data)
-							.then(group => {
-								//creacion de partidos. El servicio retorna los IDs de los grupos
-								return fetch(`${api}/group/${group.id}/match`, getRQ({}, 'POST'))
-								.then(res => {
-									if(res.status == 500) return -1
-									return res.json()
-								})
+						.then(res => res.json())
+						.then(res => res.data)
+						.then(group => {
+							//creacion de partidos. El servicio retorna los IDs de los grupos
+							return fetch(`${api}/group/${group.id}/match`, getRQ({}, 'POST'))
+							.then(res => {
+								if(res.status == 500) return -1
+								return res.json()
 							})
-						)
-					}
-					return promises
-				}))
-			})
-			.catch(e =>{
-				throw e
-			})
+						})
+					)
+				}
+				return promises
+			}))
+		})
+		.catch(e =>{
+			throw e
 		})
 	})
-	.catch(e => logger(e))
+})
+.catch(e => logger(e))
 }
 
-competitionBuilder.go()
+competitionBuilder.createMatches = () => {
+	const promises = structure.map( cat => {
+		return fetch(`${api}/category/${cat.category_id}/match`, getRQ({}, 'POST'))
+		.then(res => res.json())
+		.then(res => res.data)
+	})
+
+	return Promise.all(promises)
+	.then(res => {
+		logger('done!')
+	})
+}
+
+// competitionBuilder.go()
+competitionBuilder.createMatches()
+
 exports.competitionBuilder = competitionBuilder

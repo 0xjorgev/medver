@@ -1478,6 +1478,25 @@ paths:
         200:
           description: result
       security: []
+
+  /group/{group_id}/match_placeholder:
+    post:
+      summary: Replaces the match placeholders for a given group
+      description: Replaces the match placeholders for a given group
+      tags:
+        - Match
+        - Group
+      responses:
+        200:
+          description: doc pending
+      parameters:
+        - name: group_id
+          in: path
+          description: group ID
+          required: true
+          type: integer
+          format: integer
+
   /group/{group_id}/standing_table:
     get:
       summary: Gets the current standing table for a given group_id
@@ -1578,6 +1597,22 @@ paths:
         200:
           description: list of matches currently on this group
       security: []
+    post:
+      summary: generates matches for the given group
+      description: generates matches for the given group
+      tags:
+        - Match
+        - Group
+      responses:
+        200:
+          description: the current standing_table of the group
+      parameters:
+        - name: group_id
+          in: path
+          description: group ID
+          required: true
+          type: integer
+          format: integer
   /match:
     get:
       summary: Gets all matches

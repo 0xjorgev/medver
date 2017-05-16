@@ -1,13 +1,7 @@
 if (typeof define !== 'function') {
 	var define = require('amdefine')(module)
 }
-//phpmyadmin
-//phpDBPwd*
-//root
-//DbPwd2017*
-//fc Wordpress
-//root_fc
-//rpEeD8!5&qmK4F6p@X
+
 define(['express'
 		,'../model/index'
 		,'../util/request_message_util'
@@ -361,53 +355,20 @@ define(['express'
 
 	// crea los partidos de una categoria
 	router.post('/:category_id/match', (req, res) => {
+		let cats = null
 		return Models.category
 			.where({id: req.params.category_id})
 			.fetch({withRelated: ['phases.groups']})
-			.then(result => {
-				var cat = result.toJSON()
-
-				var groupsWithTeams = []
-				var teamCount = 1
-				cat.phases.filter(ph => ph.position == 1)
+			.then(cat => {
+				cats = cat
+				return cat.related('phases')
 				.map(phase => {
-					phase.groups.map((group, index) => {
-						var teams = []
-						for (var i = 1; i <= group.participant_team; i++) {
-							//genero un equipo x participant_team
-							teams.push({
-								phase_id: phase.id
-								,group_id: group.id
-								,position: i
-								,name: `Team ${teamCount++}`
-							})
-						}
-						groupsWithTeams.push(teams)
-					})
-				})
-				return groupsWithTeams
-			})
-			.then(result => {
-				return result.map(group => {
-					//por cada grupo, voy a generar los partidos posibles
-					var matches = Combinatorics.combination(group, 2)
-					let match = null
-					while(match = matches.next()){
-						new Models.match({
-							group_id: match[0].group_id
-							,placeholder_home_team_group: match[0].group_id
-							,placeholder_home_team_position: match[0].position
-							,placeholder_visitor_team_group: match[1].group_id
-							,placeholder_visitor_team_position: match[1].position
-							,location: 'TBA'
-						})
-						.save()
-						.then(r => logger.debug(r.toJSON()) )
-						.catch(e => console.log(e))
-					}
+					return phase
+						.related('groups')
+						.map(group => group.createMatches())
 				})
 			})
-			.then(result => Response(res, result))
+			.then(result => Response(res, cats))
 			.catch(error => Response(res, null, error))
 	})
 
@@ -443,8 +404,7 @@ define(['express'
 		var teamId = req.params.team_id
 
 		return Models.match.query(function(qb){
-				qb.innerJoin('rounds', 'rounds.id', 'matches.round_id')
-				qb.innerJoin('groups', 'groups.id', 'rounds.group_id')
+				qb.innerJoin('groups', 'groups.id', 'matches.group_id')
 				qb.innerJoin('phases', 'phases.id', 'groups.phase_id')
 				qb.innerJoin('categories', 'categories.id', 'phases.category_id')
 				qb.where('categories.id', '=', categoryId)
@@ -452,18 +412,12 @@ define(['express'
 				qb.where('matches.home_team_id', '=', teamId)
 				qb.orWhere('matches.visitor_team_id', '=', teamId)
 			})
-			.fetchAll({withRelated:['round',
-				'round.group',
-				'round.group.phase',
-				'round.group.phase.category',
+			.fetchAll({withRelated:[
+				'group.phase.category',
 				'home_team',
 				'visitor_team']})
-			.then(function(result){
-				Response(res, result)
-			})
-			.catch(function(err){
-				Response(res, null, err)
-			})
+			.then(result => Response(res, result))
+			.catch(err => Response(res, null, err))
 	})
 
 	//==========================================================================
@@ -529,6 +483,7 @@ define(['express'
 		if(data.payment != undefined) spiderData.payment = data.payment
 		if(data.document != undefined) spiderData.document = data.document
 		if(data.roster != undefined) spiderData.roster = data.roster
+		if(data.position_in_group != undefined) spiderData.position_in_group = data.position_in_group
 		return spiderData
 	}
 
@@ -591,7 +546,7 @@ define(['express'
 			})
 			.catch(function(err){
 				console.log("Error request: ", err)
-				return err
+				throw err
 			})
 	}
 
@@ -619,7 +574,6 @@ define(['express'
 
 	const send_status_email = function(data){
 		// console.log("Status Email ", data.template)
-		console.log("TORNEO_KEY: ", data.category.relations.season.relations.competition.attributes.name);
 		var tag = {
 			COACH_KEY: data.user.attributes.username
 			,TEAM_KEY: data.team.attributes.name
@@ -682,7 +636,6 @@ define(['express'
 	const team_owner_email = (data) => {
 		//Buscar Id entidad Team_id
 		//entity_relationship -> to (id_entidad_equipo) -> relationship_Type 1 (Owner)
-		//FIXME: desanidar los promises
 		return Models.entity
 			.where({object_id:data.team_id, active:true, object_type:'teams'})
 			.fetch()
@@ -690,25 +643,19 @@ define(['express'
 				return Models.entity_relationship
 				.where({ent_ref_to_id:result.attributes.id, relationship_type_id:1, active:true})
 				.fetch({withRelated:['from', 'to']})
-				.then(function(innerResult){
-					return Models.user
-					.where({id:innerResult.relations.from.attributes.object_id})
-					.fetch()
-					.then(function(user_result){
-						data.user = user_result
-						return team_data(data)
-					})
-					.catch(function(user_error){
-						return user_error
-					})
-				})
-				.catch(function(InnerError){
-					return InnerError
-				})
+			})
+			.then(function(innerResult){
+				return Models.user
+				.where({id:innerResult.relations.from.attributes.object_id})
+				.fetch()
+			})
+			.then(function(user_result){
+				data.user = user_result
+				return team_data(data)
 			})
 			.catch(function(error){
 				return error
-			});
+			})
 	}
 
 	//==========================================================================
@@ -722,8 +669,8 @@ define(['express'
 				data.team = result
 				return competition_data(data)
 			})
-			.catch((error) => {
-				return {}
+			.catch(error => {
+				throw error
 			})
 	}
 
@@ -739,8 +686,8 @@ define(['express'
 				data.imageUrl = result.relations.season.relations.competition.attributes.img_url
 				return send_status_email(data)
 			})
-			.catch((error) => {
-				return {}
+			.catch(error => {
+				throw error
 			})
 	}
 

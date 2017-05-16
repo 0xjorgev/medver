@@ -5,6 +5,7 @@ if (typeof define !== 'function') {
 define(['express', '../model/index', '../util/request_message_util', '../util/knex_util','../util/generic_util']
 	, function (express, Models, Message, Knex, utilities) {
 
+
 	var router = express.Router();
 
 	router.get('/', (req, res) => {
@@ -40,6 +41,7 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 		var playerId = req.params.player_id;
 		var categoryId = req.params.category_id;
 
+		//FIXME: hay que eliminar la referencia a round
 		return Models.event_match_player.query(function(qb){
 				qb.innerJoin('matches', 'matches.id', 'events_matches_players.match_id')
 				qb.innerJoin('rounds', 'rounds.id', 'matches.round_id')

@@ -7,12 +7,14 @@ define(['express',
 		'../util/response_message_util',
 		'../util/knex_util',
 		'../util/logger_util',
+		'../helpers/team_placeholders_helper',
 		'../helpers/standing_table_helper'],
 		 (express,
 			Models,
 			Response,
 			Knex,
 			logger,
+			MatchPlaceholder,
 			StandingTable) => {
 
 	let router = express.Router()
@@ -53,13 +55,14 @@ define(['express',
 
 	router.post('/', (req, res) => {
 		const groupPost = buildGroupData(req.body)
-
+		let newGroup = null
 		Models.group.forge(groupPost)
 		.save()
-		.then(newGroup => {
+		.then(_newGroup => {
+			newGroup = _newGroup
 			return updatePhase(groupPost)
 		})
-		.then(result => Response(res, result) )
+		.then(result => Response(res, newGroup) )
 		.catch(error => Response(res, null, error) )
 	})
 
@@ -116,10 +119,30 @@ define(['express',
 			.catch( error => Response(res, null, error) );
 	})
 
+	router.post('/:group_id/match', (req, res) => {
+		Models.group
+		.forge({id: req.params.group_id})
+		.fetch()
+		.then(group => (group == null) ? null : group.createMatches() )
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
+
+	router.post('/:group_id/match_placeholder', (req, res) => {
+		Models.group.forge({id: req.params.group_id})
+		.fetch()
+		.then(group => group.updateMatchPlaceholders())
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
+
 	router.post('/:group_id/standing_table', function(req, res){
 		var group_id = req.params.group_id
 		StandingTable.calculateByGroup(group_id)
-		StandingTable.getStandingTableByGroup(group_id, res)
+		.then(result => {
+			return StandingTable.getStandingTableByGroup(group_id, res)
+		})
+		.catch(e => Response(res, null, e))
 	})
 
 	const buildGroupData = data => {

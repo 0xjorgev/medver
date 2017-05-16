@@ -379,7 +379,11 @@ logger.debug(finalQuery)
 		var comp_id = req.params.competition_id;
 		return Models.competition
 			.where({'id': comp_id })
-			.fetch( {withRelated: ['discipline','subdiscipline', 'competition_type', 'seasons', 'competition_user.users']} )
+			.fetch( {withRelated: ['discipline'
+			,'subdiscipline'
+			,'competition_type'
+			,'seasons.categories'
+			,'competition_user.users']} )
 			.then(result => Response(res, result) )
 			.catch(error => Response(res, null, error) )
 	});
@@ -467,15 +471,15 @@ logger.debug(finalQuery)
 
 		// Obtengo los datos de la competition antes de actualizar
 		Models.competition
-		.where( {'id': competition_id, 'active': true})
+		.where( {'id': competition_id})
 		.fetch({withRelated: ['competition_user.users']})
-		.then((result) => {
+		.then(result => {
 			thisCompetition = result
 			return Knex('competitions')
 				.where({id: result.attributes.id})
 				.update(competitionUpd, ['id'])
 		})
-		.then((result) => {
+		.then(result => {
 			//should I send emails to admins?
 			const newIsPublished = competitionUpd.is_published
 			const oldIsPublished = thisCompetition.attributes.is_published

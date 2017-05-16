@@ -288,8 +288,6 @@ define(['express'
 		.forge(matchData)
 		.save()
 		.then(match => {
-			// //TODO: asignacion temporal, mientras elimino round_id de esta tabla
-			// _match.group_id = match.round.group_id
 			return Models.match
 			.query(qb => {
 				qb.select(Knex.raw('matches.*, matches_referees.id as matches_referee_id'))
@@ -317,6 +315,7 @@ define(['express'
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
 				StandingTable.calculateByGroup(_match.group_id)
+				//TODO: revisar esta llamada
 				.then(r =>  PlaceholdersHelper.replacePlaceholders(_match.group_id) )
 			}
 			return result

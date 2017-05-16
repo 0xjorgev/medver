@@ -5,18 +5,6 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-/*
-        table.increments('id').primary();
-        table.boolean('active').notNullable().defaultTo(true);
-        table.timestamp('created_at').defaultTo(knex.fn.now());
-        table.timestamp('updated_at').defaultTo(knex.fn.now());
-        //Relationships
-        --table.integer('player_in').references('players.id').index();
-        --table.integer('player_out').references('players.id').index();
-        --table.integer('match_id').references('matches.id').index();
-        --table.integer('event_id').references('events.id').index();
-*/
-
 define(['./base_model','./player', './match', './event', './team'], function (DB) {
 
     const Event_match_player = DB.Model.extend({
@@ -24,7 +12,7 @@ define(['./base_model','./player', './match', './event', './team'], function (DB
         ,hasTimestamps: true
 		,initialize: function(){
 			this.on('saving', () => {
-				return this.load(['event','match', 'player_in', 'player_out'])
+				return this.load(['event','match', 'player_in.person', 'player_out.person'])
 			})
 		}
         //relations

@@ -115,7 +115,7 @@ exports.up = function(knex, Promise) {
 		return Promise.all([
 			knex.schema.createTable('tmp_events_matches_players', function(table){
 				table.increments('id').primary()
-				table.boolean('active')
+				table.boolean('active').notNullable().defaultTo(true)
 				table.integer('instant').defaultTo(0)
 				//Relationships
 				table.integer('player_in')

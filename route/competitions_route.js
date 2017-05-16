@@ -220,25 +220,22 @@ define(['express'
 		' ,categories.name as category_name' +
 		' ,categories.player_minimum_summoned as summoned_players_min' +
 		' ,categories.player_maximum_summoned as summoned_players_max' +
-		' ,entities.id as entity_id' +
+		' ,entities.id as entity_id' + 
 		' ,entities.object_id as entity_object_id' +
 		' ,entities.object_type as entity_object_type' +
 		' ,players.id as players_id' +
-		' ,players.persons.first_name as players_first_name' +
-		' ,players.persons.last_name as players_last_name' +
-		' ,players.persons.img_url as players_img_url' +
-		' ,players.persons.portrait_url as players_portrait_url' +
-		' ,players.persons.document_number as players_document_number' +
-		' ,players.persons.nickname as players_nickname' +
-		' ,players.persons.birthday as players_birthday' +
-		' ,players.persons.status_id as players_status_id' +
-		' ,players.persons.email as players_email' +
-		' ,players.persons.active as players_active' +
-		// ' ,players.created_at as players_created_at' +
-		// ' ,players.updated_at as players_updated_at' +
-		' ,players.persons.gender_id as players_gender_id' +
-		' ,players.persons.document_img_url as players_document_img_url' +
-		' ,players.persons.meta as players_meta' +
+		' ,persons.first_name as players_first_name' +
+		' ,persons.last_name as players_last_name' +
+		' ,persons.img_url as players_img_url' +
+		' ,persons.document_number as players_document_number' +
+		' ,persons.nickname as players_nickname' +
+		' ,persons.birthday as players_birthday' +
+		' ,persons.status_type_id as players_status_id' +
+		' ,persons.email as players_email' +
+		' ,persons.active as players_active' +
+		' ,persons.gender_id as players_gender_id' +
+		' ,persons.document_img_url as players_document_img_url' +
+		' ,persons.meta as players_meta' +
 		' ,teams.id as teams_id' +
 		' ,teams.name as teams_name' +
 		' ,teams.logo_url as teams_logo_url' +
@@ -249,8 +246,6 @@ define(['express'
 		' ,teams.subdiscipline_id as teams_subdiscipline_id' +
 		' ,teams.gender_id as teams_gender_id' +
 		' ,teams.active as teams_active' +
-		// ' ,teams.created_at as teams_created_at' +
-		// ' ,teams.updated_at as teams_updated_at' +
 		// ' ,teams.meta as teams_meta' +
 		' ,teams.portrait_url as teams_portrait_url' +
 		' ,teams.club_id as teams_club_id' +
@@ -264,7 +259,7 @@ define(['express'
 		' inner join competitions on competitions.id = seasons.competition_id' +
 		' inner join entities on categories_groups_phases_teams.entity_id = entities.id' +
 		' left join players on entities.object_id = players.id and entities.object_type = \'players\'' +
-		//' inner join persons on persons.id = players.person_id' +
+		' left join persons on entities.object_id = persons.id and entities.object_type = \'persons\'' +
 		' left join teams on entities.object_id = teams.id and entities.object_type = \'teams\'' +
 		' left join (select category_id, team_id, count(*) as player_count from category_summoned group by 1,2)' +
 		' player_count on player_count.team_id = teams.id and player_count.category_id = categories.id'
@@ -304,7 +299,7 @@ define(['express'
 		let limit = ' limit $LIMIT offset $OFFSET'
 
 		let finalQuery = query.replace('$FIELDS$', fields)
-
+logger.debug(finalQuery)
 		//paginacion. no se aplica paginacion si se solicita el csv
 		if(!req.query.csv && req._pagination.pageSize && req._pagination.page){
 			const offset = (req._pagination.page - 1) * req._pagination.pageSize

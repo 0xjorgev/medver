@@ -45,6 +45,9 @@ define(['./base_model'
 				,related_to: function(){
 					return this.hasMany('Entity_relationship', 'ent_ref_to_id');
 				}
+				,feed_items: function(){
+					return this.hasMany('Entity_relationship', 'ent_ref_to_id');
+				}
 			},{
 				//Método para registrar un jugador en una competition tipo tryout
 				findOrCreate: function(_entity){

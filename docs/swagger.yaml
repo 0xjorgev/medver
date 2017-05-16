@@ -1312,7 +1312,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/PlayerData'
+            $ref: '#/definitions/ParticipantRequest'
       tags:
         - Category
         - Player
@@ -1715,6 +1715,34 @@ paths:
       responses:
         200:
           description: List of players assigned to this match & team
+    post:
+      summary: registers the starter eleven players for a match for each team
+      description: registers the starter eleven players for a match for each team
+      tags:
+        - Match
+      produces:
+      - application/json
+      parameters:
+      - name: match_id
+        in: path
+        description: Match ID
+        required: true
+        type: integer
+        format: integer
+      - name: team_id
+        in: path
+        description: Team ID
+        required: true
+        type: integer
+        format: integer
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/initialPlayers'
+      responses:
+        200:
+          description: (documentation pending)
     put:
       summary: Toggles the participation of the given player in this match
       description: Toggles the participation of the given player in this match; necessary for updating the summoned player list for each match
@@ -1804,35 +1832,7 @@ paths:
       responses:
         200:
           description: (documentation pending)
-  /match/:match_id/team/:team_id/player:
-    post:
-      summary: registers the starter eleven players for a match for each team
-      description: registers the starter eleven players for a match for each team
-      tags:
-        - Match
-      produces:
-      - application/json
-      parameters:
-      - name: match_id
-        in: path
-        description: Match ID
-        required: true
-        type: integer
-        format: integer
-      - name: team_id
-        in: path
-        description: Team ID
-        required: true
-        type: integer
-        format: integer
-      - name: events
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/initialPlayers'
-      responses:
-        200:
-          description: (documentation pending)
+    
   /round:
     get:
       summary: List all rounds
@@ -2023,31 +2023,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    post:
-      summary: Creates a player and inserts it in the team roster
-      description: Receives an object or an array of objects, as described in the model example
-      parameters:
-        - name: team_id
-          in: path
-          description: Team ID
-          required: true
-          type: integer
-          format: integer
-        - name: player & team data
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/PlayerTeamData'
-      tags:
-        - Team
-        - Player
-      responses:
-        200:
-          description: result
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
   /team/{team_id}/category/{category_id}/request:
     post:
       summary: Create one request for participated in the category from the team to participated
@@ -2178,6 +2153,25 @@ paths:
       responses:
         200:
           description: List of all players
+    post:
+      summary: Creates one or many player's, each player most be associated with a team
+      description: Receives an object or an array of objects, as described in the model example
+      parameters:
+        - name: player data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlayerRequest'
+      tags:
+        - Team
+        - Player
+      responses:
+        200:
+          description: result
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /player/{player_id}/category/{category_id}/events:
     get:
       summary: Gets all player's events in a specific category
@@ -3138,7 +3132,7 @@ definitions:
         description: Club associated with this team
       active:
         type: boolean
-        description: 
+        description: valor booleano que indica si el equipo esta actualmente activo o no
     required:
       - name
       - category_type_id
@@ -3152,68 +3146,6 @@ definitions:
         type: string
       password:
         type: string
-
-  #TODO: cargar este ejemplo
-  PlayerTeamRequest:
-    title: PlayerTeam Request
-    type: object
-    properties:
-      player:
-        $ref: '#/definitions/TeamRequest'
-      team:
-        $ref: '#/definitions/CreateGroupRequest'
-
-  PlayerTeamData:
-    type: array
-    items:
-      type: object
-      properties:
-        player:
-          type: object
-          description: player data
-          required: true
-          properties:
-            first_name:
-              type: string
-              description: First name of the player
-              required: true
-            last_name:
-              type: string
-              description: Last name of the player
-              required: true
-            birthday:
-              type: string
-              description: Player's date of birth. ex. 2001-02-12T00:00:00-04:00
-              required: true
-            nickname:
-              type: string
-              description: Player's nickname or familiar name
-              required: false
-            email:
-              type: string
-              description: Player's email
-              required: false
-            document_number:
-              type: string
-              description: Identification number of the player, if available
-              required: false
-        team_player:
-          type: object
-          required: true
-          properties:
-            number:
-              type: integer
-              description: Player's number on team
-              required: true
-            position_id:
-              type: integer
-              description: Player's position on the team
-              required: true
-            team_id:
-              type: integer
-              description: Team identifier
-              required: true
-
   UpdateCategoryTeamInviteRequest:
     title: Create Category Team InviteRequest
     type: object
@@ -3244,42 +3176,22 @@ definitions:
       roster:
         type: integer
         format: int32
-
   UpdateCategyTeamPlayer:
     title: UpdateCategyTeamPlayer
     type: object
     properties:
-      id:
-        type: integer
-        format: int32
+      present_in_field:
+        type: boolean
       active:
         type: boolean
-      number:
-        type: integer
-        format: int32
-      position:
-        type: string
-    required:
-    - id
   CreateCategoryTeamPlayer:
     title: CreateCategoryTeamPlayer
     type: object
     properties:
-      category_id:
-        type: string
-      team_id:
-        type: string
-      player_id:
-        type: string
+      present_in_field:
+        type: boolean
       active:
         type: boolean
-    required:
-    - category_id
-    - team_id
-    - player_id
-    - active
-    - number
-    - position
   CategoryRequest:
     title: CategoryRequest
     type: object
@@ -3350,21 +3262,18 @@ definitions:
           type: integer
         team_id:
           type: integer
-
   initialPlayers:
       title: initialPlayers
-      type: array
-      items:
-        type: object
-        properties:
-          number:
-            type: integer
-          player_id:
-            type: integer
-          match_id:
-            type: integer
-          team_id:
-            type: integer
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              number:
+                type: integer
+              player_id:
+                type: integer
   Error:
     title: error
     type: object
@@ -3407,7 +3316,6 @@ definitions:
         description: If not provided, a new 'event calendar' will not be associated with any entity
     required:
       - entity_parent_id
-
   PersonRequest:
     title: Person Creation/Update Request
     type: object
@@ -3445,8 +3353,94 @@ definitions:
         type: integer
       meta:
         type: string
-
-  PlayerData:
+  PlayerRequest:
+    properties:
+      data:
+          type: array
+          items:
+            type: object
+            properties:
+              person:
+                type: object
+                description: personal information
+                required: true
+                properties:
+                  id:
+                    type: integer
+                    description: Person's identifier on the system
+                    request: false
+                  first_name:
+                    type: string
+                    description: First name of the player
+                    required: false
+                  last_name:
+                    type: string
+                    description: Last name of the player
+                    required: false
+                  nickname:
+                    type: string
+                    description: Nickname or familiar name
+                    required: false
+                  email:
+                    type: string
+                    description: Personal email
+                    required: false
+                  birthday:
+                    type: string
+                    description: Date of birth. ex. 2001-02-12T00:00:00-04:00
+                    required: false
+                  height:
+                    type: string
+                    required: false
+                  weight:
+                    type: string
+                    required: false
+                  img_url:
+                    type: string
+                    required: false
+                  document_number:
+                    type: string
+                    required: false
+                  document_img_url:
+                    type: string
+                    required: false
+                  nationality:
+                    type: string
+                    required: false
+                  claimed:
+                    type: string
+                    required: false
+                  active:
+                    type: boolean
+                    required: false
+                  gender_id:
+                    type: integer
+                    description: Gender's identifier on the system
+                    required: false
+                  status_type_id:
+                    type: integer
+                    description: Status's identifier on the system
+                    required: false
+                  meta:
+                    type: string
+                    required: false
+              player:
+                type: object
+                required: true
+                properties:
+                  number:
+                    type: integer
+                    description: Player's number on team
+                    required: true
+                  position_id:
+                    type: integer
+                    description: Player's position on the team
+                    required: true
+                  team_id:
+                    type: integer
+                    description: Team identifier
+                    required: true
+  ParticipantRequest:
     title: person
     type: object
     description: player data
@@ -3491,3 +3485,6 @@ definitions:
         type: string
         description: meta data of the player
         required: false
+
+
+

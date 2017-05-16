@@ -834,17 +834,13 @@ define(['express'
 			,player_id: data.params.player_id
 			,active: (data.body.active == undefined) ? true : data.body.active
 			,present_in_field: (data.body.present_in_field == undefined) ? false : data.body.present_in_field
-			// ,number:
-			// 	data.body.number = (data.body.number == undefined) ? 0 : data.body.number
-			// ,position:
-			// 	data.body.position = (data.body.position == undefined) ? ""  data.body.position
 		}
 
 		if(data.body.id){
 			console.log("data id: ", data.body.id)
 			summonedData.id = data.body.id
 		}
-
+		logger.debug(summonedData)
 		return new Models.category_summoned(summonedData)
 			.save()
 			.then(summoned => Response(res, summoned) )

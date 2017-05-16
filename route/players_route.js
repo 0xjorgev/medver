@@ -2,7 +2,8 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(['express', '../model/index', '../util/request_message_util', '../util/knex_util',], function (express, Models, Message, Knex) {
+define(['express', '../model/index', '../util/request_message_util', '../util/knex_util','../util/generic_util']
+	, function (express, Models, Message, Knex, utilities) {
 
 	var router = express.Router();
 
@@ -60,6 +61,24 @@ define(['express', '../model/index', '../util/request_message_util', '../util/kn
 			Message(res, error, error.code, []);
 		});
 	});
+
+	router.post('/', (req, res) => {
+		
+		const _players = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
+		return Promise.all(_players.map(ip => {
+			//Busca o crea la person
+			return Models.person.findOrCreate(data)
+			.then(result => {
+	            newPerson = result.toJSON()
+				//Se crea el jugador con los datos de la persona
+				let entity = {}
+				player.person_id = newPerson.id
+				return Models.player.findOrCreate(player)
+			})
+		}))
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
 
 	return router;
 });

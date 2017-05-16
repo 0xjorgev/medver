@@ -177,13 +177,12 @@ define(['express'
     //==========================================================================
 
     router.put('/:match_id/team/:team_id/player', (req, res) => {
-
         var data = {}
         if(req.body.id != undefined) data.id = req.body.id
         if(req.params.match_id != undefined) data.match_id = req.params.match_id
         if(req.params.team_id != undefined) data.team_id = req.params.team_id
         if(req.body.player_id != undefined) data.player_id = req.body.player_id
-        if(req.body.position != undefined) data.position = req.body.position
+        if(req.body.position_id != undefined) data.position_id = req.body.position_id
         if(req.body.number != undefined) data.number = req.body.number
         if(req.body.active != undefined) data.active = req.body.active
 
@@ -204,20 +203,24 @@ define(['express'
     //==========================================================================
 
     router.post('/:match_id/team/:team_id/player', (req, res) => {
-		var data = {}
+		let data = {}
 		// | number | position | team_id | player_id | match_id |
-		var match_id = req.params.match_id;
-		var team_id = req.params.team_id;
+		let match_id = req.params.match_id;
+		let team_id = req.params.team_id;
 
-	    console.log('POST /:match_id/team/:team_id/player/', data)
 
 		const body = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
 		const initial_player = body.map(_initial_player_list => {
+
+			logger.debug(team_id)
+			logger.debug(match_id)
+
 			let initialPlayer = _initial_player_list
-			initialPlayer.match_id = match_id//_initial_player_list.match_id
+			initialPlayer.match_id = match_id   //_initial_player_list.match_id
+			initialPlayer.team_id = team_id   //_initial_player_list.team_id
 			initialPlayer.number = _initial_player_list.number
-			initialPlayer.team_id = team_id//_initial_player_list.team_id
 			initialPlayer.player_id = _initial_player_list.player_id
+			initialPlayer.position_id = _initial_player_list.position_id
 			initialPlayer.is_initial = _initial_player_list.is_initial
 			return initialPlayer
 		})
@@ -354,22 +357,27 @@ define(['express'
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
 		const matchId = req.params.match_id
-		logger.debug(req.body)
+		// logger.debug(req.body)
 		const body = utilities.isArray(req.body) ? req.body : [req.body]
 		const matchResult = body.map(_event => {
 			let event = _event
 			event.match_id = matchId
+			event.player_out = (_event.player_out !== undefined && _event.player_out !== null) ? _event.player_out : null
+			event.player_in = (_event.player_in !== undefined && _event.player_in !== null) ? _event.player_in : null
 			return event
 		})
-
+		// logger.debug(matchResult)
 		return Promise.all(matchResult.map(mr => {
-			return new Models.event_match_player(mr)
-			.save()
-			.then(FeedItemHelper.createFeedItemFromEvent)
-		}))
+				logger.debug(mr)
+				return new Models.event_match_player(mr)
+					.save()
+				.then(FeedItemHelper.createFeedItemFromEvent)
+			}))
 		.then(result => {
 			return Models.match.forge({id: matchId})
-				.fetch({withRelated: 'events.event'})
+				.fetch({withRelated: ['events.event'
+									,'events.player_in.person.gender'
+									,'events.player_out.person.gender']})
 		})
 		.then(match => match.updateScore())
 		.then(result => Response(res, result))
@@ -500,57 +508,6 @@ define(['express'
 			return result
 		})
 	}
-
-	//feed de un match
-	router.get('/:match_id/feed', (req, res) => {
-		Models.match
-		.where({id: req.params.match_id})
-		.fetch({withRelated: [
-			'entity.feed_items'], debug: false})
-		.then(result => {
-			logger.debug(result.toJSON())
-			return 'hulefante'
-		})
-		.then(user => {
-			//ahora con las entidades relacionadas a este user,
-			//traigo los feeds asociados a ellas o al mismo usuario
-			//se extraen los ids de las entidades
-			let ids = null
-			if(user.related_entities){
-				ids = user.related_entities.filter(rel => {
-					return rel.entity_id && rel.entity_id !== null
-				})
-				.map(rel => rel.entity_id)
-
-				//obtengo las relaciones de las entidades
-				return Models.entity_relationship
-				.query(qb => {
-					qb.whereIn('ent_ref_to_id', ids)
-					//filtrar solamente por tipo 3 -> feed item
-					qb.where('relationship_type_id', 3)
-				})
-				.fetchAll({withRelated: ['from.object', 'to.object']})
-				.then(rel => {
-					//proceso el resultado, para retornar solamente los feeds
-					return rel.toJSON()
-					.map(r => {
-						let fi = r.from.object
-						//TODO: un FI puede tener varias entidades asociadas, este codigo debe ir en un map
-						if(fi){
-							tmpTo.object_type = r.to.object_type
-							fi.related_entities = [r.to.object]
-						}
-						return fi
-					})
-				})
-			}
-			else {
-				return []
-			}
-		})
-		.then(result => Response(res, result))
-		.catch(error => Response(res, null, error))
-	})
 
 	return router;
 });

@@ -45,26 +45,19 @@ const structure = [
 	,{ category_id: 83
 		,initial_phase_id: 89
 		,phases: [
-			 {groups: 3, teams_per_group: 4
-				,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
+			 {groups: 3, teams_per_group: 4 ,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
 		]
 	}
 	//nca u-10
 	,{ category_id: 84
 		,initial_phase_id: 88
 		,phases: [
-			 {groups: 5, teams_per_group: 4
-				,classifying_teams_per_phase: 8}
-			,{groups: 4, teams_per_group: 2
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
+			 {groups: 5, teams_per_group: 4 ,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2 ,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
 		]
 	}
 	//nca u-12
@@ -240,12 +233,8 @@ competitionBuilder.go = () => {
 				}
 
 				return fetch(`${api}/phase`, getRQ(phaseData, 'POST'))
-				.then(res => {
-					return res.json()
-				})
-				.then(res => {
-					return res.data
-				})
+				.then(res => res.json())
+				.then(res => res.data)
 				.catch(e => {
 					throw e
 				})
@@ -265,18 +254,7 @@ competitionBuilder.go = () => {
 						promises.push(
 							fetch(`${api}/group`, getRQ(groupData, 'POST'))
 							.then(res => res.json())
-							.then(res => {
-								// logger(res.data)
-								return res.data
-							})
-							// .then(group => {
-							// 	//creacion de partidos. El servicio retorna los IDs de los grupos
-							// 	return fetch(`${api}/group/${group.id}/match`, getRQ({}, 'POST'))
-							// })
-							// .then(res => {
-							// 	if(res.status == 500) return -1
-							// 	return res.json()
-							// })
+							.then(res => res.data)
 							.catch(e => {
 								throw e
 							})
@@ -311,6 +289,10 @@ competitionBuilder.createMatches = () => {
 }
 
 competitionBuilder.go()
-// competitionBuilder.createMatches()
+.then(() => {
+	logger('creando matches >')
+	return competitionBuilder.createMatches()
+})
+
 
 exports.competitionBuilder = competitionBuilder

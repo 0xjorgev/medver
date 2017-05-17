@@ -31,7 +31,35 @@ define(['./base_model'
 		,matches: function(){
 			return this.hasMany('Match', 'group_id')
 		}
+		//crea un partido en el grupo con las opciones recibidas
+		,createMatch: function(data){
 
+			if(data == undefined) data = {}
+			if(data.number == undefined) data.number = 1
+			if(data.placeholder_home_team_position == undefined) data.placeholder_home_team_position = null
+			if(data.placeholder_home_team_group == undefined) data.placeholder_home_team_group = null
+			if(data.placeholder_visitor_team_position == undefined) data.placeholder_visitor_team_position = null
+			if(data.placeholder_visitor_team_group == undefined) data.placeholder_visitor_team_group = null
+
+			return this.load(['phase.category.season'])
+			.then(() => {
+				let initialDate = this.related('phase')
+					.related('category')
+					.related('season')
+					.get('init_at')
+
+				return DB._models.Match.forge({
+					number: data.number
+					,group_id: this.id
+					,date: initialDate
+					,placeholder_home_team_position: data.placeholder_home_team_position
+					,placeholder_home_team_group: data.placeholder_home_team_group
+					,placeholder_visitor_team_position: data.placeholder_visitor_team_position
+					,placeholder_visitor_team_group: data.placeholder_visitor_team_group
+				})
+				.save()
+			})
+		}
 		//crea los partidos asociados a este grupo
 		,createMatches: function(){
 			if(!this.get('participant_team') > 0){
@@ -41,7 +69,7 @@ define(['./base_model'
 
 			//Este algoritmo aplica para la 1era fase unicamente. El resto de las
 			//fase no se calcula con la combinatoria
-			
+
 			//se genera un array con los numeros de 1 a <participant_team>
 			const positions = [...Array(this.get('participant_team')).keys()].map(x => x+1)
 			//Esta combinatoria aplica para la fase 1. Las fases > 1 deben ser ajustadas

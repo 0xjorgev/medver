@@ -36,21 +36,55 @@ define(['./base_model'
 		}
 		,createMatches: function(){
 			if(this.get('position') == 1){
-				// this.load('groups')
-				// .then(phase => {
-				// 	return phase.related('groups').map(g => g.createMatches())
-				// })
+				this.load('groups')
+				.then(phase => phase.related('groups').map(g => g.createMatches()))
 			}
 			else{
+				let previous = null
 				//obtengo la informacion de la fase anterior
 				DB._models.Phase
 				.where({category_id: this.get('category_id')
 					,position: (this.get('position') - 1)
 				})
-				.fetch()
-				.then(previous => {
-					logger.debug(`Classifying teams of phase ${previous.id}: ${previous.get('classified_team')}`)
+				.fetch({withRelated: 'groups'})
+				.then(previousPhase => {
+					previous = previousPhase
+					return this.load('groups')
+				})
+				.then(() => {
+					//se crea un partido por grupo
+					return Promise.all(
+						this.related('groups')
+						.map(group => group.createMatch())
+					)
+				})
+				.then(matches => {
+					const prevGroups = previous.related('groups').map(g => g.id)
 
+					const homePlaceholders = matches.map(match => {
+						const currentGroup = prevGroups.shift()
+						if(currentGroup){
+							match.set({placeholder_home_team_position: 1
+								,placeholder_home_team_group: currentGroup
+							})
+						}
+						return match.save()
+					})
+					
+					const awayHomePlaceholders = matches.map(match => {
+						const currentGroup = prevGroups.shift()
+						if(currentGroup){
+							match.set({placeholder_visitor_team_position: 1
+								,placeholder_visitor_team_group: currentGroup
+							})
+						}
+						return match.save()
+					})
+
+					return Promise.all(homePlaceholders.concat(awayHomePlaceholders))
+				})
+				.catch(e => {
+					throw e
 				})
 			}
 		}

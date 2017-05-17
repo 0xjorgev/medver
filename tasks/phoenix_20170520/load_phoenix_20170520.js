@@ -154,8 +154,8 @@ const fetch = require('node-fetch')
 
 const competitionBuilder = {}
 
-const api = 'http://localhost:3000/api/v1.0'
-// const api = 'http://ss-core.herokuapp.com/api/v1.0'
+// const api = 'http://localhost:3000/api/v1.0'
+const api = 'http://ss-core.herokuapp.com/api/v1.0'
 
 const getRQ = (data, method) => {
 	return {
@@ -169,6 +169,7 @@ const getRQ = (data, method) => {
 }
 
 competitionBuilder.go = () => {
+	logger('creando estructura >')
 	const _cats = structure.map(cat => {
 		return fetch(`${api}/category/${cat.category_id}`)
 		.then(res => {
@@ -282,17 +283,20 @@ competitionBuilder.createMatches = () => {
 		.then(res => res.data)
 	})
 
+	logger(promises)
+
 	return Promise.all(promises)
 	.then(res => {
 		logger('done!')
 	})
 }
 
-competitionBuilder.go()
-.then(() => {
-	logger('creando matches >')
-	return competitionBuilder.createMatches()
-})
+// competitionBuilder.go()
+// .then(() => {
+// 	logger('creando matches >')
+// 	return competitionBuilder.createMatches()
+// })
 
+competitionBuilder.createMatches()
 
 exports.competitionBuilder = competitionBuilder

@@ -297,6 +297,24 @@ competitionBuilder.createMatches = () => {
 // 	return competitionBuilder.createMatches()
 // })
 
-competitionBuilder.createMatches()
+competitionBuilder.getMatches = () => {
+	const promises = structure.map( cat => {
+		return fetch(`${api}/category/${cat.category_id}/match`)
+		.then(res => res.json())
+		.then(res => res.data)
+	})
+
+	logger(promises)
+
+	return Promise.all(promises)
+	.then(res => {
+		logger(res)
+	})
+}
+
+
+// competitionBuilder.createMatches()
+competitionBuilder.getMatches()
+
 
 exports.competitionBuilder = competitionBuilder

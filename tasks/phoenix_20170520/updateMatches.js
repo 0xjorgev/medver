@@ -6,8 +6,8 @@ var fetch = require('node-fetch')
 // const api = 'http://localhost:3000/api/v1.0'
 const api = 'http://ss-core.herokuapp.com/api/v1.0'
 
-
 var parseExcelDate = (dateNumber) => new Date((new Date(1900,0,1,0,0,0,0)).getTime() + 86400000*(dateNumber - 2))
+
 const file = xlsx.parse(`${__dirname}/NCA AF JCA 3vV & CCC PHO.xlsx`)
 const structure = [
 	//ccc b
@@ -179,18 +179,40 @@ var matchFilter = (data => {
 				&& m.placeholder_visitor_team_group == data.home.group && m.placeholder_visitor_team_position == data.home.pos)
 })
 
+var currentSheet = null
+var currentRow = null
+var msg = []
+
+var cleanString = (str) => {
+	return str
+	.replace(/[^\x00-\x7F]/g, '')
+	.replace(/\r?\n|\r/g, '')
+	.replace(/&#10;/g, '')
+	// .toUpperCase()
+	.trim()
+}
+
 getMatches()
 .then(matches => {
-	return file.filter(s => s.name.toLowerCase().includes('U-6 - NCA - Table 5'.toLowerCase()))
+	return file.filter(s => s.name.toLowerCase().includes('Table 5'.toLowerCase()))
 	.map(s => {
-		s.data.map((match, idx) => {
+		currentSheet = s.name
+		console.log('--', s.name.toLowerCase(), '----------');
+		return s.data.map((match, idx) => {
+			currentRow = idx
 			if(match.length > 1 && match[0] && !(match[0].toString().toLowerCase().trim() == 'time')){
 				var date = parseExcelDate(match[0])
-				// console.log(date, match[1], match[3], match[5])
-				console.log(match[1]);
-
-				var home = JSON.parse(match[1])
-				var away = JSON.parse(match[3])
+				// console.log(date);
+				try {
+					var h = cleanString(match[1])
+					var a = cleanString(match[3])
+					var home = (h == 'WILD CARD') ? {group: null, pos: null} : JSON.parse(h)
+					var away = (a == 'WILD CARD') ? {group: null, pos: null} : JSON.parse(a)
+				} catch (e) {
+					console.log('match[1]', match[1]);
+					console.log('match[3]', match[3]);
+					throw e
+				}
 
 				var data = {
 					home: home,
@@ -200,7 +222,7 @@ getMatches()
 				var matchesFound = matches.filter(matchFilter(data))
 
 				if(matchesFound.length == 0){
-					console.log('no match found for', home, 'vs', away);
+					msg.push(`-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`)
 					return null
 				}
 				else{
@@ -224,8 +246,10 @@ getMatches()
 		})
 		.filter(x => x != null)
 		.map(match => {
-			//2017-05-20 12:35-07
-			var query = `update matches set date = '${moment(match.date).format('YYYY-MM-DD hh:mm')}-07'::timestamp WITH TIME ZONE, location = '${match.location}' where id = ${match.id};`
+			//se esta generando una diferencia de tiempo que hace que las horas
+			//se generen un minuto menos de lo esperado aprox.
+			//le sumo 5 seg para asegurar que la hora esta en la fecha requerida
+			var query = `update matches set date = '${moment(match.date).add(5, 's').format('YYYY-MM-DD HH:mm')}-07'::timestamp WITH TIME ZONE, location = '${match.location}' where id = ${match.id};`
 			return query
 		})
 		.map(query => {
@@ -236,5 +260,9 @@ getMatches()
 .catch(e => {
 	console.error(e)
 	console.error(e.stack)
+	console.log(currentSheet, ':',currentRow);
 })
-// .then(res => console.log(res))
+.then(res => {
+	msg.unshift('-- FAILED MATCHES. Check these manually')
+	console.log(msg.join('\n'))
+})

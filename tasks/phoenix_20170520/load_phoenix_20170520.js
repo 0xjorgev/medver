@@ -154,8 +154,8 @@ const fetch = require('node-fetch')
 
 const competitionBuilder = {}
 
-// const api = 'http://localhost:3000/api/v1.0'
-const api = 'http://ss-core.herokuapp.com/api/v1.0'
+const api = 'http://localhost:3000/api/v1.0'
+// const api = 'http://ss-core.herokuapp.com/api/v1.0'
 
 const getRQ = (data, method) => {
 	return {
@@ -329,6 +329,32 @@ competitionBuilder.getMatches = () => {
 
 
 // competitionBuilder.createMatches()
-competitionBuilder.getMatches()
+// competitionBuilder.getMatches()
 
-exports.competitionBuilder = competitionBuilder
+competitionBuilder.runPlaceholders = () => {
+	const promises = structure.map( cat => {
+		return fetch(`${api}/category/${cat.category_id}/team_placeholders`)
+		.then(res => res.json())
+		.then(res => res.data)
+		.catch(e => {
+			console.error(e)
+			console.error(e.stack)
+		})
+	})
+
+	logger(promises)
+
+
+	return Promise.all(promises)
+	.then(res => {
+		logger('done!')
+	})
+	.catch(e => {
+		console.error(e)
+		console.error(e.stack)
+	})
+}
+
+competitionBuilder.runPlaceholders()
+
+// exports.competitionBuilder = competitionBuilder

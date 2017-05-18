@@ -1,12 +1,176 @@
 var xlsx = require('node-xlsx')
 var moment = require('moment')
-var matches = require('./matches').matches
+var fetch = require('node-fetch')
+// var matches = require('./matches').matches
 
-var parseExcelDate = (dateNumber) => new Date((new Date(1900,0,1)).getTime() + 86400000*(dateNumber - 2))
+// const api = 'http://localhost:3000/api/v1.0'
+const api = 'http://ss-core.herokuapp.com/api/v1.0'
+
+
+var parseExcelDate = (dateNumber) => new Date((new Date(1900,0,1,0,0,0,0)).getTime() + 86400000*(dateNumber - 2))
 const file = xlsx.parse(`${__dirname}/NCA AF JCA 3vV & CCC PHO.xlsx`)
+const structure = [
+	//ccc b
+	{ category_id: 33
+		,initial_phase_id: 39
+		,phases: [
+			 {groups: 4, teams_per_group: 4
+				,classifying_teams_per_phase: 0}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 0}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//ccc g
+	,{ category_id: 35
+		,initial_phase_id: 41
+		,phases: [
+			{groups: 2, teams_per_group: 3
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 0}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-6
+	,{ category_id: 97
+		,initial_phase_id: 104
+		,phases: [
+			 {groups: 2, teams_per_group: 4
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-8
+	,{ category_id: 83
+		,initial_phase_id: 89
+		,phases: [
+			 {groups: 3, teams_per_group: 4 ,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-10
+	,{ category_id: 84
+		,initial_phase_id: 88
+		,phases: [
+			 {groups: 5, teams_per_group: 4 ,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2 ,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-12
+	,{ category_id: 85
+		,initial_phase_id: 91
+		,phases: [
+			 {groups: 5, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-16
+	,{ category_id: 86
+		,initial_phase_id: 92
+		,phases: [
+			 {groups: 6, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-18
+	,{ category_id: 88
+		,initial_phase_id: 93
+		,phases: [
+			 {groups: 3, teams_per_group: 4
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//af
+	,{ category_id: 82
+		,initial_phase_id: 90
+		,phases: [
+			 {groups: 3, teams_per_group: 4
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//jca
+	,{ category_id: 8
+		,initial_phase_id: 39
+		,phases: [
+			 {groups: 4, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//td3v3
+	,{ category_id: 46
+		,initial_phase_id: 52
+		,phases: [
+			 {groups: 8, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+]
 
-// console.log(matches);
-// var queries = []
+getMatches = () => {
+	const promises = structure.map( cat => {
+		return fetch(`${api}/category/${cat.category_id}/match`)
+		.then(res => res.json())
+		.then(res => res.data)
+	})
+	const filterMatches = (input) => {
+		var output = []
+		input.map((category)=>{
+			return category.phases.map(phase => {
+				return phase.groups.map(group => {
+					return group.matches.map(match => {
+						match.phase_id = phase.id
+						match.phase_position = phase.position
+						output.push(match)
+					})
+				})
+			})
+		})
+		return output
+	}
+	return Promise.all(promises)
+	.then(res => filterMatches(res))
+}
 
 var matchFilter = (data => {
 	return m => (m.placeholder_home_team_group == data.home.group && m.placeholder_home_team_position == data.home.pos
@@ -15,25 +179,62 @@ var matchFilter = (data => {
 				&& m.placeholder_visitor_team_group == data.home.group && m.placeholder_visitor_team_position == data.home.pos)
 })
 
-var result = file.filter(s => s.name.toLowerCase().includes('U-6 - NCA - Table 5'.toLowerCase()))
-.map(s => {
-	s.data.map((match, idx) => {
-		if(match.length > 1 && match[0] && !(match[0].toString().toLowerCase().trim() == 'time')){
-			var date = parseExcelDate(match[0])
-			date.setDate(20)
-			date.setMonth(4)
-			date.setFullYear(2017)
-			// console.log(date, match[1], match[3], match[5])
+getMatches()
+.then(matches => {
+	return file.filter(s => s.name.toLowerCase().includes('U-6 - NCA - Table 5'.toLowerCase()))
+	.map(s => {
+		s.data.map((match, idx) => {
+			if(match.length > 1 && match[0] && !(match[0].toString().toLowerCase().trim() == 'time')){
+				var date = parseExcelDate(match[0])
+				// console.log(date, match[1], match[3], match[5])
+				console.log(match[1]);
 
-			var home = JSON.parse(match[1])
-			var away = JSON.parse(match[3])
-			var data = {
-				home: home,
-				away: away
+				var home = JSON.parse(match[1])
+				var away = JSON.parse(match[3])
+
+				var data = {
+					home: home,
+					away: away
+				}
+
+				var matchesFound = matches.filter(matchFilter(data))
+
+				if(matchesFound.length == 0){
+					console.log('no match found for', home, 'vs', away);
+					return null
+				}
+				else{
+					var thisMatch = matchesFound[0]
+					if(thisMatch.phase_position > 1)
+						date.setDate(20)
+					else
+						date.setDate(21)
+
+					date.setMonth(4)
+					date.setFullYear(2017)
+
+					return {
+						id: matchesFound[0].id
+						,date: date
+						,location: match[5]
+					}
+				}
+
 			}
-			console.log(home, 'vs', away);
-
-			console.log(matches.filter(matchFilter(data)));
-		}
+		})
+		.filter(x => x != null)
+		.map(match => {
+			//2017-05-20 12:35-07
+			var query = `update matches set date = '${moment(match.date).format('YYYY-MM-DD hh:mm')}-07'::timestamp WITH TIME ZONE, location = '${match.location}' where id = ${match.id};`
+			return query
+		})
+		.map(query => {
+			console.log(query)
+		})
 	})
 })
+.catch(e => {
+	console.error(e)
+	console.error(e.stack)
+})
+// .then(res => console.log(res))

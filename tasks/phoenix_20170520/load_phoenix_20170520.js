@@ -304,17 +304,31 @@ competitionBuilder.getMatches = () => {
 		.then(res => res.data)
 	})
 
+	const getMatches = (input) => {
+		var output = []
+		input.map((category)=>{
+			return category.phases.map((phase)=>{
+				return phase.groups.map((group)=>{
+					return group.matches.map((match)=>{
+						output.push(match)
+					})
+				})
+			})
+		});
+		return output
+	}
+
 	logger(promises)
 
 	return Promise.all(promises)
 	.then(res => {
-		logger(res)
+		return getMatches(res)
 	})
+	.then(res => logger(res))
 }
 
 
 // competitionBuilder.createMatches()
 competitionBuilder.getMatches()
-
 
 exports.competitionBuilder = competitionBuilder

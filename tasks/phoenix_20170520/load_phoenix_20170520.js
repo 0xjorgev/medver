@@ -154,8 +154,8 @@ const fetch = require('node-fetch')
 
 const competitionBuilder = {}
 
-const api = 'http://localhost:3000/api/v1.0'
-// const api = 'http://ss-core.herokuapp.com/api/v1.0'
+// const api = 'http://localhost:3000/api/v1.0'
+const api = 'http://ss-core.herokuapp.com/api/v1.0'
 
 const getRQ = (data, method) => {
 	return {

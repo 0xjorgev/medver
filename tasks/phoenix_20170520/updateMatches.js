@@ -227,7 +227,8 @@ getMatches()
 				}
 				else{
 					var thisMatch = matchesFound[0]
-					if(thisMatch.phase_position > 1)
+
+					if(thisMatch.phase_position == 1)
 						date.setDate(20)
 					else
 						date.setDate(21)

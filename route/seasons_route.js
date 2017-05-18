@@ -151,7 +151,7 @@ define(['express',
 	// 	})
 	// 	.save()
 	// 	.then(function(new_category){
-	// 		Response(res, new_category)	
+	// 		Response(res, new_category)
 	// 	})
 	// 	.catch(function(error){
 	// 		Response(res, null, error)
@@ -186,6 +186,8 @@ define(['express',
 				qb.where({active: true})
 			}}
 			,{'categories.phases.groups.matches': function(qb){ qb.where({active: true}) }}
+			,'categories.phases.groups.matches.home_placeholder_group'
+			,'categories.phases.groups.matches.visitor_placeholder_group'
 			,'categories.phases.groups.matches.home_team'
 			,'categories.phases.groups.matches.visitor_team'
 			,'categories.phases.groups.matches.referee.user'

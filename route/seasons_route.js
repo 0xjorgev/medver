@@ -192,6 +192,7 @@ define(['express',
 			,'categories.phases.groups.matches.visitor_team'
 			,'categories.phases.groups.matches.referee.user'
 			,'categories.category_type'
+			,'categories.gender'
 			]})
 			.then(result => Response(res, result) )
 			.catch(error => Response(res, null, error))

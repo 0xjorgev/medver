@@ -1,7 +1,11 @@
 if (typeof define !== 'function')
 	var define = require('amdefine')(module);
 
-define(['./base_model','./gender'], function (DB) {
+define(['./base_model'
+        ,'../util/logger_util'
+    ], function (DB
+        ,logger
+        ) {
 	var Person = DB.Model.extend({
 		tableName: 'persons'
 		,hasTimestamps: true
@@ -20,7 +24,6 @@ define(['./base_model','./gender'], function (DB) {
         findOrCreate: function(_p){
             let person = {}
             let newPerson = {}
-
             //Creamos el person
             if(_p.first_name !== undefined && _p.first_name !== null) person.first_name = _p.first_name.trim()
             if(_p.last_name !== undefined && _p.last_name !== null) person.last_name = _p.last_name.trim()
@@ -42,6 +45,7 @@ define(['./base_model','./gender'], function (DB) {
             if(_p.claimed !== undefined && _p.claimed !== null) person.claimed = _p.claimed
             if(_p.active !== undefined && _p.active !== null) person.active = _p.active
 
+            logger.debug(person)
             return DB._models.Person
                 .where({email: person.email})
                 .fetch()
@@ -64,12 +68,13 @@ define(['./base_model','./gender'], function (DB) {
                 let entity = {}
                 entity.object_id = newPerson.id
                 entity.object_type = 'persons'
+
                 return DB._models.Entity.findOrCreate(entity)
             })
             .then(_result => {
                 return DB._models.Person
-                    .where({id: newPerson.id})
-                    .fetch({withRelated: ['entity']})
+                        .where({id: newPerson.id})
+                        .fetch({withRelated: ['entity']})
             })
         }
 

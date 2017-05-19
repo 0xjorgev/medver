@@ -363,9 +363,10 @@ define(['express'
 				cats = cat
 				return cat.related('phases')
 				.map(phase => {
-					return phase
-						.related('groups')
-						.map(group => group.createMatches())
+					// return phase
+					// 	.related('groups')
+					// 	.map(group => group.createMatches())
+					return phase.createMatches()
 				})
 			})
 			.then(result => Response(res, cats))
@@ -829,63 +830,14 @@ define(['express'
 	// dada una fase, retorna los placeholders de posiciones en referencia a la fase anterior
 	// es decir, ganador grupo 1, posicion 2 grupo 3, etc
 	router.get('/:category_id/team_placeholders', (req, res) => {
-		//paso 0: si esta fase es la primera, devolver vacío, o simplemente el listado de equipos
-		// obtener la fase, revisar el campo position
 		Models.category
 		.where({id: req.params.category_id})
 		.fetch({withRelated: ['phases.groups']})
-		.then((result) => {
-			var category = result.toJSON()
-			//no devuelvo nada si la cat no tiene mas de 1 fase
-			if(category.phases.length < 2) Response(res, [])
-
-			return category.phases.map((phase) => {
-				//se retorna un promise por cada una de las fases
-				var ph = {
-					phase_id: phase.id,
-					name: phase.name,
-					position: phase.position,
-					groups: []
-				}
-
-				phase.groups.map((group) => {
-					var last = {
-						group_id: group.id,
-						name: group.name,
-						classifying_teams: group.classified_team,
-						positions: []
-					}
-
-					for (var i = 1; i <= group.classified_team; i++) {
-						last.positions.push({
-							position: i,
-							description: `Position ${i}/${group.classified_team} of '${group.name}' on '${phase.name}'`
-						})
-					}
-					ph.groups.push(last)
-				})
-
-				return ph
-			})
+		.then(category => {
+			return category.related('phases')
+			.map(phase => phase.related('groups')
+			.map(group => group.updateMatchPlaceholders()))
 		})
-		.then((result) => {
-			return _(result).flatten().sortBy('position')
-		})
-		.then((result) => {
-			var tmp = undefined
-			return result.map((phase) => {
-				if(phase.position == 1){
-					tmp = phase.groups
-				}
-				else {
-					var tmp2 = phase.groups
-					phase.groups = tmp
-					tmp = tmp2
-				}
-				return phase
-			})
-		})
-		.then(result => result.slice(1) )
 		.then(result => Response(res, result) )
 		.catch(error => Response(res, null, error) )
 	})

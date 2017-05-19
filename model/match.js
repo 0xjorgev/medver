@@ -78,16 +78,22 @@ define(['./base_model'
 				return this.hasMany('Event_match_player');
 			}
 			,referee: function(){
-				return this.hasMany('Match_referee');
+				return this.hasMany('Match_referee')
 			}
 			,entity: function(){
-				return this.morphOne('Entity', 'object');
+				return this.morphOne('Entity', 'object')
 			}
 			,group: function(){
-				return this.belongsTo('Group', 'group_id');
+				return this.belongsTo('Group', 'group_id')
 			}
 			,events: function(){
-				return this.hasMany('Event_match_player', 'match_id');
+				return this.hasMany('Event_match_player', 'match_id')
+			}
+			,home_placeholder_group: function(){
+				return this.belongsTo('Group', 'placeholder_home_team_group')
+			}
+			,visitor_placeholder_group: function(){
+				return this.belongsTo('Group', 'placeholder_visitor_team_group')
 			}
 			//actualiza el score del partido en base a los eventos
 			,getScore: function(){
@@ -99,7 +105,7 @@ define(['./base_model'
 				const homeTeamId = this.attributes.home_team_id
 				const visitorTeamId = this.attributes.visitor_team_id
 
-				//si no se ha jugado el partido, no se hace nada 
+				//si no se ha jugado el partido, no se hace nada
 				if(!this.played) return
 
 				return this.load('events.event')

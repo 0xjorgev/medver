@@ -175,10 +175,12 @@ define(['express',
 			//se totaliza el numero de equipos participantes y el num. de equipos
 			//que pasan a la siguiente fase
 			const phaseUpd = result.reduce( (obj, group) => {
-				obj.participant_team += group.attributes.participant_team
-				obj.classified_team += group.attributes.classified_team
+				obj.participant_team += group.get('participant_team')
+				// obj.classified_team += group.attributes.classified_team
 				return obj
-			}, { id: phaseId, participant_team: 0, classified_team: 0 })
+			}, { id: phaseId
+				, participant_team: 0
+			/*, classified_team: 0*/ })
 
 			return Knex('phases')
 			.where({id: phaseId})

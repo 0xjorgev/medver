@@ -257,26 +257,27 @@ define(['express'
 		//datos para los placeholders
 		// si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
 		if(data.home_team_id == undefined || data.home_team_id == null){
-			if(data.placeholder_home && data.placeholder_home.group_id != undefined)
-			matchData.placeholder_home_team_group = data.placeholder_home.group_id
-			if(data.placeholder_home && data.placeholder_home.position != undefined)
-			matchData.placeholder_home_team_position = data.placeholder_home.position
+			if(data.placeholder_home_team_group != undefined)
+				matchData.placeholder_home_team_group = data.placeholder_home_team_group
+			if(data.placeholder_home_team_position != undefined)
+				matchData.placeholder_home_team_position = data.placeholder_home_team_position
 		}
-		else {
-			matchData.placeholder_home_team_group = null
-			matchData.placeholder_home_team_position = null
-		}
+		//por el momento no voy a a eliminar los campos
+		// else {
+		// 	matchData.placeholder_home_team_group = null
+		// 	matchData.placeholder_home_team_position = null
+		// }
 
 		if(data.visitor_team_id == undefined || data.visitor_team_id == null){
-			if(data.placeholder_visitor && data.placeholder_visitor.group_id != undefined)
-			matchData.placeholder_visitor_team_group = data.placeholder_visitor.group_id
-			if(data.placeholder_visitor && data.placeholder_visitor.position != undefined)
-			matchData.placeholder_visitor_team_position = data.placeholder_visitor.position
+			if(data.placeholder_visitor_team_group != undefined)
+				matchData.placeholder_visitor_team_group = data.placeholder_visitor_team_group
+			if(data.placeholder_visitor_team_position != undefined)
+				matchData.placeholder_visitor_team_position = data.placeholder_visitor_team_position
 		}
-		else {
-			matchData.placeholder_visitor_team_group = null
-			matchData.placeholder_visitor_team_position = null
-		}
+		// else {
+		// 	matchData.placeholder_visitor_team_group = null
+		// 	matchData.placeholder_visitor_team_position = null
+		// }
 
 		let refereeData = {}
 		if(data.referee_id != undefined) refereeData.referee_id = data.referee_id

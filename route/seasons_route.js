@@ -186,10 +186,13 @@ define(['express',
 				qb.where({active: true})
 			}}
 			,{'categories.phases.groups.matches': function(qb){ qb.where({active: true}) }}
+			,'categories.phases.groups.matches.home_placeholder_group'
+			,'categories.phases.groups.matches.visitor_placeholder_group'
 			,'categories.phases.groups.matches.home_team'
 			,'categories.phases.groups.matches.visitor_team'
 			,'categories.phases.groups.matches.referee.user'
 			,'categories.category_type'
+			,'categories.gender'
 			]})
 			.then(result => Response(res, result) )
 			.catch(error => Response(res, null, error))

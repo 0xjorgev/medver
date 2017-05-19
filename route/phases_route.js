@@ -137,17 +137,11 @@ define(['express',
 
 		const data = buildData(preData)
 
-		logger.debug(data)
-
 		Knex('phases')
 		.where('id','=',preData.id)
 		.update(data, ['id'])
-		.then(result => {
-			Response(res, result)
-		})
-		.catch(err => {
-			Response(res, null, err)
-		})
+		.then(result => Response(res, result))
+		.catch(err => Response(res, null, err))
 	})
 
 	return router

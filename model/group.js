@@ -101,7 +101,6 @@ define(['./base_model'
 			})
 		}
 		,updateMatchPlaceholders: function(){
-
 			const template = 'update matches set $TEAM_team_id = team_id '
 			+ ' from categories_groups_phases_teams '
 			+ ' where matches.group_id = ?'

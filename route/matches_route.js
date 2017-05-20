@@ -202,7 +202,7 @@ define(['express'
 		var match_id = req.params.match_id;
 		var team_id = req.params.team_id;
 
-	    console.log('POST /:match_id/team/:team_id/player/', data)
+		console.log('POST /:match_id/team/:team_id/player/', data)
 
 		const body = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
 		const initial_player = body.map(_initial_player_list => {
@@ -305,11 +305,40 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-				StandingTable.calculateByGroup(_match.group_id)
-				//TODO: revisar esta llamada
-				.then(r =>  PlaceholdersHelper.replacePlaceholders(_match.group_id) )
+				return StandingTable
+				.calculateByGroup(_match.group_id)
+				.then(() => Models.group.forge({id: _match.group_id}).fetch({withRelated: ['phase.matches']}))
+				.then(group => {
+					const phase = group.related('phase')
+					//fase cerrada: todos los matches == played
+					const phaseIsClosed = phase
+						.related('matches')
+						.reduce((flag, match) => flag && match.get('played'), true)
+
+					logger.debug(`phase ${phase.id} [${phase.get('category_id')}] IsClosed ${phaseIsClosed}`)
+					if(phaseIsClosed){
+						logger.debug('updating placeholders')
+						//se busca la siguiente fase
+						return Models.phase
+							.where({category_id: phase.get('category_id'), position: phase.get('position') + 1})
+							.fetch({withRelated: 'groups'})
+							.then(nextPhase => {
+
+								if(nextPhase == null) return null
+
+								const updatePlaceholders =
+									nextPhase.related('groups')
+									.map(g => g.updateMatchPlaceholders())
+								return Promise.all(updatePlaceholders)
+							})
+					}
+					else{
+						logger.debug('no se ejecuta el replacePlaceholders')
+						//no se hace el replace
+						return null
+					}
+				})
 			}
-			return result
 		})
 		.then(result => Response(res, _match))
 		.catch(error => Response(res, null, error))

@@ -9,11 +9,13 @@ define(['express'
 	,'../model/index'
 	,'../util/request_message_util'
 	,'../util/response_message_util'
+	,'../util/logger_util'
 	,'../util/knex_util',]
 	,(express
 		, Models
 		, Message
 		, Response
+		, logger
 		, Knex) => {
 
     var router = express.Router();

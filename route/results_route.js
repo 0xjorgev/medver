@@ -41,19 +41,15 @@ define(['express'
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
 		//{"match_id":5, "event_id":7, "player_in":1, "player_out":null, "instant":33, "team_id":1 }
-		let Event_match_player = Models.event_match_player
-		let match_result  = req.body
-		let match_id = match_result.match_id
+		const matchResult = req.body
 
-		logger.debug(match_result)
+		logger.debug(matchResult)
 
-		new Event_match_player(match_result)
+		Models.event_match_player
+		.forge(matchResult)
 		.save()
-		.then(result => {
-			Response(res, result)
-		}).catch(error => {
-			Response(res, null, error)
-		})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	});
 
 

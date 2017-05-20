@@ -50,7 +50,7 @@ define(['./base_model', '../util/knex_util']
 		//actualiza el campo position_in_group segun los resultados de la standing table asociada al grupo
 		,updatePositionsInGroup: function(groupId){
 			const query = 'update categories_groups_phases_teams ' +
-			' set position_in_group = st.position ' +
+			' set position_in_group = st.position, team_id = st.team_id ' +
 			' from (select ' +
 			' id, team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position ' +
 			' from standing_tables where group_id = ?) as st' +

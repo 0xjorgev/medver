@@ -228,40 +228,47 @@ getMatches()
                   return null;
                 };
 
-                if (excelHomeScore && excelAwayScore) {
+                if (!isNaN(excelHomeScore) && !isNaN(excelAwayScore)) {
+                  let body = [];
                   for (var i = 1; i <= excelHomeScore; i++) {
-                    var body = {
+                    body.push({
                       event_id: 1,
                       team_id: getTeamId(excelHomeTeamName, thisMatch)
-                    };
-                    fetch(
-                      `${api}/match/${thisMatch.id}/event`,
-                      getRQ(body, "POST")
-                    )
-                      .then(res => res.json())
-                      .then(res => res.data)
-                      .catch(e => {
-                        throw e;
-                      });
+                    });
                   }
+                  fetch(
+                    `${api}/match/${thisMatch.id}/event`,
+                    getRQ(body, "POST")
+                  )
+                    .then(res => res.json())
+                    .then(res => res.data)
+                    .catch(e => {
+                      throw e;
+                    });
 
+                  console.log("MATCH ID", thisMatch.id);
+                  console.log("HOME SCORE", body);
+
+                  body = [];
                   for (var i = 1; i < excelAwayScore; i++) {
-                    var body = {
+                    body.push({
                       event_id: 1,
                       team_id: getTeamId(excelAwayTeamName, thisMatch)
-                    };
-                    fetch(
-                      `${api}/match/${thisMatch.id}/event`,
-                      getRQ(body, "POST")
-                    )
-                      .then(res => res.json())
-                      .then(res => res.data)
-                      .catch(e => {
-                        throw e;
-                      });
+                    });
                   }
+                  fetch(
+                    `${api}/match/${thisMatch.id}/event`,
+                    getRQ(body, "POST")
+                  )
+                    .then(res => res.json())
+                    .then(res => res.data)
+                    .catch(e => {
+                      throw e;
+                    });
+                  console.log("MATCH ID", thisMatch.id);
+                  console.log("AWAY SCORE", body);
 
-                  var body = {
+                  body = {
                     played: true,
                     home_team_score: isHome(excelHomeTeamName, thisMatch)
                       ? excelHomeScore
@@ -277,6 +284,12 @@ getMatches()
                     .catch(e => {
                       throw e;
                     });
+
+                  console.log("MATCH ID", thisMatch.id);
+                  console.log("MATCH UPDATE", body);
+                } else {
+                  // console.log('ELSE HOMESCORE',excelHomeScore);
+                  // console.log('ELSE AWAYSCORE',excelAwayScore);
                 }
               }
             }

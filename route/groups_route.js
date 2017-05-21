@@ -32,25 +32,12 @@ define(['express',
 	})
 
 	router.get('/:group_id', (req, res) => {
-		var group_id = req.params.group_id;
+		const group_id = req.params.group_id;
 		return Models.group
 		.where({id: group_id, active:true})
-		.fetch({withRelated: ['rounds']})
+		.fetch()
 		.then( result => Response(res, result) )
 		.catch( error => Response(res, null, error) )
-	});
-
-	router.get('/:group_id', function (req, res) {
-		var group_id = req.params.group_id;
-		return Models.round
-		.where({'group_id':group_id})
-		.fetch({withRelated: ['group']})
-		.then(function (result) {
-			Response(res, result)
-		})
-		.catch(function(error){
-			Response(res, null, error)
-		});
 	});
 
 	router.post('/', (req, res) => {

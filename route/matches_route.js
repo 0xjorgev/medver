@@ -323,13 +323,20 @@ define(['express'
 							.where({category_id: phase.get('category_id'), position: phase.get('position') + 1})
 							.fetch({withRelated: 'groups'})
 							.then(nextPhase => {
-
+								//si es la fase final, no se requiere la ejecucion
 								if(nextPhase == null) return null
 
-								const updatePlaceholders =
+								return Promise.all(
+									//se actualizan las posiciones de la proxima fase
+									nextPhase.related('groups')
+									.map(g => g.updateTeamsByPosition())
+								)
+								.then(() => Promise.all(
+									//se reemplazan los placeholders
 									nextPhase.related('groups')
 									.map(g => g.updateMatchPlaceholders())
-								return Promise.all(updatePlaceholders)
+								))
+								.catch( e => logger.error(e) )
 							})
 					}
 					else{

@@ -307,10 +307,13 @@ define(['express'
 			if(data.played && data.played === true){
 				return StandingTable
 				.calculateByGroup(_match.group_id)
-				.then(() => Models.group.forge({id: _match.group_id}).fetch({withRelated: ['phase.matches']}))
+				.then(() => {
+					return Models.group.forge({id: _match.group_id})
+					.fetch({withRelated: [{'phase.matches': function(qb){qb.where('matches.active', true)}}]})
+				})
 				.then(group => {
 					const phase = group.related('phase')
-					//fase cerrada: todos los matches == played
+					//fase cerrada: todos los matches activos == played
 					const phaseIsClosed = phase
 						.related('matches')
 						.reduce((flag, match) => flag && match.get('played'), true)

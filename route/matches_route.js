@@ -274,7 +274,9 @@ define(['express'
 
 		//para almacenar el match creado
 		let _match = null
-
+		//este va a ser el match objeto; en general deberiamos trabajar con este
+		//en lugar de la version json
+		let __match = null
 		Models.match
 		.forge(matchData)
 		.save()
@@ -285,9 +287,11 @@ define(['express'
 				qb.leftJoin('matches_referees', 'matches.id', 'matches_referees.match_id')
 				qb.where({'matches.id': match.attributes.id})
 			})
-			.fetch()
+			.fetch({withRelated: 'group'})
 		})
 		.then(result => {
+			//FIXME: utilizar el objeto completo en lugar de solo attrbs
+			__match = result
 			_match = result.attributes
 			refereeData.match_id = _match.id
 
@@ -306,7 +310,7 @@ define(['express'
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
 				return StandingTable
-				.calculateByGroup(_match.group_id)
+				.calculateByPhase(__match.related('group').get('phase_id'))
 				.then(() => {
 					return Models.group.forge({id: _match.group_id})
 					.fetch({withRelated: [{'phase.matches': function(qb){qb.where('matches.active', true)}}]})

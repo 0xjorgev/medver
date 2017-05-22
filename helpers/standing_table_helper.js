@@ -357,6 +357,7 @@ define(['../util/knex_util'
 		}
 
 		StandingTable.calculateByPhase = (phaseId) => {
+			logger.debug('updating standing table of phase ' + phaseId)
 			return new Promise((resolve, reject) => {
 				// Dada la fase, obtengo los equipos participantes,
 				// y los partidos en los que han jugado

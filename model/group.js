@@ -52,13 +52,7 @@ define(['./base_model'
 					rowsToInsert.push(DB._models.Category_group_phase_team.forge(data).save())
 				}
 				return Promise.all(rowsToInsert)
-				// .then(result => {
-				// 	if(result != null){
-				// 		logger.debug(result)
-				// 	}
-				// })
-				.catch(e => logger.error(e))
-
+					.catch(e => logger.error(e))
 			}, this)
 		},
 		//relations

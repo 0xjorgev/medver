@@ -227,7 +227,6 @@ define(['express'
 
 		//se obtienen los grupos que no tienen registros en la tabla spider
 		//TODO: faltan los grupos que tienen registros en spider, pero son incompletos
-		//TODO: al crear el grupo se debe escribir la spider
 		//TODO: al eliminar el grupo debe eliminarse los registros en la spider
 		//TODO: al actualizar el # de participantes en el grupo debe tambien actualizarse spider
 		Models.group.query(qb => {

@@ -102,11 +102,11 @@ define(['./base_model'
 			,updateScore: function(){
 				//TODO: antes de ejecutar la funcion, deberia verificarse si las
 				//relaciones utilizadas fueron cargadas
-				const homeTeamId = this.attributes.home_team_id
-				const visitorTeamId = this.attributes.visitor_team_id
+				const homeTeamId = this.get('home_team_id')
+				const visitorTeamId = this.get('visitor_team_id')
 
 				//si no se ha jugado el partido, no se hace nada
-				if(!this.played) return
+				if(this.played == false) return
 
 				return this.load('events.event')
 				.then(match => {
@@ -134,6 +134,7 @@ define(['./base_model'
 					return this.save()
 				})
 				.catch(e => {
+					logger.error(e)
 					throw e
 				})
 			}

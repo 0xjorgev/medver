@@ -1,5 +1,5 @@
 if (typeof define !== 'function') {
-	var define = require('amdefine')(module);
+	var define = require('amdefine')(module)
 }
 
 define(['express',
@@ -7,12 +7,14 @@ define(['express',
 	'../util/response_message_util',
 	'../util/knex_util',
 	'../helpers/app_helper.js'
+	,'../helpers/standing_table_helper'
 	,'../util/logger_util'],
 	(express,
 		Models,
 		Response,
 		Knex,
 		Util
+		,StandingTable
 		,logger
 	) => {
 
@@ -115,9 +117,8 @@ define(['express',
 		return data
 	}
 
-	router.post('/', function (req, res) {
+	router.post('/', (req, res) => {
 		logger.debug(req.body)
-
 		const data = buildData(req.body)
 
 		Models.phase.forge(data)
@@ -130,7 +131,7 @@ define(['express',
 		})
 	})
 
-	router.put('/:phase_id', function (req, res) {
+	router.put('/:phase_id', (req, res) => {
 		// logger.debug(req.body)
 		let preData = Object.create(req.body,{})
 		preData.id = req.params.phase_id
@@ -142,6 +143,13 @@ define(['express',
 		.update(data, ['id'])
 		.then(result => Response(res, result))
 		.catch(err => Response(res, null, err))
+	})
+
+	router.post('/:phase_id/standing_table', (req, res) => {
+		const phaseId = req.params.phase_id
+		StandingTable.calculateByPhase(phaseId)
+		.then(result => Response(res, `StandingTable for phase ${phaseId} updated`))
+		.catch(e => Response(res, null, e))
 	})
 
 	return router

@@ -123,15 +123,6 @@ define(['express',
 		.catch(error => Response(res, null, error))
 	})
 
-	router.post('/:group_id/standing_table', function(req, res){
-		var group_id = req.params.group_id
-		StandingTable.calculateByGroup(group_id)
-		.then(result => {
-			return StandingTable.getStandingTableByGroup(group_id, res)
-		})
-		.catch(e => Response(res, null, e))
-	})
-
 	const buildGroupData = data => {
 		let obj = {}
 		if(data.id != undefined) obj.id = data.id

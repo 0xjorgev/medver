@@ -1,7 +1,6 @@
 var xlsx = require("node-xlsx");
 var moment = require("moment");
 var fetch = require("node-fetch");
-var http = require("http");
 // var matches = require('./matches').matches
 
 const api = "http://localhost:3000/api/v1.0";
@@ -25,61 +24,142 @@ const getRQ = (data, method) => {
 
 const file = xlsx.parse(`${__dirname}/NCA AF JCA 3vV & CCC PHO.xlsx`);
 const structure = [
-  //nca u-12
-  {
-    category_id: 85,
-    initial_phase_id: 91,
-    phases: [
-      {
-        groups: 5,
-        teams_per_group: 4,
-        classifying_teams_per_phase: 8
-      },
-      {
-        groups: 4,
-        teams_per_group: 2,
-        classifying_teams_per_phase: 4
-      },
-      {
-        groups: 2,
-        teams_per_group: 2,
-        classifying_teams_per_phase: 2
-      },
-      {
-        groups: 1,
-        teams_per_group: 2,
-        classifying_teams_per_phase: 1
-      }
-    ]
-  },
-  //nca u-16
-  {
-    category_id: 86,
-    initial_phase_id: 92,
-    phases: [
-      {
-        groups: 6,
-        teams_per_group: 4,
-        classifying_teams_per_phase: 8
-      },
-      {
-        groups: 4,
-        teams_per_group: 2,
-        classifying_teams_per_phase: 4
-      },
-      {
-        groups: 2,
-        teams_per_group: 2,
-        classifying_teams_per_phase: 2
-      },
-      {
-        groups: 1,
-        teams_per_group: 2,
-        classifying_teams_per_phase: 1
-      }
-    ]
-  }
-];
+	//ccc b
+	{ category_id: 33
+		,initial_phase_id: 39
+		,phases: [
+			 {groups: 4, teams_per_group: 4
+				,classifying_teams_per_phase: 0}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 0}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//ccc g
+	,{ category_id: 35
+		,initial_phase_id: 41
+		,phases: [
+			{groups: 2, teams_per_group: 3
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 0}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-6
+	,{ category_id: 97
+		,initial_phase_id: 104
+		,phases: [
+			 {groups: 2, teams_per_group: 4
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-8
+	,{ category_id: 83
+		,initial_phase_id: 89
+		,phases: [
+			 {groups: 3, teams_per_group: 4 ,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-10
+	,{ category_id: 84
+		,initial_phase_id: 88
+		,phases: [
+			 {groups: 5, teams_per_group: 4 ,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2 ,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-12
+	,{ category_id: 85
+		,initial_phase_id: 91
+		,phases: [
+			 {groups: 5, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-16
+	,{ category_id: 86
+		,initial_phase_id: 92
+		,phases: [
+			 {groups: 6, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//nca u-18
+	,{ category_id: 88
+		,initial_phase_id: 93
+		,phases: [
+			 {groups: 3, teams_per_group: 4
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//af
+	,{ category_id: 82
+		,initial_phase_id: 90
+		,phases: [
+			 {groups: 3, teams_per_group: 4
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//jca
+	,{ category_id: 8
+		,initial_phase_id: 39
+		,phases: [
+			 {groups: 4, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+	//td3v3
+	,{ category_id: 46
+		,initial_phase_id: 52
+		,phases: [
+			 {groups: 8, teams_per_group: 4
+			,classifying_teams_per_phase: 8}
+			,{groups: 4, teams_per_group: 2
+			,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2
+			,classifying_teams_per_phase: 2}
+			,{groups: 1, teams_per_group: 2
+			,classifying_teams_per_phase: 1}
+		]
+	}
+]
 
 getMatches = () => {
   const promises = structure.map(cat => {

@@ -54,6 +54,8 @@ define(['./base_model'
 			if(_p.person_id !== undefined && _p.person_id !== null) player.person_id = _p.person_id
 			if(_p.team_id !== undefined && _p.team_id !== null) player.team_id = _p.team_id
 			if(_p.position_id !== undefined && _p.position_id !== null) player.position_id = _p.position_id
+			if(_p.active !== undefined && _p.active !== null) player.active = _p.active
+			if(_p.img_url !== undefined && _p.img_url !== null) player.img_url = _p.img_url
 
 			logger.debug(_p)
         	return DB._models.Player
@@ -80,6 +82,32 @@ define(['./base_model'
 		        entity.object_id = newPlayer.id
 		        entity.object_type = 'players'
 				return DB._models.Entity.findOrCreate(entity)
+	        })
+	        .then(_result => {
+	        	return DB._models.Player
+					.where({id: newPlayer.id})
+					.fetch({withRelated: ['entity', 'person.gender']})
+	        })
+	    }
+
+	    , savePlayer:function(_p)
+	    {
+	    	let player = {}
+        	let newPlayer = {}
+	    	let person = {}
+        	let newPerson = {}
+			//Creamos el player
+			if(_p.number !== undefined ) player.number = _p.number
+			if(_p.person_id !== undefined) player.person_id = _p.person_id
+			if(_p.team_id !== undefined ) player.team_id = _p.team_id
+			if(_p.position_id !== undefined ) player.position_id = _p.position_id
+			if(_p.active !== undefined ) player.active = _p.active
+			if(_p.img_url !== undefined ) player.img_url = _p.img_url
+			if(_p.id !== undefined ) player.id = _p.id
+
+			return new DB._models.Player(player).save()
+			.then(result => {
+	            newPlayer = result.toJSON()
 	        })
 	        .then(_result => {
 	        	return DB._models.Player

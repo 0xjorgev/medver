@@ -2179,6 +2179,31 @@ paths:
       responses:
         200:
           description: Information about a single player
+    put:
+      summary: Updates a player
+      description: Updates a player
+      parameters:
+        - name: player_id
+          in: path
+          description: Player ID
+          required: true
+          type: integer
+          format: integer
+        - name: player data
+          in: body
+          required: true
+          x-is-map: false
+          schema:
+            $ref: '#/definitions/PlayerRequest'
+      tags:
+        - Player
+      responses:
+        200:
+          description: Resource updated
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /player:
     get:
       summary: Get all players
@@ -3399,7 +3424,7 @@ definitions:
               person:
                 type: object
                 description: personal information
-                required: true
+                required: false
                 properties:
                   id:
                     type: integer
@@ -3460,22 +3485,30 @@ definitions:
                   meta:
                     type: string
                     required: false
-              player:
-                type: object
+              number:
+                type: integer
+                description: Player's number on team
                 required: true
-                properties:
-                  number:
-                    type: integer
-                    description: Player's number on team
-                    required: true
-                  position_id:
-                    type: integer
-                    description: Player's position on the team
-                    required: true
-                  team_id:
-                    type: integer
-                    description: Team identifier
-                    required: true
+              position_id:
+                type: integer
+                description: Player's position on the team
+                required: true
+              team_id:
+                type: integer
+                description: Team identifier
+                required: true
+              person_id:
+                type: integer
+                description: Person identifier
+                required: false
+              img_url:
+                type: string
+                description: Player's image on the team
+                required: false
+              active:
+                type: boolean
+                description: Player's indication if the players is active on the team
+                required: falsek
   ParticipantRequest:
     title: person
     type: object

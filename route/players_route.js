@@ -93,7 +93,43 @@ define(['express'
 				return _newpl
 			})
 		}))
-		.then(result => {logger.debug(result);Response(res, result)})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
+	})
+
+	router.put('/:player_id', (req, res)  => {
+		let playerId = req.params.player_id;
+		const _players = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
+		return Promise.all(_players.map(_pl => {
+			//Creamos el objeto de player
+			let player = {}
+			//Creamos el player
+			if(_pl.number !== undefined ) player.number = _pl.number
+			if(_pl.person_id !== undefined) player.person_id = _pl.person_id
+			if(_pl.team_id !== undefined ) player.team_id = _pl.team_id
+			if(_pl.position_id !== undefined ) player.position_id = _pl.position_id
+			if(_pl.active !== undefined ) player.active = _pl.active
+			if(_pl.img_url !== undefined ) player.img_url = _pl.img_url
+			player.id = playerId
+
+			return Models.player.savePlayer(player)
+			.then(result => {
+				player = result.toJSON()
+				if(_pl.person !== undefined)
+					return Models.person.updatePerson(_pl.person)
+				else
+					return result
+			})
+			.then(_newpl => {
+				let newPlayer = _newpl.toJSON()
+				//Retorno el player que se acaba de hacer update
+				return Models.player
+					.where({id:player.id})
+					.where({active:true})
+					.fetch({withRelated: ['team.organization', 'person' ,'person.gender', 'position'], debug: false})
+				})
+			}))
+		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error))
 	})
 

@@ -1406,6 +1406,23 @@ paths:
       responses:
         200:
           description: Resource updated
+  /phase/{phase_id}/standing_table:
+    post:
+      summary: calculates the current standing table for a given phase_id
+      description: calculates the current standing table for a given phase_id
+      tags:
+        - Standing table
+        - Phase
+      responses:
+        200:
+          description: OK Response
+      parameters:
+        - name: phase_id
+          in: path
+          description: group ID
+          required: true
+          type: integer
+          format: integer
   /phase/{phase_id}/team:
     get:
       summary: Returns the teams participating in a phase
@@ -1480,22 +1497,6 @@ paths:
     get:
       summary: Gets the current standing table for a given group_id
       description: Gets the current standing table for a given group_id
-      tags:
-        - Standing table
-        - Group
-      responses:
-        200:
-          description: the current standing_table of the group
-      parameters:
-        - name: group_id
-          in: path
-          description: group ID
-          required: true
-          type: integer
-          format: integer
-    post:
-      summary: calculates & then gets the current standing table for a given group_id
-      description: calculates & then gets the current standing table for a given group_id
       tags:
         - Standing table
         - Group

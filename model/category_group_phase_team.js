@@ -59,8 +59,6 @@ define(['./base_model', '../util/knex_util', '../util/logger_util', 'lodash']
 			' where categories_groups_phases_teams.group_id = ? ' +
 			' and categories_groups_phases_teams.team_id = st.team_id'
 
-			console.log(`${query}, ${groupId}` )
-
 			return Knex.raw(query, [groupId, groupId])
 		}
 	})

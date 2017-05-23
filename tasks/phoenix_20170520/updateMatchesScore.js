@@ -24,142 +24,219 @@ const getRQ = (data, method) => {
 
 const file = xlsx.parse(`${__dirname}/NCA AF JCA 3vV & CCC PHO.xlsx`);
 const structure = [
-	//ccc b
-	{ category_id: 33
-		,initial_phase_id: 39
-		,phases: [
-			 {groups: 4, teams_per_group: 4
-				,classifying_teams_per_phase: 0}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 0}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//ccc g
-	,{ category_id: 35
-		,initial_phase_id: 41
-		,phases: [
-			{groups: 2, teams_per_group: 3
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 0}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//nca u-6
-	,{ category_id: 97
-		,initial_phase_id: 104
-		,phases: [
-			 {groups: 2, teams_per_group: 4
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//nca u-8
-	,{ category_id: 83
-		,initial_phase_id: 89
-		,phases: [
-			 {groups: 3, teams_per_group: 4 ,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
-		]
-	}
-	//nca u-10
-	,{ category_id: 84
-		,initial_phase_id: 88
-		,phases: [
-			 {groups: 5, teams_per_group: 4 ,classifying_teams_per_phase: 8}
-			,{groups: 4, teams_per_group: 2 ,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
-		]
-	}
-	//nca u-12
-	,{ category_id: 85
-		,initial_phase_id: 91
-		,phases: [
-			 {groups: 5, teams_per_group: 4
-			,classifying_teams_per_phase: 8}
-			,{groups: 4, teams_per_group: 2
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//nca u-16
-	,{ category_id: 86
-		,initial_phase_id: 92
-		,phases: [
-			 {groups: 6, teams_per_group: 4
-			,classifying_teams_per_phase: 8}
-			,{groups: 4, teams_per_group: 2
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//nca u-18
-	,{ category_id: 88
-		,initial_phase_id: 93
-		,phases: [
-			 {groups: 3, teams_per_group: 4
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//af
-	,{ category_id: 82
-		,initial_phase_id: 90
-		,phases: [
-			 {groups: 3, teams_per_group: 4
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//jca
-	,{ category_id: 8
-		,initial_phase_id: 39
-		,phases: [
-			 {groups: 4, teams_per_group: 4
-			,classifying_teams_per_phase: 8}
-			,{groups: 4, teams_per_group: 2
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-	//td3v3
-	,{ category_id: 46
-		,initial_phase_id: 52
-		,phases: [
-			 {groups: 8, teams_per_group: 4
-			,classifying_teams_per_phase: 8}
-			,{groups: 4, teams_per_group: 2
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 2}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
-		]
-	}
-]
+  //ccc b
+  {
+    category_id: 33,
+    initial_phase_id: 39,
+    phases: [
+      {
+        groups: 4,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 0
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 0
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
+  //ccc g
+  {
+    category_id: 35,
+    initial_phase_id: 41,
+    phases: [
+      {
+        groups: 2,
+        teams_per_group: 3,
+        classifying_teams_per_phase: 4
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 0
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
+  //nca u-6
+  {
+    category_id: 97,
+    initial_phase_id: 104,
+    phases: [
+      {
+        groups: 2,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 4
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 2
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
+  //nca u-8
+  {
+    category_id: 83,
+    initial_phase_id: 89,
+    phases: [
+      { groups: 3, teams_per_group: 4, classifying_teams_per_phase: 4 },
+      { groups: 2, teams_per_group: 2, classifying_teams_per_phase: 2 },
+      { groups: 1, teams_per_group: 2, classifying_teams_per_phase: 1 }
+    ]
+  },
+  //nca u-10
+  {
+    category_id: 84,
+    initial_phase_id: 88,
+    phases: [
+      { groups: 5, teams_per_group: 4, classifying_teams_per_phase: 8 },
+      { groups: 4, teams_per_group: 2, classifying_teams_per_phase: 4 },
+      { groups: 2, teams_per_group: 2, classifying_teams_per_phase: 2 },
+      { groups: 1, teams_per_group: 2, classifying_teams_per_phase: 1 }
+    ]
+  },
+  //nca u-12
+  {
+    category_id: 85,
+    initial_phase_id: 91,
+    phases: [
+      {
+        groups: 5,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 8
+      },
+      {
+        groups: 4,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 4
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 2
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
+  //nca u-16
+  {
+    category_id: 86,
+    initial_phase_id: 92,
+    phases: [
+      {
+        groups: 6,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 8
+      },
+      {
+        groups: 4,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 4
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 2
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
+  //nca u-18
+  {
+    category_id: 88,
+    initial_phase_id: 93,
+    phases: [
+      {
+        groups: 3,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 4
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 2
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
+  //af
+  {
+    category_id: 82,
+    initial_phase_id: 90,
+    phases: [
+      {
+        groups: 3,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 4
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 2
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
+  //jca
+  {
+    category_id: 8,
+    initial_phase_id: 39,
+    phases: [
+      {
+        groups: 4,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 8
+      },
+      {
+        groups: 4,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 4
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 2
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  }
+];
 
 getMatches = () => {
   const promises = structure.map(cat => {
@@ -173,6 +250,9 @@ getMatches = () => {
       return category.phases.map(phase => {
         return phase.groups.map(group => {
           return group.matches.map(match => {
+            if (match.id == 1615) {
+              console.log("this is match 1615");
+            }
             match.phase_id = phase.id;
             match.phase_position = phase.position;
             output.push(match);
@@ -221,174 +301,179 @@ getMatches()
         // console.log('--', s.name.toLowerCase(), '----------');
         return s.data
           .map((match, idx) => {
-            currentRow = idx;
-            if (
-              match.length > 1 &&
-              match[0] &&
-              !(match[0].toString().toLowerCase().trim() == "time")
-            ) {
-              var date = parseExcelDate(match[0]);
-              // console.log(date);
-              try {
-                var h = cleanString(match[1]);
-                var a = cleanString(match[3]);
-                var home = h == "WILD CARD"
-                  ? { group: null, pos: null }
-                  : JSON.parse(h);
-                var away = a == "WILD CARD"
-                  ? { group: null, pos: null }
-                  : JSON.parse(a);
-              } catch (e) {
-                // console.log('match[1]', match[1]);
-                // console.log('match[3]', match[3]);
-                throw e;
-              }
+            setTimeout(() => {
+              currentRow = idx;
+              if (
+                match.length > 1 &&
+                match[0] &&
+                !(match[0].toString().toLowerCase().trim() == "time")
+              ) {
+                var date = parseExcelDate(match[0]);
+                // console.log(date);
+                try {
+                  var h = cleanString(match[1]);
+                  var a = cleanString(match[3]);
+                  var home = h == "WILD CARD"
+                    ? { group: null, pos: null }
+                    : JSON.parse(h);
+                  var away = a == "WILD CARD"
+                    ? { group: null, pos: null }
+                    : JSON.parse(a);
+                } catch (e) {
+                  // console.log('match[1]', match[1]);
+                  // console.log('match[3]', match[3]);
+                  throw e;
+                }
 
-              var data = {
-                home: home,
-                away: away
-              };
-
-              var matchesFound = matches.filter(matchFilter(data));
-
-              if (matchesFound.length == 0) {
-                msg.push(
-                  `-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`
-                );
-                return null;
-              } else {
-                var thisMatch = matchesFound[0];
-                // console.log(thisMatch);
-
-                const matchId = thisMatch.id;
-                const excelHomeTeamName = cleanString(match[1]);
-                const excelAwayTeamName = cleanString(match[3]);
-                const excelHomeScore = parseInt(match[2]);
-                const excelAwayScore = parseInt(match[4]);
-                let homeScore = 0;
-                let awayScore = 0;
-
-                const getTeamId = (team, match) => {
-                  const teamObj = JSON.parse(team);
-
-                  if (
-                    match.placeholder_home_team_position == teamObj.pos &&
-                    match.placeholder_home_team_group == teamObj.group &&
-                    match.home_team.id
-                  ) {
-                    return match.home_team.id;
-                  } else if (
-                    match.placeholder_visitor_team_position == teamObj.pos &&
-                    match.placeholder_visitor_team_group == teamObj.group &&
-                    match.visitor_team.id
-                  ) {
-                    return match.visitor_team.id;
-                  }
-                  console.log(`No team ${team} found in match: ${match.id}`);
-                  return null;
+                var data = {
+                  home: home,
+                  away: away
                 };
 
-                const isHome = (team, match) => {
-                  const teamObj = JSON.parse(team);
+                var matchesFound = matches.filter(matchFilter(data));
 
-                  if (
-                    match.placeholder_home_team_position == teamObj.pos &&
-                    match.placeholder_home_team_group == teamObj.group &&
-                    match.home_team.id
-                  ) {
-                    return true;
-                  } else if (
-                    match.placeholder_visitor_team_position == teamObj.pos &&
-                    match.placeholder_visitor_team_group == teamObj.group &&
-                    match.visitor_team.id
-                  ) {
-                    return false;
-                  }
-                  console.log(`No team ${team} found in match: ${match.id}`);
+                if (matchesFound.length == 0) {
+                  msg.push(
+                    `-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`
+                  );
                   return null;
-                };
+                } else {
+                  var thisMatch = matchesFound[0];
+                  // console.log(thisMatch);
 
-                if (!isNaN(excelHomeScore) && !isNaN(excelAwayScore)) {
-                  let body = [];
-                  for (var i = 1; i <= excelHomeScore; i++) {
-                    body.push({
-                      event_id: 1,
-                      team_id: getTeamId(excelHomeTeamName, thisMatch)
-                    });
-                  }
-                  fetch(
-                    `${api}/match/${thisMatch.id}/event`,
-                    getRQ(body, "POST")
-                  )
-                    .then(res => res.json())
-                    .then(res => res.data)
-                    .catch(e => {
-                      throw e;
-                    });
+                  const matchId = thisMatch.id;
+                  const excelHomeTeamName = cleanString(match[1]);
+                  const excelAwayTeamName = cleanString(match[3]);
+                  const excelHomeScore = parseInt(match[2]);
+                  const excelAwayScore = parseInt(match[4]);
+                  let homeScore = 0;
+                  let awayScore = 0;
 
-                  console.log("MATCH ID", thisMatch.id);
-                  console.log("HOME SCORE", body);
+                  const getTeamId = (team, match) => {
+                    // console.log(team);
+                    const teamObj = JSON.parse(cleanString(team));
 
-                  body = [];
-                  for (var i = 1; i < excelAwayScore; i++) {
-                    body.push({
-                      event_id: 1,
-                      team_id: getTeamId(excelAwayTeamName, thisMatch)
-                    });
-                  }
-                  fetch(
-                    `${api}/match/${thisMatch.id}/event`,
-                    getRQ(body, "POST")
-                  )
-                    .then(res => res.json())
-                    .then(res => res.data)
-                    .catch(e => {
-                      throw e;
-                    });
-                  console.log("MATCH ID", thisMatch.id);
-                  console.log("AWAY SCORE", body);
-
-                  body = {
-                    played: true,
-                    home_team_score: isHome(excelHomeTeamName, thisMatch)
-                      ? excelHomeScore
-                      : excelAwayScore,
-                    visitor_team_score: isHome(excelHomeTeamName, thisMatch)
-                      ? excelAwayScore
-                      : excelHomeScore
+                    if (
+                      match.placeholder_home_team_position == teamObj.pos &&
+                      match.placeholder_home_team_group == teamObj.group &&
+                      match.home_team.id
+                    ) {
+                      return match.home_team.id;
+                    } else if (
+                      match.placeholder_visitor_team_position == teamObj.pos &&
+                      match.placeholder_visitor_team_group == teamObj.group &&
+                      match.visitor_team.id
+                    ) {
+                      return match.visitor_team.id;
+                    }
+                    // console.log(
+                    //   `1 - No team ${team} found in match: ${match.id}`
+                    // );
+                    return null;
                   };
 
-                  fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
-                    .then(res => res.json())
-                    .then(res => res.data)
-                    .catch(e => {
-                      throw e;
-                    });
+                  const isHome = (team, match) => {
+                    const teamObj = JSON.parse(team);
 
-                  console.log("MATCH ID", thisMatch.id);
-                  console.log("MATCH UPDATE", body);
-                } else {
-                  // console.log('ELSE HOMESCORE',excelHomeScore);
-                  // console.log('ELSE AWAYSCORE',excelAwayScore);
+                    if (
+                      match.placeholder_home_team_position == teamObj.pos &&
+                      match.placeholder_home_team_group == teamObj.group &&
+                      match.home_team.id
+                    ) {
+                      return true;
+                    } else if (
+                      match.placeholder_visitor_team_position == teamObj.pos &&
+                      match.placeholder_visitor_team_group == teamObj.group &&
+                      match.visitor_team.id
+                    ) {
+                      return false;
+                    }
+                    // console.log(match);
+                    // console.log(
+                    //   `2 - No team ${team} found in match: ${match.id}`
+                    // );
+                    return null;
+                  };
+
+                  if (
+                    !isNaN(excelHomeScore) &&
+                    !isNaN(excelAwayScore) &&
+                    excelHomeTeamName !== "WILD CARD" &&
+                    excelAwayTeamName !== "WILD CARD" &&
+                    getTeamId(excelHomeTeamName, thisMatch) !== null &&
+                    getTeamId(excelAwayTeamName, thisMatch) !== null
+                  ) {
+                    let body = [];
+                    for (var i = 1; i <= excelHomeScore; i++) {
+                      body.push({
+                        event_id: 1,
+                        team_id: getTeamId(excelHomeTeamName, thisMatch)
+                      });
+                    }
+                    fetch(
+                      `${api}/match/${thisMatch.id}/event`,
+                      getRQ(body, "POST")
+                    )
+                      .then(res => res.json())
+                      .then(res => res.data)
+                      .catch(e => {
+                        throw e;
+                      });
+
+                    // console.log("MATCH ID", thisMatch.id);
+                    // console.log("HOME SCORE", body);
+
+                    body = [];
+                    for (var i = 1; i <= excelAwayScore; i++) {
+                      body.push({
+                        event_id: 1,
+                        team_id: getTeamId(excelAwayTeamName, thisMatch)
+                      });
+                    }
+                    fetch(
+                      `${api}/match/${thisMatch.id}/event`,
+                      getRQ(body, "POST")
+                    )
+                      .then(res => res.json())
+                      .then(res => res.data)
+                      .catch(e => {
+                        throw e;
+                      });
+                    // console.log("MATCH ID", thisMatch.id);
+                    // console.log("AWAY SCORE", body);
+
+                    body = {
+                      played: true,
+                      home_team_score: isHome(excelHomeTeamName, thisMatch)
+                        ? excelHomeScore
+                        : excelAwayScore,
+                      visitor_team_score: isHome(excelHomeTeamName, thisMatch)
+                        ? excelAwayScore
+                        : excelHomeScore
+                    };
+
+                    if (thisMatch.id == 1615) {
+                      console.log("about to put 1615");
+                    }
+
+                    fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
+                      .then(res => res.json())
+                      .then(res => res.data)
+                      .catch(e => {
+                        throw e;
+                      });
+
+                    // console.log("MATCH ID", thisMatch.id);
+                    // console.log("MATCH UPDATE", body);
+                  } else {
+                    // console.log('ELSE HOMESCORE',excelHomeScore);
+                    // console.log('ELSE AWAYSCORE',excelAwayScore);
+                  }
                 }
               }
-            }
+              console.log("timed out");
+            }, 5000);
           })
-          .filter(x => x != null)
-          .map(match => {
-            //se esta generando una diferencia de tiempo que hace que las horas
-            //se generen un minuto menos de lo esperado aprox.
-            //le sumo 5 seg para asegurar que la hora esta en la fecha requerida
-            var query = `update matches set date = '${moment(match.date)
-              .add(5, "s")
-              .format(
-                "YYYY-MM-DD HH:mm"
-              )}-07'::timestamp WITH TIME ZONE, location = '${match.location}' where id = ${match.id};`;
-            return query;
-          })
-          .map(query => {
-            // console.log(query)
-          });
       });
   })
   .catch(e => {

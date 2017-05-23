@@ -264,7 +264,7 @@ const getPhases = () => {
         const output = [];
         input.map(category => {
             return category.phases.map(phase => {
-				console.log(phase);
+                console.log(phase);
                 output.push(phase.id);
             });
         });
@@ -273,20 +273,64 @@ const getPhases = () => {
     return Promise.all(promises).then(res => filterPhasesId(res));
 };
 
-getPhases()
-    .then(phases => {
-        phases.map(phaseId => {
-            const body = "";
-            fetch(`${api}/phase/${phaseId}/standing_table`, getRQ(body, "POST"))
-                // .then(res => res.json())
-                // .then(res => {
-                //     console.log(res.data);
-                // })
-                // .catch(e => {
-                //     "error", console.log(e);
-                // });
-        });
-    })
-    .catch(e => {
-        console.log(e);
+const getGroups = () => {
+	const promises = structure.map(cat => {
+        return fetch(`${api}/category/${cat.category_id}/match`)
+            .then(res => res.json())
+            .then(res => res.data);
     });
+    const filterGroupsId = input => {
+        const output = [];
+        input.map(category => {
+            return category.phases.map(phase => {
+				return phase.groups.map(group => {
+					output.push(group.id);
+				});
+            });
+        });
+        return output;
+    };
+    return Promise.all(promises).then(res => filterGroupsId(res));
+}
+
+// getPhases()
+//     .then(phases => {
+//         phases.map(phaseId => {
+//             const body = "";
+//             fetch(
+//                 `${api}/phase/${phaseId}/standing_table`,
+//                 getRQ(body, "POST")
+//             );
+//             // .then(res => res.json())
+//             // .then(res => {
+//             //     console.log(res.data);
+//             // })
+//             // .catch(e => {
+//             //     "error", console.log(e);
+//             // });
+//         });
+//     })
+//     .catch(e => {
+//         console.log(e);
+//     });
+
+	getGroups()
+	    .then(groups => {
+	        groups.map(groupId => {
+	            const body = "";
+	            fetch(
+	                `${api}/group/${groupId}/match_placeholder`,
+	                getRQ(body, "POST")
+	            );
+	            // .then(res => res.json())
+	            // .then(res => {
+	            //     console.log(res.data);
+	            // })
+	            // .catch(e => {
+	            //     "error", console.log(e);
+	            // });
+	        });
+	    })
+	    .catch(e => {
+	        console.log(e);
+	    });

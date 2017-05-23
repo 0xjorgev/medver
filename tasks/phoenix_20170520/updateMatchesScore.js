@@ -292,188 +292,194 @@ var cleanString = str => {
   );
 };
 
+let timeoutCounter = 5000;
 getMatches()
   .then(matches => {
     return file
       .filter(s => s.name.toLowerCase().includes("Table 5".toLowerCase()))
       .map(s => {
-        currentSheet = s.name;
-        // console.log('--', s.name.toLowerCase(), '----------');
-        return s.data
-          .map((match, idx) => {
-            setTimeout(() => {
-              currentRow = idx;
-              if (
-                match.length > 1 &&
-                match[0] &&
-                !(match[0].toString().toLowerCase().trim() == "time")
-              ) {
-                var date = parseExcelDate(match[0]);
-                // console.log(date);
-                try {
-                  var h = cleanString(match[1]);
-                  var a = cleanString(match[3]);
-                  var home = h == "WILD CARD"
-                    ? { group: null, pos: null }
-                    : JSON.parse(h);
-                  var away = a == "WILD CARD"
-                    ? { group: null, pos: null }
-                    : JSON.parse(a);
-                } catch (e) {
-                  // console.log('match[1]', match[1]);
-                  // console.log('match[3]', match[3]);
-                  throw e;
-                }
+				timeoutCounter += 60000;
+        setTimeout(() => {
+          currentSheet = s.name;
+          console.log(s.name.toLowerCase());
+          return s.data.map((match, idx) => {
+            currentRow = idx;
+            if (
+              match.length > 1 &&
+              match[0] &&
+              !(match[0].toString().toLowerCase().trim() == "time")
+            ) {
+              var date = parseExcelDate(match[0]);
+              // console.log(date);
+              try {
+                var h = cleanString(match[1]);
+                var a = cleanString(match[3]);
+                var home = h == "WILD CARD"
+                  ? { group: null, pos: null }
+                  : JSON.parse(h);
+                var away = a == "WILD CARD"
+                  ? { group: null, pos: null }
+                  : JSON.parse(a);
+              } catch (e) {
+                // console.log('match[1]', match[1]);
+                // console.log('match[3]', match[3]);
+                throw e;
+              }
 
-                var data = {
-                  home: home,
-                  away: away
-                };
+              var data = {
+                home: home,
+                away: away
+              };
 
-                var matchesFound = matches.filter(matchFilter(data));
+              var matchesFound = matches.filter(matchFilter(data));
 
-                if (matchesFound.length == 0) {
-                  msg.push(
-                    `-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`
-                  );
-                  return null;
-                } else {
-                  var thisMatch = matchesFound[0];
-                  // console.log(thisMatch);
+              if (matchesFound.length == 0) {
+                msg.push(
+                  `-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`
+                );
+                return null;
+              } else {
+                var thisMatch = matchesFound[0];
+                // console.log(thisMatch);
 
-                  const matchId = thisMatch.id;
-                  const excelHomeTeamName = cleanString(match[1]);
-                  const excelAwayTeamName = cleanString(match[3]);
-                  const excelHomeScore = parseInt(match[2]);
-                  const excelAwayScore = parseInt(match[4]);
-                  let homeScore = 0;
-                  let awayScore = 0;
+                const matchId = thisMatch.id;
+                const excelHomeTeamName = cleanString(match[1]);
+                const excelAwayTeamName = cleanString(match[3]);
+                const excelHomeScore = parseInt(match[2]);
+                const excelAwayScore = parseInt(match[4]);
+                let homeScore = 0;
+                let awayScore = 0;
 
-                  const getTeamId = (team, match) => {
-                    // console.log(team);
-                    const teamObj = JSON.parse(cleanString(team));
-
-                    if (
-                      match.placeholder_home_team_position == teamObj.pos &&
-                      match.placeholder_home_team_group == teamObj.group &&
-                      match.home_team.id
-                    ) {
-                      return match.home_team.id;
-                    } else if (
-                      match.placeholder_visitor_team_position == teamObj.pos &&
-                      match.placeholder_visitor_team_group == teamObj.group &&
-                      match.visitor_team.id
-                    ) {
-                      return match.visitor_team.id;
-                    }
-                    // console.log(
-                    //   `1 - No team ${team} found in match: ${match.id}`
-                    // );
-                    return null;
-                  };
-
-                  const isHome = (team, match) => {
-                    const teamObj = JSON.parse(team);
-
-                    if (
-                      match.placeholder_home_team_position == teamObj.pos &&
-                      match.placeholder_home_team_group == teamObj.group &&
-                      match.home_team.id
-                    ) {
-                      return true;
-                    } else if (
-                      match.placeholder_visitor_team_position == teamObj.pos &&
-                      match.placeholder_visitor_team_group == teamObj.group &&
-                      match.visitor_team.id
-                    ) {
-                      return false;
-                    }
-                    // console.log(match);
-                    // console.log(
-                    //   `2 - No team ${team} found in match: ${match.id}`
-                    // );
-                    return null;
-                  };
+                const getTeamId = (team, match) => {
+                  // console.log(team);
+                  const teamObj = JSON.parse(cleanString(team));
 
                   if (
-                    !isNaN(excelHomeScore) &&
-                    !isNaN(excelAwayScore) &&
-                    excelHomeTeamName !== "WILD CARD" &&
-                    excelAwayTeamName !== "WILD CARD" &&
-                    getTeamId(excelHomeTeamName, thisMatch) !== null &&
-                    getTeamId(excelAwayTeamName, thisMatch) !== null
+                    match.placeholder_home_team_position == teamObj.pos &&
+                    match.placeholder_home_team_group == teamObj.group &&
+                    match.home_team.id
                   ) {
-                    let body = [];
-                    for (var i = 1; i <= excelHomeScore; i++) {
-                      body.push({
-                        event_id: 1,
-                        team_id: getTeamId(excelHomeTeamName, thisMatch)
-                      });
-                    }
-                    fetch(
-                      `${api}/match/${thisMatch.id}/event`,
-                      getRQ(body, "POST")
-                    )
-                      .then(res => res.json())
-                      .then(res => res.data)
-                      .catch(e => {
-                        throw e;
-                      });
-
-                    // console.log("MATCH ID", thisMatch.id);
-                    // console.log("HOME SCORE", body);
-
-                    body = [];
-                    for (var i = 1; i <= excelAwayScore; i++) {
-                      body.push({
-                        event_id: 1,
-                        team_id: getTeamId(excelAwayTeamName, thisMatch)
-                      });
-                    }
-                    fetch(
-                      `${api}/match/${thisMatch.id}/event`,
-                      getRQ(body, "POST")
-                    )
-                      .then(res => res.json())
-                      .then(res => res.data)
-                      .catch(e => {
-                        throw e;
-                      });
-                    // console.log("MATCH ID", thisMatch.id);
-                    // console.log("AWAY SCORE", body);
-
-                    body = {
-                      played: true,
-                      home_team_score: isHome(excelHomeTeamName, thisMatch)
-                        ? excelHomeScore
-                        : excelAwayScore,
-                      visitor_team_score: isHome(excelHomeTeamName, thisMatch)
-                        ? excelAwayScore
-                        : excelHomeScore
-                    };
-
-                    if (thisMatch.id == 1615) {
-                      console.log("about to put 1615");
-                    }
-
-                    fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
-                      .then(res => res.json())
-                      .then(res => res.data)
-                      .catch(e => {
-                        throw e;
-                      });
-
-                    // console.log("MATCH ID", thisMatch.id);
-                    // console.log("MATCH UPDATE", body);
-                  } else {
-                    // console.log('ELSE HOMESCORE',excelHomeScore);
-                    // console.log('ELSE AWAYSCORE',excelAwayScore);
+                    return match.home_team.id;
+                  } else if (
+                    match.placeholder_visitor_team_position == teamObj.pos &&
+                    match.placeholder_visitor_team_group == teamObj.group &&
+                    match.visitor_team.id
+                  ) {
+                    return match.visitor_team.id;
                   }
+                  // console.log(
+                  //   `1 - No team ${team} found in match: ${match.id}`
+                  // );
+                  return null;
+                };
+
+                const isHome = (team, match) => {
+                  const teamObj = JSON.parse(team);
+
+                  if (
+                    match.placeholder_home_team_position == teamObj.pos &&
+                    match.placeholder_home_team_group == teamObj.group &&
+                    match.home_team.id
+                  ) {
+                    return true;
+                  } else if (
+                    match.placeholder_visitor_team_position == teamObj.pos &&
+                    match.placeholder_visitor_team_group == teamObj.group &&
+                    match.visitor_team.id
+                  ) {
+                    return false;
+                  }
+                  // console.log(match);
+                  // console.log(
+                  //   `2 - No team ${team} found in match: ${match.id}`
+                  // );
+                  return null;
+                };
+
+                if (
+                  !isNaN(excelHomeScore) &&
+                  !isNaN(excelAwayScore) &&
+                  excelHomeTeamName !== "WILD CARD" &&
+                  excelAwayTeamName !== "WILD CARD" &&
+                  getTeamId(excelHomeTeamName, thisMatch) !== null &&
+                  getTeamId(excelAwayTeamName, thisMatch) !== null
+                ) {
+                  let body = [];
+                  for (var i = 1; i <= excelHomeScore; i++) {
+                    body.push({
+                      event_id: 1,
+                      team_id: getTeamId(excelHomeTeamName, thisMatch)
+                    });
+                  }
+
+									if ('u-6 - nca - table 5' == currentSheet) {
+										console.log('THIS IS POSTING TO U6');
+									}
+
+                  fetch(
+                    `${api}/match/${thisMatch.id}/event`,
+                    getRQ(body, "POST")
+                  )
+                    .then(res => res.json())
+                    .then(res => res.data)
+                    .catch(e => {
+                      throw e;
+                    });
+
+                  // console.log("MATCH ID", thisMatch.id);
+                  // console.log("HOME SCORE", body);
+
+                  body = [];
+                  for (var i = 1; i <= excelAwayScore; i++) {
+                    body.push({
+                      event_id: 1,
+                      team_id: getTeamId(excelAwayTeamName, thisMatch)
+                    });
+                  }
+                  fetch(
+                    `${api}/match/${thisMatch.id}/event`,
+                    getRQ(body, "POST")
+                  )
+                    .then(res => res.json())
+                    .then(res => res.data)
+                    .catch(e => {
+                      throw e;
+                    });
+                  // console.log("MATCH ID", thisMatch.id);
+                  // console.log("AWAY SCORE", body);
+
+                  body = {
+                    played: true,
+                    home_team_score: isHome(excelHomeTeamName, thisMatch)
+                      ? excelHomeScore
+                      : excelAwayScore,
+                    visitor_team_score: isHome(excelHomeTeamName, thisMatch)
+                      ? excelAwayScore
+                      : excelHomeScore
+                  };
+
+                  if (thisMatch.id == 1615) {
+                    console.log("about to put 1615");
+                  }
+
+                  fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
+                    .then(res => res.json())
+                    .then(res => res.data)
+                    .catch(e => {
+                      throw e;
+                    });
+
+                  // console.log("MATCH ID", thisMatch.id);
+                  // console.log("MATCH UPDATE", body);
+                } else {
+                  // console.log('ELSE HOMESCORE',excelHomeScore);
+                  // console.log('ELSE AWAYSCORE',excelAwayScore);
                 }
               }
-              console.log("timed out");
-            }, 5000);
-          })
+            }
+            // console.log("timed out");
+          });
+        }, timeoutCounter );
       });
   })
   .catch(e => {

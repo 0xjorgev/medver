@@ -208,7 +208,6 @@ define(['express'
 		let match_id = req.params.match_id;
 		let team_id = req.params.team_id;
 
-
 		const body = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
 		const initial_player = body.map(_initial_player_list => {
 
@@ -284,7 +283,9 @@ define(['express'
 
 		//para almacenar el match creado
 		let _match = null
-
+		//este va a ser el match objeto; en general deberiamos trabajar con este
+		//en lugar de la version json
+		let __match = null
 		Models.match
 		.forge(matchData)
 		.save()
@@ -295,9 +296,11 @@ define(['express'
 				qb.leftJoin('matches_referees', 'matches.id', 'matches_referees.match_id')
 				qb.where({'matches.id': match.attributes.id})
 			})
-			.fetch()
+			.fetch({withRelated: 'group'})
 		})
 		.then(result => {
+			//FIXME: utilizar el objeto completo en lugar de solo attrbs
+			__match = result
 			_match = result.attributes
 			refereeData.match_id = _match.id
 
@@ -315,11 +318,50 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-				StandingTable.calculateByGroup(_match.group_id)
-				//TODO: revisar esta llamada
-				.then(r =>  PlaceholdersHelper.replacePlaceholders(_match.group_id) )
+				return StandingTable
+				.calculateByPhase(__match.related('group').get('phase_id'))
+				.then(() => {
+					return Models.group.forge({id: _match.group_id})
+					.fetch({withRelated: [{'phase.matches': function(qb){qb.where('matches.active', true)}}]})
+				})
+				.then(group => {
+					const phase = group.related('phase')
+					//fase cerrada: todos los matches activos == played
+					const phaseIsClosed = phase
+						.related('matches')
+						.reduce((flag, match) => flag && match.get('played'), true)
+
+					logger.debug(`phase ${phase.id} [${phase.get('category_id')}] IsClosed ${phaseIsClosed}`)
+					if(phaseIsClosed){
+						logger.debug('updating placeholders')
+						//se busca la siguiente fase
+						return Models.phase
+							.where({category_id: phase.get('category_id'), position: phase.get('position') + 1})
+							.fetch({withRelated: 'groups'})
+							.then(nextPhase => {
+								//si es la fase final, no se requiere la ejecucion
+								if(nextPhase == null) return null
+
+								return Promise.all(
+									//se actualizan las posiciones de la proxima fase
+									nextPhase.related('groups')
+									.map(g => g.updateTeamsByPosition())
+								)
+								.then(() => Promise.all(
+									//se reemplazan los placeholders
+									nextPhase.related('groups')
+									.map(g => g.updateMatchPlaceholders())
+								))
+								.catch( e => logger.error(e) )
+							})
+					}
+					else{
+						logger.debug('no se ejecuta el replacePlaceholders')
+						//no se hace el replace
+						return null
+					}
+				})
 			}
-			return result
 		})
 		.then(result => Response(res, _match))
 		.catch(error => Response(res, null, error))

@@ -2,8 +2,8 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module)
 }
 
-define(['./base_model', '../util/knex_util']
-,(DB, Knex) => {
+define(['./base_model', '../util/knex_util', '../util/logger_util', 'lodash']
+,(DB, Knex, logger, _) => {
 
 	var Category_group_phase_team = DB.Model.extend({
 		tableName: 'categories_groups_phases_teams',
@@ -49,13 +49,16 @@ define(['./base_model', '../util/knex_util']
 		}
 		//actualiza el campo position_in_group segun los resultados de la standing table asociada al grupo
 		,updatePositionsInGroup: function(groupId){
+
+			// cuando se cierra la fase inicial, esto funciona
 			const query = 'update categories_groups_phases_teams ' +
-			' set position_in_group = st.position ' +
+			' set position_in_group = st.position, team_id = st.team_id ' +
 			' from (select ' +
 			' id, team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position ' +
 			' from standing_tables where group_id = ?) as st' +
 			' where categories_groups_phases_teams.group_id = ? ' +
 			' and categories_groups_phases_teams.team_id = st.team_id'
+
 			return Knex.raw(query, [groupId, groupId])
 		}
 	})

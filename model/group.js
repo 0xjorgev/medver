@@ -5,16 +5,62 @@ define(['./base_model'
 	,'../util/knex_util'
 	,'../util/logger_util'
 	,'js-combinatorics'
+	,'lodash'
 	,'./phase'
 	,'./round'], (DB
 		,Knex
 		,logger
 		,Combinatorics
+		,_
 	) => {
 
 	var Group = DB.Model.extend({
 		tableName: 'groups',
 		hasTimestamps: true,
+		initialize: function() {
+
+			this.on('saving', () => {
+				const participants = this.get('participant_team')
+				if(participants == undefined
+					|| participants == null
+					|| participants <= 1){
+					//el numero minimo de participantes en un grupo es dos,
+					//no tiene sentido un grupo con menos de dos parts.
+					this.set('participant_team', 2)
+				}
+			}, this)
+
+			//cada vez que se crea un grupo hay que actualizar la spider para
+			//garantizar que existen los slots disponibles para los equipos
+			this.on('created', () => {
+				const participants = this.get('participant_team')
+				if(participants == undefined
+					|| participants == null
+					|| participants <= 1){
+					//el numero minimo de participantes en un grupo es dos,
+					//no tiene sentido un grupo con menos de dos parts.
+					logger.debug(`participants: ${participants}`)
+					this.set('participant_team', 2)
+				}
+
+				let rowsToInsert = []
+				for(let i = 0; i < participants; i++){
+					const data = { group_id: this.id
+						,phase_id: this.get('phase_id')
+						,position_in_group: i+1
+					}
+					rowsToInsert.push(DB._models.Category_group_phase_team.forge(data).save())
+				}
+				return Promise.all(rowsToInsert)
+				// .then(result => {
+				// 	if(result != null){
+				// 		logger.debug(result)
+				// 	}
+				// })
+				.catch(e => logger.error(e))
+
+			}, this)
+		},
 		//relations
 		phase: function(){
 			return this.belongsTo('Phase', 'phase_id')
@@ -101,7 +147,6 @@ define(['./base_model'
 			})
 		}
 		,updateMatchPlaceholders: function(){
-
 			const template = 'update matches set $TEAM_team_id = team_id '
 			+ ' from categories_groups_phases_teams '
 			+ ' where matches.group_id = ?'
@@ -117,6 +162,76 @@ define(['./base_model'
 				throw e
 			})
 		}
+
+		//segun las posiciones de la standing y de los partidos que componen un
+		//grupo, actualiza la tabla spider de acuerdo al grupo y la posicion presente.
+		//REQUIERE que existan los registros correspondientes en la spider con
+		//ID de group y position_in_group
+		,updateTeamsByPosition: function(){
+			// -- 1. de los matches de los grupos de la siguiente fase, obtener los placeholders
+			// select placeholder_home_team_group, placeholder_home_team_position, placeholder_visitor_team_group, placeholder_visitor_team_position
+			// from matches where group_id in (136) -- (136, 138)
+			//
+			// -- 2. con ese resultado, obtengo los equipos que estan en esas posiciones
+			// select group_id, position, team_id from (
+			// 	select  id, team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position
+			// 	from standing_tables where group_id in (134, 135)
+			// ) table1
+			//
+			// -- 3 ya tengo la info de que equipo esta en cual posicion, ahora update a spider
+			// update categories_groups_phases_teams set team
+
+			// -- 1. de los matches de los grupos de la siguiente fase, obtener los placeholders
+
+			console.log(`matches del group ${this.get('group_id')}`)
+
+			return DB._models.Match
+			.where({group_id: this.id})
+			.fetchAll()
+			.then(matches => {
+				return matches.map(match => {
+					return {
+						group_id: match.get('group_id')
+						,home_team_group: match.get('placeholder_home_team_group')
+						,home_team_position: match.get('placeholder_home_team_position')
+						,visitor_team_group: match.get('placeholder_visitor_team_group')
+						,visitor_team_position: match.get('placeholder_visitor_team_position')
+					}
+				})
+			})
+			.then(matches => {
+				//esta cadena retorna los equipos en cada posicion del grupo
+				return Promise.all(matches.map(match => {
+					let teamPositions = []
+					//por cada match, obtengo el equipo en esa position
+					return DB._models.StandingTable.getPositions(match.home_team_group)
+					.then( homePos => {
+						teamPositions.push(homePos.rows)
+						return DB._models.StandingTable.getPositions(match.visitor_team_group)
+					})
+					.then( awayPos => {
+						teamPositions.push(awayPos.rows)
+						return _(teamPositions).flatten().uniq().value()
+					})
+					.then(cleanPositions => {
+						match.positions = cleanPositions
+						return match
+					})
+				}))
+			})
+			//actualizacion de tabla spider
+			.then(groupsWithPositions => {
+				return Promise.all(groupsWithPositions.map(group => {
+					return group.positions.map(pos => {
+						return DB._models.Category_group_phase_team
+						.where({group_id: group.group_id, position_in_group: pos.position})
+						.fetchAll()
+						.then(spiders => spiders.map(spidey => spidey.set('team_id',pos.team_id).save()))
+					})
+				}))
+			})
+		}
+
 	})
 
 	// uses Registry plugin

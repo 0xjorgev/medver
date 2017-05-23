@@ -13,9 +13,7 @@ define(['./base_model'
 	var Match = DB.Model.extend({
 		tableName: 'matches'
 		,hasTimestamps: true
-		,initialize: function() {
-			this.on('saving', this.validate, this);
-
+		,initialize: function(){
 			//hay un problema para retornar distintas columnas al
 			//hacer update
 			//ver https://github.com/tgriesser/bookshelf/issues/507
@@ -43,11 +41,13 @@ define(['./base_model'
 			// 	])
 			// })
 
-			this.on('created', match => {
-				const entity = new DB._models.Entity({
-					object_type: 'matches'
-					,object_id: this.id })
-					return entity.save()
+				this.on('saving', this.validate, this);
+
+				this.on('created', match => {
+					const entity = new DB._models.Entity({
+						object_type: 'matches'
+						,object_id: this.id })
+						return entity.save()
 				}, this)
 
 				this.on('fetched', () => {
@@ -95,18 +95,18 @@ define(['./base_model'
 			,visitor_placeholder_group: function(){
 				return this.belongsTo('Group', 'placeholder_visitor_team_group')
 			}
-			//actualiza el score del partido en base a los eventos
 			,getScore: function(){
 				return `${this.relations.home_team.attributes.name}:${this.attributes.home_team_score}  - ${this.relations.visitor_team.attributes.name}:${this.attributes.visitor_team_score}`
 			}
+			//actualiza el score del partido en base a los eventos
 			,updateScore: function(){
 				//TODO: antes de ejecutar la funcion, deberia verificarse si las
 				//relaciones utilizadas fueron cargadas
-				const homeTeamId = this.attributes.home_team_id
-				const visitorTeamId = this.attributes.visitor_team_id
+				const homeTeamId = this.get('home_team_id')
+				const visitorTeamId = this.get('visitor_team_id')
 
 				//si no se ha jugado el partido, no se hace nada
-				if(!this.played) return
+				if(this.played == false) return
 
 				return this.load('events.event')
 				.then(match => {
@@ -134,17 +134,13 @@ define(['./base_model'
 					return this.save()
 				})
 				.catch(e => {
+					logger.error(e)
 					throw e
 				})
 			}
 		}
 		,{
 			//metodos estaticos
-			//TODO: implementar generador de numeros de match
-			getMatchNumber: function(){
-				console.log('implementar generador aqui')
-				return 567
-			}
 		})
 
 	// uses Registry plugin

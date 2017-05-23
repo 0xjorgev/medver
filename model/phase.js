@@ -34,6 +34,9 @@ define(['./base_model'
 		,category_group_phase_team: function () {
 			return this.hasMany('Category_group_phase_team', 'phase_id')
 		}
+		,matches: function(){
+			return this.hasMany('Match').through('Group')
+		}
 		,createMatches: function(){
 			if(this.get('position') == 1){
 				this.load('groups')
@@ -70,7 +73,7 @@ define(['./base_model'
 						}
 						return match.save()
 					})
-					
+
 					const awayHomePlaceholders = matches.map(match => {
 						const currentGroup = prevGroups.shift()
 						if(currentGroup){

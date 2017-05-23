@@ -13,6 +13,7 @@ define(['express'
 		,'sha.js'
 		,'redis'
 		,'bluebird'
+		,'lodash'
 	],(
 		express
 		,Response
@@ -25,6 +26,7 @@ define(['express'
 		,createHash
 		,redis
 		,bluebird
+		,_
 	) => {
 
 	bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -211,6 +213,55 @@ define(['express'
 		.then(result => Response(res, result))
 		.catch(error => Response(res, null, error) )
 
+	})
+
+	//
+	router.post('/spider/build', (req,res) => {
+		// -- ubicar grupos sin registro en spider
+		// select groups.id
+		// from groups
+		// left join categories_groups_phases_teams on groups.id = categories_groups_phases_teams.group_id
+		// where groups.active = true
+		// 	and categories_groups_phases_teams.id is null
+		// 	and participant_team is not null;
+
+		//se obtienen los grupos que no tienen registros en la tabla spider
+		//TODO: faltan los grupos que tienen registros en spider, pero son incompletos
+		//TODO: al crear el grupo se debe escribir la spider
+		//TODO: al eliminar el grupo debe eliminarse los registros en la spider
+		//TODO: al actualizar el # de participantes en el grupo debe tambien actualizarse spider
+		Models.group.query(qb => {
+			qb.leftJoin('categories_groups_phases_teams', 'groups.id', 'categories_groups_phases_teams.group_id')
+			qb.where('groups.active', true)
+			qb.whereNull('categories_groups_phases_teams.id')
+		})
+		.fetchAll({withRelated: ['phase']})
+		.then(groups => {
+			return groups.map(group => {
+				//un grupo debe tener al menos dos participantes, para que sea un "grupo"
+				const participants = (group.get('participant_team') == null || group.get('participant_team') <= 1) ? 2 : group.get('participant_team')
+				return { category_id: group.related('phase').get('category_id')
+						,phase_id: group.related('phase').id
+						,group_id: group.id
+						,participants: participants }
+			})
+		})
+		.then(rowsToInsert => {
+			return rowsToInsert.reduce((promises, row) => {
+				for(let i = 0; i < row.participants; i++){
+					const spidey = {category_id: row.category_id
+						,phase_id: row.phase_id
+						,group_id: row.group_id
+					}
+					promises.push(Models.category_group_phase_team.forge(spidey).save())
+				}
+				return promises
+			}, [])
+		})
+		.then(rowsToSave => {
+			Response(res, rowsToSave)
+		})
+		.catch(e => Response(res, null, e))
 	})
 
 	router.get('/services/stats', (req, res) => {

@@ -9,11 +9,13 @@ define(['express'
 	,'../model/index'
 	,'../util/request_message_util'
 	,'../util/response_message_util'
+	,'../util/logger_util'
 	,'../util/knex_util',]
 	,(express
 		, Models
 		, Message
 		, Response
+		, logger
 		, Knex) => {
 
     var router = express.Router();
@@ -33,23 +35,21 @@ define(['express'
         });
     });
 
-
 	//este servicio esta siendo utilizado por la app
 	//sera reemplazado por POST match/id/event
 	router.post('/', function (req, res) {
 		//Model Instance
 		//{match_id:5, event_id:7, player_in:null, player_out:null, instant:0, team_id:null }
-		let Event_match_player = Models.event_match_player
-		let match_result  = req.body
-		let match_id = match_result.match_id
+		//{"match_id":5, "event_id":7, "player_in":1, "player_out":null, "instant":33, "team_id":1 }
+		const matchResult = req.body
 
-		new Event_match_player(match_result)
+		logger.debug(matchResult)
+
+		Models.event_match_player
+		.forge(matchResult)
 		.save()
-		.then(result => {
-			Response(res, result)
-		}).catch(error => {
-			Response(res, null, error)
-		})
+		.then(result => Response(res, result))
+		.catch(error => Response(res, null, error))
 	});
 
 

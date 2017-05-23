@@ -1,18 +1,29 @@
-/**
- * Created by george on 16/02/2016.
- */
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['./base_model','./player', './match', './event', './team'], function (DB) {
+define(['./base_model'
+	,'../util/logger_util'
+	,'./player'
+	, './match'
+	, './event'
+	, './team']
+	, function (DB, logger) {
 
     const Event_match_player = DB.Model.extend({
         tableName: 'events_matches_players'
         ,hasTimestamps: true
 		,initialize: function(){
 			this.on('saving', () => {
-				return this.load(['event','match', 'player_in.person', 'player_out.person'])
+
+				const relationsToLoad = []
+				if(this.get('event_id') != undefined) relationsToLoad.push('event')
+				if(this.get('player_in') != undefined) relationsToLoad.push('player_in')
+				if(this.get('player_out') != undefined) relationsToLoad.push('player_out')
+				if(this.get('match_id') != undefined) relationsToLoad.push('match')
+				// if(this.get('team_id') != undefined) relationsToLoad.push('team')
+				// return this.load(['event','match', 'player_in', 'player_out'])
+				return this.load(relationsToLoad)
 			})
 		}
         //relations

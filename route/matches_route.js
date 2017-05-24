@@ -309,6 +309,9 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
+
+				// __match.updateScore()
+
 				return StandingTable
 				.calculateByPhase(__match.related('group').get('phase_id'))
 				.then(() => {

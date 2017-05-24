@@ -257,10 +257,60 @@ define(['express'
 				return promises
 			}, [])
 		})
-		.then(rowsToSave => {
-			Response(res, rowsToSave)
+		.then(() => {
+			Models.group
+			.where({active: true})
+			.fetchAll({withRelated: 'category_group_phase_team'})
+			.then(groups => {
+				return groups
+					.map(group => {
+						const slots = group.related('category_group_phase_team').length
+						const participants = group.get('participant_team')
+						const diff = participants - slots
+
+						logger.debug(`group ${group.id} tiene ${slots} slots; debe tener ${participants}. Diff ${diff}`)
+
+						if(!diff == 0){
+							if(diff > 0){
+								//se crean
+								logger.info(group.related('category_group_phase_team').toJSON())
+							}
+							else{
+								// logger.error(group.related('category_group_phase_team').toJSON())
+								//se borran
+							}
+						}
+
+						return group
+							.related('category_group_phase_team')
+							.map(spidey => {})
+						})
+			})
 		})
-		.catch(e => Response(res, null, e))
+		// .then(data => {
+			// return data.rows.map(g => {
+			// 	logger.debug(`faltan ${g.participant_team - g.num} registros para ${g.id}`)
+			// 	const diff = g.participant_team - g.num
+			// 	let promises = []
+			// 	for(let i = 1; i <= diff; i++){
+			// 		let d = {
+			// 			category_id: g.category_id
+			// 			,phase_id: g.phase_id
+			// 			,group_id: g.group_id
+			// 			,position_in_group: i
+			// 		}
+			// 		promises.push(Models.category_group_phase_team.forge(d).save())
+			// 	}
+			// 	return Promise.all(promises)
+			// })
+		// })
+		.then(() => {
+			Response(res, 'this is the end...')
+		})
+		.catch(e => {
+			logger.error(e)
+			Response(res, null, e)
+		})
 	})
 
 	router.get('/services/stats', (req, res) => {

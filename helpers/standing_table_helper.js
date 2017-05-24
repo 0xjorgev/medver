@@ -408,6 +408,7 @@ define(['../util/knex_util'
 						matches = _matches
 						//calculo de estadisticas
 						return matches.reduce((standings, match) => {
+							console.log('THIS IS A teamStandings',teamStandings)
 							const homeId = match.get('home_team_id')
 							const awayId = match.get('visitor_team_id')
 							let home = standings[homeId]

@@ -68,7 +68,7 @@ const structure = [
       }
     ]
   },
-  //nca u-6
+  // nca u-6
   {
     category_id: 97,
     initial_phase_id: 104,
@@ -250,9 +250,6 @@ getMatches = () => {
       return category.phases.map(phase => {
         return phase.groups.map(group => {
           return group.matches.map(match => {
-            if (match.id == 1615) {
-              console.log("this is match 1615");
-            }
             match.phase_id = phase.id;
             match.phase_position = phase.position;
             output.push(match);
@@ -292,13 +289,13 @@ var cleanString = str => {
   );
 };
 
-let timeoutCounter = 5000;
+let timeoutCounter = 0;
 getMatches()
   .then(matches => {
     return file
       .filter(s => s.name.toLowerCase().includes("Table 5".toLowerCase()))
       .map(s => {
-				timeoutCounter += 60000;
+        timeoutCounter += 5000;
         setTimeout(() => {
           currentSheet = s.name;
           console.log(s.name.toLowerCase());
@@ -412,9 +409,9 @@ getMatches()
                     });
                   }
 
-									if ('u-6 - nca - table 5' == currentSheet) {
-										console.log('THIS IS POSTING TO U6');
-									}
+                  if ('u-6 - nca - table 5' == currentSheet) {
+                    console.log('THIS IS POSTING TO U6');
+                  }
 
                   fetch(
                     `${api}/match/${thisMatch.id}/event`,
@@ -424,10 +421,25 @@ getMatches()
                     .then(res => res.data)
                     .catch(e => {
                       throw e;
-                    });
+                    })
+                    .then(() => {
+                      body = {
+                        played: true,
+                        home_team_score: isHome(excelHomeTeamName, thisMatch)
+                          ? excelHomeScore
+                          : excelAwayScore,
+                        visitor_team_score: isHome(excelHomeTeamName, thisMatch)
+                          ? excelAwayScore
+                          : excelHomeScore
+                      };
 
-                  // console.log("MATCH ID", thisMatch.id);
-                  // console.log("HOME SCORE", body);
+                      fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
+                        .then(res => res.json())
+                        .then(res => res.data)
+                        .catch(e => {
+                          throw e;
+                        });
+                    })
 
                   body = [];
                   for (var i = 1; i <= excelAwayScore; i++) {
@@ -444,30 +456,25 @@ getMatches()
                     .then(res => res.data)
                     .catch(e => {
                       throw e;
-                    });
-                  // console.log("MATCH ID", thisMatch.id);
-                  // console.log("AWAY SCORE", body);
+                    })
+                    .then(() => {
+                      body = {
+                        played: true,
+                        home_team_score: isHome(excelHomeTeamName, thisMatch)
+                          ? excelHomeScore
+                          : excelAwayScore,
+                        visitor_team_score: isHome(excelHomeTeamName, thisMatch)
+                          ? excelAwayScore
+                          : excelHomeScore
+                      };
 
-                  body = {
-                    played: true,
-                    home_team_score: isHome(excelHomeTeamName, thisMatch)
-                      ? excelHomeScore
-                      : excelAwayScore,
-                    visitor_team_score: isHome(excelHomeTeamName, thisMatch)
-                      ? excelAwayScore
-                      : excelHomeScore
-                  };
-
-                  if (thisMatch.id == 1615) {
-                    console.log("about to put 1615");
-                  }
-
-                  fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
-                    .then(res => res.json())
-                    .then(res => res.data)
-                    .catch(e => {
-                      throw e;
-                    });
+                      fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
+                        .then(res => res.json())
+                        .then(res => res.data)
+                        .catch(e => {
+                          throw e;
+                        });
+                    })
 
                   // console.log("MATCH ID", thisMatch.id);
                   // console.log("MATCH UPDATE", body);
@@ -479,7 +486,7 @@ getMatches()
             }
             // console.log("timed out");
           });
-        }, timeoutCounter );
+        }, timeoutCounter);
       });
   })
   .catch(e => {

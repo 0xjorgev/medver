@@ -97,13 +97,13 @@ define(['./base_model'
 	    	let person = {}
         	let newPerson = {}
 			//Creamos el player
-			if(_p.number !== undefined ) player.number = _p.number
-			if(_p.person_id !== undefined) player.person_id = _p.person_id
-			if(_p.team_id !== undefined ) player.team_id = _p.team_id
-			if(_p.position_id !== undefined ) player.position_id = _p.position_id
-			if(_p.active !== undefined ) player.active = _p.active
-			if(_p.img_url !== undefined ) player.img_url = _p.img_url
-			if(_p.id !== undefined ) player.id = _p.id
+			if(_p.number !== undefined && _p.number !== null) player.number = _p.number
+			if(_p.person_id !== undefined && _p.person_id !== null) player.person_id = _p.person_id
+			if(_p.team_id !== undefined  && _p.team_id !== null) player.team_id = _p.team_id
+			if(_p.position_id !== undefined && _p.position_id !== null ) player.position_id = _p.position_id
+			if(_p.active !== undefined && _p.active !== null ) player.active = _p.active
+			if(_p.img_url !== undefined && _p.img_url !== null ) player.img_url = _p.img_url
+			if(_p.id !== undefined && _p.id !== null ) player.id = _p.id
 
 			return new DB._models.Player(player).save()
 			.then(result => {

@@ -81,11 +81,21 @@ define(['express'
 		
 		const _players = utilities.isArray(req.body.data) ? req.body.data : [req.body.data]
 		return Promise.all(_players.map(_pl => {
+			// logger.debug(_pl)
 			return Models.person.findOrCreate(_pl.person)
 			.then(result => {
 				let newPerson = result.toJSON()
-				_pl.player.person_id = newPerson.id
-				return Models.player.findOrCreate(_pl.player)
+				// logger.debug(newPerson)
+				_pl.person_id = newPerson.id
+				let player = {}
+				if(_pl.number !== undefined && _pl.number !== null) player.number = _pl.number
+				if(_pl.person_id !== undefined && _pl.person_id !== null) player.person_id = _pl.person_id
+				if(_pl.team_id !== undefined  && _pl.team_id !== null) player.team_id = _pl.team_id
+				if(_pl.position_id !== undefined && _pl.position_id !== null ) player.position_id = _pl.position_id
+				if(_pl.active !== undefined && _pl.active !== null ) player.active = _pl.active
+				if(_pl.img_url !== undefined && _pl.img_url !== null ) player.img_url = _pl.img_url
+				if(_pl.id !== undefined && _pl.id !== null ) player.id = _pl.id
+				return Models.player.findOrCreate(player)
 			})
 			.then(_newpl => {
 				let newPlayer = _newpl.toJSON()

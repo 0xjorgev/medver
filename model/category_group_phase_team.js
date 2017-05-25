@@ -49,12 +49,13 @@ define(['./base_model', '../util/knex_util', '../util/logger_util', 'lodash']
 		}
 		//actualiza el campo position_in_group segun los resultados de la standing table asociada al grupo
 		,updatePositionsInGroup: function(groupId){
+			//TODO: la actualizacion de la spider no debe hacerse aqui, dado que
+			//esto represema
 
-			// cuando se cierra la fase inicial, esto funciona
 			const query = 'update categories_groups_phases_teams ' +
 			' set position_in_group = st.position, team_id = st.team_id ' +
-			' from (select ' +
-			' id, team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position ' +
+			' from (select id, team_id, group_id, points, ' +
+			' row_number() over (partition by group_id order by points desc) as position ' +
 			' from standing_tables where group_id = ?) as st' +
 			' where categories_groups_phases_teams.group_id = ? ' +
 			' and categories_groups_phases_teams.team_id = st.team_id'

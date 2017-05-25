@@ -504,12 +504,14 @@ define(['express'
 		innerData.team_id = data.team_id
 		innerData.category_id = data.category_id
 		innerData.next_status = data.status_id
-
+``
 		var prev = previous_registration_status(innerData)
 
 		//TODO: creo que deberia verificar antes si ya existe el slot antes de salvarlo
 		//debido que ahora estoy creando slots en la spider cuando creo el grupo
 		//si mal no recuerdo, apenas se inscribe se pone en la 1era fase y en ningun grupo
+		//TODO: 2 - es posible que los registros creados por aqui sean los que no tienen
+		//phase id
 		return new Models.category_group_phase_team(spiderData)
 		.save()
 		.then(function(new_invitation){

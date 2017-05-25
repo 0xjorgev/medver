@@ -72,7 +72,6 @@ define(['../node_modules/lodash/lodash.min'
 				var secretKey = process.env.API_SIGNING_KEY || 's3cr3t'
 				var verifiedJwt = nJwt.verify(token, secretKey)
 
-				//TODO: hay que buscar aqui los roles de usuario
 				//si se entrega un token válido, se inyectan los datos del usuario al request
 				//estos valores se obtienen al hacer login
 				req._currentUser = {

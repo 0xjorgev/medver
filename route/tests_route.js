@@ -223,7 +223,6 @@ define(['express'
         }
         else{
             orgData = {
-                //TODO: reemplazar el id por un code, en lugar del ID directo de base de datos
                 organization_type_id: 3, //organizacion tipo club
                 name: teamData.name + ' Club',
                 description: teamData.description,
@@ -350,7 +349,7 @@ define(['express'
           var email_template = email_status_template(result.relations.status_type.attributes.code)
           data.template = email_template
           var owner_email = team_owner_email(data)
-          //TODO
+
           //Send Email ----> Send Email
         // }
       })

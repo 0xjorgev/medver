@@ -126,38 +126,6 @@ define(['express',
 		})
 	})
 
-	//TODO: creo que este servicio no se utiliza
-	//deberia reventar con el 'new Category_Season' que no esta definido
-	// router.post('/:season_id/category', function (req, res) {
-	// 	const season_id = req.params.season_id
-	// 	const category_post = req.body
-	// 	const competition_id = category_post.competition_id
-	// 	const name = category_post.name
-	// 	const description = category_post.description
-	// 	const game_title = category_post.game_title
-	// 	const init_at = category_post.init_at
-	// 	const ends_at = category_post.ends_at
-	//
-	// 	logger.debug('req.body: ')
-	// 	logger.debug(req.body)
-	//
-	// 	new Category_Season({
-	// 		name: name,
-	// 		description:description,
-	// 		game_title:game_title,
-	// 		init_at:init_at,
-	// 		ends_at:ends_at,
-	// 		competition_id: competition_id
-	// 	})
-	// 	.save()
-	// 	.then(function(new_category){
-	// 		Response(res, new_category)
-	// 	})
-	// 	.catch(function(error){
-	// 		Response(res, null, error)
-	// 	})
-	// })
-
 	router.get('/:season_id/standing_table', (req, res) => {
 		Models.season.forge({id: req.params.season_id})
 		.fetch({withRelated: [

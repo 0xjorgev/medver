@@ -7,14 +7,12 @@ define(['express',
 		'../util/response_message_util',
 		'../util/knex_util',
 		'../util/logger_util',
-		'../helpers/team_placeholders_helper',
 		'../helpers/standing_table_helper'],
 		 (express,
 			Models,
 			Response,
 			Knex,
 			logger,
-			MatchPlaceholder,
 			StandingTable) => {
 
 	let router = express.Router()

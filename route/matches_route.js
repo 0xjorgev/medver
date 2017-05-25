@@ -9,7 +9,6 @@ define(['express'
 	,'util'
 	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
-	,'../helpers/team_placeholders_helper'
 	,'../util/generic_util'
 	,'../util/logger_util'
 	,'../helpers/feed_item_helper'
@@ -22,7 +21,6 @@ define(['express'
 	,util
 	,Response
 	,StandingTable
-	,PlaceholdersHelper
 	,utilities
 	,logger
 	,FeedItemHelper

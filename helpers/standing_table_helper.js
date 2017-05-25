@@ -358,6 +358,11 @@ define(['../util/knex_util'
 
 		StandingTable.calculateByPhase = (phaseId) => {
 			logger.debug('updating standing table of phase ' + phaseId)
+
+			let matchIds = null
+			let matches = null
+			let teamStandings = null
+
 			return new Promise((resolve, reject) => {
 				// Dada la fase, obtengo los equipos participantes,
 				// y los partidos en los que han jugado
@@ -380,7 +385,7 @@ define(['../util/knex_util'
 				Knex.raw(query, [phaseId])
 				.then(result => {
 					//aqui se almacena el grupo x equipo
-					let teamStandings = result.rows
+					teamStandings = result.rows
 						.reduce((teams, row) => {
 							if(teams[row.team_id] == undefined){
 								teams[row.team_id] = {
@@ -393,135 +398,141 @@ define(['../util/knex_util'
 							return teams
 						},{})
 
-					const matchIds = _(result.rows.map(m => m.match_id)).uniq().value()
-					let matches = null
+					matchIds = _(result.rows.map(m => m.match_id)).uniq().value()
+					matches = null
 
 					return Models.match.where('id', 'in', matchIds)
 					.fetchAll()
-					//se actualizan los scores de los partidos en base a los eventos
-					//TODO: pasar el updateScore al PUT de match
-					.then(_matches => Promise.all(_matches.map(m => m.updateScore())))
-					//salvajada para asegurar que tengo los scores correctos
-					.then(() => Models.match.where('id', 'in', matchIds)
-						.fetchAll({withRelated: 'events'}))
-					.then(_matches => {
-						matches = _matches
-						//calculo de estadisticas
-						return matches.reduce((standings, match) => {
-							const homeId = match.get('home_team_id')
-							const awayId = match.get('visitor_team_id')
-							let home = standings[homeId]
-							let away = standings[awayId]
-
-							if(home == undefined){
-								home = {
-								category_id: teamStandings[homeId].category_id
-								,phase_id: teamStandings[homeId].phase_id
-								,group_id: teamStandings[homeId].group_id
-								,team_id: homeId
-								,points: 0
-								,goals_in_favor: 0
-								,goals_against: 0
-								,matches_count: 1
-								,matches_won: 0
-								,matches_lost: 0
-								,matches_draw: 0}
-							}
-							else{
-								home.matches_count += 1
-							}
-
-							if(away == undefined){
-								away = {
-								category_id: teamStandings[awayId].category_id
-								,phase_id: teamStandings[awayId].phase_id
-								,group_id: teamStandings[awayId].group_id
-								,team_id: awayId
-								,points: 0
-								,goals_in_favor: 0
-								,goals_against: 0
-								,matches_count: 1
-								,matches_won: 0
-								,matches_lost: 0
-								,matches_draw: 0}
-							}
-							else {
-								away.matches_count += 1
-							}
-
-							//puntos, partidos ganados y perdidos
-							if(match.get('home_team_score') == match.get('visitor_team_score')){
-								home.points += 1
-								away.points += 1
-								home.matches_draw += 1
-								away.matches_draw += 1
-							}
-							else{
-								if(match.get('home_team_score') > match.get('visitor_team_score')){
-									home.points += 3
-									home.matches_won += 1
-									away.points += 0
-									away.matches_lost += 1
-								}
-								else{
-									home.points += 0
-									home.matches_lost += 1
-									away.points += 3
-									away.matches_won += 1
-								}
-							}
-
-							//se cuentan goles
-							const goalCount = match.related('events')
-							//goles y autogoles
-							.filter(e => e.get('event_id') == 1 || e.get('event_id') == 4)
-							.reduce((goals, e) => {
-								let count = goals[e.get('team_id')]
-								if(goals[e.get('team_id')] == undefined)
-									goals[e.get('team_id')] = {1: 0, 4: 0}
-
-								goals[e.get('team_id')][e.get('event_id')] += 1
-								return goals
-							}, {})
-
-							//a favor: mis goles y autogoles del adversario
-							//en contra: goles en mi contra y mis autogoles
-							//aqui se valida que hayan eventos del tipo, de no haber, se coloca 0
-							home.goals_in_favor += (goalCount[homeId] && goalCount[homeId]['1']) ? goalCount[homeId]['1'] : 0
-							home.goals_in_favor	+= (goalCount[awayId] && goalCount[awayId]['4']) ? goalCount[awayId]['4'] : 0
-							home.goals_against 	+= (goalCount[homeId] && goalCount[homeId]['4']) ? goalCount[homeId]['4'] : 0
-							home.goals_against 	+= (goalCount[awayId] && goalCount[awayId]['1']) ? goalCount[awayId]['1'] : 0
-							away.goals_in_favor += (goalCount[awayId] && goalCount[awayId]['1']) ? goalCount[awayId]['1'] : 0
-							away.goals_in_favor += (goalCount[homeId] && goalCount[homeId]['4']) ? goalCount[homeId]['4'] : 0
-							away.goals_against 	+= (goalCount[awayId] && goalCount[awayId]['4']) ? goalCount[awayId]['4'] : 0
-							away.goals_against 	+= (goalCount[homeId] && goalCount[homeId]['1']) ? goalCount[homeId]['1'] : 0
-
-							standings[homeId] = home
-							standings[awayId] = away
-							return standings
-						}, {})
-					})
-					.then(teamStandings => {
-						const finalStanding = _(teamStandings).values().value()
-
-						return Knex('standing_tables')
-							.where({phase_id: phaseId})
-							.del()
-							.then(() => finalStanding)
-					})
-					.then(standings => {
-						// logger.debug(standings)
-						return Promise.all(standings.map(row => Models.standing_table.forge(row).save()))
-					})
-					.then(() => {
-						resolve('c\'est fini')
-					})
-					.catch(e => reject(e))
 				})
+				//se actualizan los scores de los partidos en base a los eventos
+				//TODO: pasar el updateScore al PUT de match
+				.then(_matches => Promise.all(_matches.map(m => m.updateScore())))
+				//salvajada para asegurar que tengo los scores correctos
+				.then(() => Models.match
+					.where('id', 'in', matchIds)
+					.fetchAll({withRelated: 'events'}))
+				.then(_matches => {
+					matches = _matches
+					//calculo de estadisticas
+					return matches.reduce((standings, match) => {
+						const homeId = match.get('home_team_id')
+						const awayId = match.get('visitor_team_id')
+						let home = standings[homeId]
+						let away = standings[awayId]
+
+						if( teamStandings[homeId] == undefined ){
+							logger.lme.eline()
+							logger.debug(match.get('home_team_id'))
+							logger.debug(teamStandings)
+							logger.lme.eline()
+						}
+
+						if(home == undefined){
+							home = {
+							category_id: teamStandings[homeId].category_id
+							,phase_id: teamStandings[homeId].phase_id
+							,group_id: teamStandings[homeId].group_id
+							,team_id: homeId
+							,points: 0
+							,goals_in_favor: 0
+							,goals_against: 0
+							,matches_count: 1
+							,matches_won: 0
+							,matches_lost: 0
+							,matches_draw: 0}
+						}
+						else{
+							home.matches_count += 1
+						}
+
+						if(away == undefined){
+							away = {
+							category_id: teamStandings[awayId].category_id
+							,phase_id: teamStandings[awayId].phase_id
+							,group_id: teamStandings[awayId].group_id
+							,team_id: awayId
+							,points: 0
+							,goals_in_favor: 0
+							,goals_against: 0
+							,matches_count: 1
+							,matches_won: 0
+							,matches_lost: 0
+							,matches_draw: 0}
+						}
+						else {
+							away.matches_count += 1
+						}
+
+						//puntos, partidos ganados y perdidos
+						if(match.get('home_team_score') == match.get('visitor_team_score')){
+							home.points += 1
+							away.points += 1
+							home.matches_draw += 1
+							away.matches_draw += 1
+						}
+						else{
+							if(match.get('home_team_score') > match.get('visitor_team_score')){
+								home.points += 3
+								home.matches_won += 1
+								away.points += 0
+								away.matches_lost += 1
+							}
+							else{
+								home.points += 0
+								home.matches_lost += 1
+								away.points += 3
+								away.matches_won += 1
+							}
+						}
+
+						//se cuentan goles
+						const goalCount = match.related('events')
+						//goles y autogoles
+						.filter(e => e.get('event_id') == 1 || e.get('event_id') == 4)
+						.reduce((goals, e) => {
+							let count = goals[e.get('team_id')]
+							if(goals[e.get('team_id')] == undefined)
+								goals[e.get('team_id')] = {1: 0, 4: 0}
+
+							goals[e.get('team_id')][e.get('event_id')] += 1
+							return goals
+						}, {})
+
+						//a favor: mis goles y autogoles del adversario
+						//en contra: goles en mi contra y mis autogoles
+						//aqui se valida que hayan eventos del tipo, de no haber, se coloca 0
+						home.goals_in_favor += (goalCount[homeId] && goalCount[homeId]['1']) ? goalCount[homeId]['1'] : 0
+						home.goals_in_favor	+= (goalCount[awayId] && goalCount[awayId]['4']) ? goalCount[awayId]['4'] : 0
+						home.goals_against 	+= (goalCount[homeId] && goalCount[homeId]['4']) ? goalCount[homeId]['4'] : 0
+						home.goals_against 	+= (goalCount[awayId] && goalCount[awayId]['1']) ? goalCount[awayId]['1'] : 0
+						away.goals_in_favor += (goalCount[awayId] && goalCount[awayId]['1']) ? goalCount[awayId]['1'] : 0
+						away.goals_in_favor += (goalCount[homeId] && goalCount[homeId]['4']) ? goalCount[homeId]['4'] : 0
+						away.goals_against 	+= (goalCount[awayId] && goalCount[awayId]['4']) ? goalCount[awayId]['4'] : 0
+						away.goals_against 	+= (goalCount[homeId] && goalCount[homeId]['1']) ? goalCount[homeId]['1'] : 0
+
+						standings[homeId] = home
+						standings[awayId] = away
+						return standings
+					}, {})
+				})
+				.then(teamStandings => {
+					const finalStanding = _(teamStandings).values().value()
+
+					return Knex('standing_tables')
+						.where({phase_id: phaseId})
+						.del()
+						.then(() => finalStanding)
+				})
+				.then(standings => Promise.all(standings.map(row => Models.standing_table.forge(row).save())))
+				.then(() => Models.phase.forge({id: phaseId}).fetch({withRelated: 'groups'}))
+				.then(phase => Promise.all(phase.related('groups')
+					.map(group => Models
+					.category_group_phase_team
+					.updatePositionsInGroup(group.id)))
+				)
+				.then(result => resolve(result))
 				.catch(e => reject(e))
-
 			})
-
 		}
 
 		return StandingTable

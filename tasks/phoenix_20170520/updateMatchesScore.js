@@ -24,6 +24,28 @@ const getRQ = (data, method) => {
 
 const file = xlsx.parse(`${__dirname}/NCA AF JCA 3vV & CCC PHO.xlsx`);
 const structure = [
+  //3v3
+  {
+    category_id: 46,
+    initial_phase_id: 52,
+    phases: [
+      {
+        groups: 4,
+        teams_per_group: 4,
+        classifying_teams_per_phase: 0
+      },
+      {
+        groups: 2,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 0
+      },
+      {
+        groups: 1,
+        teams_per_group: 2,
+        classifying_teams_per_phase: 1
+      }
+    ]
+  },
   //ccc b
   {
     category_id: 33,
@@ -307,7 +329,6 @@ getMatches()
               !(match[0].toString().toLowerCase().trim() == "time")
             ) {
               var date = parseExcelDate(match[0]);
-              // console.log(date);
               try {
                 var h = cleanString(match[1]);
                 var a = cleanString(match[3]);
@@ -318,8 +339,6 @@ getMatches()
                   ? { group: null, pos: null }
                   : JSON.parse(a);
               } catch (e) {
-                // console.log('match[1]', match[1]);
-                // console.log('match[3]', match[3]);
                 throw e;
               }
 
@@ -331,14 +350,16 @@ getMatches()
               var matchesFound = matches.filter(matchFilter(data));
 
               if (matchesFound.length == 0) {
-                msg.push(
+                console.log(
                   `-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`
                 );
                 return null;
-              } else {
+              }
+              else if (matchesFound[0].played == true) {
+                console.log(`SKIPPING MATCH ${matchesFound[0].id} AS IT IS ALREADY PLAYED`);
+              }
+              else {
                 var thisMatch = matchesFound[0];
-                // console.log(thisMatch);
-
                 const matchId = thisMatch.id;
                 const excelHomeTeamName = cleanString(match[1]);
                 const excelAwayTeamName = cleanString(match[3]);
@@ -348,7 +369,6 @@ getMatches()
                 let awayScore = 0;
 
                 const getTeamId = (team, match) => {
-                  // console.log(team);
                   const teamObj = JSON.parse(cleanString(team));
 
                   if (
@@ -364,9 +384,9 @@ getMatches()
                   ) {
                     return match.visitor_team.id;
                   }
-                  // console.log(
-                  //   `1 - No team ${team} found in match: ${match.id}`
-                  // );
+                  console.log(
+                    `1 - No team ${team} found in match: ${match.id}`
+                  );
                   return null;
                 };
 
@@ -386,10 +406,9 @@ getMatches()
                   ) {
                     return false;
                   }
-                  // console.log(match);
-                  // console.log(
-                  //   `2 - No team ${team} found in match: ${match.id}`
-                  // );
+                  console.log(
+                    `2 - No team ${team} found in match: ${match.id}`
+                  );
                   return null;
                 };
 
@@ -407,10 +426,6 @@ getMatches()
                       event_id: 1,
                       team_id: getTeamId(excelHomeTeamName, thisMatch)
                     });
-                  }
-
-                  if ('u-6 - nca - table 5' == currentSheet) {
-                    console.log('THIS IS POSTING TO U6');
                   }
 
                   fetch(
@@ -439,7 +454,7 @@ getMatches()
                         .catch(e => {
                           throw e;
                         });
-                    })
+                    });
 
                   body = [];
                   for (var i = 1; i <= excelAwayScore; i++) {
@@ -474,17 +489,11 @@ getMatches()
                         .catch(e => {
                           throw e;
                         });
-                    })
+                    });
 
-                  // console.log("MATCH ID", thisMatch.id);
-                  // console.log("MATCH UPDATE", body);
-                } else {
-                  // console.log('ELSE HOMESCORE',excelHomeScore);
-                  // console.log('ELSE AWAYSCORE',excelAwayScore);
                 }
               }
             }
-            // console.log("timed out");
           });
         }, timeoutCounter);
       });
@@ -492,9 +501,7 @@ getMatches()
   .catch(e => {
     console.error(e);
     console.error(e.stack);
-    // console.log(currentSheet, ':',currentRow);
   })
   .then(res => {
     msg.unshift("-- FAILED MATCHES. Check these manually");
-    // console.log(msg.join('\n'))
   });

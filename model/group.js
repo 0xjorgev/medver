@@ -167,17 +167,88 @@ define(['./base_model'
 				})
 				return teams
 			})
-			.then(placeholders => {
-				logger.debug('equipos en el grupo ' + this.id + ' ' + placeholders.length)
-				logger.debug(placeholders)
+			.then(phs => {
+				//necesito determinar segun la standing_tables quienes son estos
+				let groups = []
+				const placeholders =
+				_(phs.filter(x => x[0] != null && x[1] != null))
+				.uniq().value()
+				.map(ph => {
+					if(!_.includes(groups, ph[0])) groups.push(ph[0])
+					return {
+						group_id: ph[0]
+						,position: ph[1]
+					}
+				})
 
-				// return Promise.all(this.related('category_group_phase_team')
-				// .map((spidey, idx) => {
-				// 	logger.debug(teams[idx].toJSON())
-				// 	logger.debug(`seteando al equipo ${teams[idx].id} en la spider ${spidey.id}` )
-				// 	spidey.set('team_id', teams[idx].id)
-				// 	return spidey.save()
-				// }))
+				logger.debug('placeholders')
+				logger.debug(placeholders) //estos son los que necesito para rellenar la spider
+
+				logger.debug(`Se necesita la standing de los grupos`)
+				logger.debug(groups)
+
+
+
+				return this.load('phase')
+				.then(() => {
+					// if(this.related('phase').position == 1){
+					// 	//no se hace nada, es la fase 1
+					// }
+					// else{
+						//busco la standing de la fase anterior
+					return DB._models.Group.where({id: groups[0]}).fetch()
+					// }
+				})
+				.then(group => {
+					return DB._models.StandingTable.getPositionsByPhase(group.get('phase_id'))
+				})
+				.then(rs => {
+					let stands = rs.rows
+					logger.debug(stands)
+					// let stands = _(standings).flatten().value()
+					logger.debug(`Se actualizan los campos team_id categories_groups_phases_teams del grupo ${this.id}, fase ${this.get('phase_id')}`)
+
+					logger.debug(`stands`)
+					logger.debug(stands)
+					//equipos a salvar en los slots libres de la spider
+					const teamsToInsert = placeholders.map(ph => {
+						logger.debug(`buscando ph`)
+						logger.debug(ph)
+
+						const found = stands.find(x => x.position == ph.position && x.group_id == ph.group_id)
+						logger.debug('found')
+						logger.debug(found)
+
+						return stands.find(x => x.position == ph.position && x.group_id == ph.group_id)
+					})
+					// .filter(x => x.team_id != null)
+
+					logger.debug('teamsToInsert')
+					logger.debug(teamsToInsert)
+
+					return this.load('category_group_phase_team')
+					.then(() => {
+						return Promise.all(this.related('category_group_phase_team')
+						.map((spy,idx) => {
+							logger.debug(`Se coloca ${teamsToInsert[idx].team_id} en group ${spy.get('group_id')} (${spy.id})` )
+							spy.set('team_id', teamsToInsert[idx].team_id)
+							return spy.save()
+						}))
+					})
+				})
+
+					// return DB._models.Category_group_phase_team
+					// .where({group_id: this.id})
+					// .fetchAll()
+					// .then(spiders => {
+					// 	return Promise.all(spiders.map((spy,idx) => {
+					// 		logger.debug(stands)
+					// 		logger.debug(`Se coloca ${stands[idx].team_id} en group ${spy.get('group_id')} ${spy.id}` )
+					// 		spy.set('team_id', stands[idx].team_id)
+					// 		return spy.save()
+					// 	}))
+					// })
+				// })
 			})
 			.catch(e => {
 				throw e
@@ -194,10 +265,6 @@ define(['./base_model'
 			// from matches where group_id in (136) -- (136, 138)
 			//
 			// -- 2. con ese resultado, obtengo los equipos que estan en esas posiciones
-			// select group_id, position, team_id from (
-			// 	select  id, team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position
-			// 	from standing_tables where group_id in (134, 135)
-			// ) table1
 			//
 			// -- 3 ya tengo la info de que equipo esta en cual posicion, ahora update a spider
 			// update categories_groups_phases_teams set team

@@ -362,6 +362,7 @@ define(['../util/knex_util'
 			let matchIds = null
 			let matches = null
 			let teamStandings = null
+			let teamSlots = null
 
 			return new Promise((resolve, reject) => {
 				// Dada la fase, obtengo los equipos participantes,
@@ -381,25 +382,58 @@ define(['../util/knex_util'
 				+ ' and matches.active = true'
 
 				let data = null
+				Models.phase.where({id: phaseId})
+				.fetch({withRelated: [{'matches': function(qb){qb.where({played:true, 'matches.active': true})}}
+				,'category_group_phase_team']})
+				.then(phase => {
+					const phaseSlots = phase.related('category_group_phase_team').toJSON()
+					matchIds = phase.related('matches').map(x => x.id)
+					// logger.debug(phaseSlots)
 
-				Knex.raw(query, [phaseId])
+					return phase.related('matches').reduce((slots, match) => {
+						let pos = phaseSlots.find(x => x.team_id == match.get('home_team_id'))
+
+						slots[match.get('home_team_id')] = {
+							team_id: match.get('home_team_id')
+							,category_id: pos.category_id
+							,phase_id: pos.phase_id
+							,group_id: pos.group_id
+						}
+
+						//copy paste FTW
+						let posV = phaseSlots.find(x => x.team_id == match.get('visitor_team_id'))
+						slots[match.get('visitor_team_id')] = {
+							team_id: match.get('visitor_team_id')
+							,category_id: posV.category_id
+							,phase_id: posV.phase_id
+							,group_id: posV.group_id
+						}
+						return slots
+					}, {})
+				})
+				.then(slots => {
+					teamSlots = slots
+					logger.debug(teamSlots)
+					return Knex.raw(query, [phaseId])
+				})
 				.then(result => {
 					//aqui se almacena el grupo x equipo
-					teamStandings = result.rows
-						.reduce((teams, row) => {
-							if(teams[row.team_id] == undefined){
-								teams[row.team_id] = {
-									team_id: row.team_id
-									,category_id: row.category_id
-									,phase_id: row.phase_id
-									,group_id: row.group_id
-								}
-							}
-							return teams
-						},{})
-
-					matchIds = _(result.rows.map(m => m.match_id)).uniq().value()
-					matches = null
+					// teamStandings = result.rows
+					// 	.reduce((teams, row) => {
+					// 		if(teams[row.team_id] == undefined){
+					// 			teams[row.team_id] = {
+					// 				team_id: row.team_id
+					// 				,category_id: row.category_id
+					// 				,phase_id: row.phase_id
+					// 				,group_id: row.group_id
+					// 			}
+					// 		}
+					// 		return teams
+					// 	},{})
+					//
+					// logger.lme.i(teamStandings)
+					// matchIds = _(result.rows.map(m => m.match_id)).uniq().value()
+					// matches = null
 
 					return Models.match.where('id', 'in', matchIds)
 					.fetchAll()
@@ -420,11 +454,20 @@ define(['../util/knex_util'
 						let home = standings[homeId]
 						let away = standings[awayId]
 
+						if(teamSlots[homeId] == undefined || !teamSlots[homeId].hasOwnProperty('category_id')){
+							logger.lme.eline()
+							logger.debug('esto se rompio')
+							logger.debug(match.toJSON())
+							logger.debug(homeId)
+							logger.debug(teamSlots)
+							logger.lme.eline()
+						}
+
 						if(home == undefined){
 							home = {
-							category_id: teamStandings[homeId].category_id
-							,phase_id: teamStandings[homeId].phase_id
-							,group_id: teamStandings[homeId].group_id
+							category_id: teamSlots[homeId].category_id
+							,phase_id: teamSlots[homeId].phase_id
+							,group_id: teamSlots[homeId].group_id
 							,team_id: homeId
 							,points: 0
 							,goals_in_favor: 0
@@ -440,9 +483,9 @@ define(['../util/knex_util'
 
 						if(away == undefined){
 							away = {
-							category_id: teamStandings[awayId].category_id
-							,phase_id: teamStandings[awayId].phase_id
-							,group_id: teamStandings[awayId].group_id
+							category_id: teamSlots[awayId].category_id
+							,phase_id: teamSlots[awayId].phase_id
+							,group_id: teamSlots[awayId].group_id
 							,team_id: awayId
 							,points: 0
 							,goals_in_favor: 0

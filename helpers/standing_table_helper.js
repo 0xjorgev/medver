@@ -420,12 +420,6 @@ define(['../util/knex_util'
 						let home = standings[homeId]
 						let away = standings[awayId]
 
-						logger.lme.eline()
-						logger.debug('match.id ' + match.id)
-						logger.debug(match.get('home_team_id') + ' vs ' +  match.get('visitor_team_id'))
-						logger.debug(teamStandings)
-						logger.lme.eline()
-
 						if(home == undefined){
 							home = {
 							category_id: teamStandings[homeId].category_id

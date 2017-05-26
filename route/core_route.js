@@ -237,8 +237,10 @@ define(['express'
 		.fetchAll({withRelated: ['phase']})
 		.then(groups => {
 			return groups.map(group => {
+
 				//un grupo debe tener al menos dos participantes, para que sea un "grupo"
 				const participants = (group.get('participant_team') == null || group.get('participant_team') <= 1) ? 2 : group.get('participant_team')
+
 				return { category_id: group.related('phase').get('category_id')
 						,phase_id: group.related('phase').id
 						,group_id: group.id
@@ -251,14 +253,16 @@ define(['express'
 					const spidey = {category_id: row.category_id
 						,phase_id: row.phase_id
 						,group_id: row.group_id
+						,position_in_group: i+1
 					}
+
 					promises.push(Models.category_group_phase_team.forge(spidey).save())
 				}
 				return promises
 			}, [])
 		})
 		.then(() => {
-			Models.group
+			return Models.group
 			.where({active: true})
 			.fetchAll({withRelated: 'category_group_phase_team'})
 			.then(groups => {
@@ -268,12 +272,12 @@ define(['express'
 						const participants = group.get('participant_team')
 						const diff = participants - slots
 
-						logger.debug(`group ${group.id} tiene ${slots} slots; debe tener ${participants}. Diff ${diff}`)
+						// logger.debug(`group ${group.id} tiene ${slots} slots; debe tener ${participants}. Diff ${diff}`)
 
 						if(!diff == 0){
 							if(diff > 0){
 								//se crean
-								logger.info(group.related('category_group_phase_team').toJSON())
+								// logger.info(group.related('category_group_phase_team').toJSON())
 							}
 							else{
 								// logger.error(group.related('category_group_phase_team').toJSON())

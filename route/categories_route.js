@@ -112,7 +112,7 @@ define(['express'
 		return Models.category
 			.where({id: category_id})
 			.where({active: true})
-			.fetch({withRelated: ['gender','phases', 'classification']})
+			.fetch({withRelated: ['gender','phases','classification','category_type','season']})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
 	});
@@ -504,7 +504,7 @@ define(['express'
 		innerData.team_id = data.team_id
 		innerData.category_id = data.category_id
 		innerData.next_status = data.status_id
-``
+
 		var prev = previous_registration_status(innerData)
 
 		//TODO: creo que deberia verificar antes si ya existe el slot antes de salvarlo

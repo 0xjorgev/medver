@@ -307,7 +307,7 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
-
+				//TODO: calcular el score del partido
 				// __match.updateScore()
 
 				return StandingTable
@@ -334,17 +334,21 @@ define(['express'
 								//si es la fase final, no se requiere la ejecucion
 								if(nextPhase == null) return null
 
+								// return Promise.all(
+								// 	//se actualizan las posiciones de la proxima fase
+								// 	nextPhase.related('groups')
+								// 	.map(g => g.updateTeamsByPosition())
+								// )
+
 								return Promise.all(
-									//se actualizan las posiciones de la proxima fase
-									nextPhase.related('groups')
-									.map(g => g.updateTeamsByPosition())
-								)
-								.then(() => Promise.all(
 									//se reemplazan los placeholders
 									nextPhase.related('groups')
 									.map(g => g.updateMatchPlaceholders())
-								))
-								.catch( e => logger.error(e) )
+								)
+								.catch( e => {
+									logger.error(e)
+									logger.error(e.stack)
+								})
 							})
 					}
 					else{

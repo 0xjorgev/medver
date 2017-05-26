@@ -420,12 +420,11 @@ define(['../util/knex_util'
 						let home = standings[homeId]
 						let away = standings[awayId]
 
-						if( teamStandings[homeId] == undefined ){
-							logger.lme.eline()
-							logger.debug(match.get('home_team_id'))
-							logger.debug(teamStandings)
-							logger.lme.eline()
-						}
+						logger.lme.eline()
+						logger.debug('match.id ' + match.id)
+						logger.debug(match.get('home_team_id') + ' vs ' +  match.get('visitor_team_id'))
+						logger.debug(teamStandings)
+						logger.lme.eline()
 
 						if(home == undefined){
 							home = {
@@ -520,8 +519,7 @@ define(['../util/knex_util'
 
 					return Knex('standing_tables')
 						.where({phase_id: phaseId})
-						.del()
-						.then(() => finalStanding)
+						.del().then(() => finalStanding)
 				})
 				.then(standings => Promise.all(standings.map(row => Models.standing_table.forge(row).save())))
 				.then(() => Models.phase.forge({id: phaseId}).fetch({withRelated: 'groups'}))

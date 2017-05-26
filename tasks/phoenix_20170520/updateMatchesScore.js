@@ -311,7 +311,7 @@ var cleanString = str => {
   );
 };
 
-let timeoutCounter = 0;
+var timeoutCounter = 0;
 getMatches()
   .then(matches => {
     return file
@@ -365,8 +365,8 @@ getMatches()
                 const excelAwayTeamName = cleanString(match[3]);
                 const excelHomeScore = parseInt(match[2]);
                 const excelAwayScore = parseInt(match[4]);
-                let homeScore = 0;
-                let awayScore = 0;
+                var homeScore = 0;
+                var awayScore = 0;
 
                 const getTeamId = (team, match) => {
                   const teamObj = JSON.parse(cleanString(team));
@@ -420,7 +420,7 @@ getMatches()
                   getTeamId(excelHomeTeamName, thisMatch) !== null &&
                   getTeamId(excelAwayTeamName, thisMatch) !== null
                 ) {
-                  let body = [];
+                  var body = [];
                   for (var i = 1; i <= excelHomeScore; i++) {
                     body.push({
                       event_id: 1,

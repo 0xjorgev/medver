@@ -149,9 +149,36 @@ define(['./base_model'
 
 			const homeQuery = template.replace(/\$TEAM/g, 'home')
 			const awayQuery = template.replace(/\$TEAM/g, 'visitor')
+			const group = null
 
 			return Knex.raw(homeQuery, [this.id])
 			.then(() => Knex.raw(awayQuery, [this.id]))
+			//actualizacion de slots en spider.
+			//se toman los equipos de los partidos de ESTE grupo
+			//luego los escribo en los slots de la spider
+			.then(() => this.load(['matches' ,'phase']))
+			.then(matches => {
+				//los equipos que estan en el grupo, de acuerdo a los partidos
+				const teams = []
+				this.related('matches')
+				.map(m => {
+					teams.push([m.get('placeholder_home_team_group'), m.get('placeholder_home_team_position')])
+					teams.push([m.get('placeholder_visitor_team_group'), m.get('placeholder_visitor_team_position')])
+				})
+				return teams
+			})
+			.then(placeholders => {
+				logger.debug('equipos en el grupo ' + this.id + ' ' + placeholders.length)
+				logger.debug(placeholders)
+
+				// return Promise.all(this.related('category_group_phase_team')
+				// .map((spidey, idx) => {
+				// 	logger.debug(teams[idx].toJSON())
+				// 	logger.debug(`seteando al equipo ${teams[idx].id} en la spider ${spidey.id}` )
+				// 	spidey.set('team_id', teams[idx].id)
+				// 	return spidey.save()
+				// }))
+			})
 			.catch(e => {
 				throw e
 			})
@@ -176,8 +203,8 @@ define(['./base_model'
 			// update categories_groups_phases_teams set team
 
 			// -- 1. de los matches de los grupos de la siguiente fase, obtener los placeholders
-
-			console.log(`matches del group ${this.get('group_id')}`)
+			logger.debug('updateTeamsByPosition')
+			console.log(`Se buscan los matches del grupo ${this.id}`)
 
 			return DB._models.Match
 			.where({group_id: this.id})
@@ -194,6 +221,8 @@ define(['./base_model'
 				})
 			})
 			.then(matches => {
+				logger.debug('matches')
+				logger.debug(matches)
 				//esta cadena retorna los equipos en cada posicion del grupo
 				return Promise.all(matches.map(match => {
 					let teamPositions = []
@@ -215,12 +244,24 @@ define(['./base_model'
 			})
 			//actualizacion de tabla spider
 			.then(groupsWithPositions => {
+				logger.debug('posiciones')
+				logger.debug(groupsWithPositions)
 				return Promise.all(groupsWithPositions.map(group => {
 					return group.positions.map(pos => {
+						logger.debug(' > ' + group.group_id + ' ' + pos.position)
+						logger.debug()
 						return DB._models.Category_group_phase_team
 						.where({group_id: group.group_id, position_in_group: pos.position})
 						.fetchAll()
-						.then(spiders => spiders.map(spidey => spidey.set('team_id',pos.team_id).save()))
+						.then(spiders => {
+							logger.lme.wline()
+							logger.debug(spiders.toJSON())
+							return spiders.map(spidey => {
+								logger.debug(spidey)
+								return spidey.set('team_id',pos.team_id).save()
+							})
+						})
+						//poner un log en el on saving de la spider
 					})
 				}))
 			})

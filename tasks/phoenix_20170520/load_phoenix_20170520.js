@@ -9,24 +9,18 @@ const structure = [
 	{ category_id: 33
 		,initial_phase_id: 39
 		,phases: [
-			 {groups: 4, teams_per_group: 4
-				,classifying_teams_per_phase: 0}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 0}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
+			 {groups: 4, teams_per_group: 4 ,classifying_teams_per_phase: 0}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 0}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
 		]
 	}
 	//ccc g
 	,{ category_id: 35
 		,initial_phase_id: 41
 		,phases: [
-			{groups: 2, teams_per_group: 3
-			,classifying_teams_per_phase: 4}
-			,{groups: 2, teams_per_group: 2
-			,classifying_teams_per_phase: 0}
-			,{groups: 1, teams_per_group: 2
-			,classifying_teams_per_phase: 1}
+			{groups: 2, teams_per_group: 3 ,classifying_teams_per_phase: 4}
+			,{groups: 2, teams_per_group: 2 ,classifying_teams_per_phase: 0}
+			,{groups: 1, teams_per_group: 2 ,classifying_teams_per_phase: 1}
 		]
 	}
 	//nca u-6

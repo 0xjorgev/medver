@@ -112,7 +112,7 @@ define(['express'
 		return Models.category
 			.where({id: category_id})
 			.where({active: true})
-			.fetch({withRelated: ['gender','phases','classification','category_type','season']})
+			.fetch({withRelated: ['gender','phases.groups','classification','category_type','season']})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
 	});

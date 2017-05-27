@@ -244,24 +244,24 @@ define(['express'
 
 		//datos para los placeholders
 		// si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
-		if(data.home_team_id == undefined || data.home_team_id == null){
-			if(data.placeholder_home_team_group != undefined)
-				matchData.placeholder_home_team_group = data.placeholder_home_team_group
-			if(data.placeholder_home_team_position != undefined)
-				matchData.placeholder_home_team_position = data.placeholder_home_team_position
-		}
+		// if(data.home_team_id == undefined || data.home_team_id == null){
+		if(data.placeholder_home_team_group != undefined)
+			matchData.placeholder_home_team_group = data.placeholder_home_team_group
+		if(data.placeholder_home_team_position != undefined)
+			matchData.placeholder_home_team_position = data.placeholder_home_team_position
+		// }
 		//por el momento no voy a a eliminar los campos
 		// else {
 		// 	matchData.placeholder_home_team_group = null
 		// 	matchData.placeholder_home_team_position = null
 		// }
 
-		if(data.visitor_team_id == undefined || data.visitor_team_id == null){
-			if(data.placeholder_visitor_team_group != undefined)
-				matchData.placeholder_visitor_team_group = data.placeholder_visitor_team_group
-			if(data.placeholder_visitor_team_position != undefined)
-				matchData.placeholder_visitor_team_position = data.placeholder_visitor_team_position
-		}
+		// if(data.visitor_team_id == undefined || data.visitor_team_id == null){
+		if(data.placeholder_visitor_team_group != undefined)
+			matchData.placeholder_visitor_team_group = data.placeholder_visitor_team_group
+		if(data.placeholder_visitor_team_position != undefined)
+			matchData.placeholder_visitor_team_position = data.placeholder_visitor_team_position
+		// }
 		// else {
 		// 	matchData.placeholder_visitor_team_group = null
 		// 	matchData.placeholder_visitor_team_position = null

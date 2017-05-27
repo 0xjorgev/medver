@@ -361,37 +361,29 @@ define(['../util/knex_util'
 
 			let matchIds = null
 			let matches = null
-			let teamStandings = null
 			let teamSlots = null
 
 			return new Promise((resolve, reject) => {
 				// Dada la fase, obtengo los equipos participantes,
 				// y los partidos en los que han jugado
-				const query =
-				' select categories_groups_phases_teams.phase_id'
-				+ ' 	,categories_groups_phases_teams.group_id'
-				+ ' 	,categories_groups_phases_teams.category_id'
-				+ ' 	,categories_groups_phases_teams.team_id '
-				+ ' 	,matches.id as match_id'
-				+ ' from categories_groups_phases_teams'
-				+ ' inner join groups on groups.id = categories_groups_phases_teams.group_id'
-				+ ' inner join matches on (home_team_id = team_id or visitor_team_id = team_id)'
-				+ ' where categories_groups_phases_teams.phase_id = ?'
-				+ ' and categories_groups_phases_teams.group_id is not null'
-				+ ' and matches.played = true'
-				+ ' and matches.active = true'
 
-				let data = null
 				Models.phase.where({id: phaseId})
-				.fetch({withRelated: [{'matches': function(qb){qb.where({played:true, 'matches.active': true})}}
+				.fetch({withRelated: [{'matches': function(qb){
+					qb.whereNotNull('matches.home_team_id')
+					qb.whereNotNull('matches.visitor_team_id')
+					qb.where({played:true, 'matches.active': true })
+				}}
 				,'category_group_phase_team']})
 				.then(phase => {
 					const phaseSlots = phase.related('category_group_phase_team').toJSON()
-					matchIds = phase.related('matches').map(x => x.id)
+					// logger.debug('phaseSlots')
 					// logger.debug(phaseSlots)
+					matchIds = phase.related('matches').map(x => x.id)
 
 					return phase.related('matches').reduce((slots, match) => {
 						let pos = phaseSlots.find(x => x.team_id == match.get('home_team_id'))
+
+						// logger.debug(`match ${match.id}: homeId ${match.get('home_team_id')} vs awayId ${match.get('visitor_team_id')}`)
 
 						slots[match.get('home_team_id')] = {
 							team_id: match.get('home_team_id')
@@ -413,28 +405,10 @@ define(['../util/knex_util'
 				})
 				.then(slots => {
 					teamSlots = slots
-					logger.debug(teamSlots)
-					return Knex.raw(query, [phaseId])
+					// logger.debug(teamSlots)
+					return slots
 				})
-				.then(result => {
-					//aqui se almacena el grupo x equipo
-					// teamStandings = result.rows
-					// 	.reduce((teams, row) => {
-					// 		if(teams[row.team_id] == undefined){
-					// 			teams[row.team_id] = {
-					// 				team_id: row.team_id
-					// 				,category_id: row.category_id
-					// 				,phase_id: row.phase_id
-					// 				,group_id: row.group_id
-					// 			}
-					// 		}
-					// 		return teams
-					// 	},{})
-					//
-					// logger.lme.i(teamStandings)
-					// matchIds = _(result.rows.map(m => m.match_id)).uniq().value()
-					// matches = null
-
+				.then(() => {
 					return Models.match.where('id', 'in', matchIds)
 					.fetchAll()
 				})
@@ -454,18 +428,10 @@ define(['../util/knex_util'
 						let home = standings[homeId]
 						let away = standings[awayId]
 
-						if(teamSlots[homeId] == undefined || !teamSlots[homeId].hasOwnProperty('category_id')){
-							logger.lme.eline()
-							logger.debug('esto se rompio')
-							logger.debug(match.toJSON())
-							logger.debug(homeId)
-							logger.debug(teamSlots)
-							logger.lme.eline()
-						}
+						// logger.debug(`match ${match.id}: homeId ${homeId} vs awayId ${awayId}`)
 
 						if(home == undefined){
-							home = {
-							category_id: teamSlots[homeId].category_id
+							home = { category_id: teamSlots[homeId].category_id
 							,phase_id: teamSlots[homeId].phase_id
 							,group_id: teamSlots[homeId].group_id
 							,team_id: homeId
@@ -482,8 +448,7 @@ define(['../util/knex_util'
 						}
 
 						if(away == undefined){
-							away = {
-							category_id: teamSlots[awayId].category_id
+							away = { category_id: teamSlots[awayId].category_id
 							,phase_id: teamSlots[awayId].phase_id
 							,group_id: teamSlots[awayId].group_id
 							,team_id: awayId
@@ -526,7 +491,6 @@ define(['../util/knex_util'
 						//goles y autogoles
 						.filter(e => e.get('event_id') == 1 || e.get('event_id') == 4)
 						.reduce((goals, e) => {
-							let count = goals[e.get('team_id')]
 							if(goals[e.get('team_id')] == undefined)
 								goals[e.get('team_id')] = {1: 0, 4: 0}
 

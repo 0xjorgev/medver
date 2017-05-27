@@ -1,4 +1,4 @@
-// var xlsx = require('node-xlsx')
+fpla// var xlsx = require('node-xlsx')
 var _ = require('lodash')
 var lme = require('lme')
 var util = require('util')
@@ -325,6 +325,7 @@ competitionBuilder.getMatches = () => {
 // competitionBuilder.createMatches()
 // competitionBuilder.getMatches()
 
+//NOTA: este metodo no deberia usarse; corre los PH en todos los grupos de la cat
 competitionBuilder.runPlaceholders = () => {
 	const promises = structure.map( cat => {
 		return fetch(`${api}/category/${cat.category_id}/team_placeholders`)
@@ -337,7 +338,6 @@ competitionBuilder.runPlaceholders = () => {
 	})
 
 	logger(promises)
-
 
 	return Promise.all(promises)
 	.then(res => {

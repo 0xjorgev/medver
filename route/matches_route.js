@@ -323,22 +323,19 @@ define(['express'
 						.related('matches')
 						.reduce((flag, match) => flag && match.get('played'), true)
 
-					logger.debug(`phase ${phase.id} [${phase.get('category_id')}] IsClosed ${phaseIsClosed}`)
+					logger.debug(`Category ${phase.get('category_id')}, Phase ${phase.id}  is closed? ${phaseIsClosed}`)
 					if(phaseIsClosed){
-						logger.debug('updating placeholders')
+						logger.debug('Updating placeholders')
 						//se busca la siguiente fase
 						return Models.phase
 							.where({category_id: phase.get('category_id'), position: phase.get('position') + 1})
 							.fetch({withRelated: 'groups'})
 							.then(nextPhase => {
 								//si es la fase final, no se requiere la ejecucion
-								if(nextPhase == null) return null
-
-								// return Promise.all(
-								// 	//se actualizan las posiciones de la proxima fase
-								// 	nextPhase.related('groups')
-								// 	.map(g => g.updateTeamsByPosition())
-								// )
+								if(nextPhase == null) {
+									logger.debug(`Phase ${phase.id} has no next phase`)
+									return null
+								}
 
 								return Promise.all(
 									//se reemplazan los placeholders
@@ -352,7 +349,7 @@ define(['express'
 							})
 					}
 					else{
-						logger.debug('no se ejecuta el replacePlaceholders')
+						logger.debug(`Phase ${phase.id} is not closed, placeholders of next phase not replaced`)
 						//no se hace el replace
 						return null
 					}

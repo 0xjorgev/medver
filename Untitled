@@ -116,7 +116,7 @@ update categories_groups_phases_teams set position_in_group = 2 where team_id = 
 update categories_groups_phases_teams set position_in_group = 3 where team_id = 165 and group_id = 334;
 update categories_groups_phases_teams set position_in_group = 1 where team_id = 171 and group_id = 337;
 update categories_groups_phases_teams set position_in_group = 2 where team_id = 174 and group_id = 337;
-update categories_groups_phases_teams set position_in_group = 3 where team_id = 165 and group_id = 337;
+update categories_groups_phases_teams set position_in_group = 3 where team_id = 175 and group_id = 337;
 
 -- reset matches f1 y f2
 update matches set home_team_id = null, visitor_team_id = null where group_id in (334,337,338,335,336);

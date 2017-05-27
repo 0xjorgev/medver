@@ -846,6 +846,7 @@ define(['express'
 	// dada una fase, retorna los placeholders de posiciones en referencia a la fase anterior
 	// es decir, ganador grupo 1, posicion 2 grupo 3, etc
 	router.get('/:category_id/team_placeholders', (req, res) => {
+		logger.error('actualizando PH de todas las fases de la cat '+ req.params.category_id)
 		Models.category
 		.where({id: req.params.category_id})
 		.fetch({withRelated: ['phases.groups']})

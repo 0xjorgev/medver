@@ -311,54 +311,54 @@ var cleanString = str => {
   );
 };
 
-var timeoutCounter = 0;
+var timeoutCounter = 1000;
 getMatches()
   .then(matches => {
     return file
       .filter(s => s.name.toLowerCase().includes("Table 5".toLowerCase()))
       .map(s => {
-        timeoutCounter += 5000;
-        setTimeout(() => {
-          currentSheet = s.name;
-          console.log(s.name.toLowerCase());
-          return s.data.map((match, idx) => {
-            currentRow = idx;
-            if (
-              match.length > 1 &&
-              match[0] &&
-              !(match[0].toString().toLowerCase().trim() == "time")
-            ) {
-              var date = parseExcelDate(match[0]);
-              try {
-                var h = cleanString(match[1]);
-                var a = cleanString(match[3]);
-                var home = h == "WILD CARD"
-                  ? { group: null, pos: null }
-                  : JSON.parse(h);
-                var away = a == "WILD CARD"
-                  ? { group: null, pos: null }
-                  : JSON.parse(a);
-              } catch (e) {
-                throw e;
-              }
+        currentSheet = s.name;
+        console.log(s.name.toLowerCase());
+        return s.data.map((match, idx) => {
+          currentRow = idx;
+          if (
+            match.length > 1 &&
+            match[0] &&
+            !(match[0].toString().toLowerCase().trim() == "time")
+          ) {
+            var date = parseExcelDate(match[0]);
+            try {
+              var h = cleanString(match[1]);
+              var a = cleanString(match[3]);
+              var home = h == "WILD CARD"
+                ? { group: null, pos: null }
+                : JSON.parse(h);
+              var away = a == "WILD CARD"
+                ? { group: null, pos: null }
+                : JSON.parse(a);
+            } catch (e) {
+              throw e;
+            }
 
-              var data = {
-                home: home,
-                away: away
-              };
+            var data = {
+              home: home,
+              away: away
+            };
 
-              var matchesFound = matches.filter(matchFilter(data));
+            var matchesFound = matches.filter(matchFilter(data));
 
-              if (matchesFound.length == 0) {
-                console.log(
-                  `-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`
-                );
-                return null;
-              }
-              else if (matchesFound[0].played == true) {
-                console.log(`SKIPPING MATCH ${matchesFound[0].id} AS IT IS ALREADY PLAYED`);
-              }
-              else {
+            if (matchesFound.length == 0) {
+              console.log(
+                `-- ${currentSheet}:${currentRow} - no match found for ${JSON.stringify(home)} vs ${JSON.stringify(away)}`
+              );
+              return null;
+            } else if (matchesFound[0].played == true) {
+              console.log(
+                `SKIPPING MATCH ${matchesFound[0].id} AS IT IS ALREADY PLAYED`
+              );
+            } else {
+              timeoutCounter += 1000;
+              setTimeout(() => {
                 var thisMatch = matchesFound[0];
                 const matchId = thisMatch.id;
                 const excelHomeTeamName = cleanString(match[1]);
@@ -438,64 +438,43 @@ getMatches()
                       throw e;
                     })
                     .then(() => {
-                      body = {
-                        played: true,
-                        home_team_score: isHome(excelHomeTeamName, thisMatch)
-                          ? excelHomeScore
-                          : excelAwayScore,
-                        visitor_team_score: isHome(excelHomeTeamName, thisMatch)
-                          ? excelAwayScore
-                          : excelHomeScore
-                      };
-
-                      fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
+                      body = [];
+                      for (var i = 1; i <= excelAwayScore; i++) {
+                        body.push({
+                          event_id: 1,
+                          team_id: getTeamId(excelAwayTeamName, thisMatch)
+                        });
+                      }
+                      fetch(
+                        `${api}/match/${thisMatch.id}/event`,
+                        getRQ(body, "POST")
+                      )
                         .then(res => res.json())
                         .then(res => res.data)
                         .catch(e => {
                           throw e;
+                        })
+                        .then(() => {
+                          body = {
+                            played: true
+                          };
+
+                          fetch(
+                            `${api}/match/${thisMatch.id}`,
+                            getRQ(body, "PUT")
+                          )
+                            .then(res => res.json())
+                            .then(res => res.data)
+                            .catch(e => {
+                              throw e;
+                            });
                         });
                     });
-
-                  body = [];
-                  for (var i = 1; i <= excelAwayScore; i++) {
-                    body.push({
-                      event_id: 1,
-                      team_id: getTeamId(excelAwayTeamName, thisMatch)
-                    });
-                  }
-                  fetch(
-                    `${api}/match/${thisMatch.id}/event`,
-                    getRQ(body, "POST")
-                  )
-                    .then(res => res.json())
-                    .then(res => res.data)
-                    .catch(e => {
-                      throw e;
-                    })
-                    .then(() => {
-                      body = {
-                        played: true,
-                        home_team_score: isHome(excelHomeTeamName, thisMatch)
-                          ? excelHomeScore
-                          : excelAwayScore,
-                        visitor_team_score: isHome(excelHomeTeamName, thisMatch)
-                          ? excelAwayScore
-                          : excelHomeScore
-                      };
-
-                      fetch(`${api}/match/${thisMatch.id}`, getRQ(body, "PUT"))
-                        .then(res => res.json())
-                        .then(res => res.data)
-                        .catch(e => {
-                          throw e;
-                        });
-                    });
-
                 }
-              }
+              }, timeoutCounter);
             }
-          });
-        }, timeoutCounter);
+          }
+        });
       });
   })
   .catch(e => {

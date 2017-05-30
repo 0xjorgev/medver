@@ -211,7 +211,7 @@ define(['./base_model'
 
 						return stands.find(x => x.position == ph.position && x.group_id == ph.group_id)
 					})
-					
+
 					// logger.debug('teamsToInsert')
 					// logger.debug(teamsToInsert)
 

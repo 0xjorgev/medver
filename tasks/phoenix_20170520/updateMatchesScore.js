@@ -260,6 +260,8 @@ const structure = [
   }
 ];
 
+
+// Get all the matches for the given structure
 getMatches = () => {
   const promises = structure.map(cat => {
     return fetch(`${api}/category/${cat.category_id}/match`)

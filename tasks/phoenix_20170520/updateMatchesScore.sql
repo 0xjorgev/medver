@@ -19,3 +19,6 @@ DELETE FROM standing_tables WHERE group_id IN (355, 359, 360, 361, 362, 364);
 
 -- Fix Phase 2 of NCA U16
 UPDATE matches SET visitor_team_id = null, home_team_id = null WHERE group_id IN (369,363,371,370);
+
+-- standing table query
+-- select team_id, group_id, points, row_number() over (partition by group_id order by points desc, (goals_in_favor - goals_against) desc, goals_in_favor desc, goals_against desc, matches_won desc, matches_lost desc, matches_draw desc) as position from standing_tables  where phase_id in (227);

@@ -16,11 +16,11 @@ define(['./base_model','../util/knex_util' ], (DB, Knex) => {
 			return this.belongsTo('Group', 'group_id');
 		}
 	},{
-		getPositions: function(groupId){
-			const query = 'select team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position'
+		getPositionsByPhase: function(phaseId){
+			const query = 'select team_id, group_id, points, row_number() over (partition by group_id order by points desc, (goals_in_favor - goals_against) desc, goals_in_favor desc, goals_against desc, matches_won desc, matches_lost desc, matches_draw desc) as position'
 			+ ' from standing_tables '
-			+ ' where group_id in (?) '
-			return Knex.raw(query, [groupId])
+			+ ' where phase_id in (?) '
+			return Knex.raw(query, [phaseId])
 		}
 	})
 	return DB.model('StandingTable', StandingTable)

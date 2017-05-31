@@ -47,14 +47,16 @@ define(['./base_model', '../util/knex_util', '../util/logger_util', 'lodash']
 				return result
 			})
 		}
+
 		//actualiza el campo position_in_group segun los resultados de la standing table asociada al grupo
 		,updatePositionsInGroup: function(groupId){
+			logger.debug('updatePositionsInGroup')
+			logger.debug(`Se actualiza spider de ${groupId} de acuerdo a su standing table`)
 
-			// cuando se cierra la fase inicial, esto funciona
 			const query = 'update categories_groups_phases_teams ' +
 			' set position_in_group = st.position, team_id = st.team_id ' +
-			' from (select ' +
-			' id, team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position ' +
+			' from (select id, team_id, group_id, points, ' +
+			' row_number() over (partition by group_id order by points desc, (goals_in_favor - goals_against) desc, goals_in_favor desc, goals_against desc, matches_won desc, matches_lost desc, matches_draw desc) as position ' +
 			' from standing_tables where group_id = ?) as st' +
 			' where categories_groups_phases_teams.group_id = ? ' +
 			' and categories_groups_phases_teams.team_id = st.team_id'

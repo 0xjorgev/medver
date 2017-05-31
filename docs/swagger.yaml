@@ -86,6 +86,17 @@ paths:
       responses:
         200:
           description: List of services and call count
+
+  /core/spider/build:
+    post:
+      summary: creates missing categories_groups_phases_teams records according to groups.participantsw
+      description: creates missing categories_groups_phases_teams records according to groups.participants
+      tags:
+        - Core
+      responses:
+        200:
+          description: List of services and call count
+
   /core/s3_signed_url:
     get:
       summary: Returns a signed URL to upload a file to SomoSport
@@ -106,6 +117,7 @@ paths:
       responses:
         200:
           description: A signed url for upload; a final URL to access the file
+  
   /core/feed/rebuild:
     post:
       summary: Rebuilds feed items. Truncates feed item table.

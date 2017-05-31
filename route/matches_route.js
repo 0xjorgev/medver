@@ -9,7 +9,6 @@ define(['express'
 	,'util'
 	,'../util/response_message_util'
 	,'../helpers/standing_table_helper'
-	,'../helpers/team_placeholders_helper'
 	,'../util/generic_util'
 	,'../util/logger_util'
 	,'../helpers/feed_item_helper'
@@ -22,7 +21,6 @@ define(['express'
 	,util
 	,Response
 	,StandingTable
-	,PlaceholdersHelper
 	,utilities
 	,logger
 	,FeedItemHelper
@@ -255,24 +253,24 @@ define(['express'
 
 		//datos para los placeholders
 		// si se envia un team_id, para home o visitor, se elimina la informacion del placeholder correspondiente
-		if(data.home_team_id == undefined || data.home_team_id == null){
-			if(data.placeholder_home_team_group != undefined)
-				matchData.placeholder_home_team_group = data.placeholder_home_team_group
-			if(data.placeholder_home_team_position != undefined)
-				matchData.placeholder_home_team_position = data.placeholder_home_team_position
-		}
+		// if(data.home_team_id == undefined || data.home_team_id == null){
+		if(data.placeholder_home_team_group != undefined)
+			matchData.placeholder_home_team_group = data.placeholder_home_team_group
+		if(data.placeholder_home_team_position != undefined)
+			matchData.placeholder_home_team_position = data.placeholder_home_team_position
+		// }
 		//por el momento no voy a a eliminar los campos
 		// else {
 		// 	matchData.placeholder_home_team_group = null
 		// 	matchData.placeholder_home_team_position = null
 		// }
 
-		if(data.visitor_team_id == undefined || data.visitor_team_id == null){
-			if(data.placeholder_visitor_team_group != undefined)
-				matchData.placeholder_visitor_team_group = data.placeholder_visitor_team_group
-			if(data.placeholder_visitor_team_position != undefined)
-				matchData.placeholder_visitor_team_position = data.placeholder_visitor_team_position
-		}
+		// if(data.visitor_team_id == undefined || data.visitor_team_id == null){
+		if(data.placeholder_visitor_team_group != undefined)
+			matchData.placeholder_visitor_team_group = data.placeholder_visitor_team_group
+		if(data.placeholder_visitor_team_position != undefined)
+			matchData.placeholder_visitor_team_position = data.placeholder_visitor_team_position
+		// }
 		// else {
 		// 	matchData.placeholder_visitor_team_group = null
 		// 	matchData.placeholder_visitor_team_position = null
@@ -318,6 +316,9 @@ define(['express'
 
 			//se actualiza el standing_table del grupo del match
 			if(data.played && data.played === true){
+				//TODO: calcular el score del partido
+				// __match.updateScore()
+
 				return StandingTable
 				.calculateByPhase(__match.related('group').get('phase_id'))
 				.then(() => {
@@ -331,32 +332,33 @@ define(['express'
 						.related('matches')
 						.reduce((flag, match) => flag && match.get('played'), true)
 
-					logger.debug(`phase ${phase.id} [${phase.get('category_id')}] IsClosed ${phaseIsClosed}`)
+					logger.debug(`Category ${phase.get('category_id')}, Phase ${phase.id}  is closed? ${phaseIsClosed}`)
 					if(phaseIsClosed){
-						logger.debug('updating placeholders')
+						logger.debug('Updating placeholders')
 						//se busca la siguiente fase
 						return Models.phase
 							.where({category_id: phase.get('category_id'), position: phase.get('position') + 1})
 							.fetch({withRelated: 'groups'})
 							.then(nextPhase => {
 								//si es la fase final, no se requiere la ejecucion
-								if(nextPhase == null) return null
+								if(nextPhase == null) {
+									logger.debug(`Phase ${phase.id} has no next phase`)
+									return null
+								}
 
 								return Promise.all(
-									//se actualizan las posiciones de la proxima fase
-									nextPhase.related('groups')
-									.map(g => g.updateTeamsByPosition())
-								)
-								.then(() => Promise.all(
 									//se reemplazan los placeholders
 									nextPhase.related('groups')
 									.map(g => g.updateMatchPlaceholders())
-								))
-								.catch( e => logger.error(e) )
+								)
+								.catch( e => {
+									logger.error(e)
+									logger.error(e.stack)
+								})
 							})
 					}
 					else{
-						logger.debug('no se ejecuta el replacePlaceholders')
+						logger.debug(`Phase ${phase.id} is not closed, placeholders of next phase not replaced`)
 						//no se hace el replace
 						return null
 					}

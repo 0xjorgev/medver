@@ -1,0 +1,144 @@
+-- delete from standing_tables where phase_id = 104;
+
+update groups set participant_team = 2 where participant_team < 2 or participant_team is null ;
+
+update categories_groups_phases_teams set position_in_group = 0 where position_in_group is null
+
+select categories_groups_phases_teams.id, categories_groups_phases_teams.group_id, position_in_group, participant_team, num
+from groups
+inner join (select group_id, count(position_in_group) as num from categories_groups_phases_teams group by group_id) as t on t.group_id = groups.id
+inner join categories_groups_phases_teams on categories_groups_phases_teams.group_id = groups.id
+where num > participant_team
+and groups.active = true
+
+
+select group_id, position_in_group, updated_at
+from categories_groups_phases_teams
+where group_id = 340
+order by 1,2;
+
+select category_id, phase_id, group_id, team_id, position_in_group
+from categories_groups_phases_teams
+where category_id = 97
+-- where phase_id is null
+-- where group_id = 355
+-- and status_id != 3
+order by 1,2,3,5;
+
+select team_id, group_id, points, row_number() over (partition by group_id order by points desc) as position
+-- select *
+from standing_tables
+-- where group_id = 355
+where phase_id = 92
+order by category_id, phase_id, group_id;
+
+select group_id from categories_groups_phases_teams where phase_id is null and group_id is not null;
+
+select id, name from teams where id = 132;
+
+update categories_groups_phases_teams set position_in_group = 1 where id = 234;
+
+
+
+
+-- las posiciones #2 no se actualizaron, estaban en null
+-- R: lo que paso fue que se rechazaron los equipos y no se actualizaron las posiciones
+
+-- hay registros en spider con el group_id en null
+-- hay que determinar cuando esta pasando esto
+-- podria estar pasando cuando se modifica la posicion
+update categories_groups_phases_teams set phase_id = t.phase_id
+from
+(select group_id, groups.phase_id from categories_groups_phases_teams
+	inner join groups on groups.id = categories_groups_phases_teams.group_id
+	where categories_groups_phases_teams.phase_id is null
+	and categories_groups_phases_teams.group_id is not null) as t
+where categories_groups_phases_teams.group_id = t.group_id
+
+update matches set played = false where home_team_id is null or visitor_team_id is null;
+
+
+select * from phases where category_id = 97; -- (216, 217)
+select * from groups where phase_id in (216, 217);
+
+-- hay que completar los slots de la spider
+insert into categories_groups_phases_teams
+	(category_id, phase_id, group_id, position_in_group)
+	values
+	(97, 217, 335, 1)
+	,(97, 217, 335, 2)
+	,(97, 217, 338, 1)
+	,(97, 217, 338, 2)
+	(97, 216, 336, 2)
+
+select groups.* from groups
+left join categories_groups_phases_teams on groups.id = categories_groups_phases_teams.group_id
+where categories_groups_phases_teams.group_id is null
+
+select * from categories_groups_phases_teams
+-- where group_id = 359;
+where team_id = 90;
+
+update matches set home_team_id = null, visitor_team_id = null where id in (1569,1571,1572,1570)
+
+delete from standing_tables where category_id = 86;
+
+delete from categories_groups_phases_teams where phase_id = 212;
+
+select * from categories_groups_phases_teams where phase_id = 212;
+
+
+select categories_groups_phases_teams.phase_id
+	,categories_groups_phases_teams.group_id
+	,categories_groups_phases_teams.category_id
+	,categories_groups_phases_teams.team_id
+	-- ,matches.id as match_id
+from categories_groups_phases_teams
+inner join groups on groups.id = categories_groups_phases_teams.group_id
+-- inner join matches on (home_team_id = team_id or visitor_team_id = team_id)
+where categories_groups_phases_teams.phase_id = 212
+and categories_groups_phases_teams.group_id is not null
+-- and matches.played = true
+-- and matches.active = true
+
+-- equipo debe tener pos inicial en spider
+select * from categories_groups_phases_teams where category_id = 97
+order by category_id, phase_id, group_id, position_in_group;
+
+select group_id, team_id, position_in_group from categories_groups_phases_teams where group_id in (335, 338)
+order by group_id, position_in_group;
+
+select * from standing_tables where phase_id = 217
+
+-- posiciones iniciales
+update categories_groups_phases_teams set position_in_group = 1 where team_id = 160 and group_id = 334;
+update categories_groups_phases_teams set position_in_group = 2 where team_id = 164 and group_id = 334;
+update categories_groups_phases_teams set position_in_group = 3 where team_id = 165 and group_id = 334;
+update categories_groups_phases_teams set position_in_group = 1 where team_id = 171 and group_id = 337;
+update categories_groups_phases_teams set position_in_group = 2 where team_id = 174 and group_id = 337;
+update categories_groups_phases_teams set position_in_group = 3 where team_id = 175 and group_id = 337;
+
+-- reset matches f1 y f2
+update matches set home_team_id = null, visitor_team_id = null where group_id in (334,337,338,335,336);
+delete from standing_tables where group_id in (334,337,338,335,336);
+
+-- QUERY DEL CALCULO DE STANDING, para saber el grupo bajo el cual jugo el equipo
+select categories_groups_phases_teams.phase_id
+	,categories_groups_phases_teams.group_id
+	,categories_groups_phases_teams.category_id
+	,categories_groups_phases_teams.team_id
+	,matches.id as match_id
+from categories_groups_phases_teams
+inner join groups on groups.id = categories_groups_phases_teams.group_id
+inner join matches on (home_team_id = team_id or visitor_team_id = team_id)
+where categories_groups_phases_teams.phase_id = 217
+and categories_groups_phases_teams.group_id is not null
+and matches.played = true
+and matches.active = true
+
+select * from events_matches_players where match_id in (1591, 1592)
+
+
+select team_id, group_id, points, row_number() over (partition by group_id order by points desc, goals_in_favor desc, goals_against desc, matches_won desc, matches_lost desc, matches_draw desc) as position
+from standing_tables
+where phase_id in (217)

@@ -113,7 +113,7 @@ define(['express'
 		return Models.category
 			.where({id: category_id})
 			.where({active: true})
-			.fetch({withRelated: ['gender','phases', 'classification']})
+			.fetch({withRelated: ['gender','phases.groups','classification','category_type','season']})
 			.then(result => Response(res, result))
 			.catch(error => Response(res, null, error));
 	});
@@ -505,6 +505,8 @@ define(['express'
 		//TODO: creo que deberia verificar antes si ya existe el slot antes de salvarlo
 		//debido que ahora estoy creando slots en la spider cuando creo el grupo
 		//si mal no recuerdo, apenas se inscribe se pone en la 1era fase y en ningun grupo
+		//TODO: 2 - es posible que los registros creados por aqui sean los que no tienen
+		//phase id
 		return new Models.category_group_phase_team(spiderData)
 		.save()
 		.then(function(new_invitation){
@@ -833,6 +835,7 @@ define(['express'
 	// dada una fase, retorna los placeholders de posiciones en referencia a la fase anterior
 	// es decir, ganador grupo 1, posicion 2 grupo 3, etc
 	router.get('/:category_id/team_placeholders', (req, res) => {
+		logger.error('actualizando PH de todas las fases de la cat '+ req.params.category_id)
 		Models.category
 		.where({id: req.params.category_id})
 		.fetch({withRelated: ['phases.groups']})

@@ -23,7 +23,6 @@ define(['express',
 	        .fetchAll()
 	        .then(function (result) {
             console.log(result)
-
 	            Message(res,'Success', '0', result);
 	        }).catch(function(error){
 	            Message(res,error.details, error.code, []);
@@ -32,7 +31,6 @@ define(['express',
 
 	    router.get('/:id', function (req, res) {
 	    	var paciente_id = req.params.id;
-
 	        return Models.paciente
 	        .where({id:paciente_id})
 	        .fetch({withRelated:[]})

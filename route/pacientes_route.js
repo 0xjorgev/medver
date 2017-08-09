@@ -103,37 +103,53 @@ define(['express',
         	var pac_id = req.params.pac_id;
         	var pac_upd = req.body;
 
-        	// var competition_id = season_upd.competition_id;
-        	// var name = season_upd.name;
-        	// var description = season_upd.description;
-        	// var game_title = season_upd.game_title;
+        	console.log('--------------------');
+        	console.log("pac_id: " + pac_id);
+        	console.log(`pac_upd: `, pac_upd);
+        	console.log('--------------------');
 
-        	// console.log('--------------------');
-        	// console.log("competition_id: " + competition_id);
-        	// console.log("name: " + name);
-        	// console.log("description: " + description);
-        	// console.log("game_title: " + game_title);
-        	// console.log('--------------------');
+        	var pu = {}
+        	pu.id = pac_upd.id
+			pu.nombre = pac_upd.nombre
+			pu.apellido = pac_upd.apellido
+			pu.alergia = pac_upd.alergia
+			pu.email = pac_upd.email
+			pu.telefono_principal = pac_upd.telefono_principal
+			pu.sexo = pac_upd.sexo
+			pu.cedula = pac_upd.cedula
+			pu.historia_anterior = pac_upd.historia_anterior
+			pu.active = pac_upd.active
+			pu.fecha_nacimiento = pac_upd.fecha_nacimiento
+			pu.historia_id = pac_upd.historia_id
+			pu.telefono_movil = pac_upd.telefono_movil
+			pu.telefono_emergencias = pac_upd.telefono_emergencias
+			pu.tipo_documento = pac_upd.tipo_documento
+			pu.sigla_documento = pac_upd.sigla_documento
+			pu.numero_documento = pac_upd.numero_documento
+
+        	console.log('--------------------');
+        	console.log(`pu: `, pu);
+        	console.log('--------------------');
 
 	        Knex(paciente.tableName)
-	        .where('id','=',pac_id)
-	        .where('active','=',1)
-	        .update(pac_upd, ['id'])
+	        .where('id', '=', pu.id)
+	        .update(pu, ['id'])
 	        .then(function(result){
 	            if (result.length != 0){
 	                console.log('result is not null');
 	                console.log(`result: ${result[0]}`);
 	                // var email = result[0].email;
-	            // send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
-	            Message(res, 'Success', '0', result);
+	            	// send_email_from(email, 'Your new Somosport Password!', `Your new somosport Password is: ${generated_password}` );
+	            	Message(res, 'Success', '0', result);
 	            } else {
 	                Message(res, 'paciente not found', '404', result);
 	            }
 	        })
 	        .catch(function(err){
-	          Message(res, err.detail, err.code, null);
+	        	console.log(err)
+	          	Message(res, err.detail, err.code, null);
 	        });
-    });
+    	});
 
 	   	router.get('/:id/historia', function (req, res) {
 	    	var paciente_id = req.params.id;

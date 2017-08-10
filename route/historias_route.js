@@ -28,7 +28,7 @@ define(['express',
 	    router.get('/:historia_id', function (req, res) {
 
 	    	var historia_id = req.params.historia_id;
-			console.log('History Id :'+ historia_id);
+			// console.log('History Id :'+ historia_id);
 	        return Models.historia
 	        .where({id:historia_id})
 	        .fetch({withRelated:['consultas'], debug:true})
@@ -41,7 +41,7 @@ define(['express',
 
 	    //Create Medical History Record
 	   	router.post('/', function (req, res) {
-			console.log('Creacion de Historia Medica');
+			// console.log('Creacion de Historia Medica');
 			var Historia = Models.historia;
 			var hist_post = req.body;
 			var historia_anterior = hist_post.historia_anterior;
@@ -57,7 +57,7 @@ define(['express',
 			})
 			.save()
 			.then(function(new_historia){
-				console.log(`{new_historia: ${new_historia}}`);
+				// console.log(`{new_historia: ${new_historia}}`);
             	Message(res, 'Success', '0', new_historia);
 			})
 			.catch(function(error){
@@ -68,30 +68,30 @@ define(['express',
 
 	    router.put('/:historia_id', function(req, res, next){
 
-	        console.log('Update Historia Medica');
+	        // console.log('Update Historia Medica');
 	        //Model Instance
 	        var historia = new Models.historia;
 
 	        //URL Request, Season Id
 	        var historia_id = req.params.historia_id;
 
-        	console.log('--------------------');
-        	console.log("historia_id: " + historia_id);
-        	console.log(`req.body: `, req.body);
-        	console.log('--------------------');
+        	// console.log('--------------------');
+        	// console.log("historia_id: " + historia_id);
+        	// console.log(`req.body: `, req.body);
+        	// console.log('--------------------');
 
         	var hist = {}
-        	hist.id = req.body.id
-        	hist.historia_anterior = req.body.historia_anterior
-        	hist.evolucion = req.body.evolucion
-        	hist.contenido = req.body.contenido
-        	hist.antecedente = req.body.antecedente
+        	if (req.body.id != undefined) hist.id = req.body.id
+        	if (req.body.historia_anterior != undefined) hist.historia_anterior = req.body.historia_anterior
+        	if (req.body.evolucion != undefined) hist.evolucion = req.body.evolucion
+        	if (req.body.contenido != undefined) hist.contenido = req.body.contenido
+        	if (req.body.antecedente != undefined) hist.antecedente = req.body.antecedente
 
-			console.log('--------------------')
-			console.log("historia_id: " + historia_id)
-			console.log(`req.body: `, req.body)
-			console.log(`hist: `, hist)
-			console.log('--------------------')
+			// console.log('--------------------')
+			// console.log("historia_id: " + historia_id)
+			// console.log(`req.body: `, req.body)
+			// console.log(`hist: `, hist)
+			// console.log('--------------------')
 
 	        new Models.historia(hist).save()
 	        // .where('id','=',historia_id)
@@ -99,8 +99,8 @@ define(['express',
 	        // .update(hist, ['id'])
 	        .then(function(result){
 	            if (result.length != 0){
-	                console.log('result is not null');
-	                console.log(`result: ${result[0]}`);
+	                // console.log('result is not null');
+	                // console.log(`result: ${result[0]}`);
 	            	Message(res, 'Success', '0', result);
 	            } else {
 	                Message(res, 'Historia not found', '404', result);
@@ -108,7 +108,7 @@ define(['express',
 	        })
 	        .catch(function(err){
 	            console.log(`error: ${err}`);
-	          Message(res, err.detail, err.code, null);
+	          	Message(res, err.detail, err.code, null);
 	        });
 	    });
 
